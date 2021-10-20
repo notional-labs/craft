@@ -7,7 +7,7 @@ require (
 	github.com/cosmos/ibc-go v1.2.2
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/spf13/cast v1.3.1
-	github.com/tendermint/spm v0.1.6
+	github.com/tendermint/spm v0.1.7
 	github.com/tendermint/tendermint v0.34.14
 	github.com/tendermint/tm-db v0.6.4
 )
