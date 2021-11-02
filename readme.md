@@ -1,7 +1,7 @@
 # Craft Economy
 > This is the Craft Economy Mainnet (craftnet-1)
 
-> GENESIS PUBLISHED `https://ipfs.io/ipfs/QmcuMhkRVyhTdRmsx5Mh8tBVA7145KQwvfrNiTE8FzMGFM`
+> [GENESIS](https://ipfs.io/ipfs/QmcuMhkRVyhTdRmsx5Mh8tBVA7145KQwvfrNiTE8FzMGFM) PUBLISHED
 
 > PEERS PUBLISHED `0b9b1eedc4cd011bc03320a4fa4876b863ec263c@143.198.94.140:1337`
 
@@ -86,12 +86,12 @@ craftd gentx {{KEY_NAME}} 10000000ucraft \
 --website="<your_website>"
 ```
 * Copy the contents of `${HOME}/.craftd/config/gentx/gentx-XXXXXXXX.json`.
-* Fork the [repository](https://github.com/comdex-official/networks/)
-* Create a file `gentx-{{VALIDATOR_NAME}}.json` under the mainnet/craftnet-1/gentxs folder in the forked repo, paste the copied text into the file. Find reference file gentx-examplexxxxxxxx.json in the same folder.
+* Fork the [repository](https://github.com/ChandraStation/craft/tree/master/networks/mainnet)
+* Create a file `gentx-{{VALIDATOR_NAME}}.json` under the mainnet/craftnet-1/GENTX folder in the forked repo, paste the copied text into the file. Find reference file gentx-examplexxxxxxxx.json in the same folder.
 * Run `craftd tendermint show-node-id` and copy your nodeID.
 * Run `ifconfig` or `curl ipinfo.io/ip` and copy your publicly reachable IP address.
-* Create a file `peers-{{VALIDATOR_NAME}}.json` under the mainnet/craftnet-1/peers folder in the forked repo, paste the copied text from the last two steps into the file. Find reference file sample-peers.json in the same folder.
-* Create a Pull Request to the `main` branch of the [repository](https://github.com/comdex-official/networks)
+* Create a file `peers-{{VALIDATOR_NAME}}.json` under the mainnet/craftnet-1/PEERS folder in the forked repo, paste the copied text from the last two steps into the file. Find reference file sample-peers.json in the same folder.
+* Create a Pull Request to the `main` branch of the [repository](https://github.com/ChandraStation/craft/tree/master/networks/mainnet)
 >**NOTE:** The Pull Request will be merged by the maintainers to confirm the inclusion of the validator at the genesis. The final genesis file will be published under the file mainnet/craftnet-1/genesis_final.json.
 * Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of mainnet/craftnet-1/genesis_final.json.
 * Copy below node as `persistent_peers` or `seeds` in `${HOME}/.craftd/config/config.toml`
@@ -158,7 +158,7 @@ comdex init {{NODE_NAME}}
 ```shell
 comdex start
 ```
-* Acquire $ucmdx by sending a message to the validators channel in [Discord](https://discord.gg/gH6RTrnexk).
+* Acquire $ucmdx by sending a message to the validators channel in [Discord](https://discord.gg/ezBFgZkE).
 * Run `comdex tendermint show-validator` and copy your consensus public key.
 * Send a create-validator transaction
 ```
