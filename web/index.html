@@ -239,7 +239,14 @@
           //   bech32PrefixConsAddr: string;
           //   bech32PrefixConsPub: string;
           // }
-          bech32Config: defaultBech32Config("craft"),
+          bech32Config: {
+            bech32PrefixAccAddr: "craft",
+            bech32PrefixAccPub: "craft" + "pub",
+            bech32PrefixValAddr: "craft" + "valoper",
+            bech32PrefixValPub: "craft" + "valoperpub",
+            bech32PrefixConsAddr: "craft" + "valcons",
+            bech32PrefixConsPub: "craft" + "valconspub",
+          },
           // List of all coin/tokens used in this chain.
           currencies: [{
             // Coin denomination to be displayed to the user.
