@@ -1,11 +1,18 @@
 # craft
 **craft** is a blockchain economy where value is derived from accomplishments in MineCraft.
 
-## Get started
 
-```
-starport chain serve
-```
+## How it work:
 
-`serve` command installs dependencies, builds, initializes, and starts your blockchain in development.
+This chain is a DAO.
+
+* Non transferrable staking token called `exp`
+  * can be minted, and sold for foriegn ibc assets by the DAO (chain as DAO model) 
+    * Purchasers of exp join the DAO and gain decisionmaking rights
+* Monetary token called craft for the purchase of in-game items
+* Flutter mobile app for smooth signing
+* CosmWasm for easy upgrades
+
+
+
 
