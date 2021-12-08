@@ -1,5 +1,5 @@
 # craft
-**craft** is a blockchain economy where value is derived from accomplishments in MineCraft.
+**craft** is a DAO that operates minecraft server(s).
 
 
 ## How it work:
