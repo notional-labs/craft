@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: compile dig
+name: compile craft
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -28,10 +28,11 @@ jobs:
           GOOS: ${{ matrix.targetos }}
           GOARCH: ${{ matrix.arch }}
 
+# we build and install in case we want to run it or capture an artifact as we do in the step below. 
       - name: Compile dig
         run: |
           go mod download
-          cd cmd/digd
+          cd cmd/craftd
           go build .
           go install .
 
