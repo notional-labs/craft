@@ -42,4 +42,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: digd ${{ matrix.targetos }} ${{ matrix.arch }}
-          path: cmd/digd
+          path: cmd/craftd
