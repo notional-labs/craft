@@ -35,13 +35,6 @@ jobs:
           cd cmd/craftd
           go build .
           go install .
-
-      - name: Compile airdrop
-        run: |
-          cd airdrop
-          go mod download
-          go build .
-          go install .
         
           
           
