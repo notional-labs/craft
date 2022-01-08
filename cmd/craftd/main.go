@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/notional-labs/craft/app"
 	"github.com/tendermint/spm/cosmoscmd"
 )
