@@ -9,18 +9,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -68,14 +66,14 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/cosmos/ibc-go/v2/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v2/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v2/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v2/modules/core/02-client"
-	ibcporttypes "github.com/cosmos/ibc-go/v2/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/v2/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
+	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v3/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
+	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -180,9 +178,9 @@ type App struct {
 	invCheckPeriod uint
 
 	// keys to access the substores
-	keys    map[string]*sdk.KVStoreKey
-	tkeys   map[string]*sdk.TransientStoreKey
-	memKeys map[string]*sdk.MemoryStoreKey
+	keys    map[string]*storetypes.KVStoreKey
+	tkeys   map[string]*storetypes.TransientStoreKey
+	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// keepers
 	AccountKeeper    authkeeper.AccountKeeper
@@ -228,7 +226,7 @@ func New(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
-	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
+	bApp := baseapp.NewBaseApp(Name, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
@@ -269,7 +267,7 @@ func New(
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
-		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
+		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(),
 	)
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
@@ -283,7 +281,7 @@ func New(
 	)
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec, keys[distrtypes.StoreKey], app.GetSubspace(distrtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
-		&stakingKeeper, authtypes.FeeCollectorName, app.ModuleAccountAddrs(),
+		&stakingKeeper, authtypes.FeeCollectorName,
 	)
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec, keys[slashingtypes.StoreKey], &stakingKeeper, app.GetSubspace(slashingtypes.ModuleName),
@@ -318,7 +316,7 @@ func New(
 
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
+		appCodec, keys[ibctransfertypes.keys], app.GetSubspace(ibctransfertypes.ModuleName),
 		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
@@ -340,7 +338,7 @@ func New(
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transfer.IBCModule{})
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -515,21 +513,21 @@ func (app *App) InterfaceRegistry() types.InterfaceRegistry {
 // GetKey returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *App) GetKey(storeKey string) *sdk.KVStoreKey {
+func (app *App) GetKey(storeKey string) *storetypes.KVStoreKey {
 	return app.keys[storeKey]
 }
 
 // GetTKey returns the TransientStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *App) GetTKey(storeKey string) *sdk.TransientStoreKey {
+func (app *App) GetTKey(storeKey string) *storetypes.TransientStoreKey {
 	return app.tkeys[storeKey]
 }
 
 // GetMemKey returns the MemStoreKey for the provided mem key.
 //
 // NOTE: This is solely used for testing purposes.
-func (app *App) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
+func (app *App) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
 	return app.memKeys[storeKey]
 }
 
@@ -545,9 +543,6 @@ func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 // API server.
 func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
-	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
-	// Register legacy tx routes.
-	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tendermint queries routes from grpc-gateway.
@@ -582,7 +577,7 @@ func GetMaccPerms() map[string][]string {
 }
 
 // initParamsKeeper init params keeper and its subspaces
-func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
+func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
 	paramsKeeper.Subspace(authtypes.ModuleName)
@@ -591,7 +586,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(minttypes.ModuleName)
 	paramsKeeper.Subspace(distrtypes.ModuleName)
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
-	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
+	paramsKeeper.Subspace(govtypes.ModuleName)
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)

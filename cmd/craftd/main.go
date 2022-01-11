@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/notional-labs/craft/app"
 	"github.com/tendermint/spm/cosmoscmd"
 )
@@ -17,7 +18,7 @@ func main() {
 		app.New,
 		// this line is used by starport scaffolding # root/arguments
 	)
-	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
+	if err := cmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
 		os.Exit(1)
 	}
 }
