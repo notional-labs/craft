@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/cosmos/cosmos-sdk v0.45.0
+	github.com/cosmos/cosmos-sdk/x/group v0.0.0-20220111181638-6beb07992408
 	github.com/cosmos/ibc-go/v3 v3.0.0-alpha2
 	github.com/spf13/cast v1.4.1
 	github.com/tendermint/spm v0.1.9
@@ -35,7 +36,6 @@ require (
 	github.com/cosmos/cosmos-proto v1.0.0-alpha6 // indirect
 	github.com/cosmos/cosmos-sdk/db v0.0.0 // indirect
 	github.com/cosmos/cosmos-sdk/errors v1.0.0-beta.2 // indirect
-	github.com/cosmos/cosmos-sdk/x/group v0.0.0-20220111181638-6beb07992408 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/iavl v0.17.3 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.11.1 // indirect
