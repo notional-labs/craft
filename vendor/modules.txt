@@ -180,6 +180,8 @@ github.com/cosmos/cosmos-sdk/store/listenkv
 github.com/cosmos/cosmos-sdk/store/mem
 github.com/cosmos/cosmos-sdk/store/prefix
 github.com/cosmos/cosmos-sdk/store/rootmulti
+github.com/cosmos/cosmos-sdk/store/streaming
+github.com/cosmos/cosmos-sdk/store/streaming/file
 github.com/cosmos/cosmos-sdk/store/tracekv
 github.com/cosmos/cosmos-sdk/store/transient
 github.com/cosmos/cosmos-sdk/store/types
@@ -413,6 +415,7 @@ github.com/cosmos/ibc-go/v3/modules/core/types
 github.com/cosmos/ibc-go/v3/modules/light-clients/06-solomachine/types
 github.com/cosmos/ibc-go/v3/modules/light-clients/07-tendermint/types
 github.com/cosmos/ibc-go/v3/modules/light-clients/09-localhost/types
+github.com/cosmos/ibc-go/v3/testing/mock
 # github.com/cosmos/ledger-cosmos-go v0.11.1
 ## explicit; go 1.12
 github.com/cosmos/ledger-cosmos-go
