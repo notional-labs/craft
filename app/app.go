@@ -223,9 +223,11 @@ func init() {
 type App struct {
 	*baseapp.BaseApp
 
-	cdc               *codec.LegacyAmino
+	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Codec
 	interfaceRegistry types.InterfaceRegistry
+	msgSvcRouter      *authmiddleware.MsgServiceRouter
+	legacyRouter      sdk.Router
 
 	invCheckPeriod uint
 
@@ -289,8 +291,9 @@ func New(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
-	appCodec := encodingConfig.Marshaler
-	cdc := encodingConfig.Amino
+
+	appCodec := encodingConfig.Codec
+	legacyAmino := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
 	bApp := baseapp.NewBaseApp(Name, logger, db, baseAppOptions...)
@@ -621,7 +624,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.SetTxHandler(encodingConfig.TxConfig, cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents)))
+	app.setTxHandler(encodingConfig.TxConfig, cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents)))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -675,7 +678,7 @@ func (app *App) ModuleAccountAddrs() map[string]bool {
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
 func (app *App) LegacyAmino() *codec.LegacyAmino {
-	return app.cdc
+	return app.legacyAmino
 }
 
 // AppCodec returns an app codec.
@@ -746,6 +749,31 @@ func (app *App) RegisterTxService(clientCtx client.Context) {
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *App) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+}
+
+// Set Transaction Handler
+func (app *App) setTxHandler(txConfig client.TxConfig, indexEventsStr []string) {
+	indexEvents := map[string]struct{}{}
+	for _, e := range indexEventsStr {
+		indexEvents[e] = struct{}{}
+	}
+	txHandler, err := authmiddleware.NewDefaultTxHandler(authmiddleware.TxHandlerOptions{
+		Debug:            app.Trace(),
+		IndexEvents:      indexEvents,
+		LegacyRouter:     app.legacyRouter,
+		MsgServiceRouter: app.msgSvcRouter,
+		AccountKeeper:    app.AccountKeeper,
+		BankKeeper:       app.BankKeeper,
+		FeegrantKeeper:   app.FeeGrantKeeper,
+		SignModeHandler:  txConfig.SignModeHandler(),
+		SigGasConsumer:   authmiddleware.DefaultSigVerificationGasConsumer,
+		TxDecoder:        txConfig.TxDecoder(),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	app.SetTxHandler(txHandler)
 }
 
 // GetMaccPerms returns a copy of the module account permissions

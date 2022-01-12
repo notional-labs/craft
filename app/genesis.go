@@ -19,7 +19,7 @@ import (
 type GenesisState map[string]json.RawMessage
 
 // NewDefaultGenesisState generates the default state for the application.
-func NewDefaultGenesisState(cdc codec.JSONCodec) GenesisState {
+func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	return ModuleBasics.DefaultGenesis(cdc)
 }
 
@@ -27,7 +27,7 @@ func NewDefaultGenesisState(cdc codec.JSONCodec) GenesisState {
 // This is provided for compatibility between protobuf and amino implementations.
 type EncodingConfig struct {
 	InterfaceRegistry types.InterfaceRegistry
-	Marshaler         codec.Codec
+	Codec             codec.Codec
 	TxConfig          client.TxConfig
 	Amino             *codec.LegacyAmino
 }
