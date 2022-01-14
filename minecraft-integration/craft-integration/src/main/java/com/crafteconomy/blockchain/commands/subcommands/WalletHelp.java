@@ -19,6 +19,7 @@ public class WalletHelp implements SubCommand {
         "set <craft-wallet>",
         "pay <player|UUID|wallet> <amount>", 
         "supply",
+        "pending",
     };
     
     private final String[] ADMIN_HELP_MESSAGES = {        
@@ -26,7 +27,6 @@ public class WalletHelp implements SubCommand {
         "faketx <license/purchase> [item] &7- &4[TEMP].",
         "fakesign <Generated_TxID> &7- &4[TEMP].",
         "allpending &7- &4[TEMP].",
-        "pending &7- &4[TEMP].",
     };
 
 
