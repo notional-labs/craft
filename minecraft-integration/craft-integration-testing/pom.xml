@@ -5,9 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>sh.reece</groupId>
-  <artifactId>craft-integration-testing-0.0.0</artifactId>
+  <artifactId>craft-integration-testing</artifactId>
   <version>1.0-SNAPSHOT</version>
-
   <name>craft-integration-test-plugin</name>
 
   <properties>
@@ -17,13 +16,12 @@
   </properties>
 
   <repositories>
-      <!-- Spigot -->
       <repository>
-        <id>spigot-repo</id>
-        <url>https://gitlab.com/api/v4/projects/29869267/packages/maven</url>
+        <id>repsy</id>
+        <name>craft-integration</name>
+        <url>https://repo.repsy.io/mvn/reecepbcups/craft-integration</url>
       </repository>
-  
-      <!-- PaperMC -->
+
       <repository>
         <id>papermc</id>
         <url>https://papermc.io/repo/repository/maven-public/</url>
@@ -31,6 +29,12 @@
   </repositories>
 
   <dependencies>
+    <dependency>
+	    <groupId>com.crafteconomy</groupId>
+	    <artifactId>craft-integration</artifactId>
+	    <version>3.0.1</version>
+        <scope>provided</scope>
+	</dependency>
 
     <dependency> 
       <groupId>io.papermc.paper</groupId>
@@ -38,15 +42,6 @@
       <version>1.17.1-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>com.crafteconomy</groupId>
-      <artifactId>craftintegration</artifactId>
-      <version>3.0.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/external/craft-integration-3.0.0.jar</systemPath>
-    </dependency>
-
   </dependencies>
 
   <build>

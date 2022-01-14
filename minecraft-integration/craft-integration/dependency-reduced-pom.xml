@@ -4,7 +4,7 @@
   <groupId>com.crafteconomy</groupId>
   <artifactId>craft-integration</artifactId>
   <name>craft-integration</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <build>
     <resources>
       <resource>
@@ -52,14 +52,6 @@
   </build>
   <repositories>
     <repository>
-      <id>spigot-repo</id>
-      <url>https://gitlab.com/api/v4/projects/29869267/packages/maven</url>
-    </repository>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-    <repository>
       <id>papermc</id>
       <url>https://papermc.io/repo/repository/maven-public/</url>
     </repository>
@@ -78,18 +70,19 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.github.MilkBowl</groupId>
-      <artifactId>VaultAPI</artifactId>
-      <version>1.7</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.22</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>repsy</id>
+      <name>Maven Repo</name>
+      <url>https://repo.repsy.io/mvn/reecepbcups/craft-integration</url>
+    </repository>
+  </distributionManagement>
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

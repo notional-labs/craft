@@ -6,7 +6,7 @@
 
   <groupId>com.crafteconomy</groupId>
   <artifactId>craft-integration</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <name>craft-integration</name>
 
   <properties>
@@ -16,19 +16,16 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
+  <!-- Push to Maven Repo (Public) bvy Reecepbcups -->
+  <distributionManagement>
+    <repository>
+      <id>repsy</id>
+      <name>Maven Repo</name>
+      <url>https://repo.repsy.io/mvn/reecepbcups/craft-integration</url>
+    </repository>
+  </distributionManagement>
+
   <repositories>
-    <!-- Spigot -->
-    <repository>
-      <id>spigot-repo</id>
-      <url>https://gitlab.com/api/v4/projects/29869267/packages/maven</url>
-    </repository>
-
-    <!-- VaultAPI -->
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-
     <!-- PaperMC -->
     <repository>
       <id>papermc</id>
@@ -55,14 +52,13 @@
         <scope>provided</scope> <!-- To fix java.lang.LinkageError: loader constraint violation: loader 'craft-companies.jar' error? -->
     </dependency>
 
-
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
        <artifactId>json-simple</artifactId>
        <version>1.1</version>
     </dependency>
 
-    <!-- Used for Request -->
+    <!-- Used for Request to Blockchain -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>fluent-hc</artifactId>
@@ -81,13 +77,6 @@
       <groupId>redis.clients</groupId>
       <artifactId>jedis</artifactId>
       <version>4.0.0-rc2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.MilkBowl</groupId>
-      <artifactId>VaultAPI</artifactId>
-      <version>1.7</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency> <!-- Ensure you have Vscode lombok installed -->
