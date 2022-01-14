@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>sh.reece</groupId>
+  <artifactId>craft-integration-testing-0.0.0</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>craft-integration-test-plugin</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>16</maven.compiler.source>
+    <maven.compiler.target>16</maven.compiler.target>
+  </properties>
+
+  <repositories>
+      <!-- Spigot -->
+      <repository>
+        <id>spigot-repo</id>
+        <url>https://gitlab.com/api/v4/projects/29869267/packages/maven</url>
+      </repository>
+  
+      <!-- PaperMC -->
+      <repository>
+        <id>papermc</id>
+        <url>https://papermc.io/repo/repository/maven-public/</url>
+      </repository>
+  </repositories>
+
+  <dependencies>
+
+    <dependency> 
+      <groupId>io.papermc.paper</groupId>
+      <artifactId>paper-api</artifactId>
+      <version>1.17.1-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.crafteconomy</groupId>
+      <artifactId>craftintegration</artifactId>
+      <version>3.0.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/external/craft-integration-3.0.0.jar</systemPath>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.3.1</version>
+            <configuration>
+                <finalName>craft-integration-test-plugin</finalName>
+                <outputDirectory>${basedir}/../output</outputDirectory>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.3.2</version>
+            <configuration>
+                <source>${maven.compiler.source}</source>
+                <target>${maven.compiler.target}</target>
+            </configuration>
+        </plugin>
+        <plugin> 
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+    <resources>
+        <resource>
+            <directory>src/main/resources/</directory>
+            <filtering>true</filtering>
+        </resource>
+    </resources>
+</build>
+</project>

@@ -1,0 +1,26 @@
+name: craft-integration-test-plugin
+version: "1.0"
+author: Reecepbcups
+main: sh.reece.testingvault.Main
+description: Testing blockchain integration
+api-version: 1.17
+
+# Must use Paper Spigot!
+depend: ["craft-integration"]
+
+commands:
+  test-balanceapi:
+    description: test to get balance
+    usage: /<command>
+
+  test-walletapi:
+    description: test to get a users wallet
+    usage: /<command>
+
+  test-exampleapi:
+    description: creates a transaction for the main plugin (/wallet pending)
+    usage: /<command>
+
+  test-tokensapi:
+    description: gives tokens (console only)
+    usage: /<command>
