@@ -2,8 +2,10 @@ package com.crafteconomy.blockchain.transactions;
 
 import java.io.Serializable;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
 import lombok.Getter;
@@ -15,23 +17,32 @@ import lombok.ToString;
 @ToString 
 public class Tx implements Serializable {
     
-    private UUID playerUUID;
+    private UUID fromUUID;
+    private UUID toUUID; // for BiConsumer only
+
     private UUID TxID;
-    private Consumer<UUID> function;
     private String description;
+
+    private Consumer<UUID> function = null;
+    private BiConsumer<UUID, UUID> biFunction = null;
 
     private String toWallet;
     private long amount;
 
     public Tx(UUID playerUUID, String TO_WALLET, int amount, String description, Consumer<UUID> function){
-        this.setPlayerUUID(playerUUID);
-        this.setFunction(function);
+        this.setFromUUID(playerUUID);        
         this.setDescription(description);
         this.setToWallet(toWallet);
-        this.setAmount(amount);
+        this.setAmount(amount);     
+        this.setFunction(function);
 
-        // generated randomly for each Tx
-        this.TxID = UUID.randomUUID();
+        this.TxID = UUID.randomUUID(); // random for each Tx for signing time
+    }
+
+    public Tx(UUID playerUUID, UUID recipientUUID, String TO_WALLET, int amount, String description, BiConsumer<UUID, UUID> biFunction){
+        this(playerUUID, TO_WALLET, amount, description, null);
+        this.setToUUID(recipientUUID);
+        this.setBiFunction(biFunction);        
     }
 
     public Tx() {    
@@ -39,11 +50,20 @@ public class Tx implements Serializable {
     }
 
     public String getFromWallet() {
-        return WalletManager.getInstance().getAddress(playerUUID);
+        return WalletManager.getInstance().getAddress(this.fromUUID);
+    }
+
+    public void setToWalletAsServer() {
+        this.toWallet = IntegrationAPI.getInstance().getServerWallet();
     }
 
     public void complete() {
-        this.getFunction().accept(this.playerUUID);
+        if(biFunction != null) {
+            this.getBiFunction().accept(this.fromUUID, this.toUUID);
+            
+        } else if(function != null) {
+            this.getFunction().accept(this.fromUUID);
+        }
         // remove TxID from signed_<TxID> in redis
     }
 

@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
+import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.commands.SubCommand;
 import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.transactions.PendingTransactions;
@@ -75,7 +76,9 @@ public class WalletMyPendingTxs implements SubCommand {
                 if(uuid != null) {
                     Tx txinfo = PendingTransactions.getInstance().getTxFromID(uuid);
                     if(txinfo != null) {
-                        Util.clicableTxID(sender, key.replace(walletFormat, ""), "&7- &f%uuid%");
+                        // Util.clicableTxID(sender, key.replace(walletFormat, ""), "&7- &f%uuid%");
+
+                        IntegrationAPI.getInstance().sendTxIDClickable(sender, key.replace(walletFormat, ""), "&7- &f%value%");
                         Util.colorMsg(sender, "&7&o   " + txinfo.getDescription() + "\n");
                     }
                 }

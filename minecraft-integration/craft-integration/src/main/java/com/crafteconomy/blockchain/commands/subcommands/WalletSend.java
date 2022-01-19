@@ -3,6 +3,7 @@ package com.crafteconomy.blockchain.commands.subcommands;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.commands.SubCommand;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
@@ -71,7 +72,7 @@ public class WalletSend implements SubCommand {
         Player player = (Player) sender;
 
         Tx txInfo = new Tx();
-        txInfo.setPlayerUUID(player.getUniqueId());
+        txInfo.setFromUUID(player.getUniqueId());
         txInfo.setToWallet(TO);
         txInfo.setAmount(AMOUNT);
         txInfo.setDescription(player.getName() + " sent " + AMOUNT + " to " + args[1]);
@@ -85,13 +86,8 @@ public class WalletSend implements SubCommand {
         }
 
         Util.colorMsg(sender, "\nTx for " + AMOUNT + "craft->" + TO.subSequence(0, 16) + "...");
-        Util.clicableTxID(sender, txInfo.getTxID().toString(), "&7&oTxID: %uuid%");
-
-        Util.clickableWebsite(sender, 
-            "https://crafteconomy.com/sign?"+FROM, 
-            "\n&6&l[!] &e&nClick here to sign your transaction(s)",
-            "&7&oSign your transaction(s) with the KEPLR wallet"
-        );
+        IntegrationAPI.getInstance().sendTxIDClickable(sender, txInfo.getTxID().toString());
+        IntegrationAPI.getInstance().sendWebappForSigning(sender, FROM);
     }
 
     private Consumer<UUID> getConsumerMessage(String message) {

@@ -71,7 +71,7 @@ public class WalletBalance implements SubCommand {
 
             Util.colorMsg(sender, getPlayerBalanceOutput(wallet, username));
             if(wallet != null) {
-                Util.clickableWallet(sender, wallet, "&7&oWallet: &n%wallet%");
+                Util.clickableCopy(sender, wallet, "&7&oWallet: &n%value%", "&7&oClick to copy wallet address");
             }
             
         }

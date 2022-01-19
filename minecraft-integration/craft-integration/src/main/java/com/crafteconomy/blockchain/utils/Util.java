@@ -10,14 +10,10 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.*;
 import java.util.logging.Logger;
-
-// Reeces personal Util file for plugins
 
 public class Util {
 	static ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
@@ -36,23 +32,16 @@ public class Util {
 
 	// ---- CraftIntegration Specific ----	 
 	 @SuppressWarnings("deprecation")
-	public static void clickableWallet(CommandSender sender, String WALLET_ADDRESS, String fmt) {
-		// allows copy paste of wallet address to clipboard
-        TextComponent message = new TextComponent(Util.color(fmt.replace("%wallet%", WALLET_ADDRESS)));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, WALLET_ADDRESS));
-            // message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, WALLET_ADDRESS));
-            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("§7§oClick to copy address")));
+	 public static void clickableCopy(CommandSender sender, String ThingToCopy, String fmt, String hoverText) {
+		// allows copy paste of wallet address to clipboard, format use %value% as placeholder
+		// EX: Util.clickableCopy(sender, wallet, "&fWallet set to: &n%value%", "&7&oClick to copy wallet address");
+        TextComponent message = new TextComponent(Util.color(fmt.replace("%value%", ThingToCopy)));
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ThingToCopy));            
+            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(color(hoverText))));
         sender.spigot().sendMessage(message);
     }
 
-	@SuppressWarnings("deprecation")
-	public static void clicableTxID(CommandSender sender, String UUID, String fmt) {
-		TextComponent message = new TextComponent(Util.color(fmt.replace("%uuid%", UUID)));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, UUID));
-            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("§7§oClick to copy TxID")));
-            sender.spigot().sendMessage(message);
-	}
-
+	
 	@SuppressWarnings("deprecation")
 	public static void clickableCommand(CommandSender sender, String command, String msgFormat) {
         TextComponent message = new TextComponent(Util.color(msgFormat.replace("%command%", command)));
@@ -70,23 +59,6 @@ public class Util {
             message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, URL));
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Util.color(hoverText))));
         sender.spigot().sendMessage(message);
-    }
-
-	public static String systemCommand(String command) { // used for sending transactions		
-        StringBuffer output = new StringBuffer();
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec(command);
-            p.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                output.append(line + "\n");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return output.toString();    
     }
 
 
@@ -158,10 +130,10 @@ public class Util {
 
 	public static String color(String message) {
 		if(message == null){
-			message = "NULL_ISSUE";
-			consoleMSG("NULL ERROR: " + Thread.currentThread().getStackTrace()[2]);
+			message = "CRAFT_INTEGRATION_NULL_ISSUE-Util.color";
+			consoleMSG("CRAFT_INTEGRATION_NULL_ISSUE: " + Thread.currentThread().getStackTrace()[2]);
 		}
-		return ChatColor.translateAlternateColorCodes('&', message);
+		return org.bukkit.ChatColor.translateAlternateColorCodes('&', message);
 	}
 	
 	public static List<String> color(List<String> list) {

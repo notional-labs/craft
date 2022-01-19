@@ -44,7 +44,7 @@ public class WalletHelp implements SubCommand {
                     "&7&oSetup your CRAFT wallet with Keplr"    
                 );
             } else {
-                Util.clickableWallet(sender, WALLET, " &f-> &7%wallet%");
+                Util.clickableCopy(sender, WALLET, " &f-> &7%value%", "&7&oClick to copy wallet address");
             }
         }
         

@@ -41,7 +41,7 @@ public class WalletGenerateFakeTx implements SubCommand {
 
         // , "test TX Method", Examples.purchaseBusinessLicense()
         Tx TxInfo = new Tx();
-        TxInfo.setPlayerUUID(player.getUniqueId());
+        TxInfo.setFromUUID(player.getUniqueId());
 
         String desc = null;
         String itemToPurchase = "<PlaceholderItemText>";

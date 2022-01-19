@@ -26,6 +26,8 @@ public class WalletSet implements SubCommand {
                 "&2[!] &a&nClick here to learn how to set up your wallet.",
                 "&7&oView the crafteconomy documentation"    
             );  
+            
+
             return;       
         } 
 
@@ -46,7 +48,7 @@ public class WalletSet implements SubCommand {
 
     private void setWallet(CommandSender sender, String wallet) {
         walletManager.setAddress(((Player) sender).getUniqueId(), wallet);
-        Util.clickableWallet(sender, wallet, "&fWallet set to: &n%wallet%");
+        Util.clickableCopy(sender, wallet, "&fWallet set to: &n%value%", "&7&oClick to copy wallet address");
     }
     
 }
