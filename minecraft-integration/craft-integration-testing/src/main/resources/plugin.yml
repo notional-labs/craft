@@ -1,9 +1,10 @@
 name: craft-integration-test-plugin
 version: "1.0"
 author: Reecepbcups
-main: sh.reece.testingvault.Main
+main: sh.reece.testingintegration.Main
 description: Testing blockchain integration
 api-version: 1.17
+api: ""
 
 # Must use Paper Spigot!
 depend: ["craft-integration"]
@@ -23,4 +24,12 @@ commands:
 
   test-tokensapi:
     description: gives tokens (console only)
+    usage: /<command>
+
+  test-trade:
+    description: fake trade a player + send CRAFT
+    usage: /<command>
+
+  test-keplr:
+    description: send keplr link to setup
     usage: /<command>
