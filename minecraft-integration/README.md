@@ -69,17 +69,20 @@ Tx txInfo2 = api.createNewTx(uuid, to_wallet, amt, desc, BiConsumer<UUID, UUID> 
 
 OR
 
-Tx txInfo = new Tx();
-txinfo.setPlayerUUID(uuid);
-txinfo.setToWallet(to_wallet);
-txinfo.setAmount(10);
-txinfo.setDescription("Memo");
+Tx tx = new Tx();
+tx.setFromUUID(fromUUID);
+tx.setToUUID(toUUID); // biConsumer only
+tx.setToWallet(to_wallet);
+tx.setAmount(10);
+tx.setDescription("Memo");
 
-txinfo.setFunction((Consumer<UUID>) Logic.purchaseBusinessLicense()); // single payments
+tx.setFunction((Consumer<UUID>) Logic.purchaseBusinessLicense()); // single payments
 OR
-txinfo.setBiFunction(Logic.trade(Player1UUID, Player2UUID)); // p2p
+tx.setBiFunction(Logic.trade(Player1UUID, Player2UUID)); // p2p
 
-UUID txID = txInfo.getTxID();
+UUID fromUUID    = tx.getFromUUID();
+UUID toUUID      = tx.getToUUID();
+UUID txID        = tx.getTxID();
 
 // submits transaction for user to sign
 ErrorTypes error = api.submit(txInfo); 
