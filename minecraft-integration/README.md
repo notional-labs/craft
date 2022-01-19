@@ -36,6 +36,20 @@ ADMIN:
 ```
 https://repsy.io/reecepbcups/maven/craft-integration/artifacts/com.crafteconomy
 
+<repository>
+    <id>repsy</id>
+    <name>craft-integration</name>
+    <url>https://repo.repsy.io/mvn/reecepbcups/craft-integration</url>
+</repository>
+
+<dependency>
+    <groupId>com.crafteconomy</groupId>
+    <artifactId>craft-integration</artifactId>
+    <version>3.1.6</version>
+    <scope>provided</scope>
+</dependency>
+
+
 plugin.yml -> depend: ["craft-integration"]
 
 IntegrationAPI api = CraftBlockchainPlugin.getAPI();
