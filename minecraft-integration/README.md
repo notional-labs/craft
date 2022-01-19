@@ -80,9 +80,15 @@ tx.setFunction((Consumer<UUID>) Logic.purchaseBusinessLicense()); // single paym
 OR
 tx.setBiFunction(Logic.trade(Player1UUID, Player2UUID)); // p2p
 
-UUID fromUUID    = tx.getFromUUID();
-UUID toUUID      = tx.getToUUID();
-UUID txID        = tx.getTxID();
+
+Getting values from a Tx
+    UUID fromUUID    = tx.getFromUUID();
+    UUID toUUID      = tx.getToUUID();
+    UUID txID        = tx.getTxID();
+    long amt         = tx.getAmount();
+    String desc      = tx.getDescription();
+    String toWallet  = tx.getToWallet();
+    Consumer c       = tx.getFunction(); || tx.getBiFunction();
 
 // submits transaction for user to sign
 ErrorTypes error = api.submit(txInfo); 
