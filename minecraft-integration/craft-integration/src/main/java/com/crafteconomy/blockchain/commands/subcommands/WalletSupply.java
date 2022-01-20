@@ -10,8 +10,6 @@ public class WalletSupply implements SubCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        // wallet supply
-
         String formatedCraft = Util.formatNumber(BlockchainRequest.getTotalSupply("token"));
         String formatedStake = Util.formatNumber(BlockchainRequest.getTotalSupply("stake"));
 

@@ -27,13 +27,6 @@ public class WalletManager {
         db = CraftBlockchainPlugin.getInstance().getMongo().getDatabase();       
     }
 
-    public static WalletManager getInstance() {
-        if(instance == null) {
-            instance = new WalletManager();
-        }
-        return instance;
-    }
-
     public void cacheWalletOnJoin(UUID uuid) {
         String wallet = getAddress(uuid);
 
@@ -103,17 +96,22 @@ public class WalletManager {
         Document doc = getCollection().find(filter).first();
 
         if(doc != null) { 
-            // Util.log("[WalletManager] doc: " + doc.toJson());
             Object wallet = doc.get("address");
             if(wallet != null){
                 return (String) wallet;
             } 
         }
-
         return null;        
     }
 
     private MongoCollection<Document> getCollection() {
         return db.getCollection("wallets");
+    }
+
+    public static WalletManager getInstance() {
+        if(instance == null) {
+            instance = new WalletManager();
+        }
+        return instance;
     }
 }

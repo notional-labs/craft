@@ -12,7 +12,6 @@ import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 
 public class IntegrationAPI {
@@ -121,20 +120,29 @@ public class IntegrationAPI {
     }
 
     /**
-     * Gives a player's wallet some tokens (CRAFT) via Console only
+     * Gives a wallet some tokens (CRAFT) 
      * @param consoleSender
      * @param player_uuid
      * @param amount
      * @return  null or json {"transfers":[{"coin":"1token","status":"ok"}]}
      */
-    public String deposit(CommandSender consoleSender, UUID player_uuid, long amount) {
-        if(!(consoleSender instanceof ConsoleCommandSender)) {
-            return null;
-        }
-
+    public String deposit(String wallet_address, long amount) {
         // {"transfers":[{"coin":"1token","status":"ok"}]}
-        return BlockchainRequest.depositToAddress(walletManager.getAddress(player_uuid), amount);
+        return BlockchainRequest.depositToAddress(wallet_address, amount);
     }
+
+    /**
+     * Gives a player's wallet some tokens (CRAFT)
+     * @param consoleSender
+     * @param player_uuid
+     * @param amount
+     * @return  null or json {"transfers":[{"coin":"1token","status":"ok"}]}
+     */
+    public String deposit(UUID player_uuid, long amount) {
+        // {"transfers":[{"coin":"1token","status":"ok"}]}
+        return deposit(walletManager.getAddress(player_uuid), amount);
+    }
+
 
     // --------------------------------------------------
     // clickable links / commands / TxId's to make user life better

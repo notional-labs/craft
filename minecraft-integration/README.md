@@ -58,8 +58,10 @@ IntegrationAPI api = CraftBlockchainPlugin.getAPI();
 Standard Request:
 String wallet   = api.getWallet(uuid);
 long balance    = api.getBalance(uuid);
-String value    = api.deposit(sender, uuid, longAmount);
 String swallet  = api.getServerWallet();
+
+String value    = api.deposit(uuid, longAmount);
+String value    = api.deposit(wallet_address, longAmount);
 
 
 Transactions:
@@ -113,7 +115,4 @@ Messaging:
     api.sendWalletClickable(sender, wallet, format, hoverMessage);
     api.sendWalletClickable(sender, wallet, format);
     api.sendWalletClickable(sender, wallet);
-
-
-
 ```

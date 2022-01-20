@@ -64,7 +64,6 @@ public class Tx implements Serializable {
         } else if(function != null) {
             this.getFunction().accept(this.fromUUID);
         }
-        // remove TxID from signed_<TxID> in redis
     }
 
     @Override

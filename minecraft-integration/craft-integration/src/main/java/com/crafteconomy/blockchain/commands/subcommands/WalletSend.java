@@ -36,6 +36,7 @@ public class WalletSend implements SubCommand {
             return;
         }
 
+        // FROM & TO wallet addresses (craftxxxxxxx...)
         final String FROM = walletManager.getAddress(((Player)sender).getUniqueId());
         final String TO = walletManager.getAddressFromName(args[1]);
 
@@ -50,7 +51,7 @@ public class WalletSend implements SubCommand {
         }         
         
         if(FROM == null) {
-            Util.colorMsg(sender, "&c&lERROR: &fPlease use &a/wallet setwallet <wallet> &fto set your wallet.");
+            Util.colorMsg(sender, "&c&lERROR: &fPlease use &a/wallet "+args[0]+" <wallet> &fto set your wallet.");
             return;
         }  
         
@@ -61,7 +62,7 @@ public class WalletSend implements SubCommand {
             if(target != null) {
                 Util.colorMsg(sender, "\n&4&l[!]] &n" + target.getName() + " &fhas tried sending you money");
                 Util.colorMsg(sender, "&4&l[!]] &cBut you do not have an active wallet set!");
-                Util.colorMsg(sender, "&4&l[!]] &f&a/wallet setwallet <wallet>");
+                Util.colorMsg(sender, "&4&l[!]] &f&a/wallet "+args[0]+" <wallet>");
             } else {
                 Util.colorMsg(sender, "&fInform them too &7&o/wallet set <wallet> next time they are on");
             }

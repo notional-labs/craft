@@ -28,20 +28,22 @@ import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.Jedis;
 
 // CraftBlockchainPlugin.java Task:
-// - Add way to trade items between players (Add item to player while offline), BiConsumer
 // - NFTs - support RaspPi, or cosmwasm, not both
+// +whitelist http://ENDPOINT:4500/ to only our machines ip [since only DOA needs it for Quest and Such]. BE SUPER CAREFUL
+// +Test Endpoint http://65.108.71.66/
+// TODO: Fix redis key listener not closing correctly / unexpect quit on server shutdown
 
-// whitelist http://ENDPOINT:4500/ to only our machines ip [since only DOA needs it for Quest and Such]. BE SUPER CAREFUL
+// Save to Mongo, seems like a webapp job
+// - Total amount CRAFT transacted [& transactions in last 24 hours]
+// - Total paid in taxes [& taxes in last 24 hours]
+// - Total revenue generated for the DAO [and generated in last 24 hours]
 
-// Test Endpoint http://65.108.71.66/
 
 // ********* IMPORTANT *********
 // Ensure redis-cli -> `CONFIG SET notify-keyspace-events K$` (KEA also works)
 // notify-keyspace-events = "KEA" in /etc/redis/redis.conf
 
 public class CraftBlockchainPlugin extends JavaPlugin {
-
-    private static WalletManager walletManager;
 
     private static CraftBlockchainPlugin instance;
 
@@ -78,8 +80,6 @@ public class CraftBlockchainPlugin extends JavaPlugin {
             getConfig().getString("MongoDB.username"),
             getConfig().getString("MongoDB.password")
         );
-
-        walletManager = WalletManager.getInstance();
 
         if(getTokenFaucet() == null || getApiEndpoint() == null) {
             getLogger().severe("Faucet token OR API endpoints not set in config.yml, disabling plugin");
@@ -124,9 +124,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
             }
         });
         
-
         // set players wallets back to memory from database
-        Bukkit.getOnlinePlayers().forEach(player -> walletManager.cacheWalletOnJoin(player.getUniqueId()));        
+        Bukkit.getOnlinePlayers().forEach(player -> WalletManager.getInstance().cacheWalletOnJoin(player.getUniqueId()));        
     }
 
     @Override
@@ -153,9 +152,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         return IntegrationAPI.getInstance();
     }
 
-    public String getTokenFaucet() {
-        // :4500
-        return getConfig().getString("TOKEN_FAUCET_ENDPOINT");
+    public String getTokenFaucet() {        
+        return getConfig().getString("TOKEN_FAUCET_ENDPOINT"); // :4500
     }
 
     public String getApiEndpoint() {

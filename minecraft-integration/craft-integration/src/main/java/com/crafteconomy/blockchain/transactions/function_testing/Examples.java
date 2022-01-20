@@ -2,7 +2,6 @@ package com.crafteconomy.blockchain.transactions.function_testing;
 
 import java.io.Serializable;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -31,16 +30,6 @@ public class Examples implements Serializable {
             Bukkit.broadcastMessage("[COMPLETE] Purchased "+item+" for: " + name + " == " + uuid.toString() + "\n");                
         };
         return purchase;
-    }
-
-    
-
-    @SuppressWarnings("deprecation")
-    public static BiConsumer<UUID, UUID> trade() {
-        BiConsumer<UUID, UUID> trading = (FROM, TO) -> {
-            Bukkit.broadcastMessage("Trading from: " + FROM + " to " + TO + "\n");    
-        };
-        return trading;
     }
 
 

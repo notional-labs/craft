@@ -71,7 +71,6 @@ public class WalletMyPendingTxs implements SubCommand {
                 }
 
                 // Here shows all transactions, including ones where the TxInfo is not present
-                // Util.clicableTxID(sender, key.replace(walletFormat, ""), "&7- &f%uuid%");
 
                 if(uuid != null) {
                     Tx txinfo = PendingTransactions.getInstance().getTxFromID(uuid);

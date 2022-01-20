@@ -14,12 +14,12 @@ public class SignedTransactionEvent extends Event {
     private UUID TxID;
 
     public SignedTransactionEvent(UUID TxID) {
-        super(true); // event is async woo!
+        super(true);  // async for RedisKeylistener being async   
         this.TxID = TxID;
     }
 
     public SignedTransactionEvent() { 
-        super(true); // event is async woo!   
+        super(true); // async for RedisKeylistener being async   
     }
 
     public void setTx(UUID TxID) {

@@ -8,7 +8,7 @@ import com.crafteconomy.blockchain.wallets.WalletManager;
 
 import org.bukkit.command.CommandSender;
 
-// TODO: Console only in the future when Live
+// TODO: Remove when live
 
 public class WalletFaucet implements SubCommand {
 
@@ -17,11 +17,6 @@ public class WalletFaucet implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
 
-        // if(!(sender instanceof ConsoleCommandSender)) {
-        //     Util.colorMsg(sender, "&cOnly console can use this command!");
-        //     return;
-        // }
-
         String wallet = null;
         long amount = 0;
 
@@ -29,8 +24,7 @@ public class WalletFaucet implements SubCommand {
             Util.colorMsg(sender, "&cInvalid usage. &f&l/wallet faucet <wallet> <amount>");
             return;
         }
-
-                  
+               
         wallet = args[1];
 
         // If they are requesting to give to a player
