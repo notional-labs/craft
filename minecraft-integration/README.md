@@ -32,6 +32,16 @@ ADMIN:
 /wallet allpending
 ```
 
+## Testing Commands
+```
+  /test-balanceapi (Show balance of current wallet)
+  /test-walletapi (Get current wallet as a WalletClickable)
+  /test-exampleapi (Generates a Tx which prints out a user bought something. Requires /wallet fakesign <id>)
+  /test-tokensapi (Show total CRAFT and STAKE tokens in supply)
+  /test-trade (Req. 2 players. Hold items, confirm trade amount, items are taken. On Blockchain sign trade items as agreed upon)
+  /test-keplr (Send user link to KEPLR wallet documentation)
+```
+
 ## API
 ```
 https://repsy.io/reecepbcups/maven/craft-integration/artifacts/com.crafteconomy
