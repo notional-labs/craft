@@ -3,22 +3,19 @@ FROM faddat/archlinux AS builder
 ENV GOPATH /go
 ENV PATH $PATH:/go/bin
 
-RUN pacman -Syyu --noconfirm go base-devel
+RUN pacman -Syyu --noconfirm go base-devel rocksdb
 
-COPY . /dig
+COPY . /craft
 
-RUN cd /dig/cmd/digd && \
-    go install .
+RUN cd /craft && \
+    go install -tags rocksdb ./...
 
 FROM faddat/archlinux
 
-ENV DIG_P2P_MAX_NUM_INBOUND_PEERS=500
-ENV DIG_P2P_MAX_NUM_OUTBOUND_PEERS=60
-ENV DIG_P2P_SEED_MODE=true
+ENV CRAFT_P2P_MAX_NUM_INBOUND_PEERS=500
+ENV CRAFT_P2P_MAX_NUM_OUTBOUND_PEERS=60
+ENV CRAFT_P2P_SEED_MODE=true
 
 RUN pacman -Syyu --noconfirm 
 
-COPY --from=builder /go/bin/digd /usr/bin/digd
-COPY --from=builder /dig/networks/testnet-2/genesis.json /genesis.json
-
-CMD /usr/bin/digd init busbar && cp /genesis.json /root/.dig/config/genesis.json && /usr/bin/digd start
+COPY --from=builder /go/bin/craftd /usr/bin/craftd
