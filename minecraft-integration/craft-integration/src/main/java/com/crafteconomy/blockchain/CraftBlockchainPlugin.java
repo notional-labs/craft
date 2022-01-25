@@ -10,6 +10,7 @@ import com.crafteconomy.blockchain.commands.subcommands.WalletOutputPendingTxs;
 import com.crafteconomy.blockchain.commands.subcommands.WalletSend;
 import com.crafteconomy.blockchain.commands.subcommands.WalletSet;
 import com.crafteconomy.blockchain.commands.subcommands.WalletSupply;
+import com.crafteconomy.blockchain.commands.subcommands.WalletWebapp;
 import com.crafteconomy.blockchain.commands.subcommands.debugging.WalletFakeSign;
 import com.crafteconomy.blockchain.commands.subcommands.debugging.WalletGenerateFakeTx;
 import com.crafteconomy.blockchain.listeners.JoinLeave;
@@ -97,6 +98,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         cmd.registerCommand(new String[] {"supply"}, new WalletSupply());
         cmd.registerCommand(new String[] {"faucet", "deposit"}, new WalletFaucet());
         cmd.registerCommand(new String[] {"pay", "send"}, new WalletSend());
+        cmd.registerCommand(new String[] {"webapp"}, new WalletWebapp());
 
         // debug commands
         cmd.registerCommand(new String[] {"faketx"}, new WalletGenerateFakeTx());
@@ -105,7 +107,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         cmd.registerCommand(new String[] {"mypending", "pending", "mykeys", "keys"}, new WalletMyPendingTxs());
 
         // arg[0] commands which will tab complete
-        cmd.addTabComplete(new String[] {"balance","setwallet","supply","send","pending"});
+        cmd.addTabComplete(new String[] {"balance","setwallet","supply","send","pending","webapp"});
 
 
         getServer().getPluginManager().registerEvents(new JoinLeave(), this);  
