@@ -1,0 +1,5 @@
+{
+    "go.inferGopath": false,
+    "go.autocompleteUnimportedPackages": true,
+    "go.formatTool": "gofmt"
+}
