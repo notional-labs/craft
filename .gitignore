@@ -4,3 +4,6 @@ release/
 .idea/
 .DS_Store
 .vscode
+
+minecraft-integration/*/.vscode
+minecraft-integration/*/target
