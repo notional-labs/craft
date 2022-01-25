@@ -10,10 +10,10 @@ public class WalletSupply implements SubCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        String formatedCraft = Util.formatNumber(BlockchainRequest.getTotalSupply("token"));
-        String formatedStake = Util.formatNumber(BlockchainRequest.getTotalSupply("stake"));
+        String formattedCraft = Util.formatNumber(BlockchainRequest.getTotalSupply("token"));
+        String formattedStake = Util.formatNumber(BlockchainRequest.getTotalSupply("stake"));
 
-        Util.colorMsg(sender, "Total CRAFT supply is " + formatedCraft);   
-        Util.colorMsg(sender, "Total STAKE supply is " + formatedStake);          
+        Util.colorMsg(sender, "Total CRAFT supply is " + formattedCraft);   
+        Util.colorMsg(sender, "Total STAKE supply is " + formattedStake);          
     }
 }
