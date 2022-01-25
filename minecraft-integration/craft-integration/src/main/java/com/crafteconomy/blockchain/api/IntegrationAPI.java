@@ -45,6 +45,15 @@ public class IntegrationAPI {
     }
 
     /**
+     * Checks if a player has a wallet set in the database / cache
+     * @param player_uuid
+     * @return
+     */
+    public boolean hasAccount(UUID player_uuid) {
+        return walletManager.getAddress(player_uuid) != null;
+    }
+
+    /**
      * Gets the balance of a player based on their wallet address
      * @param player_uuid
      * @return
@@ -146,12 +155,28 @@ public class IntegrationAPI {
 
     // --------------------------------------------------
     // clickable links / commands / TxId's to make user life better
-    public void sendWebappForSigning(CommandSender sender, String fromWallet) {
-		Util.clickableWebsite(sender, "https://crafteconomy.com/sign?"+fromWallet, 
-            "&6&l[!] &e&nClick here to sign your transaction(s)",
+    public void sendWebappForSigning(CommandSender sender, String fromWallet, String message, String hoverMsg) {
+		Util.clickableWebsite(sender, 
+            "https://crafteconomy.io/sign?"+fromWallet, // link which we have the webapp redirect to
+            message,
+            hoverMsg
+        );
+	}
+    public void sendWebappForSigning(CommandSender sender, String fromWallet, String message) {
+        sendWebappForSigning(sender, 
+            fromWallet, 
+            message, 
             "&7&oSign your transaction(s) with the KEPLR wallet"
         );
 	}
+    public void sendWebappForSigning(CommandSender sender, String fromWallet) {
+        sendWebappForSigning(sender, 
+            fromWallet, 
+            "&6&l[!] &e&nClick here to sign your transaction(s)", 
+            "&7&oSign your transaction(s) with the KEPLR wallet"
+        );
+	}
+    
 
 	public void sendClickableKeplrInstallDocs(CommandSender sender) {
 		Util.clickableWebsite(sender, "https://docs.crafteconomy.io/set-up/wallet", 
