@@ -3,3 +3,6 @@ vue/dist
 release/
 .idea/
 .DS_Store
+
+minecraft-integration/*/.vscode
+minecraft-integration/*/target
