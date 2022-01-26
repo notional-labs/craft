@@ -6,14 +6,14 @@ name: compile craft
 # or API.
 on: [push, pull_request, workflow_dispatch]
 
-# This workflow makes x86_64 binaries for mac, windows, and linux.
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-# we build and install in case we want to run it or capture an artifact as we do in the step below. 
+    - name: Setup Java JDK
+      uses: actions/setup-java@v2.5.0
     - name: Compile minecraft integration
       run: |
         cd minecraft-integration/craft-integration
@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2.5.0      
       - name: compile tests
         run: |
           cd minecraft-integration/craft-integration-testing
