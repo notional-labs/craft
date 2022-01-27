@@ -10,9 +10,6 @@ require (
 	github.com/tendermint/tm-db v0.6.6
 )
 
-
-
-
 require (
 	cloud.google.com/go v0.99.0 // indirect
 	cloud.google.com/go/storage v1.10.0 // indirect
@@ -152,5 +149,3 @@ replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
-
-
