@@ -3,12 +3,15 @@ module github.com/notional-labs/craft
 go 1.17
 
 require (
-	github.com/cosmos/cosmos-sdk v0.46.0-alpha1
+	github.com/cosmos/cosmos-sdk v0.46.0-alpha1.0.20220127165739-428ae3c15c17
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.3.0
 	github.com/tendermint/tendermint v0.35.0
 	github.com/tendermint/tm-db v0.6.6
 )
+
+
+
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
@@ -146,7 +149,8 @@ require (
 
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
-	github.com/cosmos/cosmos-sdk/db => github.com/cosmos/cosmos-sdk/db v1.0.0-beta.1
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
+
+
