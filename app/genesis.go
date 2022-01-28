@@ -34,7 +34,8 @@ type EncodingConfig struct {
 
 // MakeEncodingConfig creates an EncodingConfig for testing
 func MakeEncodingConfig() EncodingConfig {
-	encodingConfig := MakeEncodingConfig()
+	// encodingConfig := MakeEncodingConfig() // infinite loop?? why
+	encodingConfig := EncodingConfig{}
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
