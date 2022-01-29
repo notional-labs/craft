@@ -7,7 +7,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/spf13/viper"
@@ -21,6 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltest "github.com/cosmos/cosmos-sdk/x/genutil/client/testutil"
+	"github.com/notional-labs/craft/app"
 	"github.com/notional-labs/craft/cmd/craftd/cmd"
 )
 
@@ -73,7 +73,7 @@ func TestAddGenesisAccountCmd(t *testing.T) {
 			cfg, err := genutiltest.CreateDefaultTendermintConfig(home)
 			require.NoError(t, err)
 
-			appCodec := simapp.MakeTestEncodingConfig().Codec
+			appCodec := app.MakeEncodingConfig().Codec
 			err = genutiltest.ExecInitCmd(testMbm, home, appCodec)
 			require.NoError(t, err)
 

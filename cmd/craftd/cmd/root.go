@@ -50,8 +50,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithViper("CRAFTD")
 
 	rootCmd := &cobra.Command{
-		Use:   "craftd",
-		Short: "creaft economy",
+		Use:   "simd",
+		Short: "simulation app",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
 			cmd.SetOut(cmd.OutOrStdout())
@@ -290,13 +290,13 @@ func (a appCreator) appExport(
 	}
 
 	if height != -1 {
-		App = app.App(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
+		App = app.NewApp(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
 
 		if err := App.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		App = app.App(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
+		App = app.NewApp(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
 	}
 
 	return App.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
