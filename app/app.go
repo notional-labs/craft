@@ -282,7 +282,7 @@ type App struct {
 }
 
 // New returns a reference to an initialized blockchain app
-func New(
+func NewApp(
 	logger log.Logger,
 	db dbm.DB,
 	traceStore io.Writer,
