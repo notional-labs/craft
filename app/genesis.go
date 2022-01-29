@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/std"
 )
 
@@ -23,8 +24,27 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	return ModuleBasics.DefaultGenesis(cdc)
 }
 
+// OLD ENCODING CONFIGS (Useful as this is broken currently)
 // EncodingConfig specifies the concrete encoding types to use for a given app.
 // This is provided for compatibility between protobuf and amino implementations.
+// type EncodingConfig struct {
+// 	InterfaceRegistry types.InterfaceRegistry
+// 	Codec             codec.Codec
+// 	TxConfig          client.TxConfig
+// 	Amino             *codec.LegacyAmino
+// }
+
+// // MakeEncodingConfig creates an EncodingConfig for testing
+// func MakeEncodingConfig() EncodingConfig {
+// 	// encodingConfig := MakeEncodingConfig() // infinite loop?? why
+// 	encodingConfig := EncodingConfig{}
+// 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
+// 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+// 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
+// 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+// 	return encodingConfig
+// }
+
 type EncodingConfig struct {
 	InterfaceRegistry types.InterfaceRegistry
 	Codec             codec.Codec
@@ -34,11 +54,14 @@ type EncodingConfig struct {
 
 // MakeEncodingConfig creates an EncodingConfig for testing
 func MakeEncodingConfig() EncodingConfig {
-	// encodingConfig := MakeEncodingConfig() // infinite loop?? why
-	encodingConfig := EncodingConfig{}
-	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	return encodingConfig
+	cdc := codec.NewLegacyAmino()
+	interfaceRegistry := types.NewInterfaceRegistry()
+	marshaler := codec.NewAminoCodec(cdc)
+
+	std.RegisterLegacyAminoCodec(cdc)
+	std.RegisterInterfaces(interfaceRegistry)
+	ModuleBasics.RegisterLegacyAminoCodec(marshaler.LegacyAmino)
+	ModuleBasics.RegisterInterfaces(interfaceRegistry)
+
+	return EncodingConfig(simapp.MakeTestEncodingConfig())
 }
