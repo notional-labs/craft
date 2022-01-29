@@ -4,6 +4,11 @@ release/
 .idea/
 .DS_Store
 .vscode
+networks/test/data/application.db
+networks/test/data/blockstore.db
+networks/test/data/snapshots
+networks/test/data/state.db
+networks/test/data/tx_index.db
 
 minecraft-integration/*/.vscode
 minecraft-integration/*/target
