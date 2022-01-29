@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/cosmos/cosmos-sdk/simapp/simd/cmd"
 	"github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	"github.com/notional-labs/craft/app"
+	"github.com/notional-labs/craft/cmd/craftd/cmd"
 )
 
 func TestInitCmd(t *testing.T) {
@@ -20,5 +20,5 @@ func TestInitCmd(t *testing.T) {
 		fmt.Sprintf("--%s=%s", cli.FlagOverwrite, "true"), // Overwrite genesis.json, in case it already exists
 	})
 
-	require.NoError(t, svrcmd.Execute(rootCmd, "", simapp.DefaultNodeHome))
+	require.NoError(t, svrcmd.Execute(rootCmd, "", app.DefaultNodeHome))
 }
