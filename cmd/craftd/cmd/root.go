@@ -49,11 +49,11 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
 		WithHomeDir(craft.DefaultNodeHome).
-		WithViper("OSMOSIS")
+		WithViper("CRAFT")
 
 	rootCmd := &cobra.Command{
-		Use:   "osmosisd",
-		Short: "Start osmosis app",
+		Use:   "craftd",
+		Short: "Start craft app",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
 			if err != nil {
@@ -144,7 +144,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		config.Cmd(),
 	)
 
-	server.AddCommands(rootCmd, craft.DefaultNodeHome, newApp, createOsmosisAppAndExport, addModuleInitFlags)
+	server.AddCommands(rootCmd, craft.DefaultNodeHome, newApp, createCraftAppAndExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -259,7 +259,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	)
 }
 
-func createOsmosisAppAndExport(
+func createCraftAppAndExport(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
 	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
 
