@@ -82,14 +82,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
 
-	type OsmosisMempoolConfig struct {
-		ArbitrageMinGasPrice string `mapstructure:"arbitrage-min-gas-fee"`
-	}
-
 	type CustomAppConfig struct {
 		serverconfig.Config
-
-		OsmosisMempoolConfig OsmosisMempoolConfig `mapstructure:"osmosis-mempool"`
 	}
 
 	// Optionally allow the chain developer to overwrite the SDK's default
@@ -100,27 +94,11 @@ func initAppConfig() (string, interface{}) {
 	srvCfg.StateSync.SnapshotKeepRecent = 2
 	srvCfg.MinGasPrices = "0uosmo"
 
-	memCfg := OsmosisMempoolConfig{ArbitrageMinGasPrice: "0.01"}
+	CraftAppCfg := CustomAppConfig{Config: *srvCfg}
 
-	OsmosisAppCfg := CustomAppConfig{Config: *srvCfg, OsmosisMempoolConfig: memCfg}
+	CraftAppTemplate := serverconfig.DefaultConfigTemplate
 
-	OsmosisAppTemplate := serverconfig.DefaultConfigTemplate + `
-###############################################################################
-###                      Osmosis Mempool Configuration                      ###
-###############################################################################
-[osmosis-mempool]
-# This is the max allowed gas any tx. 
-# This is only for local mempool purposes, and thus	is only ran on check tx.
-max-gas-wanted-per-tx = "25000000"
-# This is the minimum gas fee any arbitrage tx should have, denominated in uosmo per gas
-# Default value of ".005" then means that a tx with 1 million gas costs (.005 uosmo/gas) * 1_000_000 gas = .005 osmo
-arbitrage-min-gas-fee = ".005"
-# This is the minimum gas fee any tx with high gas demand should have, denominated in uosmo per gas
-# Default value of ".0025" then means that a tx with 1 million gas costs (.0025 uosmo/gas) * 1_000_000 gas = .0025 osmo
-min-gas-price-for-high-gas-tx = ".0025"
-`
-
-	return OsmosisAppTemplate, OsmosisAppCfg
+	return CraftAppTemplate, CraftAppCfg
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {

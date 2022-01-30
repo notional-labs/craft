@@ -8,7 +8,7 @@
 # The minimum gas prices a validator is willing to accept for processing a
 # transaction. A transaction's fees must meet the minimum of any denomination
 # specified in this config (e.g. 0.25token1;0.0001token2).
-minimum-gas-prices = "0stake"
+minimum-gas-prices = "0uosmo"
 
 # default: the last 100 states are kept in addition to every 500th state; pruning at 10 block intervals
 # nothing: all historic states will be saved, nothing will be deleted (i.e. archiving node)
@@ -105,7 +105,7 @@ global-labels = [
 [api]
 
 # Enable defines if the API server should be enabled.
-enable = false
+enable = true
 
 # Swagger defines if swagger documentation should automatically be registered.
 swagger = false
@@ -190,14 +190,7 @@ enable-unsafe-cors = false
 
 # snapshot-interval specifies the block interval at which local state sync snapshots are
 # taken (0 to disable). Must be a multiple of pruning-keep-every.
-snapshot-interval = 0
+snapshot-interval = 1500
 
 # snapshot-keep-recent specifies the number of recent snapshots to keep and serve (0 to keep all).
 snapshot-keep-recent = 2
-
-[wasm]
-# This is the maximum sdk gas (wasm and storage) that we allow for any x/wasm "smart" queries
-query_gas_limit = 300000
-# This is the number of wasm vm instances we keep cached in memory for speed-up
-# Warning: this is currently unstable and may lead to crashes, best to keep for 0 unless testing locally
-lru_size = 0

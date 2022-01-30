@@ -86,6 +86,7 @@ import (
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	oldgovtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	govv1beta2 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta2"
 
 	// Group: Governance, but between only a few users.  Useful for DAOs.
 	"github.com/cosmos/cosmos-sdk/x/group"
@@ -610,6 +611,12 @@ func NewCraftApp(
 		//		icatypes.ModuleName,
 		//		ibcmock.ModuleName,
 		feegrant.ModuleName,
+		authz.ModuleName,
+		nft.ModuleName,
+		group.ModuleName,
+		vestingtypes.ModuleName,
+		upgradetypes.ModuleName,
+		paramstypes.ModuleName,
 	)
 
 	// Uncomment if you want to set a custom migration order here.
@@ -823,7 +830,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(minttypes.ModuleName)
 	paramsKeeper.Subspace(distrtypes.ModuleName)
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
-	paramsKeeper.Subspace(govtypes.ModuleName)
+	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1beta2.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	//	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	//	paramsKeeper.Subspace(ibchost.ModuleName)
