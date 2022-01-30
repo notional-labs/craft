@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/notional-labs/craft/app"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
@@ -32,12 +31,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/notional-labs/craft/app"
-	"github.com/notional-labs/craft/app/params"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
-func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
+func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Codec).
@@ -138,7 +136,7 @@ lru_size = 0`
 	return customAppTemplate, customAppConfig
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+func initRootCmd(rootCmd *cobra.Command, encodingConfig app.EncodingConfig) {
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
@@ -226,7 +224,7 @@ func txCommand() *cobra.Command {
 }
 
 type appCreator struct {
-	encCfg params.EncodingConfig
+	encCfg app.EncodingConfig
 }
 
 // newApp is an appCreator
@@ -277,27 +275,27 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 	)
 }
 
-// appExport creates a new simapp (optionally at a given height)
 // and exports state.
-func (a appCreator) appExport(
+func (ac appCreator) appExport(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
 	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
 
-	var App *app.App
+	var craftApp *app.App
 	homePath, ok := appOpts.Get(flags.FlagHome).(string)
 	if !ok || homePath == "" {
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
 	if height != -1 {
-		App = app.App(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
+		craftApp = app.NewApp(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), app.EncodingConfig(ac.encCfg), appOpts)
 
-		if err := App.LoadHeight(height); err != nil {
+		if err := craftApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		App = app.App(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
+		craftApp = app.NewApp(
+			logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), app.EncodingConfig(ac.encCfg), appOpts)
 	}
 
-	return App.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+	return craftApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }
