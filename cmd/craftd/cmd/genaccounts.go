@@ -24,6 +24,7 @@ const (
 	flagVestingStart = "vesting-start-time"
 	flagVestingEnd   = "vesting-end-time"
 	flagVestingAmt   = "vesting-amount"
+	flagAccountType  = "account-type"
 )
 
 // AddGenesisAccountCmd returns add-genesis-account cobra Command.
@@ -79,6 +80,7 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 			vestingStart, _ := cmd.Flags().GetInt64(flagVestingStart)
 			vestingEnd, _ := cmd.Flags().GetInt64(flagVestingEnd)
 			vestingAmtStr, _ := cmd.Flags().GetString(flagVestingAmt)
+			accountTypeStr, _ := cmd.Flags().GetString(flagAccountType)
 
 			vestingAmt, err := sdk.ParseCoinsNormalized(vestingAmtStr)
 			if err != nil {
@@ -110,7 +112,12 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 					return errors.New("invalid vesting parameters; must supply start and end time or end time")
 				}
 			} else {
-				genAccount = baseAccount
+				switch {
+				case accountTypeStr == "perm-locked":
+					genAccount = authvesting.NewPermanentLockedAccount(baseAccount, coins)
+				default:
+					genAccount = baseAccount
+				}
 			}
 
 			if err := genAccount.Validate(); err != nil {
@@ -179,6 +186,7 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 	cmd.Flags().String(flagVestingAmt, "", "amount of coins for vesting accounts")
 	cmd.Flags().Int64(flagVestingStart, 0, "schedule start time (unix epoch) for vesting accounts")
 	cmd.Flags().Int64(flagVestingEnd, 0, "schedule end time (unix epoch) for vesting accounts")
+	cmd.Flags().String(flagAccountType, "base", "account type to create (perm-locked)")
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
