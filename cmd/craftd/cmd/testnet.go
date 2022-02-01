@@ -207,13 +207,13 @@ func initTestnetFiles(
 	nodeIDs := make([]string, args.numValidators)
 	valPubKeys := make([]cryptotypes.PubKey, args.numValidators)
 
-	appConfig := srvconfig.DefaultConfig()
-	appConfig.MinGasPrices = args.minGasPrices
-	appConfig.API.Enable = true
-	appConfig.Telemetry.Enabled = true
-	appConfig.Telemetry.PrometheusRetentionTime = 60
-	appConfig.Telemetry.EnableHostnameLabel = false
-	appConfig.Telemetry.GlobalLabels = [][]string{{"chain_id", args.chainID}}
+	simappConfig := srvconfig.DefaultConfig()
+	simappConfig.MinGasPrices = args.minGasPrices
+	simappConfig.API.Enable = true
+	simappConfig.Telemetry.Enabled = true
+	simappConfig.Telemetry.PrometheusRetentionTime = 60
+	simappConfig.Telemetry.EnableHostnameLabel = false
+	simappConfig.Telemetry.GlobalLabels = [][]string{{"chain_id", args.chainID}}
 
 	var (
 		genAccounts []authtypes.GenesisAccount
@@ -332,7 +332,7 @@ func initTestnetFiles(
 			return err
 		}
 
-		srvconfig.WriteConfigFile(filepath.Join(nodeDir, "config", "app.toml"), appConfig)
+		srvconfig.WriteConfigFile(filepath.Join(nodeDir, "config", "app.toml"), simappConfig)
 	}
 
 	if err := initGenFiles(clientCtx, mbm, args.chainID, genAccounts, genBalances, genFiles, args.numValidators); err != nil {
@@ -519,7 +519,7 @@ func startTestnet(cmd *cobra.Command, args startArgs) error {
 		return err
 	}
 
-	testnet.WaitForHeight(1)
+	testnet.WaitForHeight(200)
 	cmd.Println("press the Enter Key to terminate")
 	fmt.Scanln() // wait for Enter Key
 	testnet.Cleanup()
