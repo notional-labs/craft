@@ -31,6 +31,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	authvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
@@ -60,6 +61,7 @@ type initArgs struct {
 	numValidators     int
 	outputDir         string
 	startingIPAddress string
+	accountType       string
 }
 
 type startArgs struct {
@@ -135,6 +137,7 @@ Example:
 			args.startingIPAddress, _ = cmd.Flags().GetString(flagStartingIPAddress)
 			args.numValidators, _ = cmd.Flags().GetInt(flagNumValidators)
 			args.algo, _ = cmd.Flags().GetString(flags.FlagKeyAlgorithm)
+			args.accountType, _ = cmd.Flags().GetString(flagAccountType)
 
 			return initTestnetFiles(clientCtx, cmd, config, mbm, genBalIterator, args)
 
@@ -146,7 +149,7 @@ Example:
 	cmd.Flags().String(flagNodeDaemonHome, "simd", "Home directory of the node's daemon configuration")
 	cmd.Flags().String(flagStartingIPAddress, "192.168.0.1", "Starting IP address (192.168.0.1 results in persistent peers list ID0@192.168.0.1:46656, ID1@192.168.0.2:46656, ...)")
 	cmd.Flags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
-
+	cmd.Flags().String(flagAccountType, "base", "account type to create (perm-locked)")
 	return cmd
 }
 
@@ -285,12 +288,20 @@ func initTestnetFiles(
 		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
 		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
 		coins := sdk.Coins{
-			sdk.NewCoin("testtoken", accTokens),
-			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
+			sdk.NewCoin("craft", accTokens),
+			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens), // exp in future
 		}
 
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
-		genAccounts = append(genAccounts, authtypes.NewBaseAccount(addr, nil, 0, 0))
+
+		baseacc := authtypes.NewBaseAccount(addr, nil, 0, 0)
+
+		switch args.accountType {
+		case "perm-locked":
+			genAccounts = append(genAccounts, authvesting.NewPermanentLockedAccount(baseacc, coins))
+		default:
+			genAccounts = append(genAccounts, baseacc)
+		}
 
 		valTokens := sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)
 		createValMsg, err := stakingtypes.NewMsgCreateValidator(
