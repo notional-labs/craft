@@ -36,7 +36,7 @@ jobs:
           cd cmd/*
           go build .
           go install .
-          timeout 60 ./craftd start --home ../../networks/test
+          timeout 60 ./craftd start --home ../../networks/test | true
         
           
           
