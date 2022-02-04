@@ -3,12 +3,12 @@ module github.com/notional-labs/craft
 go 1.17
 
 require (
-	github.com/cosmos/cosmos-sdk v0.46.0-alpha2.0.20220202174149-0efe4c7debc4
+	github.com/cosmos/cosmos-sdk v0.46.0-alpha2.0.20220204165814-c00cedb14272
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tendermint/tendermint v0.35.0
+	github.com/tendermint/tendermint v0.35.1
 	github.com/tendermint/tm-db v0.6.7-0.20220126143007-a45e5705ec10
 )
 
@@ -95,8 +95,6 @@ require (
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20210609091139-0a56a4bca00b // indirect
-	github.com/opencontainers/image-spec v1.0.2 // indirect
-	github.com/opencontainers/runc v1.0.3 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/petermattis/goid v0.0.0-20180202154549-b0b1615b78e5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -147,5 +145,4 @@ require (
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
