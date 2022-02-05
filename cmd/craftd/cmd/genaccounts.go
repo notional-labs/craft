@@ -112,12 +112,13 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 					return errors.New("invalid vesting parameters; must supply start and end time or end time")
 				}
 			} else {
-				switch {
-				case accountTypeStr == "perm-locked":
-					genAccount = authvesting.NewPermanentLockedAccount(baseAccount, coins)
-				default:
-					genAccount = baseAccount
-				}
+				genAccount = baseAccount
+			}
+
+			// Since perm locked is for all coins, if specified we lock all coins anyways
+			// whether --vesting-amt is used or not.
+			if accountTypeStr == "perm-locked" {
+				genAccount = authvesting.NewPermanentLockedAccount(baseAccount, coins)
 			}
 
 			if err := genAccount.Validate(); err != nil {
