@@ -70,7 +70,6 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         redisDB = new RedisManager(
             getConfig().getString("Redis.host"), 
             getConfig().getInt("Redis.port"),
-            getConfig().getString("Redis.username"), 
             getConfig().getString("Redis.password")
         );
 

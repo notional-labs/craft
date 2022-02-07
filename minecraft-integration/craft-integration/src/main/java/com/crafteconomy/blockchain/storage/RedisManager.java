@@ -8,6 +8,7 @@ import com.crafteconomy.blockchain.utils.Util;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Protocol;
 
 // 	Util.log("[DEBUG] Jedis Active: " + redisDB.getPool().getNumActive());
 // 	Util.log("[DEBUG] Jedis Idle: " + redisDB.getPool().getNumIdle());
@@ -20,7 +21,7 @@ public class RedisManager {
 
     private static RedisManager instance;
 
-    public RedisManager(String host, int port, String username, String password) {
+    public RedisManager(String host, int port, String password) {
         instance = this;
         config = new JedisPoolConfig();  
 
@@ -32,8 +33,8 @@ public class RedisManager {
         // needed for redis pubsub
         config.setMaxWait(Duration.ZERO);
         
-        if(username.length() > 0 && password.length() > 0) {
-            pool = new JedisPool(config, host, port, 2000, username, password);
+        if(password.length() > 0) {
+            pool = new JedisPool(config, host, port, 2000, password, Protocol.DEFAULT_DATABASE);
         } else {
             pool = new JedisPool(config, host, port, 2000);
         }

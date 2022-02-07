@@ -5,6 +5,7 @@ main: com.crafteconomy.blockchain.CraftBlockchainPlugin
 description: Blockchain integration for Craft Economy
 website: https://crafteconomy.io/
 api-version: 1.17
+api: ""
 database: true
 commands:
   wallet:
