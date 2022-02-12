@@ -3572,63 +3572,7 @@
 <script id='elementor-frontend-js' src='wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.5.2' type='text/javascript'></script>
 <script id='elementor-frontend-js-after' type='text/javascript' > 
 
-    ;(function ($) {
-        // Discord Connect functionality
-        const clientId = '938181435599241336';
-        const clientSecret = 'CO-uJL5iivikaxuQeAY9fmWLAIxOsw4c';
-        const redirectUri = 'https://crafteconomy.io/';
-
-        // Btn to redirect
-        $('.discord-connect').click(function () {
-            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&client_secret=${clientSecret}&response_type=code&redirect_uri=${redirectUri}&scope=email%20identify&prompt=consent`;
-        });
-
-        // Page load
-        $(function () {
-            const params = new URLSearchParams(window.location.search);
-
-            if (params.has('code')) {
-                const code = params.get('code');
-
-                $.ajax({
-                    type: "POST",
-                    url: 'https://discord.com/api/oauth2/token',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    data: {
-                        'client_id': clientId,
-                        'client_secret': clientSecret,
-                        'grant_type': 'authorization_code',
-                        'code': code,
-                        'redirect_uri': redirectUri
-                    },
-                    success: function(token) {
-                        const accessToken = token["access_token"];
-
-                        $.ajax({
-                            type: "GET",
-                            url: 'https://discord.com/api/users/@me',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                                'Authorization': `Bearer ${accessToken}`
-                            },
-                            success: function(data) {
-                                localStorage.setItem("discord_me", JSON.stringify(data));
-                                checkLinks();
-                            },
-                            error: function() {
-                                alert('Failed to get your Discord account, please try again later.');
-                            }
-                        });
-                    },
-                    error: function () {
-                        window.location = '/';
-                    }
-                });
-            }
-        });
-
+;(function ($) {
         const $window = $(window),
             debounce = function (func, wait, immediate) {
                 var timeout;
