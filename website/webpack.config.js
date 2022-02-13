@@ -1,5 +1,4 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const path = require("path");
 
@@ -12,14 +11,13 @@ module.exports = {
         path: path.resolve(__dirname,  "/dist/")
     },
     devServer: {
-        port: 8081
+        port: 80
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: "index.html",
             chunks: ["main"]
-        }),
-       // new BundleAnalyzerPlugin()
+        })
     ],  
     resolve: {
         fallback: {
