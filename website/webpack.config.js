@@ -1,16 +1,15 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const path = require("path");
-var webpack = require('webpack');
+//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const path = require("path");
 
 module.exports = {
     entry: {
         main: "./src/main.js",
     },
-    mode: "production",
     output: {
         filename: "bundle.js",
-        path: path.resolve(__dirname,  "dist")
+        path: path.resolve(__dirname,  "/dist/")
     },
     devServer: {
         port: 8081
@@ -19,6 +18,20 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: "index.html",
             chunks: ["main"]
-        })
-    ]
+        }),
+       // new BundleAnalyzerPlugin()
+    ],  
+    resolve: {
+        fallback: {
+          "fs": false,
+          "tls": false,
+          "net": false,
+          "path": false,
+          "zlib": false,
+          "http": false,
+          "https": false,
+          "stream": false,
+          "crypto": false
+        } 
+      }
 };
