@@ -1085,8 +1085,8 @@
     <link href='wp-content/plugins/elementor/assets/lib/font-awesome/css/solid.min.css?ver=5.15.3' id='elementor-icons-fa-solid-css' media='all' rel='stylesheet' type='text/css'/>
     <link href='wp-content/plugins/elementor/assets/lib/font-awesome/css/regular.min.css?ver=5.15.3' id='elementor-icons-fa-regular-css' media='all' rel='stylesheet' type='text/css'/>
     <link href='wp-content/plugins/elementor/assets/lib/font-awesome/css/brands.min.css?ver=5.15.3' id='elementor-icons-fa-brands-css' media='all' rel='stylesheet' type='text/css'/>
-    <script id='jquery-core-js' src='wp-includes/js/jquery/jquery.min.js?ver=3.6.0' type='text/javascript'></script>
-    <script id='jquery-migrate-js' src='wp-includes/js/jquery/jquery-migrate.min.js?ver=3.3.2' type='text/javascript'></script>
+    <script id='jquery-core-js' src='https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js' type='text/javascript'></script>
+    <script id='jquery-migrate-js' src='https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js' type='text/javascript'></script>
     <script id='ays-pb-js-extra' type='text/javascript'>
         /* <![CDATA[ */
         var pbLocalizeObj = {
@@ -2915,7 +2915,7 @@
                                                         <div class="elementor-widget-wrap elementor-element-populated">
                                                             <div class="elementor-element elementor-element-61d150b elementor-widget elementor-widget-heading" data-element_type="widget" data-id="61d150b" data-widget_type="heading.default">
                                                                 <div class="elementor-widget-container">
-                                                                    <h2 class="elementor-heading-title elementor-size-default"><a href="#" class="link_keplr">Keplr Wallet</a></h2>
+                                                                    <h2 class="elementor-heading-title elementor-size-default"><a class="keplr-connect" href="#">Keplr Wallet</a></h2>
                                                                 </div>
                                                             </div>
                                                             <div class="elementor-element elementor-element-12f682b elementor-widget elementor-widget-heading" data-element_type="widget" data-id="12f682b" data-widget_type="heading.default">
@@ -3552,7 +3552,7 @@
 <script id='elementor-webpack-runtime-js' src='wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.5.2' type='text/javascript'></script>
 <script id='elementor-frontend-modules-js' src='wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.5.2' type='text/javascript'></script>
 <script id='elementor-waypoints-js' src='wp-content/plugins/elementor/assets/lib/waypoints/waypoints.min.js?ver=4.0.2' type='text/javascript'></script>
-<script id='jquery-ui-core-js' src='wp-includes/js/jquery/ui/core.min.js?ver=1.13.0' type='text/javascript'></script>
+<script id='jquery-ui-core-js' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.0/jquery-ui.min.js' type='text/javascript'></script>
 <script id='elementor-frontend-js-before' type='text/javascript'>
     var elementorFrontendConfig = {
         "environmentMode": {"edit": false, "wpPreview": false, "isScriptDebug": false},
@@ -3570,199 +3570,9 @@
     };
 </script>
 <script id='elementor-frontend-js' src='wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.5.2' type='text/javascript'></script>
-<script id='elementor-frontend-js-after' type='text/javascript'>
-    ;(function ($) {
-        // Discord Connect functionality
-        const clientId = '938181435599241336';
-        const clientSecret = 'CO-uJL5iivikaxuQeAY9fmWLAIxOsw4c';
-        const redirectUri = 'https://crafteconomy.io/';
+<script id='elementor-frontend-js-after' type='text/javascript' > 
 
-        const apiConnectionsLinkUrl = 'https://api.crafteconomy.io/v1/connections/link';
-
-        /**
-         * Check if a link was formed using 2 or more accounts
-         */
-        function checkLinks() {
-            // Check if Discord exists and Keplr exists
-            if (localStorage.getItem("discord_me") !== null && localStorage.getItem("keplr_me") !== null) {
-                const discord = localStorage.getItem("discord_me");
-                const keplr = localStorage.getItem("keplr_me");
-
-                $.ajax({
-                    type: "POST",
-                    url: apiConnectionsLinkUrl,
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    data: {
-                        discordId: JSON.parse(discord).id,
-                        keplrId: JSON.parse(keplr).id
-                    },
-                    success: function() {
-                        alert('Successfully linked your Discord and Keplr wallet together')
-                    },
-                    error: function() {
-                        alert('Failed to link your accounts, one or more account is already linked elsewhere');
-                    }
-                });
-            }
-        }
-
-        // Btn to redirect
-        $('.discord-connect').click(function () {
-            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&client_secret=${clientSecret}&response_type=code&redirect_uri=${redirectUri}&scope=email%20identify&prompt=consent`;
-        });
-
-        // Page load
-        $(function () {
-            const params = new URLSearchParams(window.location.search);
-
-            if (params.has('code')) {
-                const code = params.get('code');
-
-                $.ajax({
-                    type: "POST",
-                    url: 'https://discord.com/api/oauth2/token',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    data: {
-                        'client_id': clientId,
-                        'client_secret': clientSecret,
-                        'grant_type': 'authorization_code',
-                        'code': code,
-                        'redirect_uri': redirectUri
-                    },
-                    success: function(token) {
-                        const accessToken = token["access_token"];
-
-                        $.ajax({
-                            type: "GET",
-                            url: 'https://discord.com/api/users/@me',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                                'Authorization': `Bearer ${accessToken}`
-                            },
-                            success: function(data) {
-                                localStorage.setItem("discord_me", JSON.stringify(data));
-                                checkLinks();
-                            },
-                            error: function() {
-                                alert('Failed to get your Discord account, please try again later.');
-                            }
-                        });
-                    },
-                    error: function () {
-                        window.location = '/';
-                    }
-                });
-            }
-        });
-
-        $('.link_keplr').click(async function () {
-            // Handle Keplr
-            if (window.keplr && window.keplr.experimentalSuggestChain) {
-                // Keplr v0.6.4 introduces an experimental feature that supports the feature to suggests the chain from a webpage.
-                // If the user approves, the chain will be added to the user's Keplr extension.
-                // If the user rejects it or the suggested chain information doesn't include the required fields, it will throw an error.
-                // If the same chain id is already registered, it will resolve and not require the user interactions.
-                await window.keplr.experimentalSuggestChain({
-                    // Chain-id of the Cosmos SDK chain.
-                    chainId: "craft",
-                    // The name of the chain to be displayed to the user.
-                    chainName: "Craft",
-                    // RPC endpoint of the chain.
-                    rpc: "http://143.198.94.140:26657",
-                    // REST endpoint of the chain.
-                    rest: "http://143.198.94.140:1317",
-                    // Staking coin information
-                    // (Currently, Keplr doesn't have the UI that shows multiple tokens, therefore this uses the SHELL token as the primary token althought SHELL is not a staking coin.)
-                    stakeCurrency: {
-                        // Coin denomination to be displayed to the user.
-                        coinDenom: "CRAFT",
-                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "ucraft",
-                        // # of decimal points to convert minimal denomination to user-facing denomination.
-                        coinDecimals: 6,
-                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-                        // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-                        // coinGeckoId: ""
-                    },
-                    // (Optional) If you have a wallet webpage used to stake the coin then provide the url to the website in `walletUrlForStaking`.
-                    // The 'stake' button in Keplr extension will link to the webpage.
-                    // walletUrlForStaking: "",
-                    // The BIP44 path.
-                    bip44: {
-                        // You can only set the coin type of BIP44.
-                        // 'Purpose' is fixed to 44.
-                        coinType: 118,
-                    },
-                    // Bech32 configuration to show the address to user.
-                    // This field is the interface of
-                    // {
-                    //   bech32PrefixAccAddr: string;
-                    //   bech32PrefixAccPub: string;
-                    //   bech32PrefixValAddr: string;
-                    //   bech32PrefixValPub: string;
-                    //   bech32PrefixConsAddr: string;
-                    //   bech32PrefixConsPub: string;
-                    // }
-                    bech32Config: {
-                        bech32PrefixAccAddr: "craft",
-                        bech32PrefixAccPub: "craft" + "pub",
-                        bech32PrefixValAddr: "craft" + "valoper",
-                        bech32PrefixValPub: "craft" + "valoperpub",
-                        bech32PrefixConsAddr: "craft" + "valcons",
-                        bech32PrefixConsPub: "craft" + "valconspub",
-                    },
-                    // List of all coin/tokens used in this chain.
-                    currencies: [{
-                        // Coin denomination to be displayed to the user.
-                        coinDenom: "CRAFT",
-                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "ucraft",
-                        // # of decimal points to convert minimal denomination to user-facing denomination.
-                        coinDecimals: 6,
-                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-                        // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-                        // coinGeckoId: ""
-                    }],
-                    // List of coin/tokens used as a fee token in this chain.
-                    feeCurrencies: [{
-                        // Coin denomination to be displayed to the user.
-                        coinDenom: "CRAFT",
-                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "ucraft",
-                        // # of decimal points to convert minimal denomination to user-facing denomination.
-                        coinDecimals: 6,
-                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-                        // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-                        // coinGeckoId: ""
-                    }],
-                    // (Optional) The number of the coin type.
-                    // This field is only used to fetch the address from ENS.
-                    // Ideally, it is recommended to be the same with BIP44 path's coin type.
-                    // However, some early chains may choose to use the Cosmos Hub BIP44 path of '118'.
-                    // So, this is separated to support such chains.
-                    // coinType: 118,
-                    // (Optional) This is used to set the fee of the transaction.
-                    // If this field is not provided, Keplr extension will set the default gas price as (low: 0.01, average: 0.025, high: 0.04).
-                    // Currently, Keplr doesn't support dynamic calculation of the gas prices based on on-chain data.
-                    // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
-                    gasPriceStep: {
-                        low: 0.025,
-                        average: 0.03,
-                        high: 0.04
-                    }
-                });
-
-                // Verify if a link was formed
-                checkLinks();
-            } else {
-                alert("Please install keplr wallet to connect");
-            }
-        });
-
+;(function ($) {
         const $window = $(window),
             debounce = function (func, wait, immediate) {
                 var timeout;

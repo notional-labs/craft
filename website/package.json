@@ -1,0 +1,29 @@
+{
+    "name": "craft-web",
+    "version": "1.0.0",
+    "description": "",
+    "private": "true",
+    "main": "index.js",
+    "scripts": {
+      "dev": "webpack-dev-server",
+      "test": "webpack"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "html-webpack-plugin": "^4.3.0",
+        "webpack": "^4.46.0",
+        "webpack-cli": "^3.3.12",
+        "webpack-dev-server": "^3.11.0"
+    },
+    "dependencies": {
+        "@chainapsis/cosmosjs": "0.0.3-alpha.3",
+        "@cosmjs/launchpad": "^0.23.0",
+        "@cosmjs/stargate": "^0.27.1",
+        "axios": "^0.19.0",
+        "fast-deep-equal": "^3.1.1",
+        "i": "^0.3.7",
+        "npm": "^8.5.0"
+    }
+}
