@@ -1,7 +1,3 @@
-const {
-  SigningCosmosClient
-} = require("@cosmjs/launchpad");
-
 $('.keplr-connect').click(async function(event) {
 
   // If `window.getOfflineSigner` or `window.keplr` is null, Keplr extension may be not installed on browser.
