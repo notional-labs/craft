@@ -1,0 +1,28 @@
+{
+  "name": "keplr-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "html-webpack-plugin": "^4.3.0",
+    "source-map-loader": "^1.1.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "@chainapsis/cosmosjs": "0.0.3-alpha.3",
+    "@cosmjs/launchpad": "^0.23.0",
+    "@cosmjs/proto-signing": "^0.27.1",
+    "@cosmjs/stargate": "^0.27.1",
+    "axios": "^0.19.0",
+    "fast-deep-equal": "^3.1.1",
+    "request": "^2.81.0"
+  }
+}
