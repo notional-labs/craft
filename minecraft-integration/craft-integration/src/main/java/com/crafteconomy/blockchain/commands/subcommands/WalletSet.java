@@ -1,5 +1,6 @@
 package com.crafteconomy.blockchain.commands.subcommands;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.commands.SubCommand;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
@@ -11,6 +12,8 @@ public class WalletSet implements SubCommand {
     // wallet set <craft-wallet-address>
 
     WalletManager walletManager = WalletManager.getInstance();
+    String walletPrefix = CraftBlockchainPlugin.getInstance().getWalletPrefix();
+    int walletLength = CraftBlockchainPlugin.getInstance().getWalletLength();
     
     @Override
     public void onCommand(CommandSender sender, String[] args) {
@@ -43,7 +46,7 @@ public class WalletSet implements SubCommand {
     }
 
     private boolean isValidWallet(String walletAddress) {
-        return walletAddress.length() == 44 && walletAddress.startsWith("craft");
+        return walletAddress.length() == walletLength && walletAddress.startsWith(walletPrefix);
     }
 
     private void setWallet(CommandSender sender, String wallet) {

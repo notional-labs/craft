@@ -74,7 +74,12 @@ public class WalletGenerateFakeTx implements SubCommand {
             // Util.colorMsg(sender, "&7&o(( View your pending TxIDs with /wallet mypending ))");
             Util.clickableCommand(sender, "/wallet mypending", "&7&o(( View your pending TxIDs with %command% ))");
 
-            Util.clickableWebsite(sender, "https://crafteconomy.com/sign?"+walletAddress, 
+            // TODO:
+            // Util.clickableWebsite(sender, "https://crafteconomy.com/sign?"+walletAddress, 
+            //     "\n&6&l[!] &e&nClick here to sign your transaction(s)",
+            //     "&7&oSign this transaction with your KEPLR wallet");
+
+            Util.clickableWebsite(sender, "http://localhost:8081/", 
                 "\n&6&l[!] &e&nClick here to sign your transaction(s)",
                 "&7&oSign this transaction with your KEPLR wallet");
 

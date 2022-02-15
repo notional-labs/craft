@@ -13,6 +13,10 @@ import redis.clients.jedis.Protocol;
 // 	Util.log("[DEBUG] Jedis Active: " + redisDB.getPool().getNumActive());
 // 	Util.log("[DEBUG] Jedis Idle: " + redisDB.getPool().getNumIdle());
 
+// ********* IMPORTANT *********
+// Ensure redis-cli -> `CONFIG SET notify-keyspace-events K$` (KEA also works)
+// notify-keyspace-events = "KEA" in /etc/redis/redis.conf
+
 public class RedisManager {
 
     private static JedisPool pool;
@@ -34,9 +38,9 @@ public class RedisManager {
         config.setMaxWait(Duration.ZERO);
         
         if(password.length() > 0) {
-            pool = new JedisPool(config, host, port, 2000, password, Protocol.DEFAULT_DATABASE);
+            pool = new JedisPool(config, host, port, 0, password, Protocol.DEFAULT_DATABASE);
         } else {
-            pool = new JedisPool(config, host, port, 2000);
+            pool = new JedisPool(config, host, port, 0);
         }
     }    
 

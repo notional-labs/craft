@@ -131,10 +131,26 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        redisPubSubTask.cancel();
-        PendingTransactions.clearUncompletedTransactionsFromRedis();
-        jedisPubSubClient.close();
-        redisDB.closePool();     
+
+        // create async runnable
+        Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+            @Override
+            public void run() {
+                // close redis pubsub client
+                if(jedisPubSubClient != null) {
+                    jedisPubSubClient.close();
+                }
+
+                PendingTransactions.clearUncompletedTransactionsFromRedis();
+
+                // close redis connection        
+                redisPubSubTask.cancel();
+                jedisPubSubClient.close();
+                
+                redisDB.closePool(); 
+        
+            }
+        }).cancel();                 
     }
 
     public RedisManager getRedis(){
@@ -160,5 +176,21 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     public String getApiEndpoint() {
         // BlockchainAPI - :1317
         return getConfig().getString("API_ENDPOINT");
+    }
+
+    public String getWalletPrefix() {
+        // TODO: Update -> ex. osmo or craft, make lowercase
+        return "osmo";
+    }
+    public int getWalletLength() {
+        // TODO: craft is 43, osmo is 43
+        return 43;
+    }
+
+    public String getTokenDenom(boolean smallerValue) {
+        if(smallerValue) {
+            return "uosmo";
+        }
+        return "osmo";
     }
 }

@@ -17,9 +17,14 @@ public class BlockchainRequest {
     
     private static RedisManager redisDB = CraftBlockchainPlugin.getInstance().getRedis();
 
+    // http://IP:PORT/cosmos/bank/v1beta1
     private static final String API_ENDPOINT = CraftBlockchainPlugin.getInstance().getApiEndpoint();
+    // osmosis endpoints (https://osmo.api.ping.pub/). Found via https://v1.cosmos.network/rpc/v0.41.4
     private static final String BALANCES_ENDPOINT = API_ENDPOINT + "/balances/%address%/by_denom?denom=%denomination%";
     private static final String SUPPLY_ENDPOINT = API_ENDPOINT + "/supply/%denomination%";
+    // TODO: For denominations in uosmo/ucraft, ensure to *1000000
+
+    private static final String TOKEN_DENOMINATION = CraftBlockchainPlugin.getInstance().getTokenDenom(true);
 
     // -= BALANCES =-
     public static long getBalance(String craft_address, String denomination) {
@@ -41,7 +46,7 @@ public class BlockchainRequest {
     }
 
     public static long getBalance(String craft_address) {
-        return getBalance(craft_address, "token");
+        return getBalance(craft_address, TOKEN_DENOMINATION);
     }
 
 
@@ -60,9 +65,8 @@ public class BlockchainRequest {
     }
 
     public static long getTotalSupply() {
-        return getTotalSupply("token");
+        return getTotalSupply(TOKEN_DENOMINATION);
     }
-
 
     // -= GIVING TOKENS =-
     public static String depositToAddress(String craft_address, long amount) {
@@ -118,7 +122,13 @@ public class BlockchainRequest {
      * @param DESCRIPTION
      * @return String JSON Amino (Readable by webapp)
      */
+    // TODO: Old craft tx format
+    // private static String generateJSONAminoTx(String FROM, String TO, long AMOUNT, String DESCRIPTION) {
+    //     return "{\"body\":{\"messages\":[{\"@type\":\"/cosmos.bank.v1beta1.MsgSend\",\"from_address\":\""+FROM+"\",\"to_address\":\""+TO+"\",\"amount\":[{\"denom\":\"token\",\"amount\":\""+AMOUNT+"\"}]}],\"memo\":\""+DESCRIPTION+"\",\"timeout_height\":\"0\",\"extension_options\":[],\"non_critical_extension_options\":[]},\"auth_info\":{\"signer_infos\":[],\"fee\":{\"amount\":[],\"gas_limit\":\"200000\",\"payer\":\"\",\"granter\":\"\"}},\"signatures\":[]}";
+    // }
+
     private static String generateJSONAminoTx(String FROM, String TO, long AMOUNT, String DESCRIPTION) {
-        return "{\"body\":{\"messages\":[{\"@type\":\"/cosmos.bank.v1beta1.MsgSend\",\"from_address\":\""+FROM+"\",\"to_address\":\""+TO+"\",\"amount\":[{\"denom\":\"token\",\"amount\":\""+AMOUNT+"\"}]}],\"memo\":\""+DESCRIPTION+"\",\"timeout_height\":\"0\",\"extension_options\":[],\"non_critical_extension_options\":[]},\"auth_info\":{\"signer_infos\":[],\"fee\":{\"amount\":[],\"gas_limit\":\"200000\",\"payer\":\"\",\"granter\":\"\"}},\"signatures\":[]}";
+        // since it is uosmo, we multiple amount x 1mil
+        return "{\"txBody\":{\"messages\":[{\"fromAddress\":\""+FROM+"\",\"toAddress\":\""+TO+"\",\"amount\":[{\"denom\":\"uosmo\",\"amount\":\""+(AMOUNT*1000000)+"\"}]}],\"memo\":\""+DESCRIPTION+"\"},\"authInfo\":{\"signerInfos\":[{\"publicKey\":{\"type_url\":\"/cosmos.crypto.secp256k1.PubKey\",\"value\":\"CiEClb3dZ44jTqORGRy3N4CIxVFFKF1v4h3GbFr7etcCV6Q=\"},\"modeInfo\":{\"single\":{\"mode\":\"SIGN_MODE_DIRECT\"}},\"sequence\":\"111\"}],\"fee\":{\"amount\":[{\"denom\":\"uosmo\",\"amount\":\"0\"}],\"gasLimit\":\"200000\"}},\"chainId\":\"osmosis-1\",\"accountNumber\":\"126268\"}";
     }
 }

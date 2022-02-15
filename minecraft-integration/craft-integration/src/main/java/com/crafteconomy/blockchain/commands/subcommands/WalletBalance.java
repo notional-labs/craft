@@ -2,6 +2,7 @@ package com.crafteconomy.blockchain.commands.subcommands;
 
 import java.util.UUID;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.commands.SubCommand;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
@@ -16,6 +17,8 @@ import org.bukkit.entity.Player;
 public class WalletBalance implements SubCommand {
 
     WalletManager walletManager = WalletManager.getInstance();
+    String walletPrefix = CraftBlockchainPlugin.getInstance().getWalletPrefix();
+    int walletLength = CraftBlockchainPlugin.getInstance().getWalletLength();
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
@@ -34,9 +37,8 @@ public class WalletBalance implements SubCommand {
         // if they request another players address, get their offline UUID if they joined before
         if(args.length >= 2) {            
             Player player = Bukkit.getPlayer(args[1]);
-
             
-            if(args[1].length() == 44 && args[1].startsWith("craft")) {
+            if(args[1].length() == walletLength && args[1].startsWith(walletPrefix)) {
                 wallet = args[1];
 
             } else if(player == null) {
@@ -86,14 +88,14 @@ public class WalletBalance implements SubCommand {
         long amount = BlockchainRequest.getBalance(wallet);
 
         if(otherUser != null) {
-            return otherUser + " has " + amount + "craft";
+            return otherUser + " has " + amount + walletPrefix;
         } else {
             return "You have " + amount + "craft";
         }
     }
 
     private String getWalletBalanceOutput(String wallet){
-        if(!wallet.startsWith("craft")){
+        if(!wallet.startsWith(walletPrefix)){
             return "";
         }
 
@@ -106,7 +108,7 @@ public class WalletBalance implements SubCommand {
             return "&c[!] Blockchain is currently down, please try again later.";
         }
 
-        return wallet + " has " + amount + "craft";
+        return wallet + " has " + amount + walletPrefix;
     }
     
 }
