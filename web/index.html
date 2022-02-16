@@ -1150,7 +1150,7 @@
             border-width: 2px;
             border-radius: 0;
             font-weight: normal;
-            width: 124% !important;
+            width: 100% !important;
             font-family: "VT323", monospace !important;
             font-size: 1.5em;
             text-align: center !important;
@@ -2287,7 +2287,7 @@
             font-family: Arial;
             border: 1px Solid rgba(255, 255, 255, 0);
             border-radius: 0px;
-            background-image: url(http://140.82.52.45/wp-content/uploads/2021/12/portalPopup.jpg);
+            background-image: url(wp-content/uploads/2021/12/portalPopup.jpg);
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center center;
@@ -2324,90 +2324,39 @@
                                                 </div>
                                             </div>
                                             <div
-                                                class="elementor-element elementor-element-d422cd8 eael-contact-form-7-button-align-left eael-contact-form-7-button-custom elementor-widget elementor-widget-eael-contact-form-7"
+                                                class="elementor-element elementor-element-d422cd8 elementor-widget"
                                                 data-id="d422cd8"
                                                 data-element_type="widget"
-                                                data-widget_type="eael-contact-form-7.default"
                                             >
                                                 <div class="elementor-widget-container">
-                                                    <div class="eael-contact-form-7-wrapper">
-                                                        <div class="eael-contact-form eael-contact-form-7 eael-contact-form-d422cd8 labels-hide placeholder-show eael-contact-form-align-default">
-                                                            <div role="form" class="wpcf7" id="wpcf7-f251-o1" lang="en-US" dir="ltr">
-                                                                <div class="screen-reader-response">
-                                                                    <p role="status" aria-live="polite" aria-atomic="true"></p>
-                                                                    <ul></ul>
-                                                                </div>
-                                                                <form action="/#wpcf7-f251-o1" method="post" class="wpcf7-form init" novalidate="novalidate" data-status="init">
-                                                                    <div style="display: none;">
-                                                                        <input type="hidden" name="_wpcf7" value="251" />
-                                                                        <input type="hidden" name="_wpcf7_version" value="5.5.3" />
-                                                                        <input type="hidden" name="_wpcf7_locale" value="en_US" />
-                                                                        <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f251-o1" />
-                                                                        <input type="hidden" name="_wpcf7_container_post" value="0" />
-                                                                        <input type="hidden" name="_wpcf7_posted_data_hash" value="" />
-                                                                    </div>
+                                                        <div class="labels-hide placeholder-show">
+                                                                <form 
+                                                                 name ="submit-form"
+                                                                 action="https://usebasin.com/f/1b494a464a67"
+                                                                 method="post"
+                                                                 id="signup">
                                                                     <p>
-                                                                        <span class="wpcf7-form-control-wrap your-name">
-                                                                            <input
-                                                                                type="text"
-                                                                                name="your-name"
-                                                                                value=""
-                                                                                size="40"
-                                                                                class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-                                                                                aria-required="true"
-                                                                                aria-invalid="false"
-                                                                                placeholder="Name"
-                                                                            />
-                                                                        </span>
+                                                                        <input type="text" id="name" name="Name" value="" size="40" placeholder="Name" required/>
                                                                     </p>
+
                                                                     <p>
-                                                                        <span class="wpcf7-form-control-wrap your-email">
-                                                                            <input
-                                                                                type="email"
-                                                                                name="your-email"
-                                                                                value=""
-                                                                                size="40"
-                                                                                class="wpcf7-form-control wpcf7-text wpcf7-email wpcf7-validates-as-required wpcf7-validates-as-email"
-                                                                                aria-required="true"
-                                                                                aria-invalid="false"
-                                                                                placeholder="Email Address"
-                                                                            />
-                                                                        </span>
+                                                                        <input type="text" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Invalid email address"
+                                                                        id="email" name="Email" value="" size="40" placeholder="Email Address" required/>
                                                                     </p>
+
                                                                     <p>
-                                                                        <span class="wpcf7-form-control-wrap your-craft-address">
-                                                                            <input
-                                                                                type="text"
-                                                                                name="your-craft-address"
-                                                                                value=""
-                                                                                size="40"
-                                                                                class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-                                                                                aria-required="true"
-                                                                                aria-invalid="false"
-                                                                                placeholder="CRAFT Address"
-                                                                            />
-                                                                        </span>
+                                                                        <input type="text" id="craft-address" name="Craft-Address" value="" size="40" placeholder="CRAFT Address" required/>
                                                                     </p>
+
                                                                     <p>
-                                                                        <span class="wpcf7-form-control-wrap your-minecraft-username">
-                                                                            <input
-                                                                                type="text"
-                                                                                name="your-minecraft-username"
-                                                                                value=""
-                                                                                size="40"
-                                                                                class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-                                                                                aria-required="true"
-                                                                                aria-invalid="false"
-                                                                                placeholder="Minecraft Username"
-                                                                            />
-                                                                        </span>
+                                                                        <input type="text" id="minecraft-username" name="Minecraft-Username" value="" size="40" placeholder="Minecraft Username" required/>
                                                                     </p>
-                                                                    <p><input type="submit" value="Sign Up For Beta!" class="wpcf7-form-control has-spinner wpcf7-submit" /></p>
-                                                                    <div class="wpcf7-response-output" aria-hidden="true"></div>
+                                                                    
+                                                                    <p>
+                                                                        <input type="submit" id="form-submit" value="Sign Up For Beta!"/>
+                                                                    </p>
                                                                 </form>
-                                                            </div>
                                                         </div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
