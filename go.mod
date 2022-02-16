@@ -3,7 +3,7 @@ module github.com/notional-labs/craft
 go 1.17
 
 require (
-	github.com/cosmos/cosmos-sdk v0.46.0-alpha2.0.20220210224515-89739a554ace
+	github.com/cosmos/cosmos-sdk v0.46.0-alpha2.0.20220215175622-7869d38e94d5
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
