@@ -160,7 +160,7 @@ const (
 	Name                 = "craft"
 )
 
-const appName = "CraftApp"
+const AppName = "CraftApp"
 
 var (
 	// DefaultNodeHome default home directories for the application daemon
