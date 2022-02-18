@@ -54,7 +54,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 	rootCmd := &cobra.Command{
 		Use:   "craftd",
-		Short: "Start craft app with notional fork v46",
+		Short: "Start craft app with reece-gov fork (working to impl. MintExp Prop)",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
 			if err != nil {
