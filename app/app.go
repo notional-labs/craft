@@ -432,7 +432,8 @@ func NewCraftApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(slashingtypes.RouterKey, slashing.NewSlashProposalsHandler(app.SlashingKeeper, app.StakingKeeper))
+		AddRoute(slashingtypes.RouterKey, slashing.NewSlashProposalsHandler(app.SlashingKeeper, app.StakingKeeper)).
+		AddRoute(minttypes.RouterKey, mint.NewMintProposalHandler(app.MintKeeper, app.BankKeeper))
 
 	govConfig := govtypes.DefaultConfig()
 	/*
