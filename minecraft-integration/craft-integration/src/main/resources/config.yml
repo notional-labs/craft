@@ -1,0 +1,13 @@
+MongoDB:
+  host: 127.0.0.1
+  port: 27017
+  database: "databasehere"
+  username: "user"
+  password: "password"
+Redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+API_ENDPOINT: http://osmo.api.ping.pub/cosmos/bank/v1beta1/
+TOKEN_FAUCET_ENDPOINT: "http://0.0.0.0:4500/"
+SERVER_WALLET_ADDRESS: osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p

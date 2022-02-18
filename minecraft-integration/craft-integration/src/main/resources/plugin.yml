@@ -1,0 +1,14 @@
+name: craft-integration
+version: "${project.version}"
+author: Reecepbcups
+main: com.crafteconomy.blockchain.CraftBlockchainPlugin
+description: Blockchain integration for Craft Economy
+website: https://crafteconomy.io/
+api-version: 1.17
+api: ""
+database: true
+commands:
+  wallet:
+    description: crafteconomy wallet integration command
+    usage: /<command>
+    aliases: [craftwallet, cwallet]
