@@ -530,8 +530,8 @@ func startTestnet(cmd *cobra.Command, args startArgs) error {
 		return err
 	}
 
-	// don't check or else testnet won't run
-	testnet.WaitForHeight(200)
+	height, _ := testnet.WaitForHeight(200)
+	fmt.Printf("Testnet started (height=%d).\n", height)
 
 	cmd.Println("press the Enter Key to terminate")
 	fmt.Scanln() // wait for Enter Key
