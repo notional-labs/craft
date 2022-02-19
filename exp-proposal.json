@@ -1,13 +1,15 @@
 {
 	"messages": [
 		{
-			"@type": "/cosmos.mint.v1beta1.MsgExpRequest",
-			"delegator_address": "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0",
+			"@type": "/cosmos.mint.v1beta1.MintExp",
+			"title": "I want some EXP DAO",
+			"description": "plz",
+			"account_address": "cosmos1slvj3lhag59s7pk0tp6eljz3zwun9e77am4xye",
 			"amount":{"denom": "exp","amount": "500"}
 		},
 		{
 			"@type": "/cosmos.gov.v1beta2.MsgExecLegacyContent",
-			"authority": "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0",
+			"authority": "cosmos1slvj3lhag59s7pk0tp6eljz3zwun9e77am4xye",
 			"content": {
 				"@type": "/cosmos.gov.v1beta1.TextProposal",
 				"title": "My title for the prop",
@@ -15,6 +17,6 @@
 			}
 		}
   	],
-	"metadata": "???What do I put here, parse_test.go for gov uses base64 encoded []byte{42}",
+	"metadata": "",
 	"deposit": "1000stake"
 }

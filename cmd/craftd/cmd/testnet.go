@@ -530,12 +530,9 @@ func startTestnet(cmd *cobra.Command, args startArgs) error {
 		return err
 	}
 
-	height, err := testnet.WaitForHeight(200)
-	if err != nil {
-		return err
-	}
-
+	height, _ := testnet.WaitForHeight(200)
 	fmt.Printf("Testnet started (height=%d).\n", height)
+
 	cmd.Println("press the Enter Key to terminate")
 	fmt.Scanln() // wait for Enter Key
 	testnet.Cleanup()
