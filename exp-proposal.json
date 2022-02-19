@@ -1,6 +1,20 @@
 {
-    "title": "PBCUPS would like to join the DAO",
-    "description": "I purpose you give me EXP for my deposit, were deposit is not returned in token but rather in EXP stake",
-    "type": "Text",
-    "deposit": "100token"
+	"messages": [
+		{
+			"@type": "/cosmos.mint.v1beta1.MsgExpRequest",
+			"delegator_address": "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0",
+			"amount":{"denom": "exp","amount": "500"}
+		},
+		{
+			"@type": "/cosmos.gov.v1beta2.MsgExecLegacyContent",
+			"authority": "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0",
+			"content": {
+				"@type": "/cosmos.gov.v1beta1.TextProposal",
+				"title": "My title for the prop",
+				"description": "my description"
+			}
+		}
+  	],
+	"metadata": "???What do I put here, parse_test.go for gov uses base64 encoded []byte{42}",
+	"deposit": "1000stake"
 }
