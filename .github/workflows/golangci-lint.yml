@@ -18,36 +18,3 @@ jobs:
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
           version: latest
-
-          # Optional: working directory, useful for monorepos
-          # working-directory: somedir
-          timeout: 5m
-
-          skip-dirs:
-            - web
-            - networks
-            - minecraft-integration
-
-
-          # Optional: golangci-lint command line arguments.
-          # args: --issues-exit-code=0
-
-          # Optional: show only new issues if it's a pull request. The default value is `false`.
-          # only-new-issues: true
-
-          # Optional: if set to true then the action will use pre-installed Go.
-          # skip-go-installation: true
-
-          # Optional: if set to true then the action don't cache or restore ~/go/pkg.
-          # skip-pkg-cache: true
-
-          # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
-          # skip-build-cache: true
-
-          # which dirs to skip: issues from them won't be reported;
-          # can use regexp here: generated.*, regexp is applied on full path;
-          # default value is empty list, but default dirs are skipped independently
-          # from this option's value (see skip-dirs-use-default).
-          # "/" will be replaced by current OS file path separator to properly work
-          # on Windows.
-
