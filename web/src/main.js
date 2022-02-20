@@ -124,13 +124,13 @@ $('.keplr-connect').click(async function(event) {
 });
 
 // Discord Connect functionality
-const clientId = '938181435599241336';
-const clientSecret = 'CO-uJL5iivikaxuQeAY9fmWLAIxOsw4c';
+const clientId = '';
+const clientSecret = '';
 const redirectUri = 'https://crafteconomy.io/';
 
 // Btn to redirect
 $('.discord-connect').click(function() {
-  window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&client_secret=${clientSecret}&response_type=code&redirect_uri=${redirectUri}&scope=email%20identify&prompt=consent`;
+  window.location.href = ``;
 });
 
 // Page load
