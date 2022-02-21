@@ -29,16 +29,8 @@ import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.Jedis;
 
 // CraftBlockchainPlugin.java Task:
-// - NFTs - support RaspPi, or cosmwasm, not both
 // +whitelist http://ENDPOINT:4500/ to only our machines ip [since only DOA needs it for Quest and Such]. BE SUPER CAREFUL
-// +Test Endpoint http://65.108.71.66/
 // TODO: Fix redis key listener not closing correctly / unexpect quit on server shutdown
-
-// Save to Mongo, seems like a webapp job
-// - Total amount CRAFT transacted [& transactions in last 24 hours]
-// - Total paid in taxes [& taxes in last 24 hours]
-// - Total revenue generated for the DAO [and generated in last 24 hours]
-
 
 // ********* IMPORTANT *********
 // Ensure redis-cli -> `CONFIG SET notify-keyspace-events K$` (KEA also works)
@@ -56,7 +48,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     private BukkitTask redisPubSubTask = null;
     private Jedis jedisPubSubClient = null;
-    private RedisKeyListener keyListner = null;
+    private RedisKeyListener keyListener = null;
 
 
     @Override
@@ -113,15 +105,15 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SignedTxCheckListner(), this);
 
 
-        // We dont want to crash main server thread. Running sync crashes main server thread
-        keyListner = new RedisKeyListener();        
+        // We dont want to crash main server thread. Running sync crashes main server thread        
+        keyListener = new RedisKeyListener();    
         redisPubSubTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
             @Override
             public void run() {      
                 Util.logSevere("Starting Redis PubSub Client");  
                 jedisPubSubClient = redisDB.getRedisConnection();        
                 // Webapp sends this request after the Tx has been signed
-                jedisPubSubClient.psubscribe(keyListner, "__key*__:signed_*");                
+                jedisPubSubClient.psubscribe(keyListener, "__key*__:signed_*");                
             }
         });
         
@@ -131,26 +123,14 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // TODO:
+        // PendingTransactions.clearUncompletedTransactionsFromRedis();
 
-        // create async runnable
-        Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
-            @Override
-            public void run() {
-                // close redis pubsub client
-                if(jedisPubSubClient != null) {
-                    jedisPubSubClient.close();
-                }
+        keyListener.unsubscribe();
+        redisPubSubTask.cancel();
 
-                PendingTransactions.clearUncompletedTransactionsFromRedis();
-
-                // close redis connection        
-                redisPubSubTask.cancel();
-                jedisPubSubClient.close();
-                
-                redisDB.closePool(); 
-        
-            }
-        }).cancel();                 
+        redisDB.closePool(); 
+        // jedisPubSubClient.close();              
     }
 
     public RedisManager getRedis(){
