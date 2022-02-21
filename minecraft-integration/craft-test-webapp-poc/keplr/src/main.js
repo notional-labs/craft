@@ -158,19 +158,13 @@ window.onload = async () => {
             </button>
             <div class="collapse" id="collapseExample">
                 <div class="card card-body">
-                <li>Desc: ${body[txID]["txBody"]["memo"]}</li>
-                <li>Paying: ${body[txID]["txBody"]["messages"][0]["toAddress"]}</li>
-                <li>Amount: ${body[txID]["txBody"]["messages"][0]["amount"][0]["amount"]} uosmo</li> 
+                <li>Desc: ${body[txID]["description"]}</li>
+                <li>Paying: ${body[txID]["to_address"]}</li>
+                <li>Amount: ${String(body[txID]["amount"])} ${body[txID]["denom"]} (in uosmo for testing)</li> 
                 <li>ID: ${txID}</li> 
                 </div>
             </div>
             `
-
-            // Old Txs from CRAFT, above is osmo
-            // <li>Desc: ${body[txID]["body"]["memo"]}</li>
-            // <li>Paying: ${body[txID]["body"]["messages"][0]["to_address"]}</li>
-            // <li>Amount: ${body[txID]["body"]["messages"][0]["amount"][0]["amount"]} CRAFT</li>
-
             // create button with function
             var btn = document.createElement("BUTTON");
             btn.innerHTML = "Sign " + txID;
@@ -180,19 +174,13 @@ window.onload = async () => {
 
                 // makes osmo request
                 sendTx(
-                    body[txID]["txBody"]["messages"][0]["toAddress"], 
+                    body[txID]["to_address"], 
                     // since we pass through OSMO value, we convert back to uosmo
-                    parseInt(body[txID]["txBody"]["messages"][0]["amount"][0]["amount"])/1000000, 
-                    "uosmo",
+                    parseInt(body[txID]["amount"]), 
+                    body[txID]["denom"],
                     txID,
-                    body[txID]["txBody"]["memo"]
+                    body[txID]["description"]
                 );
-                // sendTx(
-                //     body[txID]["body"]["messages"][0]["to_address"], 
-                //     body[txID]["body"]["messages"][0]["amount"][0]["amount"], 
-                //     "osmo",
-                //     body[txID]["body"]["memo"]
-                // );
             }
             txDiv.append(btn);
 
@@ -249,10 +237,10 @@ function sendTx(recipient, amount, denom, txID, memo) {
         return false;
     }
 
-    // if uosmo, *1mil. Else, its normal number
-    if (denom.startsWith("u")) {
-        amount *= 1000000;
-    }
+    // TODO: if u<denom>, *1mil. Else, its normal number
+    // if (denom.startsWith("u")) {
+    //     amount *= 1000000;
+    // }
     amount = Math.floor(amount);
 
     (async () => {

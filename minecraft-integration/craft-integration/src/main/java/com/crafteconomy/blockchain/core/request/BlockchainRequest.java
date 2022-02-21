@@ -79,6 +79,7 @@ public class BlockchainRequest {
 
 
     private static PendingTransactions pTxs = PendingTransactions.getInstance();
+
     public static ErrorTypes transaction(Tx transaction) {
         int minuteTTL = 30;
 
@@ -103,7 +104,8 @@ public class BlockchainRequest {
             String transactionJson = generateJSONAminoTx(from, to, amount, transaction.getDescription());
             jsonObject = new JSONObject(transactionJson);
        }catch (JSONException err){
-            Util.logSevere("Error" + err.toString());
+            Util.logSevere("EBlockchainRequest.java Error " + err.toString());
+            Util.logSevere("Description: " + transaction.getDescription());
             return ErrorTypes.JSON_PARSE_TRANSACTION;
        }
        
@@ -113,6 +115,8 @@ public class BlockchainRequest {
         return ErrorTypes.NO_ERROR;
     }
 
+    // TODO: Small value for now to make testing easier
+    private static String tokenDenom = CraftBlockchainPlugin.getInstance().getTokenDenom(true);
 
     /**
      * Generates a JSON object for a transaction used by the blockchain
@@ -122,13 +126,11 @@ public class BlockchainRequest {
      * @param DESCRIPTION
      * @return String JSON Amino (Readable by webapp)
      */
-    // TODO: Old craft tx format
-    // private static String generateJSONAminoTx(String FROM, String TO, long AMOUNT, String DESCRIPTION) {
-    //     return "{\"body\":{\"messages\":[{\"@type\":\"/cosmos.bank.v1beta1.MsgSend\",\"from_address\":\""+FROM+"\",\"to_address\":\""+TO+"\",\"amount\":[{\"denom\":\"token\",\"amount\":\""+AMOUNT+"\"}]}],\"memo\":\""+DESCRIPTION+"\",\"timeout_height\":\"0\",\"extension_options\":[],\"non_critical_extension_options\":[]},\"auth_info\":{\"signer_infos\":[],\"fee\":{\"amount\":[],\"gas_limit\":\"200000\",\"payer\":\"\",\"granter\":\"\"}},\"signatures\":[]}";
-    // }
-
-    private static String generateJSONAminoTx(String FROM, String TO, long AMOUNT, String DESCRIPTION) {
-        // since it is uosmo, we multiple amount x 1mil
-        return "{\"txBody\":{\"messages\":[{\"fromAddress\":\""+FROM+"\",\"toAddress\":\""+TO+"\",\"amount\":[{\"denom\":\"uosmo\",\"amount\":\""+(AMOUNT*1000000)+"\"}]}],\"memo\":\""+DESCRIPTION+"\"},\"authInfo\":{\"signerInfos\":[{\"publicKey\":{\"type_url\":\"/cosmos.crypto.secp256k1.PubKey\",\"value\":\"CiEClb3dZ44jTqORGRy3N4CIxVFFKF1v4h3GbFr7etcCV6Q=\"},\"modeInfo\":{\"single\":{\"mode\":\"SIGN_MODE_DIRECT\"}},\"sequence\":\"111\"}],\"fee\":{\"amount\":[{\"denom\":\"uosmo\",\"amount\":\"0\"}],\"gasLimit\":\"200000\"}},\"chainId\":\"osmosis-1\",\"accountNumber\":\"126268\"}";
+    private static String generateJSONAminoTx(String FROM, String TO, long AMOUNT, String DESCRIPTION) {    
+        // TODO: long updatedAmount = AMOUNT * 1000000;
+        long updatedAmount = AMOUNT;  // less for testing purposes
+        
+        // return "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"amount\": {\"denom\": \"uosmo\",\"amount\": \""+updatedAmount+"\"}}";
+        return "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"amount\": \""+updatedAmount+"\",\"denom\": \""+tokenDenom+"\"}";
     }
 }
