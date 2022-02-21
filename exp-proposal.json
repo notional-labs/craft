@@ -4,8 +4,7 @@
 			"@type": "/cosmos.mint.v1beta1.MintExp",
 			"title": "I want some EXP DAO",
 			"description": "plz",
-			"account_address": "cosmos1slvj3lhag59s7pk0tp6eljz3zwun9e77am4xye",
-			"amount":{"denom": "exp","amount": "500"}
+			"account_address": "cosmos1slvj3lhag59s7pk0tp6eljz3zwun9e77am4xye"			
 		},
 		{
 			"@type": "/cosmos.gov.v1beta2.MsgExecLegacyContent",
@@ -17,6 +16,6 @@
 			}
 		}
   	],
-	"metadata": "",
+	"metadata": null,
 	"deposit": "1000stake"
 }
