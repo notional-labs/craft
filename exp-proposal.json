@@ -1,10 +1,12 @@
 {
 	"messages": [
 		{
-			"@type": "/cosmos.mint.v1beta1.MintExp",
-			"title": "I want some EXP DAO",
-			"description": "plz",
-			"account_address": "cosmos1slvj3lhag59s7pk0tp6eljz3zwun9e77am4xye"			
+			"@type": "/cosmos.bank.v1beta2.RequestExpProposal",
+			"title": "Requesting some Exp",
+			"description": "I would like some EXP to be on the DAO please",
+			"recipient": "%s1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
+			"amount": "10exp",
+			"deposit": "1000craft"			
 		},
 		{
 			"@type": "/cosmos.gov.v1beta2.MsgExecLegacyContent",

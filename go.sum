@@ -1125,8 +1125,8 @@ github.com/rakyll/statik v0.1.7/go.mod h1:AlZONWzMtEnMs7W4e/1LURLiI49pIMmp6V9Ung
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 h1:MkV+77GLUNo5oJ0jf870itWm3D0Sjh7+Za9gazKc5LQ=
 github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/reecepbcups/cosmos-sdk v0.46.0-alpha-craft-gov h1:UpAY7OCxeGNtbZZtBo4KFpJQbrIfywT5Mr1dGuGpHtw=
-github.com/reecepbcups/cosmos-sdk v0.46.0-alpha-craft-gov/go.mod h1:7vTfXgl2ojx22orY2UsHToETYu4UQRVlMZRvxPyGu0c=
+github.com/reecepbcups/cosmos-sdk v0.46.0-alpha-craft-gov-2 h1:vl5BDga1/oQTMdpca3wAMdKewZEeGBAtACNC/TKtygE=
+github.com/reecepbcups/cosmos-sdk v0.46.0-alpha-craft-gov-2/go.mod h1:7vTfXgl2ojx22orY2UsHToETYu4UQRVlMZRvxPyGu0c=
 github.com/regen-network/cosmos-proto v0.3.1 h1:rV7iM4SSFAagvy8RiyhiACbWEGotmqzywPxOvwMdxcg=
 github.com/regen-network/cosmos-proto v0.3.1/go.mod h1:jO0sVX6a1B36nmE8C9xBFXpNwWejXC7QqCOnH3O0+YM=
 github.com/regen-network/protobuf v1.3.3-alpha.regen.1 h1:OHEc+q5iIAXpqiqFKeLpu5NwTIkVXUs48vFMwzqpqY4=

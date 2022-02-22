@@ -48,6 +48,7 @@ import (
 
 	// Bank
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	bankclient "github.com/cosmos/cosmos-sdk/x/bank/client"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
@@ -179,6 +180,7 @@ var (
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
 			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler,
+			bankclient.ProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -200,6 +202,7 @@ var (
 		authtypes.FeeCollectorName:     nil,
 		distrtypes.ModuleName:          nil,
 		minttypes.ModuleName:           {authtypes.Minter},
+		banktypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
@@ -433,7 +436,7 @@ func NewCraftApp(
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(slashingtypes.RouterKey, slashing.NewSlashProposalsHandler(app.SlashingKeeper, app.StakingKeeper)).
-		AddRoute(minttypes.RouterKey, mint.NewMintProposalHandler(app.MintKeeper, app.BankKeeper))
+		AddRoute(banktypes.RouterKey, bank.NewRequestExpProposalHandler(app.BankKeeper))
 
 	govConfig := govtypes.DefaultConfig()
 	/*
