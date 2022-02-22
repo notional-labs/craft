@@ -975,8 +975,8 @@ github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLA
 github.com/nishanths/exhaustive v0.7.11/go.mod h1:gX+MP7DWMKJmNa1HfMozK+u04hQd3na9i0hyqf3/dOI=
 github.com/nishanths/predeclared v0.0.0-20190419143655-18a43bb90ffc/go.mod h1:62PewwiQTlm/7Rj+cxVYqZvDIUc+JjZq6GHAC1fsObQ=
 github.com/nishanths/predeclared v0.2.1/go.mod h1:HvkGJcA3naj4lOwnFXFDkFxVtSqQMB9sbB1usJ+xjQE=
-github.com/notional-labs/ibc-go/v3 v3.0.0-20220222090648-f4df4866fdb8 h1:68ti669Qdx8RBXXetDYugMGoaBFLiPQeIloj/si+MJs=
-github.com/notional-labs/ibc-go/v3 v3.0.0-20220222090648-f4df4866fdb8/go.mod h1:dcATfHSmABy5PpBAJwuMmIolS8eeX2Z14ljb+mQm/3I=
+github.com/notional-labs/ibc-go/v3 v3.0.0-20220222120102-f9705ec1c8c2 h1:u86C8WL7mP3+6gMSxro2D3wEV8OLKdodECTkr9icz10=
+github.com/notional-labs/ibc-go/v3 v3.0.0-20220222120102-f9705ec1c8c2/go.mod h1:dcATfHSmABy5PpBAJwuMmIolS8eeX2Z14ljb+mQm/3I=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
 github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+AU=
