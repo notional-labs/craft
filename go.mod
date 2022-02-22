@@ -3,13 +3,18 @@ module github.com/notional-labs/craft
 go 1.17
 
 require (
-	github.com/cosmos/cosmos-sdk v0.46.0-alpha2.0.20220215175622-7869d38e94d5
+	github.com/cosmos/cosmos-sdk v0.46.0-alpha2.0.20220218134704-20e17ea71a9b
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tendermint/tendermint v0.35.1
-	github.com/tendermint/tm-db v0.6.7-0.20220126143007-a45e5705ec10
+	github.com/tendermint/tm-db v0.6.7-0.20220215234331-1cf56ef1580b
+)
+
+require (
+	github.com/cosmos/cosmos-sdk/api v0.1.0-alpha4 // indirect
+	github.com/cosmos/gorocksdb v1.2.0 // indirect
 )
 
 require (
@@ -31,11 +36,12 @@ require (
 	github.com/coinbase/rosetta-sdk-go v0.7.2 // indirect
 	github.com/confio/ics23/go v0.6.6 // indirect
 	github.com/cosmos/btcutil v1.0.4 // indirect
-	github.com/cosmos/cosmos-proto v1.0.0-alpha7 // indirect
-	github.com/cosmos/cosmos-sdk/db v1.0.0-beta.1 // indirect
+	github.com/cosmos/cosmos-proto v1.0.0-alpha7.0.20220208174455-213b76899fac // indirect
+	github.com/cosmos/cosmos-sdk/db v1.0.0-beta.1.0.20220218134704-20e17ea71a9b // indirect
 	github.com/cosmos/cosmos-sdk/errors v1.0.0-beta.2 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/iavl v0.17.3 // indirect
+	github.com/cosmos/ibc-go/v3 v3.0.0-rc0
 	github.com/cosmos/ledger-cosmos-go v0.11.1 // indirect
 	github.com/cosmos/ledger-go v0.9.2 // indirect
 	github.com/danieljoos/wincred v1.0.2 // indirect
@@ -113,7 +119,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
-	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tendermint/btcd v0.1.1 // indirect
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15 // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
@@ -143,6 +148,6 @@ require (
 
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
-	github.com/cosmos/ibc-go => github.com/notional-labs/ibc-go/v3 v3.0.0-20220219033251-120278477073
+	github.com/cosmos/ibc-go/v3 => github.com/notional-labs/ibc-go/v3 v3.0.0-20220222090648-f4df4866fdb8
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 )
