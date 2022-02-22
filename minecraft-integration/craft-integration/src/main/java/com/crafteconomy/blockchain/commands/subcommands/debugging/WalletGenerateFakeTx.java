@@ -48,26 +48,29 @@ public class WalletGenerateFakeTx implements SubCommand {
 
         if(args[1].equalsIgnoreCase("license")) {
             TxInfo.setFunction(Examples.purchaseBusinessLicense());
-            desc = "Purchase Business License";
-
+            desc = "Purchase Business License for 2";
+            TxInfo.setAmount(2);
         } else {
-
-            if(args.length >= 3) { itemToPurchase = args[2]; }
+            if(args.length >= 3) { 
+                itemToPurchase = Util.argsToSingleString(2, args); 
+            }
 
             TxInfo.setFunction(Examples.purchaseSomeItem(itemToPurchase));
-            desc = "Purchasing item: " + itemToPurchase;
+            desc = "Purchasing item " + itemToPurchase + " for 1";
+            TxInfo.setAmount(1);
         }
+
         TxInfo.setDescription(desc);
 
         TxInfo.setToWallet(walletAddress);
-        TxInfo.setAmount(1);
+        
        
         
         try (Jedis jedis = redis.getRedisConnection()) {
             ErrorTypes error = BlockchainRequest.transaction(TxInfo);
-            if(error != ErrorTypes.NO_ERROR) {
-                // code
-            }
+            // if(error != ErrorTypes.NO_ERROR) {
+            //     // code
+            // }
                         
             Util.colorMsg(sender, "\n&a&l[✓] &aAdded following Tx to redis:");
             Util.colorMsg(sender, "&f&otx_"+walletAddress.subSequence(0, 10)+"..._" +TxInfo.getTxID());
