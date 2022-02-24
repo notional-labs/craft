@@ -20,10 +20,15 @@ public class IntegrationAPI {
 
     // singleton, sets wallet to the server wallet in config
     private final String SERVER_WALLET; 
+    private final String webappAddress;
     private IntegrationAPI() {     
         SERVER_WALLET = CraftBlockchainPlugin.getInstance().getConfig().getString("SERVER_WALLET_ADDRESS");
         if(SERVER_WALLET == null) {
             throw new IllegalStateException("SERVER_WALLET_ADDRESS is not set in config.yml");
+        }
+        webappAddress = CraftBlockchainPlugin.getInstance().getConfig().getString("SIGNING_WEBAPP_LINK");
+        if(webappAddress == null) {
+            throw new IllegalStateException("SIGNING_WEBAPP_LINK is not set in config.yml");
         }
     }
 
@@ -33,6 +38,14 @@ public class IntegrationAPI {
      */
     public String getServerWallet() {
         return SERVER_WALLET;
+    }
+
+    /**
+     * Gets where the user will actually be signing the transaction.
+     * @return String Wallet
+     */
+    public String getWebAppAddress() {
+        return webappAddress;
     }
 
     /**
@@ -157,7 +170,7 @@ public class IntegrationAPI {
     // clickable links / commands / TxId's to make user life better
     public void sendWebappForSigning(CommandSender sender, String fromWallet, String message, String hoverMsg) {
 		Util.clickableWebsite(sender, 
-            "https://crafteconomy.io/sign?"+fromWallet, // link which we have the webapp redirect to
+            getWebAppAddress(), // link which we have the webapp redirect to
             message,
             hoverMsg
         );

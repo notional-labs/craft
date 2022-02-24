@@ -50,6 +50,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     private Jedis jedisPubSubClient = null;
     private RedisKeyListener keyListener = null;
 
+    private String webappLink = null;
+
 
     @Override
     public void onEnable() {
@@ -72,6 +74,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
             getConfig().getString("MongoDB.username"),
             getConfig().getString("MongoDB.password")
         );
+
+        webappLink = getConfig().getString("SIGNING_WEBAPP_LINK");
 
         if(getTokenFaucet() == null || getApiEndpoint() == null) {
             getLogger().severe("Faucet token OR API endpoints not set in config.yml, disabling plugin");
@@ -124,13 +128,12 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         // TODO:
-        // PendingTransactions.clearUncompletedTransactionsFromRedis();
-
         keyListener.unsubscribe();
         redisPubSubTask.cancel();
 
+        PendingTransactions.clearUncompletedTransactionsFromRedis();
         redisDB.closePool(); 
-        // jedisPubSubClient.close();              
+        // jedisPubSubClient.close();             
     }
 
     public RedisManager getRedis(){
@@ -165,6 +168,10 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     public int getWalletLength() {
         // TODO: craft is 43, osmo is 43
         return 43;
+    }
+
+    public String getWebappLink() {
+        return webappLink;
     }
 
     public String getTokenDenom(boolean smallerValue) {
