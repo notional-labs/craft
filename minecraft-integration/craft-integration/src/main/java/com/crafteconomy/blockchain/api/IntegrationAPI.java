@@ -67,6 +67,23 @@ public class IntegrationAPI {
     }
 
     /**
+     * Best to be used for actual transactions since we don't like floats
+     * @param craft_amount
+     * @return
+     */
+    public long convertCraftToUCRAFT(long craft_amount) {
+        return (long)craft_amount * 1_000_000;
+    }
+
+    /**
+     * Best to be used for displaying only
+     * @return Float of CRAFT amount to be human readable
+     */
+    public float convertUCRAFTtoBeReadable(long ucraft){
+        return ((float)ucraft / 1_000_000);
+    }
+
+    /**
      * Gets the balance of a player based on their wallet address
      * @param player_uuid
      * @return

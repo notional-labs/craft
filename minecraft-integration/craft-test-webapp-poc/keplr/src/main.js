@@ -150,7 +150,7 @@ window.onload = async () => {
             console.log(txID);  
             // document.getElementById("txs").append(txID);   
 
-            // trying to add it to a nice collapsable object
+            // trying to add it to a nice collapsable object, reload this when a Tx is signed (or remove from an array or something)
             var txDiv = document.createElement("div" + txID)
             txDiv.innerHTML = `
             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
@@ -224,9 +224,10 @@ function fireSuccessfulBroadcast(txID) {
         function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 console.log(body);
+                window.location.reload();
             }
         }
-    );
+    );    
 }
 
 // create a function to send a transaction

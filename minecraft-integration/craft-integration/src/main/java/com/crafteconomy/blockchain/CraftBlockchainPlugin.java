@@ -110,12 +110,12 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
 
         // We dont want to crash main server thread. Running sync crashes main server thread        
-        keyListener = new RedisKeyListener();    
+        keyListener = new RedisKeyListener(); 
+        jedisPubSubClient = redisDB.getRedisConnection();  
         redisPubSubTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
             @Override
             public void run() {      
-                Util.logSevere("Starting Redis PubSub Client");  
-                jedisPubSubClient = redisDB.getRedisConnection();        
+                Util.logSevere("Starting Redis PubSub Client");                          
                 // Webapp sends this request after the Tx has been signed
                 jedisPubSubClient.psubscribe(keyListener, "__key*__:signed_*");                
             }
@@ -130,6 +130,9 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         // TODO:
         keyListener.unsubscribe();
         redisPubSubTask.cancel();
+        
+        // TODO This breaks getting resources from the redis pool on reload
+        // Bukkit.getScheduler().cancelTasks(this);
 
         PendingTransactions.clearUncompletedTransactionsFromRedis();
         redisDB.closePool(); 
