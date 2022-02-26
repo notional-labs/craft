@@ -21,6 +21,8 @@ public class WalletGenerateFakeTx implements SubCommand {
 
     RedisManager redis = CraftBlockchainPlugin.getInstance().getRedis();
 
+    String webapp = CraftBlockchainPlugin.getInstance().getWebappLink();
+
     @Override
     public void onCommand(CommandSender sender, String[] args) {
 
@@ -82,7 +84,7 @@ public class WalletGenerateFakeTx implements SubCommand {
             //     "\n&6&l[!] &e&nClick here to sign your transaction(s)",
             //     "&7&oSign this transaction with your KEPLR wallet");
 
-            Util.clickableWebsite(sender, "http://localhost:8081/", 
+            Util.clickableWebsite(sender, webapp, 
                 "\n&6&l[!] &e&nClick here to sign your transaction(s)",
                 "&7&oSign this transaction with your KEPLR wallet");
 

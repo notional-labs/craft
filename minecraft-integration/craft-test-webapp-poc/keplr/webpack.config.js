@@ -10,6 +10,7 @@ module.exports = {
         path: path.resolve(__dirname,  "dist")
     },
     devServer: {
+        host: '127.0.0.1',
         port: 8081
     },
     // https://github.com/googleapis/google-api-nodejs-client/issues/1732

@@ -49,7 +49,7 @@ public class MyExampleTransaction implements CommandExecutor {
             // Tx tx1 = api.createNewTx(player.getUniqueId(), to_wallet, 10, "Describe what it does here", Logic.purchaseBusinessLicense());
 
             Tx txinfo = new Tx(); // getTxID() -> auto generated. just a UUID [/wallet pending shows all]
-            txinfo.setPlayerUUID(player.getUniqueId());
+            txinfo.setFromUUID(player.getUniqueId());
             txinfo.setToWallet(to_wallet);
             txinfo.setAmount(10);
             txinfo.setDescription("Describe what it does here");
