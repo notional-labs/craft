@@ -33,7 +33,8 @@ craft1w9rugshphy0a849yp56klt5ul8y55mne7g7vf0
 craft1ddd9vf56hv5jntdqkd85dv6je6xes25g3ykyn4
 craft145r7j5u2868er6ylj3nt9zzg5lnc9gyt4d6282
 craft1me3g0a2nr24sjykmhvpl687f6zt66nlvhv0y9h
-craft1ugjgu3hg7jcmafq3tr6g857950vuyj0kua0hka"""
+craft1ugjgu3hg7jcmafq3tr6g857950vuyj0kua0hka
+craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0"""
 
     for idx, wallet in enumerate(walletsList.split("\n")):
         if(len(wallet) < 10):
