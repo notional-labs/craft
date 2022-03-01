@@ -27,4 +27,3 @@ service restart redis-cli
 
 ![alt text](Showcased.png)
 ![alt text](ExampleWebappSignView.png)
-![alt text](exmpleIdea.png)
