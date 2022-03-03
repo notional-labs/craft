@@ -7,11 +7,14 @@ import java.util.function.Consumer;
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.escrow.EscrowErrors;
+import com.crafteconomy.blockchain.escrow.EscrowManager;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class IntegrationAPI {
@@ -55,6 +58,28 @@ public class IntegrationAPI {
      */
     public String getWallet(UUID player_uuid) {
         return walletManager.getAddress(player_uuid);
+    }
+
+    /**
+     * Sets a players wallet if True, False is an an incorrect wallet address
+     * @param player_uuid
+     * @return
+     */
+    public boolean setWallet(UUID player_uuid, String craftWallet) {    
+        if(isValidWallet(craftWallet)) {
+            walletManager.setAddress(player_uuid, craftWallet);
+            return true;
+        }
+        return false;        
+    }
+
+    /**
+     * Checks if a wallet is valid
+     * @param wallet
+     * @return True if valid, False if incorrect
+     */
+    public boolean isValidWallet(String address) {
+        return WalletManager.isValidWallet(address);
     }
 
     /**
@@ -185,26 +210,27 @@ public class IntegrationAPI {
 
     // --------------------------------------------------
     // clickable links / commands / TxId's to make user life better
-    public void sendWebappForSigning(CommandSender sender, String fromWallet, String message, String hoverMsg) {
+    public void sendWebappForSigning(CommandSender sender, String message, String hoverMsg) {
 		Util.clickableWebsite(sender, 
             getWebAppAddress(), // link which we have the webapp redirect to
             message,
             hoverMsg
         );
 	}
-    public void sendWebappForSigning(CommandSender sender, String fromWallet, String message) {
+    public void sendWebappForSigning(CommandSender sender, String message) {
         sendWebappForSigning(sender, 
-            fromWallet, 
             message, 
             "&7&oSign your transaction(s) with the KEPLR wallet"
         );
 	}
-    public void sendWebappForSigning(CommandSender sender, String fromWallet) {
+    public void sendWebappForSigning(CommandSender sender) {
         sendWebappForSigning(sender, 
-            fromWallet, 
             "&6&l[!] &e&nClick here to sign your transaction(s)", 
             "&7&oSign your transaction(s) with the KEPLR wallet"
         );
+	}
+    public void sendWebappForSigning(Player player) {
+        sendWebappForSigning((CommandSender)player);
 	}
     
 
@@ -227,6 +253,10 @@ public class IntegrationAPI {
 		sendTxIDClickable(sender, TxID, "&7&oTxID: &n%value%");
 	}
 
+    public void sendTxIDClickable(Player player, String TxID) {
+		sendTxIDClickable((CommandSender)player, TxID, "&7&oTxID: &n%value%");
+	}
+
 
     public void sendWalletClickable(CommandSender sender, String wallet, String format, String hoverMessage) {
 		Util.clickableCopy(sender, wallet, format, hoverMessage);
@@ -239,6 +269,28 @@ public class IntegrationAPI {
     public void sendWalletClickable(CommandSender sender, String wallet) {
 		sendWalletClickable(sender, wallet, "&7&oWallet: &n%value%");
 	}
+
+
+
+    // ESCROW ACCOUNTS
+    
+    /**
+     * Deposits CRAFT into an in game account (Escrow). 
+     * Each escrow is redeemable for 1x craft, its deposit rate
+     */
+    public EscrowErrors escrowDeposit(UUID playerUUID, long amount) {
+        // creates a Tx to send CRAFT to DAO. On sign, player gets escrow balance
+        return EscrowManager.getInstance().depositEscrow(playerUUID, amount);
+    }
+
+    public EscrowErrors escrowRedeem(UUID playerUUID, long amount) {
+        // If player has enough escrow, their wallet is paid in CRAFT & escrow is subtracted
+        return EscrowManager.getInstance().redeemEscrow(playerUUID, amount);
+    }
+
+    public long escrowGetBalance(UUID uuid) {
+        return EscrowManager.getInstance().getEscrowBalance(uuid);
+    }
 
 
 
