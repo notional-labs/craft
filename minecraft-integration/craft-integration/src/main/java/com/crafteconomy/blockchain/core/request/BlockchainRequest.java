@@ -20,6 +20,7 @@ public class BlockchainRequest {
     // http://IP:PORT/cosmos/bank/v1beta1
     private static final String API_ENDPOINT = CraftBlockchainPlugin.getInstance().getApiEndpoint();
     // osmosis endpoints (https://osmo.api.ping.pub/). Found via https://v1.cosmos.network/rpc/v0.41.4
+    // https://lcd-osmosis.blockapsis.com/cosmos/bank/v1beta1/balances/osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p/by_denom?denom=uosmo
     private static final String BALANCES_ENDPOINT = API_ENDPOINT + "/balances/%address%/by_denom?denom=%denomination%";
     private static final String SUPPLY_ENDPOINT = API_ENDPOINT + "/supply/%denomination%";
     // TODO: For denominations in uosmo/ucraft, ensure to *1000000

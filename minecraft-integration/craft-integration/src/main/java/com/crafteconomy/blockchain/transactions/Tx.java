@@ -8,6 +8,9 @@ import java.util.function.Consumer;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,6 +19,9 @@ import lombok.ToString;
 @Setter
 @ToString 
 public class Tx implements Serializable {
+
+    private static IntegrationAPI api = IntegrationAPI.getInstance();
+    private static WalletManager walletManager = WalletManager.getInstance();
     
     private UUID fromUUID;
     private UUID toUUID; // for BiConsumer only
@@ -50,11 +56,11 @@ public class Tx implements Serializable {
     }
 
     public String getFromWallet() {
-        return WalletManager.getInstance().getAddress(this.fromUUID);
+        return walletManager.getAddress(this.fromUUID);
     }
 
     public void setToWalletAsServer() {
-        this.toWallet = IntegrationAPI.getInstance().getServerWallet();
+        this.toWallet = api.getServerWallet();
     }
 
     public void complete() {
@@ -63,6 +69,23 @@ public class Tx implements Serializable {
             
         } else if(function != null) {
             this.getFunction().accept(this.fromUUID);
+        }
+    }
+
+    /**
+     * Submit the transaction to redis for the webapp to sign & send link to sign it
+     */
+    public void submit(boolean includeTxClickable, boolean sendDescMessage, boolean sendWebappLink) {
+        api.submit(this);
+        Player player = Bukkit.getPlayer(this.fromUUID);
+        if(player != null) {
+            if(includeTxClickable) {
+                api.sendTxIDClickable(player, this.TxID.toString());
+            }
+            if(sendDescMessage) {
+                player.sendMessage(this.getDescription());
+            }            
+            api.sendWebappForSigning(player);
         }
     }
 

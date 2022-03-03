@@ -11,10 +11,8 @@ import org.bukkit.entity.Player;
 public class WalletSet implements SubCommand {
     // wallet set <craft-wallet-address>
 
-    WalletManager walletManager = WalletManager.getInstance();
-    String walletPrefix = CraftBlockchainPlugin.getInstance().getWalletPrefix();
-    int walletLength = CraftBlockchainPlugin.getInstance().getWalletLength();
-    
+    WalletManager walletManager = WalletManager.getInstance();    
+
     @Override
     public void onCommand(CommandSender sender, String[] args) {
 
@@ -37,7 +35,7 @@ public class WalletSet implements SubCommand {
         // gets last argument which is the craft wallet address
         String newWallet = args[1]; 
 
-        if(!isValidWallet(newWallet)) {
+        if(!WalletManager.isValidWallet(newWallet)) {
             Util.colorMsg(sender, "&cInvalid wallet address " + newWallet + " ( length " + newWallet.length() + " )");
             return;
         } 
@@ -45,9 +43,7 @@ public class WalletSet implements SubCommand {
         setWallet(sender, newWallet);                                
     }
 
-    private boolean isValidWallet(String walletAddress) {
-        return walletAddress.length() == walletLength && walletAddress.startsWith(walletPrefix);
-    }
+    
 
     private void setWallet(CommandSender sender, String wallet) {
         walletManager.setAddress(((Player) sender).getUniqueId(), wallet);

@@ -22,6 +22,9 @@ public class WalletManager {
     private Map<UUID, String> walletCache = new HashMap<UUID, String>();
 
     private static WalletManager instance;  
+
+    private static String walletPrefix = CraftBlockchainPlugin.getInstance().getWalletPrefix();
+    private static int walletLength = CraftBlockchainPlugin.getInstance().getWalletLength();    
     
     private WalletManager() { 
         db = CraftBlockchainPlugin.getInstance().getMongo().getDatabase();       
@@ -53,6 +56,10 @@ public class WalletManager {
         }
 
         return wallet;
+    }
+
+    public static boolean isValidWallet(String walletAddress) {
+        return walletAddress.length() == walletLength && walletAddress.startsWith(walletPrefix);
     }
 
     /**
