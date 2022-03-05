@@ -77,7 +77,7 @@ public class EscrowManager {
     
     // TODO: Negative balance checking
     public void removeEscrow(UUID uuid, long amount) {
-        if(amount > 0) { amount = -amount; }        
+        if(amount > 0) { amount = -amount; }
         changeBalance(uuid, amount);
     }
 

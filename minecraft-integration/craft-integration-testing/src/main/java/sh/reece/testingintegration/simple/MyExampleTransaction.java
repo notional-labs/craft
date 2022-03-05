@@ -19,7 +19,6 @@ public class MyExampleTransaction implements CommandExecutor {
 
     IntegrationAPI api = CraftBlockchainPlugin.getAPI();
 
-
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {    
         
@@ -47,7 +46,6 @@ public class MyExampleTransaction implements CommandExecutor {
 
             // Creates inline transaction
             // Tx tx1 = api.createNewTx(player.getUniqueId(), to_wallet, 10, "Describe what it does here", Logic.purchaseBusinessLicense());
-
             Tx txinfo = new Tx(); // getTxID() -> auto generated. just a UUID [/wallet pending shows all]
             txinfo.setFromUUID(player.getUniqueId());
             txinfo.setToWallet(to_wallet);
@@ -55,7 +53,7 @@ public class MyExampleTransaction implements CommandExecutor {
             txinfo.setDescription("Describe what it does here");
             txinfo.setFunction(Logic.purchaseBusinessLicense());
 
-            ErrorTypes error = api.submit(txinfo);
+            ErrorTypes error = txinfo.submit(false, false, false);
 
             if(error == ErrorTypes.NO_ERROR) {
                 // Util.colorMsg(sender,  + txinfo.getTxID());

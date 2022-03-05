@@ -6,6 +6,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.api.IntegrationAPI;
+import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
 import org.bukkit.Bukkit;
@@ -75,18 +76,21 @@ public class Tx implements Serializable {
     /**
      * Submit the transaction to redis for the webapp to sign & send link to sign it
      */
-    public void submit(boolean includeTxClickable, boolean sendDescMessage, boolean sendWebappLink) {
-        api.submit(this);
-        Player player = Bukkit.getPlayer(this.fromUUID);
-        if(player != null) {
-            if(includeTxClickable) {
-                api.sendTxIDClickable(player, this.TxID.toString());
-            }
-            if(sendDescMessage) {
-                player.sendMessage(this.getDescription());
+    public ErrorTypes submit(boolean includeTxClickable, boolean sendDescMessage, boolean sendWebappLink) {
+        ErrorTypes returnType = api.submit(this);
+        if(returnType == ErrorTypes.NO_ERROR) {
+            Player player = Bukkit.getPlayer(this.fromUUID);
+            if(player != null) {
+                if(includeTxClickable) {
+                    api.sendTxIDClickable(player, this.TxID.toString());
+                }
+                if(sendDescMessage) {
+                    player.sendMessage(this.getDescription());
+                }            
+                api.sendWebappForSigning(player);
             }            
-            api.sendWebappForSigning(player);
         }
+        return returnType;
     }
 
     @Override
