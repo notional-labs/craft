@@ -1,4 +1,4 @@
-package sh.reece.testingintegration.onlyconsole;
+package sh.reece.testingintegration.simple;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;

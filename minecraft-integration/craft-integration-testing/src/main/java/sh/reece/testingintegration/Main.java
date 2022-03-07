@@ -3,8 +3,9 @@ package sh.reece.testingintegration;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import sh.reece.testingintegration.onlyconsole.GiveTokens;
 import sh.reece.testingintegration.simple.Balance;
+import sh.reece.testingintegration.simple.EscrowSpendExample;
+import sh.reece.testingintegration.simple.GiveTokens;
 import sh.reece.testingintegration.simple.HowToKepler;
 import sh.reece.testingintegration.simple.MyExampleTransaction;
 import sh.reece.testingintegration.simple.Wallet;
@@ -27,6 +28,7 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginCommand("test-tokensapi").setExecutor(new GiveTokens());
         Bukkit.getPluginCommand("test-trade").setExecutor(new TradeCommand());
         Bukkit.getPluginCommand("test-keplr").setExecutor(new HowToKepler());
+        Bukkit.getPluginCommand("test-escrowspend").setExecutor(new EscrowSpendExample());
     }
 
 

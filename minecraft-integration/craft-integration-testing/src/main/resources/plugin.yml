@@ -33,3 +33,7 @@ commands:
   test-keplr:
     description: send keplr link to setup
     usage: /<command>
+
+  test-escrowspend:
+    description: send keplr link to setup
+    usage: /<command>  
