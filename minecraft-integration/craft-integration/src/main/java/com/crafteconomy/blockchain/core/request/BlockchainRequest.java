@@ -72,10 +72,14 @@ public class BlockchainRequest {
     // -= GIVING TOKENS =-
     public static String depositToAddress(String craft_address, long amount) {
         String body = "{  \"address\": \""+craft_address+"\",  \"coins\": [    \""+amount+"token\"  ]}";
-
         String log = "Faucet: " + craft_address + " " + amount;
 
-        return (String) EndpointQuery.req(CraftBlockchainPlugin.getInstance().getTokenFaucet(), RequestTypes.FAUCET, body, log);
+        if(CraftBlockchainPlugin.ENABLED_FAUCET == true) { // used since trying to request tokens from osmo would crash
+            return (String) EndpointQuery.req(CraftBlockchainPlugin.getInstance().getTokenFaucet(), RequestTypes.FAUCET, body, log);
+        } else {
+            return "";
+        }
+        
     }
 
 

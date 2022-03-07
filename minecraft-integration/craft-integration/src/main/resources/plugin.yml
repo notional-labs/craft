@@ -12,3 +12,7 @@ commands:
     description: crafteconomy wallet integration command
     usage: /<command>
     aliases: [craftwallet, cwallet]
+  escrow:
+    description: crafteconomy escrow account 
+    usage: /<command>
+    aliases: [craftescrow, esc]    

@@ -1,4 +1,4 @@
-package com.crafteconomy.blockchain.commands.subcommands.debugging;
+package com.crafteconomy.blockchain.commands.wallet.subcommands.debugging;
 
 import java.util.UUID;
 

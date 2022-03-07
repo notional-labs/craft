@@ -1,4 +1,4 @@
-package com.crafteconomy.blockchain.commands.subcommands;
+package com.crafteconomy.blockchain.commands.wallet.subcommands;
 
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.commands.SubCommand;

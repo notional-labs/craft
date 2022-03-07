@@ -1,18 +1,23 @@
 package com.crafteconomy.blockchain;
 
 import com.crafteconomy.blockchain.api.IntegrationAPI;
-import com.crafteconomy.blockchain.commands.WalletCMD;
-import com.crafteconomy.blockchain.commands.subcommands.WalletBalance;
-import com.crafteconomy.blockchain.commands.subcommands.WalletFaucet;
-import com.crafteconomy.blockchain.commands.subcommands.WalletHelp;
-import com.crafteconomy.blockchain.commands.subcommands.WalletMyPendingTxs;
-import com.crafteconomy.blockchain.commands.subcommands.WalletOutputPendingTxs;
-import com.crafteconomy.blockchain.commands.subcommands.WalletSend;
-import com.crafteconomy.blockchain.commands.subcommands.WalletSet;
-import com.crafteconomy.blockchain.commands.subcommands.WalletSupply;
-import com.crafteconomy.blockchain.commands.subcommands.WalletWebapp;
-import com.crafteconomy.blockchain.commands.subcommands.debugging.WalletFakeSign;
-import com.crafteconomy.blockchain.commands.subcommands.debugging.WalletGenerateFakeTx;
+import com.crafteconomy.blockchain.commands.escrow.EscrowCMD;
+import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowBalance;
+import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowDeposit;
+import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowHelp;
+import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowRedeem;
+import com.crafteconomy.blockchain.commands.wallet.WalletCMD;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletBalance;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletFaucet;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletHelp;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletMyPendingTxs;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletOutputPendingTxs;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletSend;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletSet;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletSupply;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletWebapp;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.WalletFakeSign;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.WalletGenerateFakeTx;
 import com.crafteconomy.blockchain.listeners.JoinLeave;
 import com.crafteconomy.blockchain.storage.MongoDB;
 import com.crafteconomy.blockchain.storage.RedisManager;
@@ -51,6 +56,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     private RedisKeyListener keyListener = null;
 
     private String webappLink = null;
+
+    public static boolean ENABLED_FAUCET = false;
 
 
     @Override
@@ -104,12 +111,24 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         // arg[0] commands which will tab complete
         cmd.addTabComplete(new String[] {"balance","setwallet","supply","send","pending","webapp"});
 
+        // Escrow Commands
+        EscrowCMD escrowCMD = new EscrowCMD();
+        getCommand("escrow").setExecutor(escrowCMD);
+        getCommand("escrow").setTabCompleter(escrowCMD);
+        // register sub commands
+        escrowCMD.registerCommand("help", new EscrowHelp());
+        escrowCMD.registerCommand(new String[] {"b", "bal", "balance"}, new EscrowBalance());
+        escrowCMD.registerCommand(new String[] {"d", "dep", "deposit"}, new EscrowDeposit());
+        escrowCMD.registerCommand(new String[] {"r", "red", "redeem"}, new EscrowRedeem());
+        // arg[0] commands which will tab complete
+        escrowCMD.addTabComplete(new String[] {"balance","deposit","redeem"});
+
 
         getServer().getPluginManager().registerEvents(new JoinLeave(), this);  
         getServer().getPluginManager().registerEvents(new SignedTxCheckListner(), this);
 
 
-        // We dont want to crash main server thread. Running sync crashes main server thread        
+        // We dont want to crash main server thread. Running sync crashes main server thread
         keyListener = new RedisKeyListener(); 
         jedisPubSubClient = redisDB.getRedisConnection();  
         redisPubSubTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
@@ -127,7 +146,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // TODO:
+        // TODO: some reason, this still crashes main server thread sometimes locally
         keyListener.unsubscribe();
         redisPubSubTask.cancel();
         
@@ -135,7 +154,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         // Bukkit.getScheduler().cancelTasks(this);
 
         PendingTransactions.clearUncompletedTransactionsFromRedis();
-        redisDB.closePool(); 
+        redisDB.closePool();  
         // jedisPubSubClient.close();             
     }
 

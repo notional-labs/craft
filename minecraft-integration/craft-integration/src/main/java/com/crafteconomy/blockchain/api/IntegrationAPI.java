@@ -21,15 +21,19 @@ public class IntegrationAPI {
 
     WalletManager walletManager = WalletManager.getInstance();
 
+    private CraftBlockchainPlugin blockchainPlugin;
+
     // singleton, sets wallet to the server wallet in config
     private final String SERVER_WALLET; 
     private final String webappAddress;
-    private IntegrationAPI() {     
-        SERVER_WALLET = CraftBlockchainPlugin.getInstance().getConfig().getString("SERVER_WALLET_ADDRESS");
+    private IntegrationAPI() {    
+        blockchainPlugin = CraftBlockchainPlugin.getInstance();
+
+        SERVER_WALLET = blockchainPlugin.getConfig().getString("SERVER_WALLET_ADDRESS");
         if(SERVER_WALLET == null) {
             throw new IllegalStateException("SERVER_WALLET_ADDRESS is not set in config.yml");
         }
-        webappAddress = CraftBlockchainPlugin.getInstance().getConfig().getString("SIGNING_WEBAPP_LINK");
+        webappAddress = blockchainPlugin.getConfig().getString("SIGNING_WEBAPP_LINK");
         if(webappAddress == null) {
             throw new IllegalStateException("SIGNING_WEBAPP_LINK is not set in config.yml");
         }
@@ -119,6 +123,15 @@ public class IntegrationAPI {
             return 0;
         }
         return BlockchainRequest.getBalance(walletAddr);
+    }
+
+    /**
+     * Gets either CRAFT (false) or UCRAFT (true)
+     * @param getSmallerValue
+     * @return craft | ucraft
+     */
+    public String getTokenDenomination(boolean getSmallerValue) {
+        return blockchainPlugin.getTokenDenom(getSmallerValue);
     }
 
 
@@ -280,16 +293,21 @@ public class IntegrationAPI {
      */
     public EscrowErrors escrowDeposit(UUID playerUUID, long amount) {
         // creates a Tx to send CRAFT to DAO. On sign, player gets escrow balance
-        return EscrowManager.getInstance().depositEscrow(playerUUID, amount);
+        return EscrowManager.getInstance().deposit(playerUUID, amount);
     }
 
-    public EscrowErrors escrowRedeem(UUID playerUUID, long amount) {
+    public long escrowRedeem(UUID playerUUID, long amount) {
         // If player has enough escrow, their wallet is paid in CRAFT & escrow is subtracted
-        return EscrowManager.getInstance().redeemEscrow(playerUUID, amount);
+        return EscrowManager.getInstance().redeem(playerUUID, amount);
+    }
+
+    public EscrowErrors escrowSpend(UUID playerUUID, long cost) {
+        // Will remove balance & return Success if they can spend
+        return EscrowManager.getInstance().spend(playerUUID, cost);
     }
 
     public long escrowGetBalance(UUID uuid) {
-        return EscrowManager.getInstance().getEscrowBalance(uuid);
+        return EscrowManager.getInstance().getBalance(uuid);
     }
 
 

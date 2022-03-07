@@ -6,6 +6,7 @@ public enum EscrowErrors {
     NOT_ENOUGH_CRAFT_FUNDS("You do not have enough CRAFT balance to redeem this amount."),
     NO_WALLET("You do not have a wallet."),
     FAUCET_DEPOSIT_ERROR("The Faucet deposit failed."),
+    INSUFFICIENT_FUNDS("Not enough funds to spend this amount of escrow"),
     SUCCESS("success");
 
     private final String message;

@@ -1,4 +1,4 @@
-package com.crafteconomy.blockchain.commands;
+package com.crafteconomy.blockchain.commands.escrow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,12 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.crafteconomy.blockchain.commands.SubCommand;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
-public class WalletCMD implements CommandExecutor, TabCompleter {
+// /escrow
+public class EscrowCMD implements CommandExecutor, TabCompleter {
 
     private Map<String, SubCommand> commands = new HashMap<>();
 
@@ -43,22 +46,22 @@ public class WalletCMD implements CommandExecutor, TabCompleter {
 			return result;
 		}	        
 
-        if(args.length >= 1) {
-            String subCommand = args[0].toLowerCase(); // walelt <SUBCOMMAND>
+        // if(args.length >= 1) {
+        //     String subCommand = args[0].toLowerCase(); // walelt <SUBCOMMAND>
 
-            if(subCommand.startsWith("bal")) {                
-                if(args.length == 2) { return null; }
-            }
+        //     if(subCommand.startsWith("bal")) {                
+        //         if(args.length == 2) { return null; }
+        //     }
 
-            if(subCommand.startsWith("set")) {
-                if(args.length == 2) { return Arrays.asList("<craft-wallet-address>"); }
-            }
+        //     if(subCommand.startsWith("set")) {
+        //         if(args.length == 2) { return Arrays.asList("<craft-wallet-address>"); }
+        //     }
 
-            if(subCommand.startsWith("pay") || subCommand.startsWith("send")) {
-                if(args.length == 2) { return null; }
-                if(args.length == 3) { return Arrays.asList("10", "25", "50"); }
-            }
-        } 
+        //     if(subCommand.startsWith("pay") || subCommand.startsWith("send")) {
+        //         if(args.length == 2) { return null; }
+        //         if(args.length == 3) { return Arrays.asList("10", "25", "50"); }
+        //     }
+        // } 
         
         return new ArrayList<String>();        
     }

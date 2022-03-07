@@ -1,10 +1,17 @@
 package com.crafteconomy.blockchain.escrow;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+
+import javax.lang.model.type.ErrorType;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
+import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.transactions.Tx;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -24,99 +31,110 @@ public class EscrowManager {
     private static EscrowManager instance;  
     private IntegrationAPI api = null;
 
+    // TODO: move to Blockchain Core folder. 
+    private static final Cache<UUID, Long> balanceCache = CacheBuilder.newBuilder()
+        .maximumSize((long) (Bukkit.getMaxPlayers() * 1.2)) // room for staff to be cached too
+        .expireAfterWrite(10, TimeUnit.MINUTES)
+        .build();
+
+    public void unloadCachedPlayer(UUID uuid) {
+        balanceCache.invalidate(uuid);
+    }
+    
+    public void loadCachedPlayer(UUID uuid) {
+        balanceCache.put(uuid, getBalance(uuid));
+    }
+
     private EscrowManager() { 
         db = CraftBlockchainPlugin.getInstance().getMongo().getDatabase(); 
         api = IntegrationAPI.getInstance();      
     }
 
-    public Long getEscrowBalance(UUID uuid) {
-        return getBalanceFromDatabase(uuid);
-    }
-
-    public EscrowErrors depositEscrow(UUID uuid, long amount) {
-        // pay DAO the balance, the deposit fake tokens into account
-        if(!doesPlayerHaveEnoughFundsForEscrow(uuid, amount)) {
-            return EscrowErrors.NOT_ENOUGH_CRAFT_FUNDS;
+    public long getBalance(UUID uuid) {
+        // get cached value
+        Object value = balanceCache.getIfPresent(uuid);
+        if (value != null) {
+            return (long) value;
         }
-        Tx tx = api.createServerTx(uuid, amount, "ESCROWING " + amount + "FOR " + uuid.toString(), EscrowLogic.depositEscrow(uuid, amount));
-        tx.submit(true, true, true);
-        return EscrowErrors.SUCCESS;
-    }
 
-    
-    /**
-     * Removes escrow balance & deposits CRAFT into their wallet
-     * TODO: UNTESTED SINCE TESTING IS ON OSMOSIS!!!
-     * @param uuid
-     * @param amount
-     * @return False if failed, true if deposited
-     */
-    public EscrowErrors redeemEscrow(UUID uuid, long amount) {
-        // not enough escrow balance to withdraw this much
-        // long escrowBal = getBalanceFromDatabase(uuid); // done below
-        // if(escrowBal < amount) { return EscrowErrors.NO_ENOUGH_ESCROW_BALANCE; }
-
-        String wallet = api.getWallet(uuid);
-        if(wallet == null) { return EscrowErrors.NO_WALLET; }
-
-        // if player has 1 escrow, but wants to withdraw 10. We know the max they can withdraw is 1, so we only withdraw the 1 they have
-        amount = Math.min(getBalanceFromDatabase(uuid), amount);        
-        removeEscrow(uuid, amount);
-
-        // deposit into wallet failed        
-        String returnValue = api.deposit(wallet, amount);
-        if(returnValue == null) { return EscrowErrors.FAUCET_DEPOSIT_ERROR; }            
-
-        Player player = Bukkit.getPlayer(uuid);
-        if(player != null) {
-            player.sendMessage("You have redeemed " + amount + CraftBlockchainPlugin.getInstance().getTokenDenom(false) + " from your escrow account -> wallet.");
-            player.sendMessage("Your new escrow balance is: " + getBalanceFromDatabase(uuid));
-        }        
-        return EscrowErrors.SUCCESS;
-    }
-    
-    // TODO: Negative balance checking
-    public void removeEscrow(UUID uuid, long amount) {
-        if(amount > 0) { amount = -amount; }
-        changeBalance(uuid, amount);
-    }
-
-    private boolean doesPlayerHaveEnoughFundsForEscrow(UUID uuid, long amount) {
-        long currentBalance = IntegrationAPI.getInstance().getBalance(uuid);
-        if(currentBalance < amount) {
-            return false;
-        }
-        return true;
-    }
-
-    public void changeBalance(UUID uuid, long amount) {
-        // increase or decrease balance
-        long currentBalance = getBalanceFromDatabase(uuid);
-        setBalanceToDatabase(uuid, currentBalance+amount);
-    }
-
-    // -= Database Functions =-
-    private void setBalanceToDatabase(UUID uuid, long amount) {
+        // cache time ran out, get document if any & cache current value
         Document doc = getUsersDocument(uuid);
-        if(doc != null) {
-            getCollection().updateOne(Filters.eq("_id", uuid.toString()), Updates.set("amount", amount));
-        } else {
-            doc = new Document("_id", uuid.toString());
-            doc.append("amount", amount);
-            getCollection().insertOne(doc);
-        }
-    }
+        if(doc == null) { 
+            balanceCache.put(uuid, 0L);
+            return 0L; 
+        } 
 
-    private Long getBalanceFromDatabase(UUID uuid) {
-        Document doc = getUsersDocument(uuid);
-        if(doc == null) { return 0L; } 
-        
         Object escrowAmount = doc.get("amount");
         if(escrowAmount != null){
-            return (long) escrowAmount;
+            long amt = (long) escrowAmount;
+            balanceCache.put(uuid, amt);
+            return amt;
         } 
-        return 0L;       
+        return 0L; 
     }
+    
+    public EscrowErrors deposit(UUID uuid, long amount) {
+        // Get the most the user can withdraw from CRAFT wallet or what they want, which would be the minimum of the 2
+        amount = Math.min(api.getBalance(uuid), amount);
+
+        Tx tx = api.createServerTx(uuid, amount, "ESCROWING " + amount + "FOR " + uuid.toString(), depositEscrowLogic(uuid, amount));
+        tx.submit(true, true, true); // submit & send TxClickable, Description, & WebappLink
+        return EscrowErrors.SUCCESS;
+    }
+
+    /**
+     * Redeems from in game held CRAFT balance to their actual CRAFT wallet address
+     * @param uuid
+     * @param redeemAmt
+     * @return Amount they redeemed, or -1 if they do not have a wallet
+     */
+    public long redeem(UUID uuid, long redeemAmt) {
+        String wallet = api.getWallet(uuid);
+        if(wallet == null) { 
+            return ErrorTypes.NO_WALLET.code; 
+        }
+
+        redeemAmt = Math.abs(redeemAmt); // only positive redeems
+            
+        // max withdraw is the redeemAmt OR total amount in their wallet, which ever is less
+        long mostTheyCanRedeem = Math.min(getBalance(uuid), redeemAmt);
+        removeBalance(uuid, mostTheyCanRedeem);
+        System.out.println("Redeeming " + mostTheyCanRedeem + " from in game -> wallet via deposit");
+        // deposits the tokens to their actual wallet
+        api.deposit(uuid, mostTheyCanRedeem);
+
+        Player player = Bukkit.getPlayer(uuid);
+            if(player != null) {
+                player.sendMessage("You have redeemed " + redeemAmt + CraftBlockchainPlugin.getInstance().getTokenDenom(false) + " from your escrow account -> wallet.");
+                player.sendMessage("Your new escrow balance is: " + getBalance(uuid));
+            }  
+
+        return mostTheyCanRedeem; 
+    }
+
+    private void setBalance(UUID uuid, long newBalance) {
+        // TODO: Move MongoDB logic only on close, call from onDisable() for all online
+        Document doc = getUsersDocument(uuid);
+        if(doc != null) {
+            getCollection().updateOne(Filters.eq("_id", uuid.toString()), Updates.set("amount", newBalance));
+        } else {
+            doc = new Document("_id", uuid.toString());
+            doc.append("amount", newBalance);
+            getCollection().insertOne(doc);
+        }
+        balanceCache.put(uuid, newBalance);
+    }
+
+    public EscrowErrors spend(UUID uuid, long cost) {
+        // player not enough escrow.
+        if(getBalance(uuid) < cost) {
+            return EscrowErrors.INSUFFICIENT_FUNDS;
+        }
+        removeBalance(uuid, cost);
+        return EscrowErrors.SUCCESS;
+    }
+
+    
 
     private Document getUsersDocument(UUID uuid) {
         Bson filter = Filters.eq("_id", uuid.toString());
@@ -133,4 +151,34 @@ public class EscrowManager {
         }
         return instance;
     }
+
+
+    /**
+     * On successful signing, this function will be called to update the balance of the player
+     * @param player_uuid
+     * @param amount
+     * @return Consumer<UUID>
+     */
+    private static Consumer<UUID> depositEscrowLogic(UUID player_uuid, long amount) {        
+        Consumer<UUID> deposit = (uuid) -> {  
+            instance.addBalance(uuid, amount);
+
+            Player player = Bukkit.getPlayer(player_uuid);
+            if(player != null) {
+                player.sendMessage("You have deposited " + amount + "CRAFT into your escrow account.");
+            }        
+        };
+        return deposit;
+    }  
+
+
+    private void addBalance(UUID uuid, long addAmount) {
+        setBalance(uuid, getBalance(uuid) + addAmount);
+    }
+    private void removeBalance(UUID uuid, long removeAmount) {
+        // "Adds" negative absolute value amount (ensures we don't add via this func)
+        addBalance(uuid, -Math.abs(removeAmount));
+    }
+
+
 }
