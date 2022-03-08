@@ -1,12 +1,17 @@
 package cmd
 
 import (
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
+	"github.com/notional-labs/craft/app"
 	"github.com/notional-labs/craft/app/params"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -232,12 +237,19 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		panic(err)
 	}
 
+	var wasmOpts []wasm.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
+
 	return craft.NewCraftApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		craft.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
+		app.GetEnabledProposals(),
 		appOpts,
+		wasmOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
@@ -254,21 +266,72 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 }
 
 func createCraftAppAndExport(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
-	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
+	logger log.Logger,
+	db dbm.DB,
+	traceStore io.Writer,
+	height int64,
+	forZeroHeight bool,
+	jailWhiteList []string,
+	appOpts servertypes.AppOptions,
+	wasmOpts []wasm.Option) (servertypes.ExportedApp, error) {
 
 	encCfg := craft.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Codec = codec.NewProtoCodec(encCfg.InterfaceRegistry)
 	var app *craft.CraftApp
 	if height != -1 {
-		app = craft.NewCraftApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg, appOpts)
+		app = craft.NewCraftApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg, appOpts, wasmOpts)
 
 		if err := app.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		app = craft.NewCraftApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, appOpts)
+		app = craft.NewCraftApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, appOpts, wasmOpts)
 	}
 
 	return app.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+}
+
+type appCreator struct {
+	encCfg params.EncodingConfig
+}
+
+func (ac appCreator) appExport(
+	logger log.Logger,
+	db dbm.DB,
+	traceStore io.Writer,
+	height int64,
+	forZeroHeight bool,
+	jailAllowedAddrs []string,
+	appOpts servertypes.AppOptions,
+) (servertypes.ExportedApp, error) {
+
+	var wasmApp *app.CraftApp
+	homePath, ok := appOpts.Get(flags.FlagHome).(string)
+	if !ok || homePath == "" {
+		return servertypes.ExportedApp{}, errors.New("application home is not set")
+	}
+
+	loadLatest := height == -1
+	var emptyWasmOpts []wasm.Option
+	wasmApp = app.NewCraftApp(
+		logger,
+		db,
+		traceStore,
+		loadLatest,
+		map[int64]bool{},
+		homePath,
+		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
+		ac.encCfg,
+		app.GetEnabledProposals(),
+		appOpts,
+		emptyWasmOpts,
+	)
+
+	if height != -1 {
+		if err := wasmApp.LoadHeight(height); err != nil {
+			return servertypes.ExportedApp{}, err
+		}
+	}
+
+	return wasmApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }

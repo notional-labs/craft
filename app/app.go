@@ -1,9 +1,11 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cast"
 
@@ -145,9 +147,14 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	ibcmock "github.com/cosmos/ibc-go/v3/testing/mock"
 
+	// NFT
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
+
+	// Wasm
+
+	"github.com/CosmWasm/wasmd/x/wasm"
 
 	// API documentation
 
@@ -157,7 +164,32 @@ import (
 const (
 	AccountAddressPrefix = "craft"
 	Name                 = "craft"
+
+	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
+	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
+	ProposalsEnabled = "false"
+	// If set to non-empty string it must be comma-separated list of values that are all a subset
+	// of "EnableAllProposals" (takes precedence over ProposalsEnabled)
+	// https://github.com/CosmWasm/wasmd/blob/02a54d33ff2c064f3539ae12d75d027d9c665f05/x/wasm/internal/types/proposal.go#L28-L34
+	EnableSpecificProposals = ""
 )
+
+// GetEnabledProposals parses the ProposalsEnabled / EnableSpecificProposals values to
+// produce a list of enabled proposals to pass into wasmd app.
+func GetEnabledProposals() []wasm.ProposalType {
+	if EnableSpecificProposals == "" {
+		if ProposalsEnabled == "true" {
+			return wasm.EnableAllProposals
+		}
+		return wasm.DisableAllProposals
+	}
+	chunks := strings.Split(EnableSpecificProposals, ",")
+	proposals, err := wasm.ConvertToProposals(chunks)
+	if err != nil {
+		panic(err)
+	}
+	return proposals
+}
 
 const AppName = "CraftApp"
 
@@ -193,6 +225,7 @@ var (
 		groupmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
+		wasm.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -206,6 +239,7 @@ var (
 		nft.ModuleName:                 nil,
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		icatypes.ModuleName:            nil,
+		wasm.ModuleName:                {authtypes.Burner},
 
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
@@ -264,6 +298,7 @@ type CraftApp struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	EvidenceKeeper      evidencekeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
+	WasmKeeper          wasm.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
@@ -272,6 +307,7 @@ type CraftApp struct {
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedIBCMockKeeper       capabilitykeeper.ScopedKeeper
 	ScopedICAMockKeeper       capabilitykeeper.ScopedKeeper
+	scopedWasmKeeper          capabilitykeeper.ScopedKeeper
 
 	// make IBC modules public for test purposes
 	// these modules are never directly routed to by the IBC Router
@@ -297,7 +333,9 @@ func NewCraftApp(
 	homePath string,
 	invCheckPeriod uint,
 	encodingConfig appparameters.EncodingConfig,
+	enabledProposals []wasm.ProposalType,
 	appOpts servertypes.AppOptions,
+	wasmOpts []wasm.Option,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *CraftApp {
 
@@ -331,6 +369,7 @@ func NewCraftApp(
 		authzkeeper.StoreKey,
 		nftkeeper.StoreKey,
 		group.StoreKey,
+		wasm.StoreKey,
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -366,6 +405,7 @@ func NewCraftApp(
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
 	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 
@@ -461,8 +501,34 @@ func NewCraftApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	// BELOW HERE IS COMMENTED-OUT IBC-STUFF
-	//		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+	wasmDir := filepath.Join(homePath, "wasm")
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	}
+
+	// The last arguments can contain custom message handlers, and custom query handlers,
+	// if we want to allow any custom callbacks
+	supportedFeatures := "iterator,staking,stargate"
+	app.WasmKeeper = wasm.NewKeeper(
+		appCodec,
+		keys[wasm.StoreKey],
+		app.GetSubspace(wasm.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.StakingKeeper,
+		app.DistrKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedWasmKeeper,
+		app.TransferKeeper,
+		app.msgSvcRouter,
+		app.GRPCQueryRouter(),
+		wasmDir,
+		wasmConfig,
+		supportedFeatures,
+		wasmOpts...,
+	)
 
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
@@ -498,6 +564,11 @@ func NewCraftApp(
 	icaControllerIBCModule := icacontroller.NewIBCModule(app.ICAControllerKeeper, icaAuthModule)
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
+	// The gov proposal types can be individually enabled
+	if len(enabledProposals) != 0 {
+		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.WasmKeeper, enabledProposals))
+	}
+
 	// Create static IBC router, add app routes, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(icacontrollertypes.SubModuleName, icaControllerIBCModule).
@@ -505,6 +576,8 @@ func NewCraftApp(
 		AddRoute(ibcmock.ModuleName+icacontrollertypes.SubModuleName, icaControllerIBCModule). // ica with mock auth module stack route to ica (top level of middleware stack)
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
 		AddRoute(ibcmock.ModuleName, mockIBCModule)
+
+	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper))
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	/****  Module Options ****/
@@ -535,6 +608,7 @@ func NewCraftApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
@@ -581,6 +655,7 @@ func NewCraftApp(
 		vestingtypes.ModuleName,
 		icatypes.ModuleName,
 		ibcmock.ModuleName,
+		wasm.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -606,6 +681,7 @@ func NewCraftApp(
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		ibcmock.ModuleName,
+		wasm.ModuleName,
 	)
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -635,6 +711,7 @@ func NewCraftApp(
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
+		wasm.ModuleName,
 	)
 
 	// Uncomment if you want to set a custom migration order here.
@@ -664,6 +741,9 @@ func NewCraftApp(
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper),
+		ibc.NewAppModule(app.IBCKeeper),
+		transferModule,
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -677,7 +757,7 @@ func NewCraftApp(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.setTxHandler(encodingConfig.TxConfig, cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents)))
+	app.setTxHandler(encodingConfig.TxConfig, cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents)), wasmConfig, keys)
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -805,22 +885,25 @@ func (app *CraftApp) RegisterTendermintService(clientCtx client.Context) {
 }
 
 // Set Transaction Handler
-func (app *CraftApp) setTxHandler(txConfig client.TxConfig, indexEventsStr []string) {
+func (app *CraftApp) setTxHandler(txConfig client.TxConfig, indexEventsStr []string, wasmConfig wasm.Config, keys map[string]*storetypes.KVStoreKey) {
 	indexEvents := map[string]struct{}{}
 	for _, e := range indexEventsStr {
 		indexEvents[e] = struct{}{}
 	}
-	txHandler, err := authmiddleware.NewDefaultTxHandler(authmiddleware.TxHandlerOptions{
-		Debug:            app.Trace(),
-		IndexEvents:      indexEvents,
-		LegacyRouter:     app.legacyRouter,
-		MsgServiceRouter: app.msgSvcRouter,
-		AccountKeeper:    app.AccountKeeper,
-		BankKeeper:       app.BankKeeper,
-		FeegrantKeeper:   app.FeeGrantKeeper,
-		SignModeHandler:  txConfig.SignModeHandler(),
-		SigGasConsumer:   authmiddleware.DefaultSigVerificationGasConsumer,
-		TxDecoder:        txConfig.TxDecoder(),
+	txHandler, err := NewDefaultTxHandler(TxHandlerOptions{
+		Debug:             app.Trace(),
+		IndexEvents:       indexEvents,
+		LegacyRouter:      app.legacyRouter,
+		MsgServiceRouter:  app.msgSvcRouter,
+		AccountKeeper:     app.AccountKeeper,
+		BankKeeper:        app.BankKeeper,
+		FeegrantKeeper:    app.FeeGrantKeeper,
+		SignModeHandler:   txConfig.SignModeHandler(),
+		SigGasConsumer:    authmiddleware.DefaultSigVerificationGasConsumer,
+		TxDecoder:         txConfig.TxDecoder(),
+		WasmConfig:        &wasmConfig,
+		TXCounterStoreKey: keys[wasm.StoreKey],
+		ChannelKeeper:     app.IBCKeeper.ChannelKeeper,
 	})
 	if err != nil {
 		panic(err)

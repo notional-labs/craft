@@ -6,6 +6,7 @@ release/
 .idea/
 .DS_Store
 .vscode
+checks.json
 networks/test/data/application.db
 networks/test/data/blockstore.db
 networks/test/data/snapshots
