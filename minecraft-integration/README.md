@@ -40,6 +40,7 @@ ADMIN:
   /test-tokensapi (Show total CRAFT and STAKE tokens in supply)
   /test-trade (Req. 2 players. Hold items, confirm trade amount, items are taken. On Blockchain sign trade items as agreed upon)
   /test-keplr (Send user link to KEPLR wallet documentation)
+  /test-escrowspend (pays 1 craft for some dirt to ensure it works correctly)
 ```
 
 ## API
@@ -55,7 +56,7 @@ https://repsy.io/reecepbcups/maven/craft-integration/artifacts/com.crafteconomy
 <dependency>
     <groupId>com.crafteconomy</groupId>
     <artifactId>craft-integration</artifactId>
-    <version>3.1.6</version>
+    <version>3.3.1</version>
     <scope>provided</scope>
 </dependency>
 
@@ -69,15 +70,36 @@ Standard Request:
 String wallet   = api.getWallet(uuid);
 long balance    = api.getBalance(uuid);
 String swallet  = api.getServerWallet();
+String webapp   = api.getWebAppAddress();
 
-String value    = api.deposit(uuid, longAmount);
+String value    = api.deposit(uuid, longAmount); // sends funds to player from faucet
 String value    = api.deposit(wallet_address, longAmount);
 
 
+Formating:
+String denom     = api.getTokenDenomination(boolean getSmallerValue);   // true = ucraft, false = craft
+float readableCraftValue = api.convertUCRAFTtoBeReadable(long ucraft);  // 1000000ucraft = 1 craft 
+long craftAmount = api.convertCraftToUCRAFT(long craft_amount);         // 0.1craft -> 100,000ucraft, for submitting to chain
+
+Account Wallets:
+boolean hasAcc = api.hasAccount(uuid);
+boolean valid = api.isValidWallet(String wallet);
+boolean validSet = api.setWallet(uuid, wallet);
+
+-
+
+Escrow Accounts: Returns EscrowErrors.SUCCESS if successful
+EscrowErrors err = api.escrowDeposit(UUID, amount); 
+err = api.escrowRedeem(UUID, amount); // in game back to wallet
+err = api.escrowSpend(UUID, cost); // purchase something in game with balance if any
+err = api.escrowGetBalance(UUID);
+
+-
+
 Transactions:
 
-Tx txInfo = api.createNewTx(uuid, to_wallet, amt, desc, Consumer<UUID> Function);
-Tx txInfo2 = api.createNewTx(uuid, to_wallet, amt, desc, BiConsumer<UUID, UUID> Function);
+Tx tx1 = api.createNewTx(uuid, to_wallet, amt, desc, Consumer<UUID> Function);
+Tx tx2 = api.createNewTx(uuid, to_wallet, amt, desc, BiConsumer<UUID, UUID> Function);
 
 OR
 
@@ -86,12 +108,16 @@ tx.setFromUUID(fromUUID);
 tx.setToUUID(toUUID); // biConsumer only
 tx.setToWallet(to_wallet);
 tx.setAmount(10);
-tx.setDescription("Memo");
+tx.setDescription("Memo here");
 
 tx.setFunction((Consumer<UUID>) Logic.purchaseBusinessLicense()); // single payments
 OR
 tx.setBiFunction(Logic.trade(Player1UUID, Player2UUID)); // p2p
 
+// submits transaction for user to sign via webapp, returns ErrorTypes.NO_ERROR if successful
+ErrorTypes error = api.submit(txInfo); 
+OR
+txInfo.submit(boolean includeTxClickable, boolean sendDescMessage, boolean sendWebappLink)
 
 Getting values from a Tx
     UUID fromUUID    = tx.getFromUUID();
@@ -102,14 +128,12 @@ Getting values from a Tx
     String toWallet  = tx.getToWallet();
     Consumer c       = tx.getFunction(); || tx.getBiFunction();
 
-// submits transaction for user to sign
-ErrorTypes error = api.submit(txInfo); 
-ErrorTypes.NO_ERROR // Successful submit for a pending transaction [not yet signed]
-
+-
 
 Messaging:
-    // Link to sign on webapp, useful when a transaction has been submitted
+    // Link to sign on webapp, useful when a transaction has been submitted OR just tx.submit(false, false, true)
     api.sendWebappForSigning(CommandSender sender, String fromWallet);
+    api.sendWebappForSigning(Player player);
 
     // Link to take user to documents page (useful when getWallet==null)
     api.sendClickableKeplrInstallDocs(sender);
@@ -120,6 +144,7 @@ Messaging:
     api.sendTxIDClickable(sender, TxIDString, format, hoverMessage);
     api.sendTxIDClickable(sender, TxIDString, format);
     api.sendTxIDClickable(sender, TxIDString);
+    api.sendTxIDClickable(player, TxIDString);
 
     // Sends user their wallet & allows for them to click copy it
     api.sendWalletClickable(sender, wallet, format, hoverMessage);
