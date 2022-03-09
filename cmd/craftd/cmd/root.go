@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/x/crisis"
-	"github.com/notional-labs/craft/app/params"
-
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -25,7 +25,11 @@ import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	"github.com/notional-labs/craft/app"
+	"github.com/notional-labs/craft/app/params"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	tmcmds "github.com/tendermint/tendermint/cmd/tendermint/commands"
@@ -41,6 +45,14 @@ import (
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	encodingConfig := craft.MakeEncodingConfig()
+
+	cfg := sdk.GetConfig()
+	cfg.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
+	cfg.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
+	cfg.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
+	cfg.SetAddressVerifier(wasmtypes.VerifyAddressLen())
+	cfg.Seal()
+
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Codec).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
@@ -232,12 +244,19 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		panic(err)
 	}
 
+	var wasmOpts []wasm.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
+
 	return craft.NewCraftApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		craft.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
+		app.GetEnabledProposals(),
 		appOpts,
+		wasmOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
@@ -256,19 +275,23 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 func createCraftAppAndExport(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
 	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
-
 	encCfg := craft.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Codec = codec.NewProtoCodec(encCfg.InterfaceRegistry)
-	var app *craft.CraftApp
-	if height != -1 {
-		app = craft.NewCraftApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg, appOpts)
+	var appcraft *craft.CraftApp
+	var wasmOpts []wasm.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
 
-		if err := app.LoadHeight(height); err != nil {
+	if height != -1 {
+		appcraft = craft.NewCraftApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg, app.GetEnabledProposals(), appOpts, wasmOpts)
+
+		if err := appcraft.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		app = craft.NewCraftApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, appOpts)
+		appcraft = craft.NewCraftApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, app.GetEnabledProposals(), appOpts, wasmOpts)
 	}
 
-	return app.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	return appcraft.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }
