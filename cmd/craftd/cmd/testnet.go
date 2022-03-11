@@ -491,7 +491,8 @@ func writeFile(name string, dir string, contents []byte) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(file, contents, 0644) // nolint: gosec
+	// #nosec G306
+	err = ioutil.WriteFile(file, contents, 0644)
 	if err != nil {
 		return err
 	}
@@ -534,7 +535,10 @@ func startTestnet(cmd *cobra.Command, args startArgs) error {
 	fmt.Printf("Testnet started (height=%d).\n", height)
 
 	cmd.Println("press the Enter Key to terminate")
-	fmt.Scanln() // wait for Enter Key
+	if _, err := fmt.Scanln(); err != nil { // wait for Enter Key
+		return err
+	}
+
 	testnet.Cleanup()
 
 	return nil

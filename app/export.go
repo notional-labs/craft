@@ -175,7 +175,10 @@ func (app *CraftApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs 
 		counter++
 	}
 
-	iter.Close()
+	err := iter.Close()
+	if err != nil {
+		panic(err)
+	}
 
 	if _, err := app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx); err != nil {
 		panic(err)
