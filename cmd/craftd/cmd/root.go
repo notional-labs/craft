@@ -1,12 +1,18 @@
 package cmd
 
 import (
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	"github.com/cosmos/cosmos-sdk/x/crisis"
+	"github.com/notional-labs/craft/app"
+	"github.com/notional-labs/craft/app/params"
+	"github.com/prometheus/client_golang/prometheus"
+
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -25,11 +31,8 @@ import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/notional-labs/craft/app"
-	"github.com/notional-labs/craft/app/params"
-	"github.com/prometheus/client_golang/prometheus"
+	craft "github.com/notional-labs/craft/app"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	tmcmds "github.com/tendermint/tendermint/cmd/tendermint/commands"
@@ -37,8 +40,6 @@ import (
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
-
-	craft "github.com/notional-labs/craft/app"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -294,4 +295,49 @@ func createCraftAppAndExport(
 	}
 
 	return appcraft.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+}
+
+type appCreator struct {
+	encCfg params.EncodingConfig
+}
+
+func (ac appCreator) appExport(
+	logger log.Logger,
+	db dbm.DB,
+	traceStore io.Writer,
+	height int64,
+	forZeroHeight bool,
+	jailAllowedAddrs []string,
+	appOpts servertypes.AppOptions,
+) (servertypes.ExportedApp, error) {
+
+	var wasmApp *app.CraftApp
+	homePath, ok := appOpts.Get(flags.FlagHome).(string)
+	if !ok || homePath == "" {
+		return servertypes.ExportedApp{}, errors.New("application home is not set")
+	}
+
+	loadLatest := height == -1
+	var emptyWasmOpts []wasm.Option
+	wasmApp = app.NewCraftApp(
+		logger,
+		db,
+		traceStore,
+		loadLatest,
+		map[int64]bool{},
+		homePath,
+		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
+		ac.encCfg,
+		app.GetEnabledProposals(),
+		appOpts,
+		emptyWasmOpts,
+	)
+
+	if height != -1 {
+		if err := wasmApp.LoadHeight(height); err != nil {
+			return servertypes.ExportedApp{}, err
+		}
+	}
+
+	return wasmApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }
