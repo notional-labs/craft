@@ -7,8 +7,8 @@ RUN pacman -Syyu --noconfirm go base-devel rocksdb
 
 COPY . /craft
 
-RUN cd /craft && \
-    go install ./...
+WORKDIR "/craft"
+RUN go install ./...
 
 FROM faddat/archlinux
 
