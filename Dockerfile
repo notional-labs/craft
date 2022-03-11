@@ -10,6 +10,7 @@ COPY . /craft
 WORKDIR "/craft"
 RUN go install ./...
 
+WORKDIR "/"
 FROM faddat/archlinux
 
 ENV CRAFT_P2P_MAX_NUM_INBOUND_PEERS=500
