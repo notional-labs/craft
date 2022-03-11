@@ -8,8 +8,10 @@ import javax.lang.model.type.ErrorType;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
+import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.transactions.Tx;
+import com.crafteconomy.blockchain.wallets.WalletManager;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mongodb.client.MongoCollection;
@@ -29,6 +31,7 @@ public class EscrowManager {
     private MongoDatabase db = null;
 
     private static EscrowManager instance;  
+    private WalletManager walletManager;
     private IntegrationAPI api = null;
 
     // TODO: move to Blockchain Core folder. 
@@ -47,7 +50,8 @@ public class EscrowManager {
 
     private EscrowManager() { 
         db = CraftBlockchainPlugin.getInstance().getMongo().getDatabase(); 
-        api = IntegrationAPI.getInstance();      
+        api = IntegrationAPI.getInstance();    
+        walletManager = WalletManager.getInstance();  
     }
 
     public long getBalance(UUID uuid) {
@@ -101,7 +105,8 @@ public class EscrowManager {
         removeBalance(uuid, mostTheyCanRedeem);
         System.out.println("Redeeming " + mostTheyCanRedeem + " from in game -> wallet via deposit");
         // deposits the tokens to their actual wallet
-        api.deposit(uuid, mostTheyCanRedeem);
+        // api.faucet();
+        BlockchainRequest.depositToAddress(walletManager.getAddress(uuid), mostTheyCanRedeem);
 
         Player player = Bukkit.getPlayer(uuid);
             if(player != null) {

@@ -35,7 +35,7 @@ public class GiveTokens implements CommandExecutor {
 
         Player player = Bukkit.getPlayer(args[0]);
 
-        String value = api.deposit(player.getUniqueId(), Long.valueOf(args[1]));
+        String value = api.faucet(player.getUniqueId(), Long.valueOf(args[1]));
 
         if(value != null) {
             Util.colorMsg(sender, "Deposited " + args[1] + " to " + player.getName() + " wallet");

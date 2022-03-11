@@ -72,8 +72,9 @@ long balance    = api.getBalance(uuid);
 String swallet  = api.getServerWallet();
 String webapp   = api.getWebAppAddress();
 
-String value    = api.deposit(uuid, longAmount); // sends funds to player from faucet
-String value    = api.deposit(wallet_address, longAmount);
+// sends funds to player from faucet. returns "NO_WALLET" or {"transfers":[{"coin":"1token","status":"ok"}]}
+String value    = api.faucet(uuid, longAmount); 
+String value    = api.faucet(wallet_address, longAmount);
 
 
 Formating:

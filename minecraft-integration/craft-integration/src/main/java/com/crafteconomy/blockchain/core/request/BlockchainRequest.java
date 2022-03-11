@@ -70,7 +70,11 @@ public class BlockchainRequest {
     }
 
     // -= GIVING TOKENS =-
-    public static String depositToAddress(String craft_address, long amount) {
+    public static String depositToAddress(String craft_address, long amount) {        
+        if(craft_address == null) {
+            return "NO_WALLET";
+        }
+
         String body = "{  \"address\": \""+craft_address+"\",  \"coins\": [    \""+amount+"token\"  ]}";
         String log = "Faucet: " + craft_address + " " + amount;
 

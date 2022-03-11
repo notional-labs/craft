@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 public class WalletFaucet implements SubCommand {
 
     WalletManager walletManager = WalletManager.getInstance();
+    int requiredWalletLength = CraftBlockchainPlugin.getInstance().getWalletLength();
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
@@ -38,7 +39,7 @@ public class WalletFaucet implements SubCommand {
             }
         }
 
-        if(wallet == null || wallet.length() != 44) {
+        if(wallet == null || wallet.length() != requiredWalletLength) {
             Util.colorMsg(sender, "&cInvalid wallet address " + wallet + " ( length " + wallet.length() + " )");
             return;
         }

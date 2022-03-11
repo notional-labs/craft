@@ -202,9 +202,11 @@ public class IntegrationAPI {
      * @param consoleSender
      * @param player_uuid
      * @param amount
-     * @return  null or json {"transfers":[{"coin":"1token","status":"ok"}]}
+     * @return  "" if faucet is disabled, 
+     *          or {"transfers":[{"coin":"1token","status":"ok"}]}
+     *          or "NO_WALLET" if wallet is null
      */
-    public String deposit(String wallet_address, long amount) {
+    public String faucet(String wallet_address, long amount) {
         // {"transfers":[{"coin":"1token","status":"ok"}]}
         return BlockchainRequest.depositToAddress(wallet_address, amount);
     }
@@ -214,11 +216,13 @@ public class IntegrationAPI {
      * @param consoleSender
      * @param player_uuid
      * @param amount
-     * @return  null or json {"transfers":[{"coin":"1token","status":"ok"}]}
+     * @return  "" if faucet is disabled, 
+     *          or {"transfers":[{"coin":"1token","status":"ok"}]}
+     *          or "NO_WALLET" if wallet is null
      */
-    public String deposit(UUID player_uuid, long amount) {
+    public String faucet(UUID player_uuid, long amount) {
         // {"transfers":[{"coin":"1token","status":"ok"}]}
-        return deposit(walletManager.getAddress(player_uuid), amount);
+        return faucet(walletManager.getAddress(player_uuid), amount);
     }
 
 
