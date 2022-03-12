@@ -3,12 +3,13 @@ module github.com/notional-labs/craft
 go 1.17
 
 require (
+	github.com/CosmWasm/wasmd v0.23.0
 	github.com/CosmWasm/wasmvm v1.0.0-soon2.0.20220223181252-4aba468c9bc6 // indirect
-	github.com/cosmos/cosmos-sdk v0.46.0-alpha2.0.20220227172654-e460f010e1a6
+	github.com/cosmos/cosmos-sdk v0.46.0-alpha3.0.20220311194917-25feb237f891
 	github.com/cosmos/ibc-go/v3 v3.0.0-rc1
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/spf13/cast v1.4.1
-	github.com/spf13/cobra v1.3.0
+	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tendermint/tendermint v0.36.0-dev.0.20220226000315-ea497301a7d3
@@ -20,7 +21,6 @@ require (
 	cloud.google.com/go/storage v1.14.0 // indirect
 	filippo.io/edwards25519 v1.0.0-beta.2 // indirect
 	github.com/99designs/keyring v1.1.6 // indirect
-	github.com/CosmWasm/wasmd v0.23.0
 	github.com/Workiva/go-datastructures v1.0.53 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/aws/aws-sdk-go v1.40.45 // indirect
@@ -40,7 +40,7 @@ require (
 	github.com/cosmos/cosmos-sdk/errors v1.0.0-beta.2 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
-	github.com/cosmos/iavl v0.17.3 // indirect
+	github.com/cosmos/iavl v0.18.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.11.1 // indirect
 	github.com/cosmos/ledger-go v0.9.2 // indirect
 	github.com/danieljoos/wincred v1.0.2 // indirect
@@ -135,7 +135,7 @@ require (
 	google.golang.org/api v0.63.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220118154757-00ab72f36ad5 // indirect
-	google.golang.org/grpc v1.44.0 // indirect
+	google.golang.org/grpc v1.45.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.3 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -146,7 +146,7 @@ require (
 
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
-	github.com/CosmWasm/wasmd => github.com/notional-labs/wasmd v0.21.1-0.20220305205305-7e10035bf916
+	github.com/CosmWasm/wasmd => github.com/notional-labs/wasmd v0.21.1-0.20220308154838-dcd17d62ffd2
 	github.com/cosmos/ibc-go/v3 => github.com/notional-labs/ibc-go/v3 v3.0.0-20220305164509-7990c74892cc
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 )
