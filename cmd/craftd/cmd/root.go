@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -295,49 +294,4 @@ func createCraftAppAndExport(
 	}
 
 	return appcraft.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
-}
-
-type appCreator struct {
-	encCfg params.EncodingConfig
-}
-
-func (ac appCreator) appExport(
-	logger log.Logger,
-	db dbm.DB,
-	traceStore io.Writer,
-	height int64,
-	forZeroHeight bool,
-	jailAllowedAddrs []string,
-	appOpts servertypes.AppOptions,
-) (servertypes.ExportedApp, error) {
-
-	var wasmApp *app.CraftApp
-	homePath, ok := appOpts.Get(flags.FlagHome).(string)
-	if !ok || homePath == "" {
-		return servertypes.ExportedApp{}, errors.New("application home is not set")
-	}
-
-	loadLatest := height == -1
-	var emptyWasmOpts []wasm.Option
-	wasmApp = app.NewCraftApp(
-		logger,
-		db,
-		traceStore,
-		loadLatest,
-		map[int64]bool{},
-		homePath,
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		ac.encCfg,
-		app.GetEnabledProposals(),
-		appOpts,
-		emptyWasmOpts,
-	)
-
-	if height != -1 {
-		if err := wasmApp.LoadHeight(height); err != nil {
-			return servertypes.ExportedApp{}, err
-		}
-	}
-
-	return wasmApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }
