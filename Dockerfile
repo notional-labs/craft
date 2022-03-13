@@ -3,7 +3,7 @@ FROM faddat/archlinux AS builder
 ENV GOPATH /go
 ENV PATH $PATH:/go/bin
 
-RUN pacman -Syyu --noconfirm go base-devel rocksdb
+RUN pacman -Syyu --noconfirm go base-devel
 
 COPY . /craft
 
