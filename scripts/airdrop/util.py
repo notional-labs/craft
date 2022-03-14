@@ -14,6 +14,23 @@ NETWORKS = {
     'juno': "https://lcd-juno.itastakers.com",
 }
 
+AIRDROP_DISTRIBUTIONS = { 
+    # TODO: NOT REAL VALUES, FOR TESTING ONLY
+    # https://github.com/notional-labs/craft/issues/17
+    1: 0, # stakers of [akash, osmo, atom, and juno]
+    2: 0, # LP's of Pool 1 & 561
+    3: 0, # Delegators to Atom relayers
+    4: 0, # ChandraStation Deleagators
+    5: 0, # ION Holders & LP's
+    6: 37_500_000, # Genesis Validators
+    7: 0, # Beta Players
+}
+
+AIRDROP_RATES = { # TODO: NOT REAL VALUES, FOR TESTING ONLY
+    "dig": 10_000_000,   # 10dig = 1 craft
+    "osmo": 100_000      # 0.1 osmo = 1 craft
+}
+
 GENESIS_VALIDATORS = { 
     # pbcups TODO: Testing
     'digvaloper1ms3k4d9j7rzpzmq3d4jg4j4kffldfnq66wxdpj': 1.07, 
@@ -61,7 +78,9 @@ GENESIS_VALIDATORS = {
     'gravityvaloper1lu9p4tl02nl979l9huk33x8rgnwzwmysap0s60': 1.05,
 
     # AltcoinPsyco - Akash | Sentinel | Persistence
-    # node moniker?
+    'akashvaloper1d4sctjlcqjrfkxpp0a5hwsntfhzy7mz2lhujx8': 1.05,
+    'sentvaloper12kz3rd47mpljfzqc9ygrpelj5kp6tx0dl8ylrk': 1.05,
+    'persistencevaloper17egy2hqqrutajzvf4f6qe2qzc3uey7ysvkeftp': 1.05,
 
     # notionaldao - Osmosis | Huahua | Juno
     'osmovaloper1083svrca4t350mphfv9x45wq9asrs60c6rv0j5': 1.05,
@@ -84,7 +103,12 @@ GENESIS_VALIDATORS = {
     'cosmosvaloper1hdrlqvyjfy5sdrseecjrutyws9khtxxaux62l7': 1.05,
     'junovaloper1q3jsx9dpfhtyqqgetwpe5tmk8f0ms5qywje8tw': 1.05,
 
-    # vitwit_- Atom | Akash | Osmosis | Juno | Regen - ??
+    # vitwit_ (WitVal) - Atom | Akash | Osmosis | Juno | Regen
+    'cosmosvaloper1ddle9tczl87gsvmeva3c48nenyng4n56nghmjk': 1.05,
+    'akashvaloper1qwlcuf2c2dhtgy8z5y7xxqev96km0n5mw30ls2': 1.05,
+    'osmovaloper1ddle9tczl87gsvmeva3c48nenyng4n56yscals': 1.05,
+    'junovaloper16msryt3fqlxtvsy8u5ay7wv2p8mglfg9g70e3q': 1.05,
+    'regenvaloper1h5z08rzvrwt3pzdjc03upvuh2x0j3yskldyqvj': 1.05,
 
     # OmniFlixNetwork - Juno | Stargaze | Osmosis
     'osmovaloper12zwq8pcmmgwsl95rueqsf65avfg5zcj047ucw6': 1.05,
