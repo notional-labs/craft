@@ -2,8 +2,6 @@ from util import convert_address_to_craft
 from util import GENESIS_VALIDATORS, BLACKLISTED_CENTRAL_EXCHANGES, NETWORKS, headers
 
 import requests
-import pprint
-import json
 
 '''
 CraftEconomy Airdrops
@@ -30,8 +28,7 @@ def main():
 
 def get_all_validators_in_network(website_link) -> dict:
     '''
-    Returns a dict of validators in the network, excluding genesis validators (Since we will calculate their rewards seperate with bonus)
-    OR we can just calulate it here if they are in genesis
+    Returns a dict of validators in a given network
     '''
     response = requests.get(f'{website_link}/cosmos/staking/v1beta1/validators', headers=headers).json()
     
@@ -49,6 +46,10 @@ def get_all_validators_in_network(website_link) -> dict:
 
         if bonus_multiplier > 1:
             print(validator['operator_address'] , bonus_multiplier)
+
+        validators[opp_address] = bonus_multiplier
+
+    return validators
 
 
 def get_delegators_of_validator(website_link, validator_addr):
