@@ -23,6 +23,7 @@ Logic:
 TOTAL_AIRDROP_AMOUNT = 37_500_000
 # FORMULA = math.min(multiplier*(Allocated $CRAFT/ElligbleSuppy)*math.sqrt(balanceAmount), maxAmount)
 
+# holds their craft address & total craft they get for the airdrop
 craft_airdrop_amounts = {}
 
 def main(): 
@@ -32,15 +33,15 @@ def main():
     # all_delegates = {}
 
     # network = "dig"
-    
-    for network in ['dig', 'osmo']:
+    for network in ['dig']:
         idx = 0
+
+        # delegates = get_delegators_of_validator(network, 'digvaloper1ms3k4d9j7rzpzmq3d4jg4j4kffldfnq66wxdpj') #pbcups validator testing
 
         all_validators = get_all_validators_and_their_airdrop_bonus(network) 
         for validator in all_validators:
             idx += 1
-
-            # delegates = get_delegators_of_validator(network, 'digvaloper1ms3k4d9j7rzpzmq3d4jg4j4kffldfnq66wxdpj') #pbcups validator testing
+            
             delegations = get_delegators_of_validator(network, validator)
 
             for address in delegations: 
@@ -52,8 +53,8 @@ def main():
                         craft_airdrop_amounts[craftAddress] = 0
                     craft_airdrop_amounts[craftAddress] = craft_airdrop_amounts[craftAddress] + (int(delegations[address]) / AIRDROP_RATES[network])
 
-            if idx == 20:
-                break
+            # if idx == 70:
+                # break
     
     total_supply_for_this_group = 10_000_000
     craftPerAddress = (total_supply_for_this_group / len(craft_airdrop_amounts))
@@ -69,14 +70,18 @@ def get_all_validators_and_their_airdrop_bonus(name) -> dict:
     response = requests.get(f'{website_link}/cosmos/staking/v1beta1/validators', headers=headers).json()
     
     validators = {}
-    for i in range(len(response['validators'])):
+    for i in range(len(response['validators'])-1):
         bonus_multiplier = 1.0
         validator = response['validators'][i]  
         moniker = validator['description']['moniker']
         opp_address = validator['operator_address']
+        isJailed = validator['jailed']
 
         if opp_address in BLACKLISTED_CENTRAL_EXCHANGES.keys():
             continue # No airdrop for central exchanges (Coinbase, Binance, et.)
+
+        if isJailed:
+            continue # only active validators
 
         if opp_address in GENESIS_VALIDATORS.keys():
             bonus_multiplier = GENESIS_VALIDATORS[opp_address]
@@ -94,10 +99,17 @@ def get_delegators_of_validator(name, validator_addr) -> dict:
     delegators = {}
     response = requests.get(f'{website_link}/cosmos/staking/v1beta1/validators/{validator_addr}/delegations', headers=headers).json()
     
+    boostMultiplier = 1.0
+    if validator_addr in GENESIS_VALIDATORS.keys():
+        boostMultiplier = GENESIS_VALIDATORS[validator_addr]
+        print("BOOSTED to " + str(boostMultiplier))
+
     for delegator in response['delegation_responses']:
         # Save to delegators dict. Maybe divide balance amount /1_000_000 to make it whole balances
         # print(delegator['delegation']['delegator_address'], delegator['balance']['amount'], delegator['balance']['denom'])
-        delegators[delegator['delegation']['delegator_address']] = delegator['balance']['amount']
+
+        # if they are delegated to a genesis validator, boost their amount by 5% (or 20% for chandra)
+        delegators[delegator['delegation']['delegator_address']] = int(delegator['balance']['amount'])*boostMultiplier
 
     return delegators # {'digxxxxx': amountHeld}
 
