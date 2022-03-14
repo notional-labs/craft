@@ -19,3 +19,4 @@ networks/test/data/evidence.db
 minecraft-integration/*/.vscode
 minecraft-integration/*/target
 minecraft-integration/output
+*__pycache__
