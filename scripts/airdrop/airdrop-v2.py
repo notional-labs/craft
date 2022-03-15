@@ -1,7 +1,8 @@
-from util import convert_address_to_craft
+from util import AIRDROP_DISTRIBUTIONS, convert_address_to_craft
 from util import GENESIS_VALIDATORS, BLACKLISTED_CENTRAL_EXCHANGES, NETWORKS, headers, AIRDROP_RATES
 
 import requests
+import json
 
 '''
 CraftEconomy Airdrops
@@ -28,33 +29,31 @@ craft_airdrop_amounts = {}
 
 def main(): 
     # d = get_all_validators_and_their_airdrop_bonus('osmo') 
-    # calculate_bonus_airdrops()
     
     # all_delegates = {}
 
     # network = "dig"
     for network in ['dig']:
-        idx = 0
-
         # delegates = get_delegators_of_validator(network, 'digvaloper1ms3k4d9j7rzpzmq3d4jg4j4kffldfnq66wxdpj') #pbcups validator testing
 
+        # {XXXXvaloperXXXXXXXX: 1.0, XXXXvaloperCHANDRASTATION: 1.20}
         all_validators = get_all_validators_and_their_airdrop_bonus(network) 
-        for validator in all_validators:
-            idx += 1
+
+        for idx, validator in enumerate(all_validators):
             
             delegations = get_delegators_of_validator(network, validator)
 
             for address in delegations: 
                 # all_delegates[address] = delegations[address]
                 craftAddress = convert_address_to_craft(address)
-                if craftAddress is not None:
-                    # gets the amount of tokens delegated to the address
-                    if craftAddress not in craft_airdrop_amounts:
-                        craft_airdrop_amounts[craftAddress] = 0
-                    craft_airdrop_amounts[craftAddress] = craft_airdrop_amounts[craftAddress] + (int(delegations[address]) / AIRDROP_RATES[network])
+                # are we doing airdrop rates OR a set amount no matter the delegation enom? 
+                # (ex. you get same amount of craft if you delegated osmo or dig, since its a per wallet basis)
 
-            # if idx == 70:
-                # break
+                # TODO: If above is true, loop through all_validators & get len, then divide total_supply_for_this_group / len() = craftPerAddress
+                # add_airdrop_to_account(craftAddress, int(delegations[address]) / AIRDROP_RATES[network])
+
+            if idx == 10:
+                break # Testing
     
     total_supply_for_this_group = 10_000_000
     craftPerAddress = (total_supply_for_this_group / len(craft_airdrop_amounts))
@@ -113,16 +112,40 @@ def get_delegators_of_validator(name, validator_addr) -> dict:
 
     return delegators # {'digxxxxx': amountHeld}
 
+def add_airdrop_to_account(craft_address, amount):
+    global craft_airdrop_amounts
+    if craft_address not in craft_airdrop_amounts:
+        craft_airdrop_amounts[craft_address] = 0
+    craft_airdrop_amounts[craft_address] += amount
+    pass
 
-def calculate_bonus_airdrops():
-    for opperator_address in GENESIS_VALIDATORS.keys():
-        for denom in NETWORKS.keys():
-            if opperator_address.startswith(denom):
-                link = NETWORKS[denom]
+def fairdrop_for_osmosis_pools():
+    '''Group #2 - LPs for pool #1 and #561 (luna/osmo)'''
+    # TODO: POOL #1 & #561 (luna/osmo) - not done
+    # osmosisd export 2138101 > state_export.json
+    # osmosisd export-derive-balances state_export.json balances.json --breakdown-by-pool-ids 1,561
+    with open('balances.json') as f:
+        balances = json.load(f)
 
-        # print(opperator_address, link)
-        get_delegators_of_validator(link, opperator_address)
-        break
+    # Gets # of accounts in the pools, and gets gets how much craft everyone gets evenly
+    # (their % of 37_500_000/totalAccountsNumber)
+    amountOfAccouts = len(balances)
+    craft_per_LPer = (AIRDROP_DISTRIBUTIONS[2] / len(amountOfAccouts))
+
+    for account in balances:
+        address = account['address'] # something like this
+        craftAddress = convert_address_to_craft(address)
+        add_airdrop_to_account(craftAddress, int(craft_per_LPer))
+
+
+# def calculate_bonus_airdrops():
+#     for opperator_address in GENESIS_VALIDATORS.keys():
+#         for denom in NETWORKS.keys():
+#             if opperator_address.startswith(denom):
+#                 link = NETWORKS[denom]
+#         # print(opperator_address, link)
+#         get_delegators_of_validator(link, opperator_address)
+#         break
 
 
 
