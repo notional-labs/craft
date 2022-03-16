@@ -1,5 +1,10 @@
 package com.crafteconomy.blockchain.listeners;
 
+import java.util.UUID;
+
+import com.crafteconomy.blockchain.core.request.Caches;
+import com.crafteconomy.blockchain.core.types.RequestTypes;
+import com.crafteconomy.blockchain.escrow.EscrowManager;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
 import org.bukkit.event.EventHandler;
@@ -15,17 +20,24 @@ public class JoinLeave implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent e) {
-        walletManager.cacheWalletOnJoin(e.getPlayer().getUniqueId());
+        UUID uuid = e.getPlayer().getUniqueId();
+        walletManager.cacheWalletOnJoin(uuid);
+        EscrowManager.getInstance().loadCachedPlayer(uuid);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLeave(PlayerQuitEvent e) {
-        walletManager.removeFromCache(e.getPlayer().getUniqueId());
+        unloadPlayer(e.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onLeave(PlayerKickEvent e) {
-        walletManager.removeFromCache(e.getPlayer().getUniqueId());
+    public void onKick(PlayerKickEvent e) {
+        unloadPlayer(e.getPlayer().getUniqueId());
+    }
+
+    private void unloadPlayer(UUID uuid) {
+        walletManager.removeFromCache(uuid);
+        EscrowManager.getInstance().unloadCachedPlayer(uuid);
     }
 
 }

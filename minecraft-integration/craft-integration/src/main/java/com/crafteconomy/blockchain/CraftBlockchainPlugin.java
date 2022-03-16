@@ -35,7 +35,7 @@ import redis.clients.jedis.Jedis;
 
 // CraftBlockchainPlugin.java Task:
 // +whitelist http://ENDPOINT:4500/ to only our machines ip [since only DOA needs it for Quest and Such]. BE SUPER CAREFUL
-// TODO: Fix redis key listener not closing correctly / unexpect quit on server shutdown
+// TODO: Fix redis key listener not closing correctly / unexpect quit on server shutdown. This is kinda fixed but eh
 
 // ********* IMPORTANT *********
 // Ensure redis-cli -> `CONFIG SET notify-keyspace-events K$` (KEA also works)

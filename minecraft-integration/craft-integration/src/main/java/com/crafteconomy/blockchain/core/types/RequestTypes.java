@@ -6,6 +6,7 @@ package com.crafteconomy.blockchain.core.types;
 public enum RequestTypes {
     BALANCE("balance"), 
     SUPPLY("amount"),
+    ESCROW(""), // escrow balance in game
     FAUCET("");
 
     public String json_key;

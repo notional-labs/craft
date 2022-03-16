@@ -1,19 +1,16 @@
 package com.crafteconomy.blockchain.escrow;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import javax.lang.model.type.ErrorType;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
+import com.crafteconomy.blockchain.core.request.Caches;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.RequestTypes;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.wallets.WalletManager;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -25,27 +22,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class EscrowManager {
-
-    // TODO: UNTESTED
     
     private MongoDatabase db = null;
 
     private static EscrowManager instance;  
     private WalletManager walletManager;
     private IntegrationAPI api = null;
+    private RequestTypes escrow = RequestTypes.ESCROW;
 
-    // TODO: move to Blockchain Core folder. 
-    private static final Cache<UUID, Long> balanceCache = CacheBuilder.newBuilder()
-        .maximumSize((long) (Bukkit.getMaxPlayers() * 1.2)) // room for staff to be cached too
-        .expireAfterWrite(10, TimeUnit.MINUTES)
-        .build();
-
+    // TODO: 
     public void unloadCachedPlayer(UUID uuid) {
-        balanceCache.invalidate(uuid);
+        Caches.invalidate(escrow, uuid);
     }
     
     public void loadCachedPlayer(UUID uuid) {
-        balanceCache.put(uuid, getBalance(uuid));
+        Caches.put(escrow, uuid, getBalance(uuid));
     }
 
     private EscrowManager() { 
@@ -56,7 +47,7 @@ public class EscrowManager {
 
     public long getBalance(UUID uuid) {
         // get cached value
-        Object value = balanceCache.getIfPresent(uuid);
+        Object value = Caches.getIfPresent(escrow, uuid);
         if (value != null) {
             return (long) value;
         }
@@ -64,14 +55,14 @@ public class EscrowManager {
         // cache time ran out, get document if any & cache current value
         Document doc = getUsersDocument(uuid);
         if(doc == null) { 
-            balanceCache.put(uuid, 0L);
+            Caches.put(escrow, uuid, 0L);
             return 0L; 
         } 
 
         Object escrowAmount = doc.get("amount");
         if(escrowAmount != null){
             long amt = (long) escrowAmount;
-            balanceCache.put(uuid, amt);
+            Caches.put(escrow, uuid, amt);
             return amt;
         } 
         return 0L; 
@@ -127,7 +118,7 @@ public class EscrowManager {
             doc.append("amount", newBalance);
             getCollection().insertOne(doc);
         }
-        balanceCache.put(uuid, newBalance);
+        Caches.put(escrow, uuid, newBalance);
     }
 
     public EscrowErrors spend(UUID uuid, long cost) {
