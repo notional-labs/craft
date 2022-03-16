@@ -30,7 +30,6 @@ public class EscrowManager {
     private IntegrationAPI api = null;
     private RequestTypes escrow = RequestTypes.ESCROW;
 
-    // TODO: 
     public void unloadCachedPlayer(UUID uuid) {
         Caches.invalidate(escrow, uuid);
     }
@@ -109,7 +108,6 @@ public class EscrowManager {
     }
 
     private void setBalance(UUID uuid, long newBalance) {
-        // TODO: Move MongoDB logic only on close, call from onDisable() for all online
         Document doc = getUsersDocument(uuid);
         if(doc != null) {
             getCollection().updateOne(Filters.eq("_id", uuid.toString()), Updates.set("amount", newBalance));

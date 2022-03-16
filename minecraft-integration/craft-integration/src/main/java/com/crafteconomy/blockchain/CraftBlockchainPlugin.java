@@ -35,7 +35,6 @@ import redis.clients.jedis.Jedis;
 
 // CraftBlockchainPlugin.java Task:
 // +whitelist http://ENDPOINT:4500/ to only our machines ip [since only DOA needs it for Quest and Such]. BE SUPER CAREFUL
-// TODO: Fix redis key listener not closing correctly / unexpect quit on server shutdown. This is kinda fixed but eh
 
 // ********* IMPORTANT *********
 // Ensure redis-cli -> `CONFIG SET notify-keyspace-events K$` (KEA also works)
@@ -183,13 +182,11 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         return getConfig().getString("API_ENDPOINT");
     }
 
-    public String getWalletPrefix() {
-        // TODO: Update -> ex. osmo or craft, make lowercase
-        return "osmo";
+    public String getWalletPrefix() {        
+        return "osmo"; // TODO: Update -> ex. osmo or craft, make lowercase
     }
-    public int getWalletLength() {
-        // TODO: craft is 43, osmo is 43
-        return 43;
+    public int getWalletLength() {    
+        return 39 + getWalletPrefix().length();
     }
 
     public String getWebappLink() {

@@ -55,8 +55,7 @@ public class WalletMyPendingTxs implements SubCommand {
         }
  
         if(keys.size() > 0) {
-            Util.colorMsg(sender, "&b[!] Your pending transactions:");
-            // TODO: add signing website here
+            Util.colorMsg(sender, "\n&b&l[!] Your pending transactions:");            
             
             String walletFormat = "tx_" + walletAddress + "_";
 
@@ -83,6 +82,7 @@ public class WalletMyPendingTxs implements SubCommand {
                 }
 
             }
+            IntegrationAPI.getInstance().sendWebappForSigning(sender);
 
         } else {
             Util.colorMsg(sender, "&c[!] You have no pending transactions");

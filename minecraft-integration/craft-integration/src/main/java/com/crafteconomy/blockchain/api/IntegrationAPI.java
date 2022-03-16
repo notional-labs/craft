@@ -196,7 +196,6 @@ public class IntegrationAPI {
         return BlockchainRequest.transaction(tx);
     }
 
-    // TODO: Maybe rename deposit to faucet?
     /**
      * Gives a wallet some tokens (CRAFT) 
      * @param consoleSender
