@@ -147,6 +147,7 @@ require (
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
 	github.com/CosmWasm/wasmd => github.com/notional-labs/wasmd v0.21.1-0.20220313014136-a30c4efbca5d
+	github.com/cosmos/cosmos-sdk => github.com/notional-labs/cosmos-sdk v0.46.0-craft.0.20220320203905-175e3c0e5ef1
 	github.com/cosmos/ibc-go/v3 => github.com/notional-labs/ibc-go/v3 v3.0.0-20220313013342-c5d92b4023b4
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 )
