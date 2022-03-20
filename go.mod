@@ -16,12 +16,11 @@ require (
 )
 
 require (
-	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/CosmWasm/wasmvm v1.0.0-soon2.0.20220223181252-4aba468c9bc6 // indirect
 	cloud.google.com/go v0.99.0 // indirect
 	cloud.google.com/go/storage v1.14.0 // indirect
 	filippo.io/edwards25519 v1.0.0-beta.2 // indirect
 	github.com/99designs/keyring v1.1.6 // indirect
+	github.com/CosmWasm/wasmvm v1.0.0-soon2.0.20220223181252-4aba468c9bc6 // indirect
 	github.com/Workiva/go-datastructures v1.0.53 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/aws/aws-sdk-go v1.40.45 // indirect
@@ -64,6 +63,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/btree v1.0.1 // indirect
+	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/orderedcode v0.0.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
@@ -147,6 +147,7 @@ require (
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
 	github.com/CosmWasm/wasmd => github.com/notional-labs/wasmd v0.21.1-0.20220313014136-a30c4efbca5d
+	github.com/cosmos/cosmos-sdk => github.com/notional-labs/cosmos-sdk v0.46.0-craft.0.20220320203905-175e3c0e5ef1
 	github.com/cosmos/ibc-go/v3 => github.com/notional-labs/ibc-go/v3 v3.0.0-20220313013342-c5d92b4023b4
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 )
