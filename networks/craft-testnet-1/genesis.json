@@ -46,7 +46,7 @@
     },
     "bank": {
       "params": {
-        "send_enabled": [],
+        "send_enabled": [{"denom": "uexp", "enabled": false }],
         "default_send_enabled": true
       },
       "balances": [
