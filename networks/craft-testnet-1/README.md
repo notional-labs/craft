@@ -51,7 +51,7 @@ to add ledger key
 * `craftd keys add [key_name] --ledger` to add a ledger key 
 
 ## Validator setup instructions
-# GenTx : [Skip to Post Genesis](# Become a validator (Post Genesis))
+# GenTx : [Skip to Post Genesis](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#become-a-validator-post-genesis)
 
 ```bash
 Install craftd binary
