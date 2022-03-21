@@ -33,7 +33,7 @@
 * **Arch Linux:** `pacman -S make`
 * **Ubuntu sudo:** `apt-get install make`
 
-## Craftd Installation Steps
+### Craftd Installation Steps
 
 ```bash
 Clone git repository
@@ -44,7 +44,7 @@ go install ./...
 ```
 > to add ledger support `go install -tags ledger ./...`
 
-# Generate keys
+### Generate keys
 * `craftd keys add [key_name]`
 * `craftd keys add [key_name] --recover` to regenerate keys with your BIP39 mnemonic
 to add ledger key
