@@ -11,6 +11,7 @@
 * 4 GB RAM
 * 100 GB SSD
 * 3.2 x4 GHz CPU
+
 **Recommended**
 * 8 GB RAM
 * 100 GB NVME SSD
