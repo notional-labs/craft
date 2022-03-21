@@ -46,10 +46,9 @@ go install ./...
 
 # Generate keys
 * `craftd keys add [key_name]`
-or
 * `craftd keys add [key_name] --recover` to regenerate keys with your BIP39 mnemonic
 to add ledger key
-* `craftd keys add [key_name] --ledger`
+* `craftd keys add [key_name] --ledger` to add a ledger key 
 
 ## Validator setup instructions
 # GenTx : [Skip to Post Genesis](# Become a validator (Post Genesis))
