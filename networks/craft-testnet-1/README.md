@@ -42,6 +42,8 @@ cd craft
 git checkout v0.1.1
 go install ./...
 ```
+> to add ledger support `go install -tags ledger ./...`
+
 # Generate keys
 * `craftd keys add [key_name]`
 or
