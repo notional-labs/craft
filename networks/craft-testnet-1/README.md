@@ -73,12 +73,13 @@ craftd gentx <key_name> 1000000uexp --home=~/.craftd/ --keyring-backend=os --cha
 ## Peers, Seeds, Genesis & Service File (Post GenTX)
 * Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/blob/master/networks/craft-testnet-1/genesis.json`
 
-* Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)**
+* Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
 
 * Copy below value as minimum-gas-prices in `${HOME}/.craftd/config/app.toml
 0.02ucraft`
 
 Start craftd by creating a systemd service to run the node in the background
+```bash
 nano /etc/systemd/system/craft.service
 Copy and paste the following file into your service file. Be sure to edit as you see fit.
 [Unit]
@@ -98,8 +99,10 @@ LimitMEMLOCK=209715200
 
 [Install]
 WantedBy=multi-user.target
-Reload the service files sudo systemctl daemon-reload Create the symlinlk sudo systemctl enable craft.service Start the node sudo systemctl start craft && journalctl -u craft -f
-Become a validator (Post Genesis)
+```
+>Reload the service files `sudo systemctl daemon-reload Create the symlinlk sudo systemctl enable craft.service Start the node sudo systemctl start craft && journalctl -u craft -f`
+
+## Become a validator (Post Genesis)
 Install craftd binary
 Initialize node
 craftd init <moniker> --chain-id craft-testnet-1 --staking-bond-denom exp
