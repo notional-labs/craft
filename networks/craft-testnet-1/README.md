@@ -66,14 +66,18 @@ craftd gentx <key_name> 1000000uexp --home=~/.craftd/ --keyring-backend=os --cha
 
 **Copy the contents of** `${HOME}/.craftd/config/gentx/gentx-XXXXXXXX.json to craft/networks/craft-testnet-1/gentx/<yourvalidatorname>.json`
 
-Create a Pull Request to the main branch of the repository
-NOTE: The Pull Request will be merged by the maintainers to confirm the inclusion of the validator at the genesis.
-Peers, Seeds, Genesis & Service File (Post GenTX)
-Replace the contents of your ${HOME}/.craftd/config/genesis.json with that of https://github.com/notional-labs/craft/blob/master/networks/craft-testnet-1/genesis.json
-Copy below node as persistent_peers or seeds in ${HOME}/.craftd/config/config.toml
-0b9b1eedc4cd011bc03320a4fa4876b863ec263c@143.198.94.140:1337
-Copy below value as minimum-gas-prices in ${HOME}/.craftd/config/app.toml
-0.02ucraft
+**Create a Pull Request to the main branch of the repository** 
+
+>NOTE: The Pull Request will be merged by the maintainers to confirm the inclusion of the validator at the genesis.
+
+## Peers, Seeds, Genesis & Service File (Post GenTX)
+* Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/blob/master/networks/craft-testnet-1/genesis.json`
+
+* Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)**
+
+* Copy below value as minimum-gas-prices in `${HOME}/.craftd/config/app.toml
+0.02ucraft`
+
 Start craftd by creating a systemd service to run the node in the background
 nano /etc/systemd/system/craft.service
 Copy and paste the following file into your service file. Be sure to edit as you see fit.
