@@ -1,4 +1,4 @@
-#Craft Economy
+# Craft Economy
 
 >This is the Craft Economy Testnet-1 (craft-testnet-1)
 
@@ -6,7 +6,7 @@
 
 >[PEERS PUBLISHED](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
 
-##Hardware Requirements
+## Hardware Requirements
 **Minimal**
 * 4 GB RAM
 * 100 GB SSD
@@ -42,11 +42,11 @@ git checkout v0.1.1
 go install ./...
 ```
 # Generate keys
-`craftd keys add [key_name]`
+* `craftd keys add [key_name]`
 or
-`craftd keys add [key_name] --recover` to regenerate keys with your BIP39 mnemonic
+* `craftd keys add [key_name] --recover` to regenerate keys with your BIP39 mnemonic
 to add ledger key
-`craftd keys add [key_name] --ledger`
+* `craftd keys add [key_name] --ledger`
 
 ## Validator setup instructions
 # GenTx : [Skip to Post Genesis](# Become a validator (Post Genesis))
