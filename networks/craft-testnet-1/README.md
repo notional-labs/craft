@@ -62,12 +62,12 @@ craftd init <moniker> --chain-id craft-testnet-1 --staking-bond-denom exp
 ## Add Genesis Account
 
 ```bash
-craftd add-genesis-account <key_name> 11000000uexp
+craftd add-genesis-account <key_name> 1000000uexp
 ```
 
 ### Create & Submit GenTX
 ```bash
-craftd gentx <key_name> 1000000uexp --home=~/.craftd/ --keyring-backend=os --chain-id=craft-testnet-1 --moniker=<your_moniker> --commission-max-change-rate=0.01 --commission-max-rate=0.5 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
+craftd gentx <key_name> 1000000uexp --home="$HOME/.craftd/" --keyring-backend=os --chain-id=craft-testnet-1 --moniker="<your_moniker>" --commission-max-change-rate=0.01 --commission-max-rate=0.5 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
 ```
 ### Fork the repository 
 
