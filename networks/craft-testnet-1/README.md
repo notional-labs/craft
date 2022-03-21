@@ -103,7 +103,7 @@ WantedBy=multi-user.target
 >Reload the service files `sudo systemctl daemon-reload Create the symlinlk sudo systemctl enable craft.service Start the node sudo systemctl start craft && journalctl -u craft -f`
 
 ## Become a validator (Post Genesis)
-* [Install craftd binary]()
+* [Install craftd binary](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#craftd-installation-steps)
 
 ### Initialize node
 `craftd init <moniker> --chain-id  --staking-bond-denom exp`
