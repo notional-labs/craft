@@ -3,9 +3,9 @@ module github.com/notional-labs/craft
 go 1.18
 
 require (
-	github.com/CosmWasm/wasmd v0.23.0
+	github.com/CosmWasm/wasmd v0.24.0
 	github.com/cosmos/cosmos-sdk v0.46.0-alpha3.0.20220320031723-ea672d40f51d
-	github.com/cosmos/ibc-go/v3 v3.0.0-rc1
+	github.com/cosmos/ibc-go/v3 v3.0.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.4.0
