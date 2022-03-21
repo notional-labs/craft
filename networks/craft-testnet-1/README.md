@@ -50,19 +50,19 @@ go install ./...
 to add ledger key
 * `craftd keys add [key_name] --ledger` to add a ledger key 
 
-## Validator setup instructions
-# GenTx : [Skip to Post Genesis](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#become-a-validator-post-genesis)
+# Validator setup instructions
+## GenTx : [Skip to Post Genesis](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#become-a-validator-post-genesis)
 
 ```bash
 Install craftd binary
 Initialize node
 craftd init <moniker> --chain-id craft-testnet-1 --staking-bond-denom exp
 ```
-## Create & Submit GenTX
+### Create & Submit GenTX
 ```bash
 craftd gentx <key_name> 1000000uexp --home=~/.craftd/ --keyring-backend=os --chain-id=craft-testnet-1 --moniker=<your_moniker> --commission-max-change-rate=0.01 --commission-max-rate=0.5 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
 ```
-## Fork the repository 
+### Fork the repository 
 
 **Copy the contents of** `${HOME}/.craftd/config/gentx/gentx-XXXXXXXX.json to craft/networks/craft-testnet-1/gentx/<yourvalidatorname>.json`
 
@@ -70,7 +70,7 @@ craftd gentx <key_name> 1000000uexp --home=~/.craftd/ --keyring-backend=os --cha
 
 >NOTE: The Pull Request will be merged by the maintainers to confirm the inclusion of the validator at the genesis.
 
-## Peers, Seeds, Genesis & Service File (Post GenTX)
+### Peers, Seeds, Genesis & Service File (Post GenTX)
 * Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/blob/master/networks/craft-testnet-1/genesis.json`
 
 * Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
@@ -102,12 +102,12 @@ WantedBy=multi-user.target
 ```
 >Reload the service files `sudo systemctl daemon-reload Create the symlinlk sudo systemctl enable craft.service Start the node sudo systemctl start craft && journalctl -u craft -f`
 
-# Become a validator (Post Genesis)
+## Become a validator (Post Genesis)
 * Install craftd binary
-* Initialize node
+### Initialize node
 `craftd init <moniker> --chain-id craft-testnet-1 --staking-bond-denom exp`
-Peers, Seeds, Genesis & Service File
-Replace the contents of your ${HOME}/.craftd/config/genesis.json with that of https://github.com/notional-labs/craft/raw/master/networks/craft-testnet-1/genesis.json
+### Peers, Seeds, Genesis & Service File
+Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/raw/master/networks/craft-testnet-1/genesis.json`
 Copy below node as persistent_peers or seeds in ${HOME}/.craftd/config/config.toml
 0b9b1eedc4cd011bc03320a4fa4876b863ec263c@143.198.94.140:1337
 Copy below value as minimum-gas-prices in ${HOME}/.craftd/config/app.toml
