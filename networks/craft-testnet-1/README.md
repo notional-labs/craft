@@ -100,7 +100,7 @@ LimitMEMLOCK=209715200
 [Install]
 WantedBy=multi-user.target
 ```
->Reload the service files `sudo systemctl daemon-reload Create the symlinlk sudo systemctl enable craft.service Start the node sudo systemctl start craft && journalctl -u craft -f`
+>Reload the service files `sudo systemctl daemon-reload` Create the symlinlk `sudo systemctl enable craft.service` 
 
 ## Become a validator (Post Genesis)
 * [Install craftd binary](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#craftd-installation-steps)
@@ -137,7 +137,7 @@ LimitMEMLOCK=209715200
 [Install]
 WantedBy=multi-user.target
 ```
->Reload the service files `sudo systemctl daemon-reload Create the symlinlk sudo systemctl enable craft.service Start the node sudo systemctl start craft && journalctl -u craft -f`
 
 ### Start the node
-* `systemctl start craft` optional command for logging `journalctl -u craft -f`
+* Reload the service file `sudo systemctl daemon-reload` Create the symlinlk `sudo systemctl enable craft.service`
+* Start the node `systemctl start craft` optional command for logging `journalctl -u craft -f`
