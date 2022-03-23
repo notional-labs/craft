@@ -41,27 +41,6 @@
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "craft189v3uk0ek76ffswzdt052sln9c30hg9k8yyneh",
-          "pub_key": null,
-          "account_number": "0",
-          "sequence": "0"
-        },
-        {
-          "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "craft12lh9mwuadacywsujjtd088y6j35k8x874rkgk9",
-          "pub_key": null,
-          "account_number": "0",
-          "sequence": "0"
-        },
-        {
-          "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "craft1n33gppg3v99yhgdjs327gj75kthxfdyfg8wf4k",
-          "pub_key": null,
-          "account_number": "0",
-          "sequence": "0"
-        },
-        {
-          "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "craft15zm7fcjl6vry2ufdxv3vhttst6qdyml678rxyd",
           "pub_key": null,
           "account_number": "0",
@@ -160,6 +139,13 @@
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
+          "address": "craft12lh9mwuadacywsujjtd088y6j35k8x874rkgk9",
+          "pub_key": null,
+          "account_number": "0",
+          "sequence": "0"
+        },
+        {
+          "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "craft122nlntdquyrsjcwvxvh8acse6fer98y6ak432f",
           "pub_key": null,
           "account_number": "0",
@@ -251,6 +237,13 @@
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
+          "address": "craft189v3uk0ek76ffswzdt052sln9c30hg9k8yyneh",
+          "pub_key": null,
+          "account_number": "0",
+          "sequence": "0"
+        },
+        {
+          "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "craft1p79gj0hcg7wp74df8xaf969tr37gt0t9f0x30m",
           "pub_key": null,
           "account_number": "0",
@@ -322,6 +315,20 @@
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "craft1w0dpqj64wz8v8t0u6l3jj6a9l4dhnyl5emr7cx",
+          "pub_key": null,
+          "account_number": "0",
+          "sequence": "0"
+        },
+        {
+          "@type": "/cosmos.auth.v1beta1.BaseAccount",
+          "address": "craft1n33gppg3v99yhgdjs327gj75kthxfdyfg8wf4k",
+          "pub_key": null,
+          "account_number": "0",
+          "sequence": "0"
+        },
+        {
+          "@type": "/cosmos.auth.v1beta1.BaseAccount",
+          "address": "craft1zt9q62x909nz0w55nlnd7l8h4vhyzrgkxly9q4",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
@@ -444,10 +451,6 @@
         {
           "address": "craft189v3uk0ek76ffswzdt052sln9c30hg9k8yyneh",
           "coins": [
-            {
-              "denom": "ucraft",
-              "amount": "100000000000000"
-            },
             {
               "denom": "uexp",
               "amount": "1000000"
@@ -741,11 +744,11 @@
       "supply": [
         {
           "denom": "ucraft",
-          "amount": "200000000000000"
+          "amount": "100000000000000"
         },
         {
           "denom": "uexp",
-          "amount": "43000000"
+          "amount": "242000000"
         }
       ],
       "denom_metadata": []
