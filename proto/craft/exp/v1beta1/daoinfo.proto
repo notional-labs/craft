@@ -1,9 +1,10 @@
 syntax = "proto3";
-package cosmos.auth.v1beta1;
+package craft.exp.v1beta1;
 
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/notional-labs/craft/x/exp/types";
 

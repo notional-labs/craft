@@ -1,4 +1,5 @@
 syntax = "proto3";
+package craft.exp.v1beta1;
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/notional-labs/craft/x/exp/types";

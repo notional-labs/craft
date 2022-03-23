@@ -9,12 +9,12 @@ import "cosmos/auth/v1beta1/auth.proto";
 
 // Params holds parameters for the incentives module
 message Params {
-   uint64 max_coin_mint = 1 [
+  uint64 max_coin_mint = 1 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.moretags) = "yaml:\"max_coin_mint\"",
     (gogoproto.nullable) = false
   ];
-  BaseAccount DaoAccount = 2;
+  string DaoAccount = 2;
 }
 
 option go_package = "github.com/notional-labs/craft/x/exp/types";
