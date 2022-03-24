@@ -14,8 +14,8 @@ option go_package = "github.com/notional-labs/craft/x/exp/types";
 
 // ModuleAccount defines an account for modules that holds coins on a pool.
 message AccountRecord {
-  option (gogoproto.goproto_getters)         = false;
-  option (gogoproto.goproto_stringer)        = false;
+  option (gogoproto.goproto_getters)         = true;
+  option (gogoproto.goproto_stringer)        = true;
 
   string account                      = 1;
   cosmos.base.v1beta1.Coin max_token  = 2;
@@ -23,4 +23,5 @@ message AccountRecord {
 
 message DaoInfo {
     repeated AccountRecord whitelist = 1 [ (gogoproto.moretags) = "yaml:\"dao_info\"" ];
+    
 }

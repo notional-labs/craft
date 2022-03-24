@@ -20,8 +20,5 @@ service Query {
 
 message WhiteListRequest {}
 message WhiteListResponse {
-  repeated AccountRecord account = 1 [
-    (gogoproto.nullable) = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
-  ];
+  repeated AccountRecord account = 1;
 }

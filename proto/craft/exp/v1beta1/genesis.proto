@@ -12,7 +12,7 @@ message Params {
   uint64 max_coin_mint = 1 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.moretags) = "yaml:\"max_coin_mint\"",
-    (gogoproto.nullable) = false
+    (gogoproto.nullable) = true
   ];
   string DaoAccount = 2;
 }
