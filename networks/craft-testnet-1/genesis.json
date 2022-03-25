@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2022-03-26T05:00:00Z",
+  "genesis_time": "2022-03-27T05:00:00Z",
   "chain_id": "craft-testnet-1",
   "initial_height": "1",
   "consensus_params": {
