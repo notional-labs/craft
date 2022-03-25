@@ -1,0 +1,8 @@
+{"body":{"messages":[{"@type":"/cosmos.staking.v1beta1.MsgCreateValidator","description":{"moniker":"Analytic Dynamix","identity":"","website":"analyticdynamix.com",
+"security_contact":"","details":"Change the world thru blockchain"},"commission":{"rate":"0.050000000000000000","max_rate":"0.500000000000000000","max_change_rate":
+"0.010000000000000000"},"min_self_delegation":"1","delegator_address":"craft1wycekpw7ut6c5f80890a436r7k2qmjqcd24wnr","validator_address":
+"craftvaloper1wycekpw7ut6c5f80890a436r7k2qmjqckwh86u","pubkey":{"@type":"/cosmos.crypto.ed25519.PubKey","key":"XX78Yi1nXH2Q3ThiLkW0NQxerKKir5FEbtq4w4i1cag="},
+"value":{"denom":"uexp","amount":"1000000"}}],"memo":"af203556a9e999580348943908924eca2a80a6f3@144.76.176.211:26656","timeout_height":"0",
+"extension_options":[],"non_critical_extension_options":[]},"auth_info":{"signer_infos":[{"public_key":{"@type":"/cosmos.crypto.secp256k1.PubKey",
+"key":"A2aIEeN0daV7y6/VQHnGaXOikbPP6kyx2s+96s6folGB"},"mode_info":{"single":{"mode":"SIGN_MODE_DIRECT"}},"sequence":"0"}],"fee":{"amount":[],
+"gas_limit":"200000","payer":"","granter":""},"tip":null},"signatures":["7PqHLIbwCCYyqkiTMEbBnL0SzGKjVzJBhV0s4CEB9wQL4ak86cToRbCiyue0PpeUSl0tAk7mA2WhAdlf2cfE3A=="]}
