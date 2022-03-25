@@ -1,5 +1,5 @@
 craftd init pbcups
-craftd add-genesis-account craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh 100000000000000ucraft,1000000uexp
+craftd add-genesis-account craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh 100000000000000ucraft,30000000000uexp
 
 craftd gentx reece 1000000uexp --keyring-backend=os --chain-id=craft-testnet-1 \
     --moniker="pbcups" \
@@ -10,7 +10,7 @@ craftd gentx reece 1000000uexp --keyring-backend=os --chain-id=craft-testnet-1 \
     --website="https://reece.sh"
 
 # base genesis incase of mess ups
-`curl https://raw.githubusercontent.com/notional-labs/craft/43f2c8135ee2fcfacd332d2ea35c99410e2213f3/networks/craft-testnet-1/genesis.json > /root/.craftd/config/genesis.json`
+`curl https://raw.githubusercontent.com/notional-labs/craft/47bc97b214f8660de6ebc1ad5cde7b6b04a5eaf0/networks/craft-testnet-1/genesis.json > /root/.craftd/config/genesis.json`
 
 
 python3 /root/craft/networks/craft-testnet-1/add-genesis-accounts.py
@@ -63,7 +63,7 @@ craftd add-genesis-account craft1n33gppg3v99yhgdjs327gj75kthxfdyfg8wf4k 1000000u
 ```
 
 
-craftd collect-gentxs --gentx-dir /root/craft/networks/craft-testnet-1/gentx/
+craftd collect-gentxs --gentx-dir /root/gentxs/
 
 ##################### debugging bad account
 craftd add-genesis-account craft19gkxgttdeg99trgcy735jc7yqvjrfluf56u45f 1000000uexp # BAD ACCOUNT, removed from net
