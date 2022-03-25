@@ -8,7 +8,6 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
-	"github.com/notional-labs/craft/app"
 	"github.com/notional-labs/craft/app/params"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -31,7 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	craft "github.com/notional-labs/craft/app"
+	"github.com/notional-labs/craft/app"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	tmcmds "github.com/tendermint/tendermint/cmd/tendermint/commands"
@@ -44,7 +43,7 @@ import (
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
-	encodingConfig := craft.MakeEncodingConfig()
+	encodingConfig := app.MakeEncodingConfig()
 
 	cfg := sdk.GetConfig()
 	cfg.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
@@ -61,7 +60,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(craft.DefaultNodeHome).
+		WithHomeDir(app.DefaultNodeHome).
 		WithViper("CRAFT")
 
 	rootCmd := &cobra.Command{
@@ -97,7 +96,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 // initAppConfig helps to override default appConfig template and configs.
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-
 	type CustomAppConfig struct {
 		serverconfig.Config
 	}
@@ -118,34 +116,33 @@ func initAppConfig() (string, interface{}) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
 	debugCmd := debug.Cmd()
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(craft.ModuleBasics, craft.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, craft.DefaultNodeHome),
+		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
-		AddGenesisAccountCmd(craft.DefaultNodeHome),
-		genutilcli.GenTxCmd(craft.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, craft.DefaultNodeHome),
-		genutilcli.ValidateGenesisCmd(craft.ModuleBasics),
+		AddGenesisAccountCmd(app.DefaultNodeHome),
+		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
+		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
 		tmcli.NewCompletionCmd(rootCmd, true),
-		NewTestnetCmd(craft.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		NewTestnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		tmcmds.RollbackStateCmd,
 		debugCmd,
 		config.Cmd(),
 	)
 
-	server.AddCommands(rootCmd, craft.DefaultNodeHome, newApp, createCraftAppAndExport, addModuleInitFlags)
+	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, createCraftAppAndExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(craft.DefaultNodeHome),
+		keys.Commands(app.DefaultNodeHome),
 	)
 	// add rosetta
 	rootCmd.AddCommand(server.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Codec))
@@ -185,7 +182,7 @@ func queryCommand() *cobra.Command {
 		authcmd.QueryTxCmd(),
 	)
 
-	craft.ModuleBasics.AddQueryCommands(cmd)
+	app.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -211,7 +208,7 @@ func txCommand() *cobra.Command {
 		authcmd.GetDecodeCommand(),
 	)
 
-	craft.ModuleBasics.AddTxCommands(cmd)
+	app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -235,7 +232,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	}
 
 	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
-	snapshotDB, err := sdk.NewLevelDB("metadata", snapshotDir)
+	snapshotDB, err := dbm.NewDB("metadata", dbm.BadgerDBBackend, snapshotDir)
 	if err != nil {
 		panic(err)
 	}
@@ -249,11 +246,11 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
-	return craft.NewCraftApp(
+	return app.NewCraftApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		craft.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
+		app.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
 		app.GetEnabledProposals(),
 		appOpts,
 		wasmOpts,
@@ -274,23 +271,24 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 
 func createCraftAppAndExport(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
-	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
-	encCfg := craft.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
+	appOpts servertypes.AppOptions,
+) (servertypes.ExportedApp, error) {
+	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Codec = codec.NewProtoCodec(encCfg.InterfaceRegistry)
-	var appcraft *craft.CraftApp
+	var appcraft *app.CraftApp
 	var wasmOpts []wasm.Option
 	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
 	if height != -1 {
-		appcraft = craft.NewCraftApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg, app.GetEnabledProposals(), appOpts, wasmOpts)
+		appcraft = app.NewCraftApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg, app.GetEnabledProposals(), appOpts, wasmOpts)
 
 		if err := appcraft.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		appcraft = craft.NewCraftApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, app.GetEnabledProposals(), appOpts, wasmOpts)
+		appcraft = app.NewCraftApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, app.GetEnabledProposals(), appOpts, wasmOpts)
 	}
 
 	return appcraft.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
