@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/notional-labs/craft/x/exp/types";
+option go_package = "x/exp/types";
 
 // BaseAccount defines a base account type. It contains all the necessary fields
 // for basic account functionality. Any custom account type should extend this
@@ -22,5 +22,6 @@ message AccountRecord {
 }
 
 message DaoInfo {
-    repeated AccountRecord whitelist = 1 [ (gogoproto.moretags) = "yaml:\"dao_info\"" ];
+  string dao_account = 1  ;
+  repeated AccountRecord whitelist = 2 [ (gogoproto.moretags) = "yaml:\"dao_info\"" ];
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 package craft.exp.v1beta1;
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/notional-labs/craft/x/exp/types";
+option go_package = "x/exp/types";
 
 // MintExpProposal is a gov Content type to create mint exp proposal
 // not be necessary by we use sdk 0.46

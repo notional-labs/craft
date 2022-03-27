@@ -6,6 +6,7 @@ import "google/protobuf/any.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/auth/v1beta1/auth.proto";
+import "craft/exp/v1beta1/daoinfo.proto";
 
 // Params holds parameters for the incentives module
 message Params {
@@ -17,10 +18,10 @@ message Params {
   string DaoAccount = 2;
 }
 
-option go_package = "github.com/notional-labs/craft/x/exp/types";
+option go_package = "x/exp/types";
 
 // GenesisState defines the exp module's genesis state.
 message GenesisState {
     Params params = 1 [(gogoproto.nullable) = false];
-    repeated google.protobuf.Any white_list = 2;
+    repeated AccountRecord white_list = 2;
 }

@@ -2,34 +2,36 @@ syntax = "proto3";
 
 package cosmos.group.v1;
 
-option go_package = "github.com/cosmos/cosmos-sdk/x/group";
+option go_package = "x/exp/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "google/protobuf/any.proto";
-import "cosmos/group/v1/types.proto";
-
-import "cosmos/msg/v1/msg.proto";
 
 // Msg is the cosmos.group.v1 Msg service.
 service Msg {
+    rpc MintAndAllocateExp(MsgMintAndAllocateExp) returns (MsgMintAndAllocateExpResponse);
+    rpc BurnAndRemoveMember(MsgBurnAndRemoveMember) returns (MsgBurnAndRemoveMemberResponse);
 }
 
 message MsgMintAndAllocateExp {
-  uint64 amount = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 amount = 1 ;
 
   // members defines the group members.
-  string member = 2 [(gogoproto.nullable) = false];
+  string member = 2 ;
 
   // metadata is any arbitrary metadata to attached to the group.
   string metadata = 3;
 }
 
-// MsgBurnAndRemoveMember  .
+message MsgMintAndAllocateExpResponse {}
+
+// MsgBurnAndRemoveMember 
 message MsgBurnAndRemoveMember {
-   uint64 amount = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 amount = 1 ;
 
    // members defines the group members.
-   string member = 1 [(gogoproto.nullable) = false];
-
+  string member = 2 ;
 }
+
+message MsgBurnAndRemoveMemberResponse{}
