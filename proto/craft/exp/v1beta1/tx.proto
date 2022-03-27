@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package cosmos.group.v1;
+package craft.exp.v1beta1;
 
 option go_package = "x/exp/types";
 

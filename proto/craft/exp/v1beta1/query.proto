@@ -3,14 +3,15 @@ package craft.exp.v1beta1;
 
 import "craft/exp/v1beta1/daoinfo.proto";
 import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 
 option go_package = "x/exp/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // returns coins that is going to be distributed
-  rpc WhiteList(WhiteListRequest)
-      returns (WhiteListResponse) {
+  rpc WhiteList(WhiteListRequest) returns (WhiteListResponse) {
     option (google.api.http).get = "/craft.exp.v1beta1/whitelistDAO";
   }
 }
