@@ -14,6 +14,6 @@ for file in gentx_files:
     amt = validatorData['value']['amount']
 
     if delegator == "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh":
-        print(f"craftd add-genesis-account {delegator} 100000000000000ucraft,1000000uexp")
+        print(f"craftd add-genesis-account {delegator} 100000000000000ucraft,30000000000uexp")
     else:
         print(f"craftd add-genesis-account {delegator} {amt}uexp")

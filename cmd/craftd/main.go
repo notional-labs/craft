@@ -9,6 +9,7 @@ import (
 	"github.com/notional-labs/craft/cmd/craftd/cmd"
 )
 
+//nolint:errorlint
 func main() {
 	rootCmd, _ := cmd.NewRootCmd()
 
