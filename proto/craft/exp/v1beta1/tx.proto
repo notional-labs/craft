@@ -6,8 +6,6 @@ option go_package = "x/exp/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
-import "google/protobuf/any.proto";
-
 // Msg is the cosmos.group.v1 Msg service.
 service Msg {
     rpc MintAndAllocateExp(MsgMintAndAllocateExp) returns (MsgMintAndAllocateExpResponse);

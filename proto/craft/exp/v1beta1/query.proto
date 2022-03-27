@@ -2,9 +2,7 @@ syntax = "proto3";
 package craft.exp.v1beta1;
 
 import "craft/exp/v1beta1/daoinfo.proto";
-import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/duration.proto";
 
 option go_package = "x/exp/types";
 
@@ -13,8 +11,7 @@ service Query {
   // returns coins that is going to be distributed
   rpc WhiteList(WhiteListRequest)
       returns (WhiteListResponse) {
-    option (google.api.http).get =
-        "/craft.exp.v1beta1/whitelistDAO";
+    option (google.api.http).get = "/craft.exp.v1beta1/whitelistDAO";
   }
 }
 
