@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package craft.exp.v1beta1;
+
+option go_package = "x/exp/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+// Msg is the cosmos.group.v1 Msg service.
+service Msg {
+    rpc MintAndAllocateExp(MsgMintAndAllocateExp) returns (MsgMintAndAllocateExpResponse);
+    rpc BurnAndRemoveMember(MsgBurnAndRemoveMember) returns (MsgBurnAndRemoveMemberResponse);
+}
+
+message MsgMintAndAllocateExp {
+  cosmos.base.v1beta1.Coin amount = 1 ;
+  //string FromAdd
+
+  string from_address = 2;
+
+  // members defines the Dao members address.
+  string member = 3 ;
+
+  // metadata is any arbitrary metadata to attached.
+  string metadata = 4;
+}
+
+message MsgMintAndAllocateExpResponse {}
+
+// MsgBurnAndRemoveMember 
+message MsgBurnAndRemoveMember {
+   // from_address defines the member who want exit Dao and get their money.
+  string from_address = 1 ;
+
+  // metadata is any arbitrary metadata to attached.
+  string metadata = 2;
+}
+
+message MsgBurnAndRemoveMemberResponse{}

@@ -1,0 +1,25 @@
+syntax = "proto3";
+package craft.exp.v1beta1;
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "x/exp/types";
+
+// BaseAccount defines a base account type. It contains all the necessary fields
+// for basic account functionality. Any custom account type should extend this
+// type for additional functionality (e.g. vesting).
+
+// ModuleAccount defines an account for modules that holds coins on a pool.
+message AccountRecord {
+  option (gogoproto.goproto_getters)         = true;
+  option (gogoproto.goproto_stringer)        = true;
+
+  string account                      = 1;
+  cosmos.base.v1beta1.Coin max_token  = 2;
+}
+
+message DaoInfo {
+  repeated AccountRecord whitelist = 1 [ (gogoproto.moretags) = "yaml:\"dao_info\"" ];
+}
