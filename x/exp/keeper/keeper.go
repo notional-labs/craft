@@ -22,8 +22,8 @@ type ExpKeeper struct {
 }
 
 func NewKeeper(
-	cdc codec.BinaryCodec,
 	key storetypes.StoreKey,
+	cdc codec.BinaryCodec,
 	paramSpace paramtypes.Subspace,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,

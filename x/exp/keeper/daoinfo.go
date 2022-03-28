@@ -24,9 +24,6 @@ func (k ExpKeeper) GetDaoInfo(ctx sdk.Context) (types.DaoInfo, error) {
 
 func (k ExpKeeper) SetDaoInfo(ctx sdk.Context, daoInfo types.DaoInfo) {
 	store := ctx.KVStore(k.storeKey)
-	if !store.Has(types.KeyDaoInfo) {
-		panic("not set DaoInfo in kvstore")
-	}
 	bz := k.cdc.MustMarshal(&daoInfo)
 	store.Set(types.KeyDaoInfo, bz)
 }

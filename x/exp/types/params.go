@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ParamStoreKeyMaxCoinMint = []byte("maxcoinmint")
-	ParamStoreKeyDaoAccount  = []byte("daoaccount")
-	ParamStoreKeyDenom       = []byte("exp")
+	ParamStoreKeyMaxCoinMint = []byte("max_coin_mint")
+	ParamStoreKeyDaoAccount  = []byte("dao_account")
+	ParamStoreKeyDenom       = []byte("denom")
 )
 
 // ParamTable for exp module.
@@ -28,9 +28,9 @@ func NewParams(MaxCoinMint uint64, DaoAccount string, denom string) Params {
 
 func DefaultParams() Params {
 	return Params{
-		MaxCoinMint: 10000,
+		MaxCoinMint: uint64(100000),
 		DaoAccount:  "craft16pctk89ystuwg4gv2dgj5lwtsavy9pkfdxlc5u",
-		Denom:       "exp",
+		Denom:       "exp2",
 	}
 }
 
@@ -45,7 +45,7 @@ func (p Params) ParamSetPairs() paramtypes.ParamSetPairs {
 func validateMaxCoinMint(i interface{}) error {
 	_, ok := i.(uint64)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
+		return fmt.Errorf("invalid parameter type: %s", i)
 	}
 	return nil
 }
@@ -53,7 +53,7 @@ func validateMaxCoinMint(i interface{}) error {
 func validateDaoAccount(i interface{}) error {
 	daoAccount, ok := i.(string)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
+		return fmt.Errorf("invalid parameter DaoAccount type: %T", i)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(daoAccount); err != nil {
@@ -65,7 +65,7 @@ func validateDaoAccount(i interface{}) error {
 func validateDenom(i interface{}) error {
 	denom, ok := i.(string)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
+		return fmt.Errorf("invalid parameter denom type: %T", i)
 	}
 
 	return sdk.ValidateDenom(denom)
@@ -75,7 +75,7 @@ func (p Params) Validate() error {
 	if err := validateDaoAccount(p.DaoAccount); err != nil {
 		return err
 	}
-	if err := validateMaxCoinMint(p.DaoAccount); err != nil {
+	if err := validateMaxCoinMint(p.MaxCoinMint); err != nil {
 		return err
 	}
 	return nil
