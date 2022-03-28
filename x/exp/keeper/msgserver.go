@@ -22,21 +22,21 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintAndAllocateExp) (*types.MsgMintAndAllocateExpResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	from_address, err := sdk.AccAddressFromBech32(msg.FromAddress)
+	fromAddress, err := sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	member_address, err := sdk.AccAddressFromBech32(msg.Member)
+	memberAddress, err := sdk.AccAddressFromBech32(msg.Member)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := k.verifyDao(ctx, from_address, member_address); err != nil {
+	if err := k.verifyDao(ctx, fromAddress, memberAddress); err != nil {
 		return nil, err
 	}
 
-	err = k.MintExpForAccount(ctx, sdk.NewCoins(*msg.Amount), member_address)
+	err = k.MintExpForAccount(ctx, sdk.NewCoins(*msg.Amount), memberAddress)
 	if err != nil {
 		return nil, err
 	}
