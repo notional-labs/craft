@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	ParamStoreKeyMaxCoinMint = []byte("max_coin_mint")
-	ParamStoreKeyDaoAccount  = []byte("dao_account")
+	ParamStoreKeyMaxCoinMint = []byte("maxCoinMint")
+	ParamStoreKeyDaoAccount  = []byte("daoAccount")
 	ParamStoreKeyDenom       = []byte("denom")
 )
 
