@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/CosmWasm/wasmd v0.24.0
-	github.com/cosmos/cosmos-sdk v0.46.0-alpha3.0.20220325134903-a69764f9f01b
+	github.com/cosmos/cosmos-sdk v0.46.0-alpha3.0.20220328183147-3cf11e1f7d4f
 	github.com/cosmos/ibc-go/v3 v3.0.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/spf13/cast v1.4.1
