@@ -2,6 +2,7 @@ package types // noalias
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 // BankKeeper defines the contract needed to be fulfilled for banking and supply
@@ -13,5 +14,6 @@ type BankKeeper interface {
 }
 
 type AccountKeeper interface {
+	GetModuleAccount(ctx sdk.Context, moduleName string) types.ModuleAccountI
 	GetModuleAddress(name string) sdk.AccAddress
 }

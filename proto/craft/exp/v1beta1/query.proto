@@ -11,12 +11,12 @@ option go_package = "x/exp/types";
 // Query defines the gRPC querier service.
 service Query {
   // returns coins that is going to be distributed
-  rpc WhiteList(WhiteListRequest) returns (WhiteListResponse) {
-    option (google.api.http).get = "/craft.exp.v1beta1/whitelistDAO";
+  rpc WhiteList(QueryWhiteListRequest) returns (QueryWhiteListResponse) {
+    option (google.api.http).get = "/craft.exp.v1beta1/whitelistdao";
   }
 }
 
-message WhiteListRequest {}
-message WhiteListResponse {
-  repeated AccountRecord account = 1;
+message QueryWhiteListRequest {}
+message QueryWhiteListResponse {
+  repeated AccountRecord accountRecord = 1;
 }

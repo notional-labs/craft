@@ -30,21 +30,21 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type WhiteListRequest struct {
+type QueryWhiteListRequest struct {
 }
 
-func (m *WhiteListRequest) Reset()         { *m = WhiteListRequest{} }
-func (m *WhiteListRequest) String() string { return proto.CompactTextString(m) }
-func (*WhiteListRequest) ProtoMessage()    {}
-func (*WhiteListRequest) Descriptor() ([]byte, []int) {
+func (m *QueryWhiteListRequest) Reset()         { *m = QueryWhiteListRequest{} }
+func (m *QueryWhiteListRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryWhiteListRequest) ProtoMessage()    {}
+func (*QueryWhiteListRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6b68876adaf3112f, []int{0}
 }
-func (m *WhiteListRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryWhiteListRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *WhiteListRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryWhiteListRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_WhiteListRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryWhiteListRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -54,34 +54,34 @@ func (m *WhiteListRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *WhiteListRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WhiteListRequest.Merge(m, src)
+func (m *QueryWhiteListRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryWhiteListRequest.Merge(m, src)
 }
-func (m *WhiteListRequest) XXX_Size() int {
+func (m *QueryWhiteListRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *WhiteListRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_WhiteListRequest.DiscardUnknown(m)
+func (m *QueryWhiteListRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryWhiteListRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_WhiteListRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryWhiteListRequest proto.InternalMessageInfo
 
-type WhiteListResponse struct {
-	Account []*AccountRecord `protobuf:"bytes,1,rep,name=account,proto3" json:"account,omitempty"`
+type QueryWhiteListResponse struct {
+	AccountRecord []*AccountRecord `protobuf:"bytes,1,rep,name=accountRecord,proto3" json:"accountRecord,omitempty"`
 }
 
-func (m *WhiteListResponse) Reset()         { *m = WhiteListResponse{} }
-func (m *WhiteListResponse) String() string { return proto.CompactTextString(m) }
-func (*WhiteListResponse) ProtoMessage()    {}
-func (*WhiteListResponse) Descriptor() ([]byte, []int) {
+func (m *QueryWhiteListResponse) Reset()         { *m = QueryWhiteListResponse{} }
+func (m *QueryWhiteListResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryWhiteListResponse) ProtoMessage()    {}
+func (*QueryWhiteListResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6b68876adaf3112f, []int{1}
 }
-func (m *WhiteListResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryWhiteListResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *WhiteListResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryWhiteListResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_WhiteListResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryWhiteListResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -91,34 +91,34 @@ func (m *WhiteListResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *WhiteListResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WhiteListResponse.Merge(m, src)
+func (m *QueryWhiteListResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryWhiteListResponse.Merge(m, src)
 }
-func (m *WhiteListResponse) XXX_Size() int {
+func (m *QueryWhiteListResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *WhiteListResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_WhiteListResponse.DiscardUnknown(m)
+func (m *QueryWhiteListResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryWhiteListResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_WhiteListResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryWhiteListResponse proto.InternalMessageInfo
 
-func (m *WhiteListResponse) GetAccount() []*AccountRecord {
+func (m *QueryWhiteListResponse) GetAccountRecord() []*AccountRecord {
 	if m != nil {
-		return m.Account
+		return m.AccountRecord
 	}
 	return nil
 }
 
 func init() {
-	proto.RegisterType((*WhiteListRequest)(nil), "craft.exp.v1beta1.WhiteListRequest")
-	proto.RegisterType((*WhiteListResponse)(nil), "craft.exp.v1beta1.WhiteListResponse")
+	proto.RegisterType((*QueryWhiteListRequest)(nil), "craft.exp.v1beta1.QueryWhiteListRequest")
+	proto.RegisterType((*QueryWhiteListResponse)(nil), "craft.exp.v1beta1.QueryWhiteListResponse")
 }
 
 func init() { proto.RegisterFile("craft/exp/v1beta1/query.proto", fileDescriptor_6b68876adaf3112f) }
 
 var fileDescriptor_6b68876adaf3112f = []byte{
-	// 304 bytes of a gzipped FileDescriptorProto
+	// 308 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x4d, 0x2e, 0x4a, 0x4c,
 	0x2b, 0xd1, 0x4f, 0xad, 0x28, 0xd0, 0x2f, 0x33, 0x4c, 0x4a, 0x2d, 0x49, 0x34, 0xd4, 0x2f, 0x2c,
 	0x4d, 0x2d, 0xaa, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x04, 0x4b, 0xeb, 0xa5, 0x56,
@@ -127,17 +127,18 @@ var fileDescriptor_6b68876adaf3112f = []byte{
 	0xe5, 0xe5, 0x97, 0x24, 0x96, 0x64, 0xe6, 0xe7, 0x15, 0x43, 0x65, 0x45, 0xd2, 0xf3, 0xd3, 0xf3,
 	0xc1, 0x4c, 0x7d, 0x10, 0x0b, 0x2a, 0xaa, 0x95, 0x9c, 0x5f, 0x9c, 0x9b, 0x5f, 0xac, 0x9f, 0x94,
 	0x58, 0x9c, 0x0a, 0x71, 0x00, 0xdc, 0xf0, 0x82, 0xc4, 0xf4, 0xcc, 0x3c, 0xb0, 0x11, 0x10, 0xb5,
-	0x4a, 0x42, 0x5c, 0x02, 0xe1, 0x19, 0x99, 0x25, 0xa9, 0x3e, 0x99, 0xc5, 0x25, 0x41, 0xa9, 0x85,
-	0xa5, 0xa9, 0xc5, 0x25, 0x4a, 0xfe, 0x5c, 0x82, 0x48, 0x62, 0xc5, 0x05, 0xf9, 0x79, 0xc5, 0xa9,
-	0x42, 0x56, 0x5c, 0xec, 0x89, 0xc9, 0xc9, 0xf9, 0xa5, 0x79, 0x25, 0x12, 0x8c, 0x0a, 0xcc, 0x1a,
-	0xdc, 0x46, 0x0a, 0x7a, 0x18, 0xde, 0xd1, 0x73, 0x84, 0xa8, 0x08, 0x4a, 0x4d, 0xce, 0x2f, 0x4a,
-	0x09, 0x82, 0x69, 0x30, 0xea, 0x60, 0xe4, 0x62, 0x0d, 0x04, 0xb9, 0x43, 0xa8, 0x9e, 0x8b, 0x13,
-	0x6e, 0xb4, 0x90, 0x32, 0x16, 0x13, 0xd0, 0x1d, 0x23, 0xa5, 0x82, 0x5f, 0x11, 0xc4, 0x75, 0x4a,
-	0xea, 0x4d, 0x97, 0x9f, 0x4c, 0x66, 0x52, 0x14, 0x92, 0xd7, 0xc7, 0x50, 0xad, 0x5f, 0x0e, 0x52,
-	0x9d, 0x93, 0x59, 0x5c, 0xe2, 0xe2, 0xe8, 0xef, 0xa4, 0x7a, 0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47,
-	0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0x4e, 0x78, 0x2c, 0xc7, 0x70, 0xe1, 0xb1, 0x1c, 0xc3, 0x8d,
-	0xc7, 0x72, 0x0c, 0x51, 0xdc, 0x15, 0xe0, 0x68, 0x28, 0xa9, 0x2c, 0x48, 0x2d, 0x4e, 0x62, 0x03,
-	0x87, 0x8e, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x7c, 0x6c, 0x40, 0x5a, 0xd2, 0x01, 0x00, 0x00,
+	0x4a, 0xe2, 0x5c, 0xa2, 0x81, 0x20, 0x15, 0xe1, 0x19, 0x99, 0x25, 0xa9, 0x3e, 0x99, 0xc5, 0x25,
+	0x41, 0xa9, 0x85, 0xa5, 0xa9, 0xc5, 0x25, 0x4a, 0x09, 0x5c, 0x62, 0xe8, 0x12, 0xc5, 0x05, 0xf9,
+	0x79, 0xc5, 0xa9, 0x42, 0x6e, 0x5c, 0xbc, 0x89, 0xc9, 0xc9, 0xf9, 0xa5, 0x79, 0x25, 0x41, 0xa9,
+	0xc9, 0xf9, 0x45, 0x29, 0x12, 0x8c, 0x0a, 0xcc, 0x1a, 0xdc, 0x46, 0x0a, 0x7a, 0x18, 0xde, 0xd3,
+	0x73, 0x44, 0x56, 0x17, 0x84, 0xaa, 0xcd, 0x68, 0x32, 0x23, 0x17, 0x2b, 0xd8, 0x0a, 0xa1, 0x4e,
+	0x46, 0x2e, 0x4e, 0xb8, 0x3d, 0x42, 0x1a, 0x58, 0x0c, 0xc2, 0xea, 0x46, 0x29, 0x4d, 0x22, 0x54,
+	0x42, 0x1c, 0xad, 0xa4, 0xde, 0x74, 0xf9, 0xc9, 0x64, 0x26, 0x45, 0x21, 0x79, 0x7d, 0x0c, 0x2d,
+	0xfa, 0xe5, 0x20, 0xd5, 0x39, 0x99, 0xc5, 0x25, 0x29, 0x89, 0xf9, 0x4e, 0xaa, 0x27, 0x1e, 0xc9,
+	0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x84, 0xc7, 0x72, 0x0c, 0x17, 0x1e,
+	0xcb, 0x31, 0xdc, 0x78, 0x2c, 0xc7, 0x10, 0xc5, 0x5d, 0x01, 0x8e, 0xa7, 0x92, 0xca, 0x82, 0xd4,
+	0xe2, 0x24, 0x36, 0x70, 0xf0, 0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x1d, 0xd2, 0x96, 0x7c,
+	0xf3, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -153,7 +154,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
 	// returns coins that is going to be distributed
-	WhiteList(ctx context.Context, in *WhiteListRequest, opts ...grpc.CallOption) (*WhiteListResponse, error)
+	WhiteList(ctx context.Context, in *QueryWhiteListRequest, opts ...grpc.CallOption) (*QueryWhiteListResponse, error)
 }
 
 type queryClient struct {
@@ -164,8 +165,8 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) WhiteList(ctx context.Context, in *WhiteListRequest, opts ...grpc.CallOption) (*WhiteListResponse, error) {
-	out := new(WhiteListResponse)
+func (c *queryClient) WhiteList(ctx context.Context, in *QueryWhiteListRequest, opts ...grpc.CallOption) (*QueryWhiteListResponse, error) {
+	out := new(QueryWhiteListResponse)
 	err := c.cc.Invoke(ctx, "/craft.exp.v1beta1.Query/WhiteList", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -176,14 +177,14 @@ func (c *queryClient) WhiteList(ctx context.Context, in *WhiteListRequest, opts 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// returns coins that is going to be distributed
-	WhiteList(context.Context, *WhiteListRequest) (*WhiteListResponse, error)
+	WhiteList(context.Context, *QueryWhiteListRequest) (*QueryWhiteListResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) WhiteList(ctx context.Context, req *WhiteListRequest) (*WhiteListResponse, error) {
+func (*UnimplementedQueryServer) WhiteList(ctx context.Context, req *QueryWhiteListRequest) (*QueryWhiteListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WhiteList not implemented")
 }
 
@@ -192,7 +193,7 @@ func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 }
 
 func _Query_WhiteList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WhiteListRequest)
+	in := new(QueryWhiteListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -204,7 +205,7 @@ func _Query_WhiteList_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/craft.exp.v1beta1.Query/WhiteList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).WhiteList(ctx, req.(*WhiteListRequest))
+		return srv.(QueryServer).WhiteList(ctx, req.(*QueryWhiteListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -222,7 +223,7 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	Metadata: "craft/exp/v1beta1/query.proto",
 }
 
-func (m *WhiteListRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryWhiteListRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -232,12 +233,12 @@ func (m *WhiteListRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WhiteListRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryWhiteListRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *WhiteListRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryWhiteListRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -245,7 +246,7 @@ func (m *WhiteListRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *WhiteListResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryWhiteListResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -255,20 +256,20 @@ func (m *WhiteListResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WhiteListResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryWhiteListResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *WhiteListResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryWhiteListResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Account) > 0 {
-		for iNdEx := len(m.Account) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.AccountRecord) > 0 {
+		for iNdEx := len(m.AccountRecord) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Account[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.AccountRecord[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -293,7 +294,7 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *WhiteListRequest) Size() (n int) {
+func (m *QueryWhiteListRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -302,14 +303,14 @@ func (m *WhiteListRequest) Size() (n int) {
 	return n
 }
 
-func (m *WhiteListResponse) Size() (n int) {
+func (m *QueryWhiteListResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.Account) > 0 {
-		for _, e := range m.Account {
+	if len(m.AccountRecord) > 0 {
+		for _, e := range m.AccountRecord {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -323,7 +324,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *WhiteListRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryWhiteListRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -346,10 +347,10 @@ func (m *WhiteListRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WhiteListRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryWhiteListRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WhiteListRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryWhiteListRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -373,7 +374,7 @@ func (m *WhiteListRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *WhiteListResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryWhiteListResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -396,15 +397,15 @@ func (m *WhiteListResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WhiteListResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryWhiteListResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WhiteListResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryWhiteListResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Account", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AccountRecord", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -431,8 +432,8 @@ func (m *WhiteListResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Account = append(m.Account, &AccountRecord{})
-			if err := m.Account[len(m.Account)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.AccountRecord = append(m.AccountRecord, &AccountRecord{})
+			if err := m.AccountRecord[len(m.AccountRecord)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

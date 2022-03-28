@@ -34,7 +34,7 @@ var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 func request_Query_WhiteList_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq WhiteListRequest
+	var protoReq QueryWhiteListRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.WhiteList(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -43,7 +43,7 @@ func request_Query_WhiteList_0(ctx context.Context, marshaler runtime.Marshaler,
 }
 
 func local_request_Query_WhiteList_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq WhiteListRequest
+	var protoReq QueryWhiteListRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.WhiteList(ctx, &protoReq)
@@ -145,7 +145,7 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_WhiteList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"craft.exp.v1beta1", "whitelistDAO"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_WhiteList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"craft.exp.v1beta1", "whitelistdao"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

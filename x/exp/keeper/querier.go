@@ -15,7 +15,6 @@ func NewQuerier(k ExpKeeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		switch path[0] {
 		case types.QueryParameters:
 			return queryParams(ctx, k, legacyQuerierCdc)
-
 		case types.QueryWhiteList:
 			return queryWhiteList(ctx, k, legacyQuerierCdc)
 
