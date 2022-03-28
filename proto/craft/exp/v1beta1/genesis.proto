@@ -6,6 +6,7 @@ import "cosmos_proto/cosmos.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/auth/v1beta1/auth.proto";
 import "craft/exp/v1beta1/daoinfo.proto";
+option go_package = "x/exp/types";
 
 // Params holds parameters for the incentives module
 message Params {
@@ -14,10 +15,9 @@ message Params {
     (gogoproto.moretags) = "yaml:\"max_coin_mint\"",
     (gogoproto.nullable) = true
   ];
-  string DaoAccount = 2;
+  string DaoAccount   = 2;
+  string denom        = 3;
 }
-
-option go_package = "x/exp/types";
 
 // GenesisState defines the exp module's genesis state.
 message GenesisState {
