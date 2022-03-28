@@ -9,4 +9,13 @@ const (
 
 	// StoreKey is the default store key for mint
 	StoreKey = ModuleName
+
+	// Query endpoints supported by the exp querier
+	QueryParameters = "parameters"
+	QueryWhiteList  = "whiteList"
+)
+
+var (
+	//KeyDaoInfo defines key to store the DaoInfo
+	KeyDaoInfo = []byte{0x01}
 )

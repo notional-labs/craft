@@ -10,6 +10,7 @@ import (
 var (
 	ParamStoreKeyMaxCoinMint = []byte("maxcoinmint")
 	ParamStoreKeyDaoAccount  = []byte("daoaccount")
+	ParamStoreKeyDenom       = []byte("exp")
 )
 
 // ParamTable for exp module.
@@ -17,10 +18,11 @@ func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(MaxCoinMint uint64, DaoAccount string) Params {
+func NewParams(MaxCoinMint uint64, DaoAccount string, denom string) Params {
 	return Params{
 		MaxCoinMint: MaxCoinMint,
 		DaoAccount:  DaoAccount,
+		Denom:       denom,
 	}
 }
 
@@ -28,6 +30,7 @@ func DefaultParams() Params {
 	return Params{
 		MaxCoinMint: 10000,
 		DaoAccount:  "craft16pctk89ystuwg4gv2dgj5lwtsavy9pkfdxlc5u",
+		Denom:       "exp",
 	}
 }
 
@@ -35,6 +38,7 @@ func (p Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(ParamStoreKeyMaxCoinMint, &p.MaxCoinMint, validateMaxCoinMint),
 		paramtypes.NewParamSetPair(ParamStoreKeyDaoAccount, &p.DaoAccount, validateDaoAccount),
+		paramtypes.NewParamSetPair(ParamStoreKeyDenom, &p.Denom, validateDenom),
 	}
 }
 
@@ -56,6 +60,15 @@ func validateDaoAccount(i interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func validateDenom(i interface{}) error {
+	denom, ok := i.(string)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	return sdk.ValidateDenom(denom)
 }
 
 func (p Params) Validate() error {
