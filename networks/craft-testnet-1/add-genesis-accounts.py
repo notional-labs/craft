@@ -25,10 +25,11 @@ for file in gentx_files:
     data = json.load(f)
 
     validatorData = data['body']['messages'][0]
+    moniker = validatorData['description']['moniker']
     delegator = validatorData['delegator_address']
     amt = validatorData['value']['amount']
 
     if delegator == "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh":
-        print(f"craftd add-genesis-account {delegator} 100000000000000ucraft,30000000000uexp")
+        print(f"craftd add-genesis-account {delegator} 100000000000000ucraft,30000000000uexp #pbcups")
     else:
-        print(f"craftd add-genesis-account {delegator} {amt}uexp")
+        print(f"craftd add-genesis-account {delegator} {amt}uexp #{moniker}")
