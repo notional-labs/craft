@@ -5,12 +5,22 @@ from pathlib import Path
 
 # cd networks/craft-testnet-1/
 
+'''
+We allow sending EXP so new validators can come on
+Everyone gets
+- 10k craft
+- 1exp
+pbcups has more to act as the token faucet for craft & exp.
+All only get 1exp delegated to them
+'''
+
 LAUNCH_TIME = "2022-03-30T17:00:00Z"
 CHAIN_ID = "craft-testv3"
 EXP_SEND = [{"denom": "uexp","enabled": True}]
 
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json"
-FOLDER = "gentx-v3"
+# GENESIS_FILE=f"{Path.home()}/Desktop/craft/networks/craft-testnet-1/genesis.json"
+FOLDER = "gentx" # since we want to give everyone with getxs tokens
 
 def main():
     # outputDetails()
