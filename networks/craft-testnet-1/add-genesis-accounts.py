@@ -5,27 +5,18 @@ from pathlib import Path
 
 # cd networks/craft-testnet-1/
 
-'''
-We allow sending EXP so new validators can come on
-Everyone gets
-- 10k craft
-- 1exp
-pbcups has more to act as the token faucet for craft & exp.
-All only get 1exp delegated to them
-'''
-
-LAUNCH_TIME = "2022-03-30T17:00:00Z"
+LAUNCH_TIME = "2022-03-30T14:00:00Z"
 CHAIN_ID = "craft-testv3"
 EXP_SEND = [{"denom": "uexp","enabled": True}]
 
-GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json"
-# GENESIS_FILE=f"{Path.home()}/Desktop/craft/networks/craft-testnet-1/genesis.json"
+GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # home dir
+# GENESIS_FILE=f"{Path.home()}/Desktop/craft/networks/craft-testnet-1/genesis.json" # laptop
 FOLDER = "gentx" # since we want to give everyone with getxs tokens
 
 def main():
     # outputDetails()
     resetGenesisFile()
-    # createGenesisAccountsCommands()
+    createGenesisAccountsCommands()
 
 def resetGenesisFile():
     # load genesis.json & remove all values for accounts & supply
@@ -44,6 +35,7 @@ def resetGenesisFile():
     # save genesis.json
     with open(GENESIS_FILE, 'w') as f:
         json.dump(genesis, f, indent=4)
+    print(f"# RESET: {GENESIS_FILE}\n")
 
 
 def outputDetails() -> str:
@@ -56,7 +48,7 @@ def outputDetails() -> str:
     hours = seconds_until_launch // 3600
     minutes = (seconds_until_launch % 3600) // 60
 
-    print(f"# {LAUNCH_TIME} ({hours}h {minutes}m) from now\n# {CHAIN_ID}\n")
+    print(f"# {LAUNCH_TIME} ({hours}h {minutes}m) from now\n# {CHAIN_ID}\n# {EXP_SEND}\n# GenesisFile: {GENESIS_FILE}")
 
 def createGenesisAccountsCommands():
     gentx_files = os.listdir(FOLDER)
