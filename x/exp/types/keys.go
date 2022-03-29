@@ -1,21 +1,21 @@
 package types
 
-// MinterKey is the key to use for the keeper store.
-var ExpKey = []byte{0x00}
-
 const (
-	// module name
+	// Module name .
 	ModuleName = "exp"
 
-	// StoreKey is the default store key for mint
+	// StoreKey is the default store key for exp .
 	StoreKey = ModuleName
 
-	// Query endpoints supported by the exp querier
+	// Query endpoints supported by the exp querier .
 	QueryParameters = "parameters"
 	QueryWhiteList  = "whiteList"
 )
 
 var (
-	//KeyDaoInfo defines key to store the DaoInfo
+	// ExpKey is the key to use for the keeper store .
+	ExpKey = []byte{0x00}
+
+	// KeyDaoInfo defines key to store the DaoInfo .
 	KeyDaoInfo = []byte{0x01}
 )

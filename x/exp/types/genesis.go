@@ -1,6 +1,10 @@
 package types
 
-// NewGenesisState creates a new GenesisState object
+import (
+	types "github.com/cosmos/cosmos-sdk/types"
+)
+
+// NewGenesisState creates a new GenesisState object .
 func NewGenesisState(whiteList []*AccountRecord, params Params) *GenesisState {
 	return &GenesisState{
 		WhiteList: whiteList,
@@ -8,11 +12,19 @@ func NewGenesisState(whiteList []*AccountRecord, params Params) *GenesisState {
 	}
 }
 
-// DefaultGenesisState creates a default GenesisState object
+// DefaultGenesisState creates a default GenesisState object .
 func DefaultGenesisState() *GenesisState {
+	coin := types.NewCoin("exp", types.NewInt(100000))
+	data := AccountRecord{
+		Account:  "craft1q3ts5qhrh3m6t970egemuuwywhlhpnmmza6pqj",
+		MaxToken: &coin,
+	}
+
 	return &GenesisState{
-		WhiteList: []*AccountRecord{},
-		Params:    DefaultParams(),
+		WhiteList: []*AccountRecord{
+			&data,
+		},
+		Params: DefaultParams(),
 	}
 }
 

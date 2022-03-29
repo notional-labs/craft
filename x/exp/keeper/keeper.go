@@ -12,7 +12,7 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-// Farewell, ashen one. Mayst thou thy peace discov'r.
+// Keeper for expModule.
 type ExpKeeper struct {
 	cdc codec.BinaryCodec
 
@@ -30,7 +30,7 @@ func NewKeeper(
 ) ExpKeeper {
 	// ensure module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
-		panic("the mint module account has not been set")
+		panic("the exp module account has not been set")
 	}
 
 	// set KeyTable if it has not already been set
@@ -56,18 +56,18 @@ func (k ExpKeeper) MintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAcc
 		// skip as no coins need to be minted
 		return nil
 	}
-	//compare denom
-	if true {
+	// only mint one denom
+	if newCoins.Len() != 1 && newCoins[0].Denom != k.GetDenom(ctx) {
 		return errors.New("Exp module only mint exp")
 	}
 
-	//mint coin for exp module
+	// mint coin for exp module
 	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, newCoins)
 	if err != nil {
 		return nil
 	}
 
-	//send coin to account
+	// send coin to account
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, dstAccount, newCoins)
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (k ExpKeeper) BurnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddr
 	return nil
 }
 
-//check Pesmission
+// verify Dao member: balances, whitelist .
 func (k ExpKeeper) verifyDao(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddress sdk.AccAddress) error {
 	params := k.GetParams(ctx)
 
@@ -111,7 +111,7 @@ func (k ExpKeeper) verifyDao(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddr
 	if err != nil {
 		return err
 	}
-	//check if dstAddress in whitelist
+	// check if dstAddress in whitelist .
 	for _, accountRecord := range daoInfo.Whitelist {
 		if dstAddress.String() == accountRecord.Account {
 			dstAddressBalances := k.bankKeeper.GetBalance(ctx, dstAddress, params.Denom)
@@ -126,7 +126,7 @@ func (k ExpKeeper) verifyDao(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddr
 }
 
 func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) error {
-	//check if dstAddress in whitelist
+	// check if dstAddress in whitelist .
 	daoInfo, err := k.GetDaoInfo(ctx)
 	if err != nil {
 		return err

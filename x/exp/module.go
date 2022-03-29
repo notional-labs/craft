@@ -30,8 +30,6 @@ type AppModuleBasic struct {
 	cdc codec.Codec
 }
 
-var _ module.AppModuleBasic = AppModuleBasic{}
-
 // Name returns the exp module's name.
 func (AppModuleBasic) Name() string {
 	return types.ModuleName
@@ -40,8 +38,10 @@ func (AppModuleBasic) Name() string {
 // RegisterLegacyAminoCodec registers the exp module's types on the given LegacyAmino codec.
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {}
 
-// RegisterInterfaces registers the module's interface types
-func (b AppModuleBasic) RegisterInterfaces(_ cdctypes.InterfaceRegistry) {}
+// RegisterInterfaces registers the module's interface types .
+func (b AppModuleBasic) RegisterInterfaces(register cdctypes.InterfaceRegistry) {
+	types.RegisterInterfaces(register)
+}
 
 // DefaultGenesis returns default genesis state as raw bytes for the exp
 // module.
@@ -72,7 +72,9 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 }
 
 // GetTxCmd returns no root tx command for the exp module.
-func (AppModuleBasic) GetTxCmd() *cobra.Command { return nil }
+func (AppModuleBasic) GetTxCmd() *cobra.Command {
+	return cli.NewTxCmd()
+}
 
 // GetQueryCmd returns the root query command for the exp module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
@@ -91,7 +93,6 @@ type AppModule struct {
 // NewAppModule creates a new AppModule object. If the InflationCalculationFn
 // argument is nil, then the SDK's default inflation function will be used.
 func NewAppModule(cdc codec.Codec, keeper keeper.ExpKeeper, ak types.AccountKeeper, bk types.BankKeeper) AppModule {
-
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},
 		keeper:         keeper,
@@ -109,7 +110,9 @@ func (AppModule) Name() string {
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
 // Deprecated: Route returns the message routing key for the exp module.
-func (AppModule) Route() sdk.Route { return sdk.Route{} }
+func (AppModule) Route() sdk.Route {
+	return sdk.Route{}
+}
 
 // QuerierRoute returns the exp module's querier route name.
 func (AppModule) QuerierRoute() string {
@@ -124,6 +127,7 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sd
 // RegisterServices registers a gRPC query service to respond to the
 // module-specific gRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
+	types.RegisterMsgServer(cfg.MsgServer(), am.keeper)
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 

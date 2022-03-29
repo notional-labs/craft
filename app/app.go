@@ -157,10 +157,9 @@ import (
 	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
 
 	// API documentation.
-
 	appparameters "github.com/notional-labs/craft/app/params"
 
-	// exp module
+	// Exp module .
 	"github.com/notional-labs/craft/x/exp"
 	expkeeper "github.com/notional-labs/craft/x/exp/keeper"
 	exptypes "github.com/notional-labs/craft/x/exp/types"
@@ -513,7 +512,7 @@ func NewCraftApp(
 	)
 	app.NFTKeeper = nftkeeper.NewKeeper(keys[nftkeeper.StoreKey], appCodec, app.AccountKeeper, app.BankKeeper)
 
-	//expKeeper
+	// expKeeper
 	app.ExpKeeper = expkeeper.NewKeeper(keys[exptypes.StoreKey], appCodec, app.GetSubspace(exptypes.ModuleName), app.AccountKeeper, app.BankKeeper)
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(

@@ -42,6 +42,6 @@ if [[ $1 == "pending" ]]; then
   echo "pending mode is on, please wait for the first block committed."
 fi
 
-# Start the node (remove the --pruning=nothing flag if historical queries are not needed)
+# # Start the node (remove the --pruning=nothing flag if historical queries are not needed)
 craftd start --pruning=nothing  --minimum-gas-prices=0.0001stake --mode validator         
 

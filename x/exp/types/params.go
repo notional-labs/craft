@@ -18,10 +18,11 @@ func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(MaxCoinMint uint64, DaoAccount string, denom string) Params {
+// NewParams create a new param for exp module .
+func NewParams(maxCoinMint uint64, daoAccount string, denom string) Params {
 	return Params{
-		MaxCoinMint: MaxCoinMint,
-		DaoAccount:  DaoAccount,
+		MaxCoinMint: maxCoinMint,
+		DaoAccount:  daoAccount,
 		Denom:       denom,
 	}
 }
@@ -29,8 +30,8 @@ func NewParams(MaxCoinMint uint64, DaoAccount string, denom string) Params {
 func DefaultParams() Params {
 	return Params{
 		MaxCoinMint: uint64(100000),
-		DaoAccount:  "craft16pctk89ystuwg4gv2dgj5lwtsavy9pkfdxlc5u",
-		Denom:       "exp2",
+		DaoAccount:  "craft1pzsr988fmdrg2fez2mfz5r5pcxg2kcsmz89jwa",
+		Denom:       "exp",
 	}
 }
 

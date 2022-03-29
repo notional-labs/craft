@@ -15,7 +15,9 @@ service Msg {
 }
 
 message MsgMintAndAllocateExp {
-  cosmos.base.v1beta1.Coin amount = 1 ;
+  repeated cosmos.base.v1beta1.Coin amount = 1 
+    [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+
   //string FromAdd
 
   string from_address = 2;
@@ -23,8 +25,6 @@ message MsgMintAndAllocateExp {
   // members defines the Dao members address.
   string member = 3 ;
 
-  // metadata is any arbitrary metadata to attached.
-  string metadata = 4;
 }
 
 message MsgMintAndAllocateExpResponse {}

@@ -6,7 +6,7 @@ import (
 	"github.com/notional-labs/craft/x/exp/types"
 )
 
-// InitGenesis new mint genesis
+// InitGenesis new exp genesis .
 func InitGenesis(ctx sdk.Context, keeper keeper.ExpKeeper, ak types.AccountKeeper, data *types.GenesisState) {
 	keeper.SetParams(ctx, data.Params)
 	keeper.SetDaoInfo(ctx, types.DaoInfo{Whitelist: data.WhiteList})

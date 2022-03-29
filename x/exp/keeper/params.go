@@ -5,7 +5,7 @@ import (
 	"github.com/notional-labs/craft/x/exp/types"
 )
 
-// GetConstantFee get's the constant fee from the paramSpace
+// GetConstantFee get's the denom from the paramSpace .
 func (k ExpKeeper) GetDenom(ctx sdk.Context) (denom string) {
 	k.paramSpace.Get(ctx, types.ParamStoreKeyDenom, &denom)
 	return
