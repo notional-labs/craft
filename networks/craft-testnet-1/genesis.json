@@ -1,6 +1,6 @@
 {
   "genesis_time": "2022-03-30T14:00:00Z",
-  "chain_id": "craft-testv3",
+  "chain_id": "craft-testnet-1",
   "initial_height": "1",
   "consensus_params": {
     "block": {
