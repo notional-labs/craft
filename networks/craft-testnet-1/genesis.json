@@ -1,6 +1,6 @@
 {
-  "genesis_time": "2022-03-27T05:00:00Z",
-  "chain_id": "craft-testnet-1",
+  "genesis_time": "2022-03-30T17:00:00Z",
+  "chain_id": "craft-testv3",
   "initial_height": "1",
   "consensus_params": {
     "block": {
@@ -336,7 +336,7 @@
         "send_enabled": [
           {
             "denom": "uexp",
-            "enabled": false
+            "enabled": true
           }
         ],
         "default_send_enabled": true
@@ -3489,7 +3489,7 @@
       "params": {
         "signed_blocks_window": "10000",
         "min_signed_per_window": "0.050000000000000000",
-        "downtime_jail_duration": "600s",
+        "downtime_jail_duration": "300s",
         "slash_fraction_double_sign": "0.100000000000000000",
         "slash_fraction_downtime": "0.000000000000000000"
       },
@@ -3498,7 +3498,7 @@
     },
     "staking": {
       "params": {
-        "unbonding_time": "1814400s",
+        "unbonding_time": "120s",
         "max_validators": 200,
         "max_entries": 7,
         "historical_entries": 10000,
