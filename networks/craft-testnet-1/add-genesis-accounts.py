@@ -5,8 +5,8 @@ from pathlib import Path
 
 # cd networks/craft-testnet-1/
 
-LAUNCH_TIME = "2022-03-30T14:00:00Z"
-CHAIN_ID = "craft-testv3"
+LAUNCH_TIME = "2022-03-30T17:00:00Z"
+CHAIN_ID = "craft-testnet-1"
 EXP_SEND = [{"denom": "uexp","enabled": True}]
 
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # home dir
@@ -14,7 +14,7 @@ GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # home dir
 FOLDER = "gentx" # since we want to give everyone with getxs tokens
 
 def main():
-    # outputDetails()
+    outputDetails()
     resetGenesisFile()
     createGenesisAccountsCommands()
 
