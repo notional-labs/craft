@@ -8,7 +8,7 @@ import (
 
 var _ sdk.Msg = &MsgMintAndAllocateExp{}
 
-// Route Implements Msg
+// Route Implements Msg.
 func (m MsgMintAndAllocateExp) Route() string { return sdk.MsgTypeURL(&m) }
 
 // Type Implements Msg.
@@ -28,7 +28,7 @@ func (m MsgMintAndAllocateExp) GetSignBytes() []byte {
 	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
 }
 
-// ValidateBasic does a sanity check on the provided data
+// ValidateBasic does a sanity check on the provided data.
 func (m MsgMintAndAllocateExp) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {
@@ -47,7 +47,7 @@ func NewMsgMintAndAllocateExp(fromAddr sdk.AccAddress, member sdk.AccAddress, am
 
 var _ sdk.Msg = &MsgBurnAndRemoveMember{}
 
-// Route Implements Msg
+// Route Implements Msg.
 func (m MsgBurnAndRemoveMember) Route() string { return sdk.MsgTypeURL(&m) }
 
 // Type Implements Msg.
@@ -67,7 +67,7 @@ func (m MsgBurnAndRemoveMember) GetSignBytes() []byte {
 	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
 }
 
-// ValidateBasic does a sanity check on the provided data
+// ValidateBasic does a sanity check on the provided data.
 func (m MsgBurnAndRemoveMember) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {
