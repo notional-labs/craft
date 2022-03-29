@@ -3,13 +3,13 @@ package keeper
 import (
 	"errors"
 
-	"github.com/notional-labs/craft/x/exp/types"
-	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	"github.com/notional-labs/craft/x/exp/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 // Keeper for expModule.
@@ -104,7 +104,7 @@ func (k ExpKeeper) verifyDao(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddr
 	params := k.GetParams(ctx)
 
 	if params.DaoAccount != daoAddress.String() {
-		return types.ErrDaoAccount
+		return sdkerrors.Wrapf(types.ErrDaoAccount, "must be %s addrees not %s", params.DaoAccount, daoAddress.String())
 	}
 
 	daoInfo, err := k.GetDaoInfo(ctx)
