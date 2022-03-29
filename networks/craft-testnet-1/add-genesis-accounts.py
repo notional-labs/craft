@@ -5,14 +5,17 @@ from pathlib import Path
 
 # cd networks/craft-testnet-1/
 
-LAUNCH_TIME = "2022-03-29T21:23:00Z"
-CHAIN_ID = "craft-testnet-1"
+LAUNCH_TIME = "2022-03-30T17:00:00Z"
+CHAIN_ID = "craft-testv3"
+EXP_SEND = [{"denom": "uexp","enabled": True}]
+
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json"
+FOLDER = "gentx-v3"
 
 def main():
-    outputDetails()
+    # outputDetails()
     resetGenesisFile()
-    createGenesisAccountsCommands()
+    # createGenesisAccountsCommands()
 
 def resetGenesisFile():
     # load genesis.json & remove all values for accounts & supply
@@ -24,6 +27,9 @@ def resetGenesisFile():
         genesis["app_state"]['auth']["accounts"] = []
         genesis["app_state"]['bank']["balances"] = []
         genesis["app_state"]['bank']["supply"] = []
+        genesis["app_state"]['bank']["params"]["send_enabled"] = EXP_SEND
+
+        genesis["app_state"]['genutil']["gen_txs"] = []
 
     # save genesis.json
     with open(GENESIS_FILE, 'w') as f:
@@ -40,12 +46,12 @@ def outputDetails() -> str:
     hours = seconds_until_launch // 3600
     minutes = (seconds_until_launch % 3600) // 60
 
-    print(f"# {LAUNCH_TIME=} ({hours}h {minutes}m) from now\n# {CHAIN_ID=}\n")
+    print(f"# {LAUNCH_TIME} ({hours}h {minutes}m) from now\n# {CHAIN_ID}\n")
 
 def createGenesisAccountsCommands():
-    gentx_files = os.listdir('gentx')
+    gentx_files = os.listdir(FOLDER)
     for file in gentx_files:
-        f = open('gentx/' + file, 'r')
+        f = open(FOLDER + "/" + file, 'r')
         data = json.load(f)
 
         validatorData = data['body']['messages'][0]
@@ -56,7 +62,7 @@ def createGenesisAccountsCommands():
         if delegator == "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh":
             print(f"craftd add-genesis-account {delegator} 100000000000000ucraft,30000000000uexp #pbcups")
         else:
-            print(f"craftd add-genesis-account {delegator} {amt}uexp #{moniker}")
+            print(f"craftd add-genesis-account {delegator} 10000000000ucraft,{amt}uexp #{moniker}")
 
 
 if __name__ == "__main__":
