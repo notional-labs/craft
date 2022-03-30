@@ -5,8 +5,8 @@ from pathlib import Path
 
 # cd networks/craft-testnet-1/
 
-LAUNCH_TIME = "2022-03-30T17:00:00Z"
-CHAIN_ID = "craft-testnet-1"
+LAUNCH_TIME = "2022-03-30T18:15:00Z"
+CHAIN_ID = "craft-v4"
 EXP_SEND = [{"denom": "uexp","enabled": True}]
 
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # home dir
@@ -17,6 +17,7 @@ def main():
     outputDetails()
     resetGenesisFile()
     createGenesisAccountsCommands()
+    pass
 
 def resetGenesisFile():
     # load genesis.json & remove all values for accounts & supply
