@@ -43,5 +43,5 @@ if [[ $1 == "pending" ]]; then
 fi
 
 # # Start the node (remove the --pruning=nothing flag if historical queries are not needed)
-craftd start --pruning=nothing  --minimum-gas-prices=0.0001stake --mode validator         
+# craftd start --pruning=nothing  --minimum-gas-prices=0.0001stake --mode validator         
 

@@ -92,9 +92,8 @@ func (m MsgJoinDao) Route() string { return sdk.MsgTypeURL(&m) }
 func (m MsgJoinDao) Type() string { return sdk.MsgTypeURL(&m) }
 
 // GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
-// This msg only execute by gov module => GetSigners() return dead address .
 func (m MsgJoinDao) GetSigners() []sdk.AccAddress {
-	daoAccount, err := sdk.AccAddressFromHex("0000000000000000000000000000000000000")
+	daoAccount, err := sdk.AccAddressFromBech32(m.GovAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -115,9 +114,10 @@ func (m MsgJoinDao) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgJoinDao(joinAddress sdk.AccAddress, maxToken int64) *MsgJoinDao {
+func NewMsgJoinDao(joinAddress sdk.AccAddress, maxToken int64, govAddress string) *MsgJoinDao {
 	return &MsgJoinDao{
 		JoinAddress: joinAddress.String(),
 		MaxToken:    maxToken,
+		GovAddress:  govAddress,
 	}
 }

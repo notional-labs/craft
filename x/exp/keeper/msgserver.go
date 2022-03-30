@@ -4,6 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/notional-labs/craft/x/exp/types"
 )
 
@@ -81,6 +82,10 @@ func (k ExpKeeper) JoinDao(goCtx context.Context, msg *types.MsgJoinDao) (*types
 	if err != nil {
 		return nil, err
 	}
+	if k.accountKeeper.GetModuleAccount(ctx, govtypes.ModuleName).GetAddress().String() != msg.GovAddress {
+		return nil, types.ErrGov
+	}
+
 	MaxCoinMint := sdk.Coin{
 		Amount: sdk.NewInt(msg.MaxToken),
 		Denom:  k.GetDenom(ctx),

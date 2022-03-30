@@ -12,4 +12,5 @@ var (
 	ErrAddressdNotFound    = sdkerrors.Register(ModuleName, 5, "address not found in whitelist")
 	ErrInvalidKey          = sdkerrors.Register(ModuleName, 6, "invalid key")
 	ErrDuplicate           = sdkerrors.Register(ModuleName, 7, "invalid duplicate")
+	ErrGov                 = sdkerrors.Register(ModuleName, 8, "whitelist must be add by a gov proposal")
 )

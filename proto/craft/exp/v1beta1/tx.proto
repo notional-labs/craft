@@ -5,7 +5,6 @@ package craft.exp.v1beta1;
 option go_package = "x/exp/types";
 
 import "gogoproto/gogo.proto";
-import "cosmos_proto/cosmos.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
 // Msg is the cosmos.group.v1 Msg service.
@@ -45,9 +44,10 @@ message MsgBurnAndRemoveMemberResponse{}
 message MsgJoinDao {
   // join_address defines the member who want join Dao.
  string join_address = 1 ;
- // max_coin_mint is maximum exp can be mint.
- int64 max_token = 2 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Int"] ;
-
+  // gov_address defines the gov chain address.
+ string gov_address = 2;
+  // max_coin_mint is maximum exp can be mint.
+ int64 max_token = 3 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Int"] ;
 }
 
 message MsgJoinDaoResponse{}

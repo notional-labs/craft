@@ -9,7 +9,7 @@ import (
 
 var _ types.QueryServer = ExpKeeper{}
 
-// Params returns params of the mint module.
+// Params returns params of the exp module.
 func (k ExpKeeper) WhiteList(c context.Context, _ *types.QueryWhiteListRequest) (*types.QueryWhiteListResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	daoInfo, err := k.GetDaoInfo(ctx)

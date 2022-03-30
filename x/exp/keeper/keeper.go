@@ -16,9 +16,10 @@ import (
 type ExpKeeper struct {
 	cdc codec.BinaryCodec
 
-	storeKey   storetypes.StoreKey
-	paramSpace paramtypes.Subspace
-	bankKeeper types.BankKeeper
+	storeKey      storetypes.StoreKey
+	paramSpace    paramtypes.Subspace
+	accountKeeper types.AccountKeeper
+	bankKeeper    types.BankKeeper
 }
 
 func NewKeeper(
@@ -39,10 +40,11 @@ func NewKeeper(
 	}
 
 	return ExpKeeper{
-		cdc:        cdc,
-		storeKey:   key,
-		paramSpace: paramSpace,
-		bankKeeper: bk,
+		cdc:           cdc,
+		storeKey:      key,
+		paramSpace:    paramSpace,
+		accountKeeper: ak,
+		bankKeeper:    bk,
 	}
 }
 
