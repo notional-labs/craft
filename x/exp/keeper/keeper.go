@@ -140,7 +140,7 @@ func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) 
 	return types.ErrAddressdNotFound
 }
 
-func (k ExpKeeper) AddAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, max_mint_coin sdk.Coin) error {
+func (k ExpKeeper) AddAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, maxToken sdk.Coin) error {
 	var newDaoInfo types.DaoInfo
 
 	daoInfo, err := k.GetDaoInfo(ctx)
@@ -156,7 +156,7 @@ func (k ExpKeeper) AddAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccA
 	}
 
 	accountRecord := &types.AccountRecord{
-		Account: memberAccount.String(), MaxToken: &max_mint_coin,
+		Account: memberAccount.String(), MaxToken: &maxToken,
 	}
 
 	newDaoInfo = types.DaoInfo{
