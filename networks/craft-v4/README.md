@@ -54,8 +54,7 @@ to add ledger key
 ## GenTx : [Skip to Post Genesis](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#become-a-validator-post-genesis)
 
 ```bash
-Install craftd binary
-Initialize node
+rm $HOME/.craftd/config/genesis.json
 craftd init <moniker> --chain-id craft-v4 --staking-bond-denom exp
 ```
 
