@@ -20,12 +20,13 @@ func NewTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	txCmd.AddCommand(NewBurnExpAndExitDaoCmd())
+	txCmd.AddCommand(NewMintExpCmd())
+	txCmd.AddCommand(NewBurnExpCmd())
 
 	return txCmd
 }
 
-func NewBurnExpAndExitDaoCmd() *cobra.Command {
+func NewMintExpCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mintexp [dao_member_address] [amount]",
 		Short: `Mint exp for a dao member. Note, the'--from' flag is ignored as it is implied from [from_key_or_address].`,
@@ -46,6 +47,28 @@ func NewBurnExpAndExitDaoCmd() *cobra.Command {
 			}
 
 			msg := types.NewMsgMintAndAllocateExp(clientCtx.GetFromAddress(), toAddr, coins)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewBurnExpCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "burnexp [dao_member_address]",
+		Short: `Burn exp and exit dao. Note, the'--from' flag is ignored as it is implied from [from_key_or_address].`,
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgBurnAndRemoveMember(clientCtx.GetFromAddress(), args[0])
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
