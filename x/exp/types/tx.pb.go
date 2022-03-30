@@ -219,42 +219,140 @@ func (m *MsgBurnAndRemoveMemberResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgBurnAndRemoveMemberResponse proto.InternalMessageInfo
 
+// MsgBurnAndRemoveMember
+type MsgJoinDao struct {
+	// join_address defines the member who want join Dao.
+	JoinAddress string `protobuf:"bytes,1,opt,name=join_address,json=joinAddress,proto3" json:"join_address,omitempty"`
+	// max_coin_mint is maximum exp can be mint.
+	MaxToken int64 `protobuf:"varint,2,opt,name=max_token,json=maxToken,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Int" json:"max_token,omitempty"`
+}
+
+func (m *MsgJoinDao) Reset()         { *m = MsgJoinDao{} }
+func (m *MsgJoinDao) String() string { return proto.CompactTextString(m) }
+func (*MsgJoinDao) ProtoMessage()    {}
+func (*MsgJoinDao) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ea0f2c4d268ca6db, []int{4}
+}
+func (m *MsgJoinDao) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgJoinDao) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgJoinDao.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgJoinDao) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgJoinDao.Merge(m, src)
+}
+func (m *MsgJoinDao) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgJoinDao) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgJoinDao.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgJoinDao proto.InternalMessageInfo
+
+func (m *MsgJoinDao) GetJoinAddress() string {
+	if m != nil {
+		return m.JoinAddress
+	}
+	return ""
+}
+
+func (m *MsgJoinDao) GetMaxToken() int64 {
+	if m != nil {
+		return m.MaxToken
+	}
+	return 0
+}
+
+type MsgJoinDaoResponse struct {
+}
+
+func (m *MsgJoinDaoResponse) Reset()         { *m = MsgJoinDaoResponse{} }
+func (m *MsgJoinDaoResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgJoinDaoResponse) ProtoMessage()    {}
+func (*MsgJoinDaoResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ea0f2c4d268ca6db, []int{5}
+}
+func (m *MsgJoinDaoResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgJoinDaoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgJoinDaoResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgJoinDaoResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgJoinDaoResponse.Merge(m, src)
+}
+func (m *MsgJoinDaoResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgJoinDaoResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgJoinDaoResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgJoinDaoResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgMintAndAllocateExp)(nil), "craft.exp.v1beta1.MsgMintAndAllocateExp")
 	proto.RegisterType((*MsgMintAndAllocateExpResponse)(nil), "craft.exp.v1beta1.MsgMintAndAllocateExpResponse")
 	proto.RegisterType((*MsgBurnAndRemoveMember)(nil), "craft.exp.v1beta1.MsgBurnAndRemoveMember")
 	proto.RegisterType((*MsgBurnAndRemoveMemberResponse)(nil), "craft.exp.v1beta1.MsgBurnAndRemoveMemberResponse")
+	proto.RegisterType((*MsgJoinDao)(nil), "craft.exp.v1beta1.MsgJoinDao")
+	proto.RegisterType((*MsgJoinDaoResponse)(nil), "craft.exp.v1beta1.MsgJoinDaoResponse")
 }
 
 func init() { proto.RegisterFile("craft/exp/v1beta1/tx.proto", fileDescriptor_ea0f2c4d268ca6db) }
 
 var fileDescriptor_ea0f2c4d268ca6db = []byte{
-	// 389 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0x31, 0x6e, 0xdb, 0x30,
-	0x14, 0x15, 0x6b, 0xc0, 0x68, 0xe9, 0x2e, 0x55, 0x5b, 0xc3, 0x16, 0x50, 0xda, 0x15, 0x50, 0x40,
-	0x1d, 0x4a, 0xd9, 0xee, 0x09, 0xe4, 0xa2, 0xa3, 0x16, 0x2d, 0x01, 0xb2, 0x18, 0x94, 0x44, 0x2b,
-	0x42, 0x4c, 0x52, 0x10, 0x69, 0x43, 0xb9, 0x45, 0xce, 0x91, 0x0b, 0xe4, 0x0a, 0x1e, 0x3d, 0x66,
-	0x4a, 0x02, 0x7b, 0xcd, 0x21, 0x02, 0x53, 0x94, 0x17, 0x6b, 0xf0, 0x24, 0x3d, 0xbe, 0xc7, 0xf7,
-	0x1e, 0xc9, 0x0f, 0x9d, 0xa4, 0x24, 0x4b, 0xe5, 0xd3, 0xaa, 0xf0, 0x37, 0xd3, 0x98, 0x2a, 0x32,
-	0xf5, 0x55, 0x85, 0x8b, 0x52, 0x28, 0x61, 0x7f, 0xd1, 0x1c, 0xa6, 0x55, 0x81, 0x0d, 0xe7, 0x7c,
-	0xcb, 0x44, 0x26, 0x34, 0xeb, 0x1f, 0xff, 0x6a, 0xa1, 0x33, 0x4c, 0x84, 0x64, 0x42, 0x2e, 0x6a,
-	0xa2, 0x06, 0x86, 0x42, 0x35, 0xf2, 0x63, 0x22, 0xe9, 0x29, 0x21, 0x11, 0x39, 0xaf, 0x79, 0xf7,
-	0x11, 0xc0, 0xef, 0xa1, 0xcc, 0xc2, 0x9c, 0xab, 0x80, 0xa7, 0xc1, 0x6a, 0x25, 0x12, 0xa2, 0xe8,
-	0xff, 0xaa, 0xb0, 0x13, 0xd8, 0x25, 0x4c, 0xac, 0xb9, 0x1a, 0x80, 0x71, 0xc7, 0xeb, 0xcd, 0x86,
-	0xd8, 0x18, 0x1f, 0xad, 0x9a, 0x42, 0xf8, 0x9f, 0xc8, 0xf9, 0x7c, 0xb2, 0x7d, 0x1e, 0x59, 0x0f,
-	0x2f, 0x23, 0x2f, 0xcb, 0xd5, 0xcd, 0x3a, 0xc6, 0x89, 0x60, 0xa6, 0x85, 0xf9, 0xfc, 0x91, 0xe9,
-	0xad, 0xaf, 0xee, 0x0a, 0x2a, 0xf5, 0x06, 0x19, 0x19, 0x6b, 0xfb, 0x27, 0xfc, 0xbc, 0x2c, 0x05,
-	0x5b, 0x90, 0x34, 0x2d, 0xa9, 0x94, 0x83, 0x0f, 0x63, 0xe0, 0x7d, 0x8a, 0x7a, 0xc7, 0xb5, 0xa0,
-	0x5e, 0xb2, 0xfb, 0xb0, 0xcb, 0x28, 0x8b, 0x69, 0x39, 0xe8, 0x68, 0xd2, 0x20, 0x77, 0x04, 0x7f,
-	0xb4, 0x16, 0x8f, 0xa8, 0x2c, 0x04, 0x97, 0xd4, 0xbd, 0x82, 0xfd, 0x50, 0x66, 0xf3, 0x75, 0xc9,
-	0x03, 0x9e, 0x46, 0x94, 0x89, 0x0d, 0x0d, 0xf5, 0xd6, 0xb3, 0x54, 0x70, 0x9e, 0xea, 0xc0, 0x8f,
-	0x8c, 0x2a, 0x92, 0x12, 0x45, 0x4c, 0xa9, 0x13, 0x76, 0xc7, 0x10, 0xb5, 0x1b, 0x37, 0xd1, 0xb3,
-	0x37, 0x00, 0x3b, 0xa1, 0xcc, 0xec, 0x02, 0xda, 0x2d, 0x37, 0xeb, 0xe1, 0xb3, 0x87, 0xc5, 0xad,
-	0x47, 0x71, 0x26, 0x97, 0x2a, 0x9b, 0x64, 0x5b, 0xc2, 0xaf, 0x6d, 0x27, 0xfe, 0xdd, 0x6e, 0xd4,
-	0x22, 0x75, 0xa6, 0x17, 0x4b, 0x9b, 0xd0, 0xf9, 0xaf, 0xed, 0x1e, 0x81, 0xdd, 0x1e, 0x81, 0xd7,
-	0x3d, 0x02, 0xf7, 0x07, 0x64, 0xed, 0x0e, 0xc8, 0x7a, 0x3a, 0x20, 0xeb, 0xba, 0x57, 0xe9, 0xd1,
-	0xd6, 0x4f, 0x1f, 0x77, 0xf5, 0xc8, 0xfd, 0x7d, 0x0f, 0x00, 0x00, 0xff, 0xff, 0x10, 0x75, 0xde,
-	0xc7, 0xf4, 0x02, 0x00, 0x00,
+	// 467 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0xc1, 0x6e, 0xd3, 0x40,
+	0x10, 0x86, 0xe3, 0x46, 0x0a, 0xed, 0x84, 0x0b, 0xa6, 0x54, 0xa9, 0xa5, 0x3a, 0xc1, 0x52, 0x51,
+	0x40, 0xc2, 0x6e, 0xca, 0x13, 0x24, 0x80, 0x10, 0x48, 0x16, 0x92, 0x85, 0x84, 0xc4, 0x25, 0x5a,
+	0xdb, 0x5b, 0x63, 0xda, 0xdd, 0xb1, 0xbc, 0x9b, 0xca, 0xbc, 0x05, 0xcf, 0xd1, 0x17, 0xe0, 0xc4,
+	0xbd, 0xc7, 0x1e, 0x39, 0x11, 0x94, 0xbc, 0x08, 0xf2, 0x7a, 0x1d, 0x24, 0xb2, 0x42, 0x39, 0x25,
+	0x33, 0xff, 0xcc, 0xff, 0x8d, 0x66, 0xbc, 0xe0, 0x24, 0x25, 0xb9, 0x90, 0x01, 0xad, 0x8a, 0xe0,
+	0x7a, 0x12, 0x53, 0x49, 0x26, 0x81, 0xac, 0xfc, 0xa2, 0x44, 0x89, 0xf6, 0x03, 0xa5, 0xf9, 0xb4,
+	0x2a, 0x7c, 0xad, 0x39, 0x87, 0x19, 0x66, 0xa8, 0xd4, 0xa0, 0xfe, 0xd7, 0x14, 0x3a, 0xc7, 0x09,
+	0x0a, 0x86, 0x62, 0xde, 0x08, 0x4d, 0xa0, 0x25, 0xb7, 0x89, 0x82, 0x98, 0x08, 0xba, 0x21, 0x24,
+	0x98, 0xf3, 0x46, 0xf7, 0xbe, 0x5b, 0xf0, 0x28, 0x14, 0x59, 0x98, 0x73, 0x39, 0xe5, 0xe9, 0xf4,
+	0xea, 0x0a, 0x13, 0x22, 0xe9, 0xeb, 0xaa, 0xb0, 0x13, 0xe8, 0x11, 0x86, 0x0b, 0x2e, 0x07, 0xd6,
+	0xa8, 0x3b, 0xee, 0x9f, 0x1f, 0xfb, 0xda, 0xb8, 0xb6, 0x6a, 0x07, 0xf2, 0x5f, 0x62, 0xce, 0x67,
+	0x67, 0xb7, 0xbf, 0x86, 0x9d, 0x9b, 0xe5, 0x70, 0x9c, 0xe5, 0xf2, 0xf3, 0x22, 0xf6, 0x13, 0x64,
+	0x7a, 0x0a, 0xfd, 0xf3, 0x5c, 0xa4, 0x97, 0x81, 0xfc, 0x5a, 0x50, 0xa1, 0x1a, 0x44, 0xa4, 0xad,
+	0xed, 0xc7, 0x70, 0xff, 0xa2, 0x44, 0x36, 0x27, 0x69, 0x5a, 0x52, 0x21, 0x06, 0x7b, 0x23, 0x6b,
+	0x7c, 0x10, 0xf5, 0xeb, 0xdc, 0xb4, 0x49, 0xd9, 0x47, 0xd0, 0x63, 0x94, 0xc5, 0xb4, 0x1c, 0x74,
+	0x95, 0xa8, 0x23, 0x6f, 0x08, 0x27, 0xc6, 0xc1, 0x23, 0x2a, 0x0a, 0xe4, 0x82, 0x7a, 0x1f, 0xe1,
+	0x28, 0x14, 0xd9, 0x6c, 0x51, 0xf2, 0x29, 0x4f, 0x23, 0xca, 0xf0, 0x9a, 0x86, 0xaa, 0x75, 0x8b,
+	0x6a, 0x6d, 0x53, 0x1d, 0xd8, 0x67, 0x54, 0x92, 0x94, 0x48, 0xa2, 0x87, 0xda, 0xc4, 0xde, 0x08,
+	0x5c, 0xb3, 0xf1, 0x06, 0x5d, 0x01, 0x84, 0x22, 0x7b, 0x87, 0x39, 0x7f, 0x45, 0xb0, 0xc6, 0x7d,
+	0xc1, 0x9c, 0xff, 0x8b, 0xab, 0x73, 0x2d, 0xee, 0x0d, 0x1c, 0x30, 0x52, 0xcd, 0x25, 0x5e, 0x52,
+	0xae, 0x78, 0xdd, 0xd9, 0xb3, 0x9b, 0xe5, 0xf0, 0xc9, 0x0e, 0x0b, 0x7d, 0xcb, 0x65, 0xb4, 0xcf,
+	0x48, 0xf5, 0xa1, 0xee, 0xf5, 0x0e, 0xc1, 0xfe, 0x4b, 0x6e, 0xe7, 0x39, 0xff, 0xb1, 0x07, 0xdd,
+	0x50, 0x64, 0x76, 0x01, 0xb6, 0xe1, 0xd2, 0x63, 0x7f, 0xeb, 0x43, 0xf3, 0x8d, 0xab, 0x75, 0xce,
+	0x76, 0xad, 0x6c, 0xc9, 0xb6, 0x80, 0x87, 0xa6, 0x0b, 0x3c, 0x35, 0x1b, 0x19, 0x4a, 0x9d, 0xc9,
+	0xce, 0xa5, 0x1b, 0xe8, 0x7b, 0xb8, 0xd7, 0xee, 0xfe, 0xc4, 0xdc, 0xad, 0x65, 0xe7, 0xf4, 0xbf,
+	0x72, 0x6b, 0x38, 0x3b, 0xbd, 0x5d, 0xb9, 0xd6, 0xdd, 0xca, 0xb5, 0x7e, 0xaf, 0x5c, 0xeb, 0xdb,
+	0xda, 0xed, 0xdc, 0xad, 0xdd, 0xce, 0xcf, 0xb5, 0xdb, 0xf9, 0xd4, 0xaf, 0xd4, 0xdb, 0x55, 0xa7,
+	0x88, 0x7b, 0xea, 0x4d, 0xbd, 0xf8, 0x13, 0x00, 0x00, 0xff, 0xff, 0x62, 0x86, 0x8b, 0x27, 0xd5,
+	0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -271,6 +369,7 @@ const _ = grpc.SupportPackageIsVersion4
 type MsgClient interface {
 	MintAndAllocateExp(ctx context.Context, in *MsgMintAndAllocateExp, opts ...grpc.CallOption) (*MsgMintAndAllocateExpResponse, error)
 	BurnAndRemoveMember(ctx context.Context, in *MsgBurnAndRemoveMember, opts ...grpc.CallOption) (*MsgBurnAndRemoveMemberResponse, error)
+	JoinDao(ctx context.Context, in *MsgJoinDao, opts ...grpc.CallOption) (*MsgJoinDaoResponse, error)
 }
 
 type msgClient struct {
@@ -299,10 +398,20 @@ func (c *msgClient) BurnAndRemoveMember(ctx context.Context, in *MsgBurnAndRemov
 	return out, nil
 }
 
+func (c *msgClient) JoinDao(ctx context.Context, in *MsgJoinDao, opts ...grpc.CallOption) (*MsgJoinDaoResponse, error) {
+	out := new(MsgJoinDaoResponse)
+	err := c.cc.Invoke(ctx, "/craft.exp.v1beta1.Msg/JoinDao", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	MintAndAllocateExp(context.Context, *MsgMintAndAllocateExp) (*MsgMintAndAllocateExpResponse, error)
 	BurnAndRemoveMember(context.Context, *MsgBurnAndRemoveMember) (*MsgBurnAndRemoveMemberResponse, error)
+	JoinDao(context.Context, *MsgJoinDao) (*MsgJoinDaoResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -314,6 +423,9 @@ func (*UnimplementedMsgServer) MintAndAllocateExp(ctx context.Context, req *MsgM
 }
 func (*UnimplementedMsgServer) BurnAndRemoveMember(ctx context.Context, req *MsgBurnAndRemoveMember) (*MsgBurnAndRemoveMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BurnAndRemoveMember not implemented")
+}
+func (*UnimplementedMsgServer) JoinDao(ctx context.Context, req *MsgJoinDao) (*MsgJoinDaoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method JoinDao not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -356,6 +468,24 @@ func _Msg_BurnAndRemoveMember_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_JoinDao_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgJoinDao)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).JoinDao(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/craft.exp.v1beta1.Msg/JoinDao",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).JoinDao(ctx, req.(*MsgJoinDao))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "craft.exp.v1beta1.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -367,6 +497,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BurnAndRemoveMember",
 			Handler:    _Msg_BurnAndRemoveMember_Handler,
+		},
+		{
+			MethodName: "JoinDao",
+			Handler:    _Msg_JoinDao_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -507,6 +641,64 @@ func (m *MsgBurnAndRemoveMemberResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgJoinDao) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgJoinDao) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgJoinDao) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.MaxToken != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.MaxToken))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.JoinAddress) > 0 {
+		i -= len(m.JoinAddress)
+		copy(dAtA[i:], m.JoinAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.JoinAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgJoinDaoResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgJoinDaoResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgJoinDaoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -568,6 +760,31 @@ func (m *MsgBurnAndRemoveMember) Size() (n int) {
 }
 
 func (m *MsgBurnAndRemoveMemberResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgJoinDao) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.JoinAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.MaxToken != 0 {
+		n += 1 + sovTx(uint64(m.MaxToken))
+	}
+	return n
+}
+
+func (m *MsgJoinDaoResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -921,6 +1138,157 @@ func (m *MsgBurnAndRemoveMemberResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgBurnAndRemoveMemberResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgJoinDao) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgJoinDao: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgJoinDao: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field JoinAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.JoinAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxToken", wireType)
+			}
+			m.MaxToken = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxToken |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgJoinDaoResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgJoinDaoResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgJoinDaoResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

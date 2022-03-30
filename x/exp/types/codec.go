@@ -10,6 +10,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgMintAndAllocateExp{},
 		&MsgBurnAndRemoveMember{},
+		&MsgJoinDao{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

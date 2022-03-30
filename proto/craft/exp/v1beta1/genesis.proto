@@ -8,14 +8,14 @@ import "cosmos/auth/v1beta1/auth.proto";
 import "craft/exp/v1beta1/daoinfo.proto";
 option go_package = "x/exp/types";
 
-// Params holds parameters for the incentives module
+// Params holds parameters for the exp module
 message Params {
   uint64 max_coin_mint = 1 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.moretags) = "yaml:\"max_coin_mint\"",
     (gogoproto.nullable) = true
   ];
-  string DaoAccount   = 2;
+  string daoAccount   = 2;
   string denom        = 3;
 }
 

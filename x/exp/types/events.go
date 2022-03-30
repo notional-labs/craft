@@ -4,4 +4,5 @@ package types
 const (
 	AttributeKeyMintExp = "mintexp"
 	AttributeKeyBurnExp = "burnexp"
+	AttributeKeyJoinDao = "joindao"
 )

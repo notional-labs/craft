@@ -139,3 +139,30 @@ func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) 
 	}
 	return types.ErrAddressdNotFound
 }
+
+func (k ExpKeeper) AddAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, max_mint_coin sdk.Coin) error {
+	var newDaoInfo types.DaoInfo
+
+	daoInfo, err := k.GetDaoInfo(ctx)
+	if err != nil {
+		return err
+	}
+	whiteList := daoInfo.GetWhitelist()
+
+	for _, ar := range whiteList {
+		if ar.Account == memberAccount.String() {
+			return sdkerrors.Wrap(types.ErrDuplicate, "address already in whitelist")
+		}
+	}
+
+	accountRecord := &types.AccountRecord{
+		Account: memberAccount.String(), MaxToken: &max_mint_coin,
+	}
+
+	newDaoInfo = types.DaoInfo{
+		Whitelist: append(whiteList, accountRecord),
+	}
+
+	k.SetDaoInfo(ctx, newDaoInfo)
+	return nil
+}

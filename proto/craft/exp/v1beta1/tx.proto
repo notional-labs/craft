@@ -12,6 +12,7 @@ import "cosmos/base/v1beta1/coin.proto";
 service Msg {
     rpc MintAndAllocateExp(MsgMintAndAllocateExp) returns (MsgMintAndAllocateExpResponse);
     rpc BurnAndRemoveMember(MsgBurnAndRemoveMember) returns (MsgBurnAndRemoveMemberResponse);
+    rpc JoinDao(MsgJoinDao) returns (MsgJoinDaoResponse);
 }
 
 message MsgMintAndAllocateExp {
@@ -39,3 +40,14 @@ message MsgBurnAndRemoveMember {
 }
 
 message MsgBurnAndRemoveMemberResponse{}
+
+// MsgBurnAndRemoveMember 
+message MsgJoinDao {
+  // join_address defines the member who want join Dao.
+ string join_address = 1 ;
+ // max_coin_mint is maximum exp can be mint.
+ int64 max_token = 2 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Int"] ;
+
+}
+
+message MsgJoinDaoResponse{}

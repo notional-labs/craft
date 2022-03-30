@@ -11,4 +11,5 @@ var (
 	ErrInputOutputMismatch = sdkerrors.Register(ModuleName, 4, "cannot mint coin with amount > max_mint_amount")
 	ErrAddressdNotFound    = sdkerrors.Register(ModuleName, 5, "address not found in whitelist")
 	ErrInvalidKey          = sdkerrors.Register(ModuleName, 6, "invalid key")
+	ErrDuplicate           = sdkerrors.Register(ModuleName, 7, "invalid duplicate")
 )

@@ -32,7 +32,7 @@ func (m MsgMintAndAllocateExp) GetSignBytes() []byte {
 func (m MsgMintAndAllocateExp) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {
-		return sdkerrors.Wrap(err, "daoAdmin")
+		return sdkerrors.Wrap(err, "from address must be valid address")
 	}
 	return nil
 }
@@ -71,7 +71,7 @@ func (m MsgBurnAndRemoveMember) GetSignBytes() []byte {
 func (m MsgBurnAndRemoveMember) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {
-		return sdkerrors.Wrap(err, "daoAdmin")
+		return sdkerrors.Wrap(err, "from address must be valid address")
 	}
 	return nil
 }
@@ -80,5 +80,44 @@ func NewMsgBurnAndRemoveMember(fromAddr sdk.AccAddress, metadata string) *MsgBur
 	return &MsgBurnAndRemoveMember{
 		FromAddress: fromAddr.String(),
 		Metadata:    metadata,
+	}
+}
+
+var _ sdk.Msg = &MsgJoinDao{}
+
+// Route Implements Msg.
+func (m MsgJoinDao) Route() string { return sdk.MsgTypeURL(&m) }
+
+// Type Implements Msg.
+func (m MsgJoinDao) Type() string { return sdk.MsgTypeURL(&m) }
+
+// GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
+// This msg only execute by gov module => GetSigners() return dead address
+func (m MsgJoinDao) GetSigners() []sdk.AccAddress {
+	daoAccount, err := sdk.AccAddressFromHex("0000000000000000000000000000000000000")
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{daoAccount}
+}
+
+// GetSignBytes Implements Msg.
+func (m MsgJoinDao) GetSignBytes() []byte {
+	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
+}
+
+// ValidateBasic does a sanity check on the provided data.
+func (m MsgJoinDao) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.JoinAddress)
+	if err != nil {
+		return sdkerrors.Wrap(err, "join address must be valid address")
+	}
+	return nil
+}
+
+func NewMsgJoinDao(joinAddress sdk.AccAddress, MaxToken int64) *MsgJoinDao {
+	return &MsgJoinDao{
+		JoinAddress: joinAddress.String(),
+		MaxToken:    MaxToken,
 	}
 }
