@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2022-03-30T18:15:00Z",
+  "genesis_time": "2022-03-30T18:35:00Z",
   "chain_id": "craft-v4",
   "initial_height": "1",
   "consensus_params": {
@@ -1048,9 +1048,9 @@
                 "description": {
                   "moniker": "Bloqhub",
                   "identity": "",
-                  "website": "https://bloqhub.io/%22,%22details%22:%22Bloqhub team",
-                  "security_contact": "",
-                  "details": ""
+                  "website": "\u003cwebsite\u003e",
+                  "security_contact": "\u003cemail\u003e",
+                  "details": "\u003cdetails here\u003e"
                 },
                 "commission": {
                   "rate": "0.050000000000000000",
@@ -1062,7 +1062,7 @@
                 "validator_address": "craftvaloper1xap0xc4p83x2scpnplv5k3c6lkr9amgy9xa0nk",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "WGacgstG5nqJwjjIPxMey3m/phB5ffyLlKFH3MD7lPI="
+                  "key": "WKdo3l4+O7GElH5HrktOhsO1p+JQA/1pKlcfMjUzKos="
                 },
                 "value": {
                   "denom": "uexp",
@@ -1070,7 +1070,7 @@
                 }
               }
             ],
-            "memo": "f1b67f0ea2f9eb1b7f2ef1c4b392430b0792c6fa@135.181.179.49:26656",
+            "memo": "5bfa2bcab91c69830b8fe93b3e94b370d5c691ce@135.181.179.49:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -1099,7 +1099,7 @@
             "tip": null
           },
           "signatures": [
-            "uTO5ywbNw3cBaFZRUofLrN8pJ7cjhoNrXY7BB2QvTXA+cbsE/uhoQNPK32skjS2grcb7t8qpx/AAuJv6b20uTw=="
+            "fifjFTxPH6bNIbpHL/6W5SRMc0xBURA34UFal/vMirAiKXxEvxFZIHtGabvTwTxElrSEx1Ck25NWUC4BvibA3A=="
           ]
         },
         {
