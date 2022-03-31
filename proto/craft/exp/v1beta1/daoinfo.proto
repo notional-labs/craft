@@ -4,6 +4,7 @@ package craft.exp.v1beta1;
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "x/exp/types";
 
@@ -18,6 +19,8 @@ message AccountRecord {
 
   string account                      = 1;
   cosmos.base.v1beta1.Coin max_token  = 2;
+  google.protobuf.Timestamp join_dao_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
 }
 
 message DaoInfo {
