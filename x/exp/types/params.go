@@ -2,15 +2,29 @@ package types
 
 import (
 	fmt "fmt"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
+// Exp params default values
+const (
+	// After pass, ISO 8601 format for when they can no longer mint EXP from this proposal
+	// TODO: Justify our choice of default here.
+	DefaultClosePoolPeriod time.Duration = time.Hour * 24 * 7 * 3
+
+	// After pass, ISO 8601 format for when they can no longer burn EXP
+	// TODO: Justify our choice of default here.
+	DefaultVestingPeriodEnd time.Duration = time.Hour * 24 * 7 * 3
+)
+
 var (
-	ParamStoreKeyMaxCoinMint = []byte("maxCoinMint")
-	ParamStoreKeyDaoAccount  = []byte("daoAccount")
-	ParamStoreKeyDenom       = []byte("denom")
+	ParamStoreKeyMaxCoinMint      = []byte("maxCoinMint")
+	ParamStoreKeyDaoAccount       = []byte("daoAccount")
+	ParamStoreKeyDenom            = []byte("denom")
+	ParamStoreKeyClosePoolPeriod  = []byte("closepool")
+	ParamStoreKeyVestingPeriodEnd = []byte("vestingperiodend")
 )
 
 // ParamTable for exp module.
@@ -29,9 +43,11 @@ func NewParams(maxCoinMint uint64, daoAccount string, denom string) Params {
 
 func DefaultParams() Params {
 	return Params{
-		MaxCoinMint: uint64(100000),
-		DaoAccount:  "craft1pzsr988fmdrg2fez2mfz5r5pcxg2kcsmz89jwa",
-		Denom:       "exp",
+		MaxCoinMint:      uint64(100000),
+		DaoAccount:       "craft1pzsr988fmdrg2fez2mfz5r5pcxg2kcsmz89jwa",
+		Denom:            "exp",
+		ClosePoolPeriod:  DefaultClosePoolPeriod,
+		VestingPeriodEnd: DefaultVestingPeriodEnd,
 	}
 }
 
@@ -40,6 +56,8 @@ func (p Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(ParamStoreKeyMaxCoinMint, &p.MaxCoinMint, validateMaxCoinMint),
 		paramtypes.NewParamSetPair(ParamStoreKeyDaoAccount, &p.DaoAccount, validateDaoAccount),
 		paramtypes.NewParamSetPair(ParamStoreKeyDenom, &p.Denom, validateDenom),
+		paramtypes.NewParamSetPair(ParamStoreKeyClosePoolPeriod, &p.ClosePoolPeriod, validatePeriod),
+		paramtypes.NewParamSetPair(ParamStoreKeyVestingPeriodEnd, &p.VestingPeriodEnd, validatePeriod),
 	}
 }
 
@@ -70,6 +88,19 @@ func validateDenom(i interface{}) error {
 	}
 
 	return sdk.ValidateDenom(denom)
+}
+
+func validatePeriod(i interface{}) error {
+	v, ok := i.(time.Duration)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v <= 0 {
+		return fmt.Errorf("time must be positive: %d", v)
+	}
+
+	return nil
 }
 
 func (p Params) Validate() error {
