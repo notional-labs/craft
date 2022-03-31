@@ -14,15 +14,15 @@ func (k ExpKeeper) GetDenom(ctx sdk.Context) (denom string) {
 }
 
 // GetClosePoolPeriod get's the ClosePoolPeriod from the paramSpace .
-func (k ExpKeeper) GetClosePoolPeriod(ctx sdk.Context) (denom string) {
-	k.paramSpace.Get(ctx, types.ParamStoreKeyClosePoolPeriod, &denom)
-	return denom
+func (k ExpKeeper) GetClosePoolPeriod(ctx sdk.Context) (duration time.Duration) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyClosePoolPeriod, &duration)
+	return duration
 }
 
-// GetClosePoolPeriod get's the ClosePoolPeriod from the paramSpace .
+// GetVestingPeriodEnd get's the VestingPeriodEnd from the paramSpace .
 func (k ExpKeeper) GetVestingPeriodEnd(ctx sdk.Context) (duration time.Duration) {
 	k.paramSpace.Get(ctx, types.ParamStoreKeyVestingPeriodEnd, &duration)
-	return denom
+	return duration
 }
 
 // GetParams gets the auth module's parameters.
