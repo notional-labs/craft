@@ -78,25 +78,3 @@ func NewBurnExpCmd() *cobra.Command {
 
 	return cmd
 }
-
-func NewJoinDaoCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "join [dao_member_address]",
-		Short: `Burn exp and exit dao. Note, the'--from' flag is ignored as it is implied from [from_key_or_address].`,
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			msg := types.NewMsgJoinDao(clientCtx.GetFromAddress(), 100000, "craft10d07y265gmmuvt4z0w9aw880jnsr700jm5qjn0")
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
