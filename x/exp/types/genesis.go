@@ -2,6 +2,7 @@ package types
 
 import (
 	types "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/libs/time"
 )
 
 // NewGenesisState creates a new GenesisState object .
@@ -16,8 +17,9 @@ func NewGenesisState(whiteList []*AccountRecord, params Params) *GenesisState {
 func DefaultGenesisState() *GenesisState {
 	coin := types.NewCoin("exp", types.NewInt(100000))
 	data := AccountRecord{
-		Account:  "craft1q3ts5qhrh3m6t970egemuuwywhlhpnmmza6pqj",
-		MaxToken: &coin,
+		Account:     "craft1q3ts5qhrh3m6t970egemuuwywhlhpnmmza6pqj",
+		MaxToken:    &coin,
+		JoinDaoTime: time.Now(),
 	}
 
 	return &GenesisState{

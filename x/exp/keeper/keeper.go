@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"errors"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -89,7 +90,12 @@ func (k ExpKeeper) BurnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddr
 	whiteList := daoInfo.GetWhitelist()
 
 	for index, ar := range whiteList {
+
 		if ar.Account == memberAccount.String() {
+			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
+			if time.Now().Before(timeCheck) {
+				return sdkerrors.Wrap(types.ErrTimeOut, "exp in vesting time, cannot burn")
+			}
 			newDaoInfo = types.DaoInfo{
 				Whitelist: append(whiteList[:index], whiteList[index+1:]...),
 			}
@@ -102,7 +108,7 @@ func (k ExpKeeper) BurnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddr
 }
 
 // verify Dao member: balances, whitelist .
-func (k ExpKeeper) verifyDao(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddress sdk.AccAddress) error {
+func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddress sdk.AccAddress) error {
 	params := k.GetParams(ctx)
 
 	if params.DaoAccount != daoAddress.String() {
@@ -117,9 +123,14 @@ func (k ExpKeeper) verifyDao(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddr
 	for _, accountRecord := range daoInfo.Whitelist {
 		if dstAddress.String() == accountRecord.Account {
 			dstAddressBalances := k.bankKeeper.GetBalance(ctx, dstAddress, params.Denom)
-
+			// amount check
 			if dstAddressBalances.Amount.GT(accountRecord.MaxToken.Amount) {
 				return types.ErrInputOutputMismatch
+			}
+			// vesting time check, give one day for DAO sign
+			timeCheck := accountRecord.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
+			if time.Now().After(timeCheck) {
+				return types.ErrTimeOut
 			}
 			return nil
 		}
@@ -158,7 +169,9 @@ func (k ExpKeeper) AddAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccA
 	}
 
 	accountRecord := &types.AccountRecord{
-		Account: memberAccount.String(), MaxToken: &maxToken,
+		Account:     memberAccount.String(),
+		MaxToken:    &maxToken,
+		JoinDaoTime: time.Now(),
 	}
 
 	newDaoInfo = types.DaoInfo{

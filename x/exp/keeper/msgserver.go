@@ -33,7 +33,7 @@ func (k ExpKeeper) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintA
 		return nil, err
 	}
 
-	if err := k.verifyDao(ctx, fromAddress, memberAddress); err != nil {
+	if err := k.verifyAccountForMint(ctx, fromAddress, memberAddress); err != nil {
 		return nil, err
 	}
 

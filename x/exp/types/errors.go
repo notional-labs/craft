@@ -13,4 +13,5 @@ var (
 	ErrInvalidKey          = sdkerrors.Register(ModuleName, 6, "invalid key")
 	ErrDuplicate           = sdkerrors.Register(ModuleName, 7, "invalid duplicate")
 	ErrGov                 = sdkerrors.Register(ModuleName, 8, "whitelist must be add by a gov proposal")
+	ErrTimeOut             = sdkerrors.Register(ModuleName, 9, "time out")
 )
