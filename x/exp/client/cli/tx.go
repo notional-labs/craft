@@ -28,7 +28,7 @@ func NewTxCmd() *cobra.Command {
 func NewMintExpCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mintexp [dao_member_address] [amount]",
-		Short: `Mint exp for a dao member. Note, the'--from' flag is ignored as it is implied from [from_key_or_address].`,
+		Short: `Mint exp for a dao member`,
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -59,7 +59,7 @@ func NewMintExpCmd() *cobra.Command {
 func NewBurnExpCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "burnexp [dao_member_address]",
-		Short: `Burn exp and exit dao. Note, the'--from' flag is ignored as it is implied from [from_key_or_address].`,
+		Short: `Burn exp and exit dao.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)

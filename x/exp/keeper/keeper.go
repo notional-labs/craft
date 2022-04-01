@@ -90,7 +90,6 @@ func (k ExpKeeper) BurnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddr
 	whiteList := daoInfo.GetWhitelist()
 
 	for index, ar := range whiteList {
-
 		if ar.Account == memberAccount.String() {
 			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
 			if time.Now().Before(timeCheck) {
@@ -99,12 +98,12 @@ func (k ExpKeeper) BurnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddr
 			newDaoInfo = types.DaoInfo{
 				Whitelist: append(whiteList[:index], whiteList[index+1:]...),
 			}
-			break
+			k.SetDaoInfo(ctx, newDaoInfo)
+			return nil
 		}
 	}
 
-	k.SetDaoInfo(ctx, newDaoInfo)
-	return nil
+	return types.ErrAddressdNotFound
 }
 
 // verify Dao member: balances, whitelist .
