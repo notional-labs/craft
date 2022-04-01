@@ -18,7 +18,7 @@
 * 4.2 GHz x6 CPU 
 
 **Operating System**
-* Linux (x86_64) or Linux (amd64) Reccomended Arch Linux
+* Linux (x86_64) or Linux (amd64) Recommended Arch Linux
 
 ### Dependencies
 >Prerequisite: go1.18+ required
@@ -39,7 +39,7 @@
 Clone git repository
 git clone https://github.com/notional-labs/craft.git
 cd craft
-git checkout v0.1.1
+git checkout v0.2.2
 go install ./...
 ```
 > to add ledger support `go install -tags ledger ./...`

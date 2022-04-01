@@ -48,7 +48,11 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     private static MongoDB mongoDB;
 
-    public static long MAX_FAUCET_AMOUNT = 10_000;
+    public static long MAX_FAUCET_AMOUNT = 100_000; // TODO: Change to cryptography
+
+    private Double TAX_RATE;
+
+    private String SERVER_WALLET = null;
 
     private BukkitTask redisPubSubTask = null;
     private Jedis jedisPubSubClient = null;
@@ -65,8 +69,6 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
         getConfig().options().copyDefaults(true);
         saveConfig();
-
-
         redisDB = new RedisManager(
             getConfig().getString("Redis.host"), 
             getConfig().getInt("Redis.port"),
@@ -81,7 +83,12 @@ public class CraftBlockchainPlugin extends JavaPlugin {
             getConfig().getString("MongoDB.password")
         );
 
+        SERVER_WALLET = getConfig().getString("SERVER_WALLET_ADDRESS");
+
         webappLink = getConfig().getString("SIGNING_WEBAPP_LINK");
+
+        TAX_RATE = getConfig().getDouble("TAX_RATE");
+        if(TAX_RATE == null) TAX_RATE = 0.0;
 
         if(getTokenFaucet() == null || getApiEndpoint() == null) {
             getLogger().severe("Faucet token OR API endpoints not set in config.yml, disabling plugin");
@@ -157,11 +164,11 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         // jedisPubSubClient.close();             
     }
 
-    public RedisManager getRedis(){
+    public RedisManager getRedis() {
         return redisDB;
     }
 
-    public MongoDB getMongo(){
+    public MongoDB getMongo() {
         return mongoDB;
     }
 
@@ -191,6 +198,15 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     public String getWebappLink() {
         return webappLink;
+    }
+
+    public Double getTaxRate() {
+        return TAX_RATE;
+    }
+
+    
+    public String getServersWalletAddress() {
+        return SERVER_WALLET;
     }
 
     public String getTokenDenom(boolean smallerValue) {

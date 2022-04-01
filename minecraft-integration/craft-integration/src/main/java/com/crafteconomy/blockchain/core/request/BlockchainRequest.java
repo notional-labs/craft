@@ -15,17 +15,21 @@ import org.json.JSONObject;
 
 public class BlockchainRequest {
     
-    private static RedisManager redisDB = CraftBlockchainPlugin.getInstance().getRedis();
+    private static CraftBlockchainPlugin blockchainPlugin = CraftBlockchainPlugin.getInstance();
+
+    private static RedisManager redisDB = blockchainPlugin.getRedis();
+    private static String SERVER_ADDRESS = blockchainPlugin.getServersWalletAddress();
 
     // http://IP:PORT/cosmos/bank/v1beta1
-    private static final String API_ENDPOINT = CraftBlockchainPlugin.getInstance().getApiEndpoint();
+    private static final String API_ENDPOINT = blockchainPlugin.getApiEndpoint();
+
     // osmosis endpoints (https://osmo.api.ping.pub/). Found via https://v1.cosmos.network/rpc/v0.41.4
     // https://lcd-osmosis.blockapsis.com/cosmos/bank/v1beta1/balances/osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p/by_denom?denom=uosmo
     private static final String BALANCES_ENDPOINT = API_ENDPOINT + "/balances/%address%/by_denom?denom=%denomination%";
     private static final String SUPPLY_ENDPOINT = API_ENDPOINT + "/supply/%denomination%";
     // TODO: For denominations in uosmo/ucraft, ensure to *1000000
 
-    private static final String TOKEN_DENOMINATION = CraftBlockchainPlugin.getInstance().getTokenDenom(true);
+    private static final String TOKEN_DENOMINATION = blockchainPlugin.getTokenDenom(true);
 
     // -= BALANCES =-
     public static long getBalance(String craft_address, String denomination) {
@@ -125,7 +129,7 @@ public class BlockchainRequest {
     }
 
     // TODO: Small value for now to make testing easier
-    private static String tokenDenom = CraftBlockchainPlugin.getInstance().getTokenDenom(true);
+    private static String tokenDenom = blockchainPlugin.getTokenDenom(true);
 
     /**
      * Generates a JSON object for a transaction used by the blockchain
@@ -138,8 +142,13 @@ public class BlockchainRequest {
     private static String generateJSONAminoTx(String FROM, String TO, long AMOUNT, String DESCRIPTION) {    
         // TODO: long updatedAmount = AMOUNT * 1000000;
         long updatedAmount = AMOUNT;  // less for testing purposes
+        double taxAmount = updatedAmount * blockchainPlugin.getTaxRate();
         
-        // return "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"amount\": {\"denom\": \"uosmo\",\"amount\": \""+updatedAmount+"\"}}";
-        return "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"amount\": \""+updatedAmount+"\",\"denom\": \""+tokenDenom+"\"}";
+        // EX: {"amount":"2","description":"Purchase Business License for 2","to_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p","tax":{"amount":0.1,"address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"},"denom":"uosmo","from_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"}
+        
+        // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
+        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"amount\": \""+updatedAmount+"\",\"denom\": \""+tokenDenom+"\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
+        // System.out.println(v);
+        return json;
     }
 }

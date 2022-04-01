@@ -273,6 +273,13 @@ github.com/cosmos/btcutil v1.0.4 h1:n7C2ngKXo7UC9gNyMNLbzqz7Asuf+7Qv4gnX/rOdQ44=
 github.com/cosmos/btcutil v1.0.4/go.mod h1:Ffqc8Hn6TJUdDgHBwIZLtrLQC1KdJ9jGJl/TvgUaxbU=
 github.com/cosmos/cosmos-proto v1.0.0-alpha7.0.20220208174455-213b76899fac h1:xdD9S2oFjpSb1sdIRM5LXgQ2SWIQTXKY7xosnp+w1LA=
 github.com/cosmos/cosmos-proto v1.0.0-alpha7.0.20220208174455-213b76899fac/go.mod h1:TUpFbyjtKZ+dXmJ48nAVio0lw6dMXMsWhEa1ln4iSw4=
+<<<<<<< HEAD
+=======
+github.com/cosmos/cosmos-sdk v0.46.0-alpha3.0.20220325134903-a69764f9f01b h1:6NuTmORwI783Ca4KjRg+W7trCiLtAF1V4jCAq9TTVh0=
+github.com/cosmos/cosmos-sdk v0.46.0-alpha3.0.20220325134903-a69764f9f01b/go.mod h1:LxCWwKa0Ejsiy5yLGyYVFksKm/LNkLZa4n54zydgWjY=
+github.com/cosmos/cosmos-sdk v0.46.0-alpha3.0.20220328183147-3cf11e1f7d4f h1:ZaA4HNAOgFq9FUSDAT5jN+CzT8B/BaTN15dlRQ8yTpo=
+github.com/cosmos/cosmos-sdk v0.46.0-alpha3.0.20220328183147-3cf11e1f7d4f/go.mod h1:LxCWwKa0Ejsiy5yLGyYVFksKm/LNkLZa4n54zydgWjY=
+>>>>>>> master
 github.com/cosmos/cosmos-sdk/api v0.1.0-alpha5 h1:UlK7NOHGlEbvbDTCM0cN7BJN6hhqeXZIuLv6KapFYTc=
 github.com/cosmos/cosmos-sdk/api v0.1.0-alpha5/go.mod h1:gZu6sOu2vl4Fd7I+BjDSx2bxndwPgFLGfOegek3SQQo=
 github.com/cosmos/cosmos-sdk/db v1.0.0-beta.1.0.20220218134704-20e17ea71a9b h1:P72FQN0/hDPcprPqADRqhOUBMM0UJxfY+rPQ4Era0g8=

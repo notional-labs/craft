@@ -64,6 +64,10 @@ public class Tx implements Serializable {
         this.toWallet = api.getServerWallet();
     }
 
+    public Double getTotalTaxAmount() {
+        return api.getTaxRate() * this.amount;
+    }
+
     public void complete() {
         if(biFunction != null) {
             this.getBiFunction().accept(this.fromUUID, this.toUUID);

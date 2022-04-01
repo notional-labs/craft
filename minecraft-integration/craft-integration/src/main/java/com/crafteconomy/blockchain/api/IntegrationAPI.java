@@ -29,7 +29,7 @@ public class IntegrationAPI {
     private IntegrationAPI() {    
         blockchainPlugin = CraftBlockchainPlugin.getInstance();
 
-        SERVER_WALLET = blockchainPlugin.getConfig().getString("SERVER_WALLET_ADDRESS");
+        SERVER_WALLET = blockchainPlugin.getServersWalletAddress();
         if(SERVER_WALLET == null) {
             throw new IllegalStateException("SERVER_WALLET_ADDRESS is not set in config.yml");
         }
@@ -132,6 +132,15 @@ public class IntegrationAPI {
      */
     public String getTokenDenomination(boolean getSmallerValue) {
         return blockchainPlugin.getTokenDenom(getSmallerValue);
+    }
+
+    /**
+     * Gets the tax rate of the server (ex. 0.05 = 5% rate * any transaction amount (so 105% total)).
+     * Is done via the webapp for you
+     * @return
+     */
+    public Double getTaxRate() {
+        return blockchainPlugin.getTaxRate();
     }
 
 
