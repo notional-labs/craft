@@ -25,12 +25,19 @@ func (k ExpKeeper) GetVestingPeriodEnd(ctx sdk.Context) (duration time.Duration)
 	return duration
 }
 
-// GetParams gets the auth module's parameters.
+// GetBurnExpPeriod get's the BurnExpPeriod from the paramSpace .
+func (k ExpKeeper) GetBurnExpPeriod(ctx sdk.Context) (duration time.Duration) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyBurnPeriod, &duration)
+	return duration
+}
+
+// GetParams gets the exp module's parameters.
 func (k ExpKeeper) GetParams(ctx sdk.Context) (params types.Params) {
 	k.paramSpace.GetParamSet(ctx, &params)
 	return types.DefaultParams()
 }
 
+//SetParams sets the exp module's parameters.
 func (k ExpKeeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }

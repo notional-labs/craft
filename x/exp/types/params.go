@@ -17,6 +17,9 @@ const (
 	// After pass, ISO 8601 format for when they can no longer burn EXP
 	// TODO: Justify our choice of default here.
 	DefaultVestingPeriodEnd time.Duration = time.Hour * 24 * 7 * 3
+
+	// Burning time
+	DefaultBurnPeriod time.Duration = time.Hour * 24 * 7 * 3
 )
 
 var (
@@ -25,9 +28,10 @@ var (
 	ParamStoreKeyDenom            = []byte("denom")
 	ParamStoreKeyClosePoolPeriod  = []byte("closepool")
 	ParamStoreKeyVestingPeriodEnd = []byte("vestingperiodend")
+	ParamStoreKeyBurnPeriod       = []byte("vestingperiodend")
 )
 
-// ParamTable for exp module.
+// ParamKeyTable for exp module.
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
@@ -58,6 +62,7 @@ func (p Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(ParamStoreKeyDenom, &p.Denom, validateDenom),
 		paramtypes.NewParamSetPair(ParamStoreKeyClosePoolPeriod, &p.ClosePoolPeriod, validatePeriod),
 		paramtypes.NewParamSetPair(ParamStoreKeyVestingPeriodEnd, &p.VestingPeriodEnd, validatePeriod),
+		paramtypes.NewParamSetPair(ParamStoreKeyBurnPeriod, &p.BurnExpPeriod, validatePeriod),
 	}
 }
 
