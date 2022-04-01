@@ -20,7 +20,7 @@ This chain is a DAO.
 
 
 * More feature development occurs while tn one is running.  We will use tn one to provide feedback and insights to the sdk team.  Both Seahorse and An1 are looking into these versions, too.
-* When feature-complete (implmentation of mint-burn-redeem economy controlled by dao) there will be a second testnet
+* When feature-complete (implmentation of mint-burn-redeem economy controlled by dao) there will be a second testnet & validator slashing gov prop
   * The second testnet will be used to look into the minecraft integrations and overall product quality
 * Testnet3, is hopefully a brief affair that leads directly into mainnet, with a feature freeze starting at the launch of tn2.  
 
