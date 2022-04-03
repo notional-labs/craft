@@ -9,103 +9,23 @@ import (
 	_ "github.com/cosmos/cosmos-sdk/x/auth/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	_ "github.com/regen-network/cosmos-proto"
 	_ "google.golang.org/protobuf/types/known/durationpb"
 	io "io"
 	math "math"
 	math_bits "math/bits"
-	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
-
-// Params holds parameters for the exp module
-type Params struct {
-	MaxCoinMint      uint64        `protobuf:"varint,1,opt,name=max_coin_mint,json=maxCoinMint,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"max_coin_mint,omitempty" yaml:"max_coin_mint"`
-	DaoAccount       string        `protobuf:"bytes,2,opt,name=daoAccount,proto3" json:"daoAccount,omitempty"`
-	Denom            string        `protobuf:"bytes,3,opt,name=denom,proto3" json:"denom,omitempty"`
-	ClosePoolPeriod  time.Duration `protobuf:"bytes,4,opt,name=close_pool_period,json=closePoolPeriod,proto3,stdduration" json:"close_pool_period"`
-	VestingPeriodEnd time.Duration `protobuf:"bytes,5,opt,name=vesting_period_end,json=vestingPeriodEnd,proto3,stdduration" json:"vesting_period_end"`
-}
-
-func (m *Params) Reset()         { *m = Params{} }
-func (m *Params) String() string { return proto.CompactTextString(m) }
-func (*Params) ProtoMessage()    {}
-func (*Params) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d9eb7710cccfbf9b, []int{0}
-}
-func (m *Params) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Params) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Params.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Params) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Params.Merge(m, src)
-}
-func (m *Params) XXX_Size() int {
-	return m.Size()
-}
-func (m *Params) XXX_DiscardUnknown() {
-	xxx_messageInfo_Params.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Params proto.InternalMessageInfo
-
-func (m *Params) GetMaxCoinMint() uint64 {
-	if m != nil {
-		return m.MaxCoinMint
-	}
-	return 0
-}
-
-func (m *Params) GetDaoAccount() string {
-	if m != nil {
-		return m.DaoAccount
-	}
-	return ""
-}
-
-func (m *Params) GetDenom() string {
-	if m != nil {
-		return m.Denom
-	}
-	return ""
-}
-
-func (m *Params) GetClosePoolPeriod() time.Duration {
-	if m != nil {
-		return m.ClosePoolPeriod
-	}
-	return 0
-}
-
-func (m *Params) GetVestingPeriodEnd() time.Duration {
-	if m != nil {
-		return m.VestingPeriodEnd
-	}
-	return 0
-}
 
 // GenesisState defines the exp module's genesis state.
 type GenesisState struct {
@@ -117,7 +37,7 @@ func (m *GenesisState) Reset()         { *m = GenesisState{} }
 func (m *GenesisState) String() string { return proto.CompactTextString(m) }
 func (*GenesisState) ProtoMessage()    {}
 func (*GenesisState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d9eb7710cccfbf9b, []int{1}
+	return fileDescriptor_d9eb7710cccfbf9b, []int{0}
 }
 func (m *GenesisState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -161,102 +81,32 @@ func (m *GenesisState) GetWhiteList() []*AccountRecord {
 }
 
 func init() {
-	proto.RegisterType((*Params)(nil), "craft.exp.v1beta1.Params")
 	proto.RegisterType((*GenesisState)(nil), "craft.exp.v1beta1.GenesisState")
 }
 
 func init() { proto.RegisterFile("craft/exp/v1beta1/genesis.proto", fileDescriptor_d9eb7710cccfbf9b) }
 
 var fileDescriptor_d9eb7710cccfbf9b = []byte{
-	// 469 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0xbf, 0x8e, 0xd3, 0x30,
-	0x18, 0xaf, 0xef, 0x7a, 0x15, 0xe7, 0x82, 0xe0, 0xa2, 0x0e, 0xbd, 0x1b, 0x92, 0xaa, 0x12, 0x52,
-	0x16, 0x1c, 0xdd, 0x31, 0x20, 0xb1, 0x20, 0x0a, 0x08, 0x06, 0x10, 0x25, 0x6c, 0x2c, 0x91, 0x13,
-	0xbb, 0xa9, 0x45, 0xe2, 0x2f, 0x8a, 0x9d, 0x23, 0xf7, 0x06, 0x8c, 0x8c, 0x3c, 0x03, 0x4f, 0xd2,
-	0xb1, 0x23, 0x53, 0x0f, 0xb5, 0x6f, 0xc0, 0x13, 0xa0, 0xd8, 0xbe, 0x13, 0x7f, 0x6e, 0x60, 0x8a,
-	0xbf, 0xfc, 0xfe, 0x7c, 0xfe, 0x7d, 0xfe, 0x70, 0x90, 0xd5, 0x74, 0xa1, 0x23, 0xde, 0x56, 0xd1,
-	0xf9, 0x69, 0xca, 0x35, 0x3d, 0x8d, 0x72, 0x2e, 0xb9, 0x12, 0x8a, 0x54, 0x35, 0x68, 0xf0, 0x8e,
-	0x0c, 0x81, 0xf0, 0xb6, 0x22, 0x8e, 0x70, 0x32, 0xca, 0x21, 0x07, 0x83, 0x46, 0xdd, 0xc9, 0x12,
-	0x4f, 0x8e, 0x33, 0x50, 0x25, 0xa8, 0xc4, 0x02, 0xb6, 0x70, 0x90, 0x6f, 0xab, 0x28, 0xa5, 0x8a,
-	0x5f, 0xb7, 0xc9, 0x40, 0xc8, 0xbf, 0x70, 0xda, 0xe8, 0xe5, 0x35, 0xde, 0x15, 0x0e, 0xbf, 0xe1,
-	0x92, 0x8c, 0x82, 0x90, 0x8b, 0xab, 0xde, 0x7e, 0x0e, 0x90, 0x17, 0x3c, 0x32, 0x55, 0xda, 0x2c,
-	0x22, 0xd6, 0xd4, 0x54, 0x0b, 0x70, 0x0d, 0xa6, 0xeb, 0x3d, 0x3c, 0x98, 0xd3, 0x9a, 0x96, 0xca,
-	0x2b, 0xf0, 0x9d, 0x92, 0xb6, 0x49, 0xd7, 0x3d, 0x29, 0x85, 0xd4, 0x63, 0x34, 0x41, 0x61, 0x7f,
-	0xf6, 0x6a, 0xb5, 0x09, 0xd0, 0xcf, 0x4d, 0x30, 0xba, 0xa0, 0x65, 0xf1, 0x78, 0xfa, 0x07, 0x65,
-	0xfa, 0xed, 0x32, 0x08, 0x73, 0xa1, 0x97, 0x4d, 0x4a, 0x32, 0x28, 0x5d, 0x36, 0xf7, 0x79, 0xa0,
-	0xd8, 0xc7, 0x48, 0x5f, 0x54, 0x5c, 0x91, 0x67, 0x20, 0xa4, 0x8a, 0x87, 0x25, 0x6d, 0xbb, 0xd3,
-	0x1b, 0x21, 0xb5, 0xe7, 0x63, 0xcc, 0x28, 0x3c, 0xcd, 0x32, 0x68, 0xa4, 0x1e, 0xef, 0x4d, 0x50,
-	0x78, 0x18, 0xff, 0xf6, 0xc7, 0x1b, 0xe1, 0x03, 0xc6, 0x25, 0x94, 0xe3, 0x7d, 0x03, 0xd9, 0xc2,
-	0x7b, 0x8b, 0x8f, 0xb2, 0x02, 0x14, 0x4f, 0x2a, 0x80, 0x22, 0xa9, 0x78, 0x2d, 0x80, 0x8d, 0xfb,
-	0x13, 0x14, 0x0e, 0xcf, 0x8e, 0x89, 0x8d, 0x4a, 0xae, 0xa2, 0x92, 0xe7, 0x2e, 0xea, 0xec, 0xd6,
-	0x6a, 0x13, 0xf4, 0xbe, 0x5e, 0x06, 0x28, 0xbe, 0x6b, 0xd4, 0x73, 0x80, 0x62, 0x6e, 0xb4, 0xde,
-	0x3b, 0xec, 0x9d, 0x73, 0xa5, 0x85, 0xcc, 0x9d, 0x5b, 0xc2, 0x25, 0x1b, 0x1f, 0xfc, 0xbf, 0xe3,
-	0x3d, 0x27, 0xb7, 0x7e, 0x2f, 0x24, 0x9b, 0x7e, 0x46, 0xf8, 0xf6, 0x4b, 0xbb, 0x29, 0xef, 0x35,
-	0xd5, 0xdc, 0x7b, 0x84, 0x07, 0x95, 0x19, 0xb1, 0x99, 0x68, 0xe7, 0xfb, 0xcf, 0xe6, 0x10, 0xfb,
-	0x06, 0xb3, 0x7e, 0xe7, 0x1b, 0x3b, 0xba, 0xf7, 0x04, 0xe3, 0x4f, 0x4b, 0xa1, 0x79, 0x52, 0x08,
-	0xd5, 0xcd, 0x68, 0x3f, 0x1c, 0x9e, 0x4d, 0x6e, 0x10, 0xbb, 0x99, 0xc5, 0x3c, 0x83, 0x9a, 0xc5,
-	0x87, 0x46, 0xf3, 0x5a, 0x28, 0x3d, 0xbb, 0xbf, 0xda, 0xfa, 0x68, 0xbd, 0xf5, 0xd1, 0x8f, 0xad,
-	0x8f, 0xbe, 0xec, 0xfc, 0xde, 0x7a, 0xe7, 0xf7, 0xbe, 0xef, 0xfc, 0xde, 0x87, 0x61, 0x6b, 0x96,
-	0xc6, 0x3c, 0x4f, 0x3a, 0x30, 0x01, 0x1f, 0xfe, 0x0a, 0x00, 0x00, 0xff, 0xff, 0xf5, 0x5e, 0x37,
-	0xd5, 0xf3, 0x02, 0x00, 0x00,
-}
-
-func (m *Params) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Params) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	n1, err1 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.VestingPeriodEnd, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.VestingPeriodEnd):])
-	if err1 != nil {
-		return 0, err1
-	}
-	i -= n1
-	i = encodeVarintGenesis(dAtA, i, uint64(n1))
-	i--
-	dAtA[i] = 0x2a
-	n2, err2 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ClosePoolPeriod, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClosePoolPeriod):])
-	if err2 != nil {
-		return 0, err2
-	}
-	i -= n2
-	i = encodeVarintGenesis(dAtA, i, uint64(n2))
-	i--
-	dAtA[i] = 0x22
-	if len(m.Denom) > 0 {
-		i -= len(m.Denom)
-		copy(dAtA[i:], m.Denom)
-		i = encodeVarintGenesis(dAtA, i, uint64(len(m.Denom)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.DaoAccount) > 0 {
-		i -= len(m.DaoAccount)
-		copy(dAtA[i:], m.DaoAccount)
-		i = encodeVarintGenesis(dAtA, i, uint64(len(m.DaoAccount)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.MaxCoinMint != 0 {
-		i = encodeVarintGenesis(dAtA, i, uint64(m.MaxCoinMint))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
+	// 292 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x90, 0xb1, 0x4e, 0xc3, 0x30,
+	0x10, 0x86, 0x63, 0x40, 0x95, 0x48, 0x58, 0x88, 0x18, 0xda, 0x0e, 0x6e, 0x84, 0x84, 0xd4, 0x29,
+	0x56, 0xcb, 0xc0, 0x88, 0xe8, 0xc2, 0xc2, 0x80, 0xc2, 0xc6, 0x52, 0x39, 0x8e, 0x93, 0x5a, 0x6a,
+	0x73, 0x51, 0x7c, 0x81, 0xf0, 0x06, 0x8c, 0x3c, 0x56, 0xc7, 0x8e, 0x4c, 0x08, 0x25, 0x2f, 0x82,
+	0x6a, 0x87, 0x22, 0xd1, 0x6e, 0xf9, 0xf5, 0x7d, 0x97, 0xfb, 0xcf, 0xee, 0x48, 0x94, 0x3c, 0x45,
+	0x26, 0xeb, 0x82, 0xbd, 0x4c, 0x62, 0x89, 0x7c, 0xc2, 0x32, 0x99, 0x4b, 0xad, 0x74, 0x58, 0x94,
+	0x80, 0xe0, 0x9f, 0x1b, 0x21, 0x94, 0x75, 0x11, 0x76, 0xc2, 0xf0, 0x22, 0x83, 0x0c, 0x0c, 0x65,
+	0xdb, 0x2f, 0x2b, 0x0e, 0x07, 0x02, 0xf4, 0x0a, 0xf4, 0xdc, 0x02, 0x1b, 0x3a, 0x44, 0x6d, 0x62,
+	0x31, 0xd7, 0x72, 0xb7, 0x46, 0x80, 0xca, 0xff, 0x71, 0x5e, 0xe1, 0x62, 0xc7, 0xb7, 0xa1, 0xe3,
+	0x07, 0x4a, 0x26, 0x1c, 0x54, 0x9e, 0xfe, 0xee, 0xa6, 0x19, 0x40, 0xb6, 0x94, 0xcc, 0xa4, 0xb8,
+	0x4a, 0x59, 0x52, 0x95, 0x1c, 0x15, 0xfc, 0x2d, 0xd8, 0xfb, 0x41, 0xc1, 0x4b, 0xbe, 0xea, 0x0a,
+	0x5e, 0xbe, 0x13, 0xf7, 0xec, 0xde, 0x9e, 0xfd, 0x84, 0x1c, 0xa5, 0x7f, 0xe3, 0xf6, 0xac, 0xd0,
+	0x27, 0x01, 0x19, 0x7b, 0xd3, 0x41, 0xb8, 0xf7, 0x0c, 0xe1, 0xa3, 0x11, 0x66, 0x27, 0xeb, 0xaf,
+	0x91, 0x13, 0x75, 0xba, 0x7f, 0xeb, 0xba, 0xaf, 0x0b, 0x85, 0x72, 0xbe, 0x54, 0x1a, 0xfb, 0x47,
+	0xc1, 0xf1, 0xd8, 0x9b, 0x06, 0x07, 0x86, 0xef, 0x84, 0x80, 0x2a, 0xc7, 0x48, 0x0a, 0x28, 0x93,
+	0xe8, 0xd4, 0xcc, 0x3c, 0x28, 0x8d, 0xb3, 0xab, 0x75, 0x43, 0xc9, 0xa6, 0xa1, 0xe4, 0xbb, 0xa1,
+	0xe4, 0xa3, 0xa5, 0xce, 0xa6, 0xa5, 0xce, 0x67, 0x4b, 0x9d, 0x67, 0xaf, 0x36, 0x07, 0xe0, 0x5b,
+	0x21, 0x75, 0xdc, 0x33, 0xc5, 0xaf, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0xa6, 0xa7, 0x7f, 0x8b,
+	0xc0, 0x01, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -317,30 +167,6 @@ func encodeVarintGenesis(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *Params) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.MaxCoinMint != 0 {
-		n += 1 + sovGenesis(uint64(m.MaxCoinMint))
-	}
-	l = len(m.DaoAccount)
-	if l > 0 {
-		n += 1 + l + sovGenesis(uint64(l))
-	}
-	l = len(m.Denom)
-	if l > 0 {
-		n += 1 + l + sovGenesis(uint64(l))
-	}
-	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClosePoolPeriod)
-	n += 1 + l + sovGenesis(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.VestingPeriodEnd)
-	n += 1 + l + sovGenesis(uint64(l))
-	return n
-}
-
 func (m *GenesisState) Size() (n int) {
 	if m == nil {
 		return 0
@@ -363,205 +189,6 @@ func sovGenesis(x uint64) (n int) {
 }
 func sozGenesis(x uint64) (n int) {
 	return sovGenesis(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *Params) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGenesis
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Params: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Params: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxCoinMint", wireType)
-			}
-			m.MaxCoinMint = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MaxCoinMint |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DaoAccount", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DaoAccount = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Denom", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Denom = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClosePoolPeriod", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.ClosePoolPeriod, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VestingPeriodEnd", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.VestingPeriodEnd, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGenesis(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *GenesisState) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

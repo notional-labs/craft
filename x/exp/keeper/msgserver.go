@@ -37,7 +37,7 @@ func (k ExpKeeper) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintA
 		return nil, err
 	}
 
-	err = k.MintExpForAccount(ctx, msg.Amount, memberAddress)
+	err = k.mintExpForAccount(ctx, msg.Amount, memberAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (k ExpKeeper) BurnAndRemoveMember(goCtx context.Context, msg *types.MsgBurn
 		return nil, err
 	}
 
-	err = k.BurnCoinAndExitDao(ctx, from)
+	err = k.burnCoinAndExitDao(ctx, from)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (k ExpKeeper) BurnAndRemoveMember(goCtx context.Context, msg *types.MsgBurn
 	return &types.MsgBurnAndRemoveMemberResponse{}, nil
 }
 
-func (k ExpKeeper) JoinDao(goCtx context.Context, msg *types.MsgJoinDao) (*types.MsgJoinDaoResponse, error) {
+func (k ExpKeeper) JoinDao(goCtx context.Context, msg *types.MsgJoinDaoByNonIbcAsset) (*types.MsgJoinDaoByNonIbcAssetResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	joinAddress, err := sdk.AccAddressFromBech32(msg.JoinAddress)
@@ -90,7 +90,7 @@ func (k ExpKeeper) JoinDao(goCtx context.Context, msg *types.MsgJoinDao) (*types
 		Amount: sdk.NewInt(msg.MaxToken),
 		Denom:  k.GetDenom(ctx),
 	}
-	err = k.AddAddressToWhiteList(ctx, joinAddress, MaxCoinMint)
+	err = k.addAddressToWhiteList(ctx, joinAddress, MaxCoinMint)
 	if err != nil {
 		return nil, err
 	}
@@ -102,5 +102,5 @@ func (k ExpKeeper) JoinDao(goCtx context.Context, msg *types.MsgJoinDao) (*types
 		),
 	)
 
-	return &types.MsgJoinDaoResponse{}, nil
+	return &types.MsgJoinDaoByNonIbcAssetResponse{}, nil
 }

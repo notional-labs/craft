@@ -54,7 +54,7 @@ func (k ExpKeeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", "x/"+types.ModuleName)
 }
 
-func (k ExpKeeper) MintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAccount sdk.AccAddress) error {
+func (k ExpKeeper) mintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAccount sdk.AccAddress) error {
 	if newCoins.Empty() {
 		// skip as no coins need to be minted
 		return nil
@@ -79,7 +79,7 @@ func (k ExpKeeper) MintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAcc
 	return nil
 }
 
-func (k ExpKeeper) BurnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddress) error {
+func (k ExpKeeper) burnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddress) error {
 	var newDaoInfo types.DaoInfo
 
 	daoInfo, err := k.GetDaoInfo(ctx)
@@ -152,7 +152,7 @@ func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) 
 	return types.ErrAddressdNotFound
 }
 
-func (k ExpKeeper) AddAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, maxToken sdk.Coin) error {
+func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, maxToken sdk.Coin) error {
 	var newDaoInfo types.DaoInfo
 
 	daoInfo, err := k.GetDaoInfo(ctx)

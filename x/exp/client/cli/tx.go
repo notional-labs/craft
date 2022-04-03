@@ -89,7 +89,7 @@ func NewBurnExpCmd() *cobra.Command {
 // 				return err
 // 			}
 
-// 			msg := types.NewMsgJoinDao(clientCtx.GetFromAddress(), 100000, "craft10d07y265gmmuvt4z0w9aw880jnsr700jm5qjn0")
+// 			msg := types.NewMsgJoinDaoByNonIbcAsset(clientCtx.GetFromAddress(), 100000, "craft10d07y265gmmuvt4z0w9aw880jnsr700jm5qjn0")
 
 // 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 // 		},

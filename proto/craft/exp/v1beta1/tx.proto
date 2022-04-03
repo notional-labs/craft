@@ -11,7 +11,9 @@ import "cosmos/base/v1beta1/coin.proto";
 service Msg {
     rpc MintAndAllocateExp(MsgMintAndAllocateExp) returns (MsgMintAndAllocateExpResponse);
     rpc BurnAndRemoveMember(MsgBurnAndRemoveMember) returns (MsgBurnAndRemoveMemberResponse);
-    rpc JoinDao(MsgJoinDao) returns (MsgJoinDaoResponse);
+    rpc JoinDaoByNonIbcAsset(MsgJoinDaoByNonIbcAsset) returns (MsgJoinDaoByNonIbcAssetResponse);
+    rpc JoinDaoByIbcAsset(MsgJoinDaoByIbcAsset) returns (MsgJoinDaoByIbcAssetResponse);
+    rpc FundExpModule(MsgFundExpModule) returns (MsgFundExpModuleResponse);
 }
 
 message MsgMintAndAllocateExp {
@@ -19,7 +21,6 @@ message MsgMintAndAllocateExp {
     [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 
   //string FromAdd
-
   string from_address = 2;
 
   // members defines the Dao members address.
@@ -41,13 +42,37 @@ message MsgBurnAndRemoveMember {
 message MsgBurnAndRemoveMemberResponse{}
 
 // MsgBurnAndRemoveMember 
-message MsgJoinDao {
+message MsgJoinDaoByNonIbcAsset {
   // join_address defines the member who want join Dao.
- string join_address = 1 ;
+  string join_address = 1 ;
   // gov_address defines the gov chain address.
- string gov_address = 2;
+  string gov_address = 2;
   // max_coin_mint is maximum exp can be mint.
- int64 max_token = 3 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Int"] ;
+  int64 max_token = 3 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Int"] ;
 }
 
-message MsgJoinDaoResponse{}
+message MsgJoinDaoByNonIbcAssetResponse{}
+
+message MsgJoinDaoByIbcAsset{
+  // from_address defines the member who want join Dao.
+  string from_address = 1 ;
+  repeated cosmos.base.v1beta1.Coin amount = 2 
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+}
+
+message MsgJoinDaoByIbcAssetResponse{}
+
+message MsgFundExpModule {
+    // from_address defines the member who want fund.
+  string from_address = 1 ;
+  repeated cosmos.base.v1beta1.Coin amount = 2 
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+}
+
+message MsgFundExpModuleResponse {}
+
+message MsgAdjustDaoTokenPrice{
+    // from_address defines the address who want adjust dao_token_price.
+  string from_address = 1 ;
+  string dao_token_price = 2;
+}

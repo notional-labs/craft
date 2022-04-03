@@ -83,16 +83,16 @@ func NewMsgBurnAndRemoveMember(fromAddr sdk.AccAddress, metadata string) *MsgBur
 	}
 }
 
-var _ sdk.Msg = &MsgJoinDao{}
+var _ sdk.Msg = &MsgJoinDaoByNonIbcAsset{}
 
 // Route Implements Msg.
-func (m MsgJoinDao) Route() string { return sdk.MsgTypeURL(&m) }
+func (m MsgJoinDaoByNonIbcAsset) Route() string { return sdk.MsgTypeURL(&m) }
 
 // Type Implements Msg.
-func (m MsgJoinDao) Type() string { return sdk.MsgTypeURL(&m) }
+func (m MsgJoinDaoByNonIbcAsset) Type() string { return sdk.MsgTypeURL(&m) }
 
 // GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
-func (m MsgJoinDao) GetSigners() []sdk.AccAddress {
+func (m MsgJoinDaoByNonIbcAsset) GetSigners() []sdk.AccAddress {
 	daoAccount, err := sdk.AccAddressFromBech32(m.GovAddress)
 	if err != nil {
 		panic(err)
@@ -101,12 +101,12 @@ func (m MsgJoinDao) GetSigners() []sdk.AccAddress {
 }
 
 // GetSignBytes Implements Msg.
-func (m MsgJoinDao) GetSignBytes() []byte {
+func (m MsgJoinDaoByNonIbcAsset) GetSignBytes() []byte {
 	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
 }
 
 // ValidateBasic does a sanity check on the provided data.
-func (m MsgJoinDao) ValidateBasic() error {
+func (m MsgJoinDaoByNonIbcAsset) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.JoinAddress)
 	if err != nil {
 		return sdkerrors.Wrap(err, "join address must be valid address")
@@ -114,8 +114,47 @@ func (m MsgJoinDao) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgJoinDao(joinAddress sdk.AccAddress, maxToken int64, govAddress string) *MsgJoinDao {
-	return &MsgJoinDao{
+func NewMsgJoinDaoByNonIbcAsset(joinAddress sdk.AccAddress, maxToken int64, govAddress string) *MsgJoinDaoByNonIbcAsset {
+	return &MsgJoinDaoByNonIbcAsset{
+		JoinAddress: joinAddress.String(),
+		MaxToken:    maxToken,
+		GovAddress:  govAddress,
+	}
+}
+
+var _ sdk.Msg = &MsgJoinDaoByNonIbcAsset{}
+
+// Route Implements Msg.
+func (m MsgJoinDaoByIbcAsset) Route() string { return sdk.MsgTypeURL(&m) }
+
+// Type Implements Msg.
+func (m MsgJoinDaoByIbcAsset) Type() string { return sdk.MsgTypeURL(&m) }
+
+// GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
+func (m MsgJoinDaoByIbcAsset) GetSigners() []sdk.AccAddress {
+	daoAccount, err := sdk.AccAddressFromBech32(m.GovAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{daoAccount}
+}
+
+// GetSignBytes Implements Msg.
+func (m MsgJoinDaoByIbcAsset) GetSignBytes() []byte {
+	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
+}
+
+// ValidateBasic does a sanity check on the provided data.
+func (m MsgJoinDaoByIbcAsset) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.JoinAddress)
+	if err != nil {
+		return sdkerrors.Wrap(err, "join address must be valid address")
+	}
+	return nil
+}
+
+func NewMsgJoinDaoByIbcAsset(joinAddress sdk.AccAddress, maxToken int64, govAddress string) *MsgJoinDaoByNonIbcAsset {
+	return &MsgJoinDaoByNonIbcAsset{
 		JoinAddress: joinAddress.String(),
 		MaxToken:    maxToken,
 		GovAddress:  govAddress,

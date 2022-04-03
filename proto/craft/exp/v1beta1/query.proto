@@ -14,9 +14,18 @@ service Query {
   rpc WhiteList(QueryWhiteListRequest) returns (QueryWhiteListResponse) {
     option (google.api.http).get = "/craft.exp.v1beta1/whitelistdao";
   }
+
+  rpc DaoTokenPrice(QueryDaoTokenPriceRequest) returns (QueryDaoTokenPriceResponse){
+    option (google.api.http).get = "/craft.exp.v1beta1/daotokenprice";
+  }
 }
 
 message QueryWhiteListRequest {}
 message QueryWhiteListResponse {
   repeated AccountRecord accountRecord = 1;
+}
+
+message QueryDaoTokenPriceRequest {}
+message QueryDaoTokenPriceResponse {
+  string dao_token_price = 1;
 }
