@@ -8,8 +8,9 @@ const (
 	StoreKey = ModuleName
 
 	// Query endpoints supported by the exp querier .
-	QueryParameters = "parameters"
-	QueryWhiteList  = "whiteList"
+	QueryParameters    = "parameters"
+	QueryWhiteList     = "whiteList"
+	QueryDaoTokenPrice = "daotokenprice"
 )
 
 var (

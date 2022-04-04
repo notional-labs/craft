@@ -6,6 +6,8 @@ option go_package = "x/exp/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+
 
 // Msg is the cosmos.group.v1 Msg service.
 service Msg {
@@ -54,10 +56,10 @@ message MsgJoinDaoByNonIbcAsset {
 message MsgJoinDaoByNonIbcAssetResponse{}
 
 message MsgJoinDaoByIbcAsset{
-  // from_address defines the member who want join Dao.
-  string from_address = 1 ;
-  repeated cosmos.base.v1beta1.Coin amount = 2 
-  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  // join_address defines the member who want join Dao.
+  string join_address = 1 ;
+  string gov_address = 2;
+  uint64  amount = 3 ;
 }
 
 message MsgJoinDaoByIbcAssetResponse{}
@@ -74,5 +76,9 @@ message MsgFundExpModuleResponse {}
 message MsgAdjustDaoTokenPrice{
     // from_address defines the address who want adjust dao_token_price.
   string from_address = 1 ;
-  string dao_token_price = 2;
+  string dao_token_price = 2
+  [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ]; ;
 }

@@ -114,14 +114,6 @@ func (m MsgJoinDaoByNonIbcAsset) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgJoinDaoByNonIbcAsset(joinAddress sdk.AccAddress, maxToken int64, govAddress string) *MsgJoinDaoByNonIbcAsset {
-	return &MsgJoinDaoByNonIbcAsset{
-		JoinAddress: joinAddress.String(),
-		MaxToken:    maxToken,
-		GovAddress:  govAddress,
-	}
-}
-
 var _ sdk.Msg = &MsgJoinDaoByNonIbcAsset{}
 
 // Route Implements Msg.
@@ -136,6 +128,7 @@ func (m MsgJoinDaoByIbcAsset) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{daoAccount}
 }
 
@@ -150,13 +143,11 @@ func (m MsgJoinDaoByIbcAsset) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrap(err, "join address must be valid address")
 	}
-	return nil
-}
 
-func NewMsgJoinDaoByIbcAsset(joinAddress sdk.AccAddress, maxToken int64, govAddress string) *MsgJoinDaoByNonIbcAsset {
-	return &MsgJoinDaoByNonIbcAsset{
-		JoinAddress: joinAddress.String(),
-		MaxToken:    maxToken,
-		GovAddress:  govAddress,
+	_, err = sdk.AccAddressFromBech32(m.GovAddress)
+	if err != nil {
+		return sdkerrors.Wrap(err, "gov address must be valid address")
 	}
+
+	return nil
 }

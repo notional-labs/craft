@@ -16,12 +16,14 @@ message AccountRecord {
   uint32 gov_id                       = 2;
   cosmos.base.v1beta1.Coin max_token  = 3;
   google.protobuf.Timestamp join_dao_time = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
 }
 
 message DaoInfo {
   repeated AccountRecord whitelist = 1 [ (gogoproto.moretags) = "yaml:\"dao_info\"" ];
-  string dao_token_price = 2;
+  string dao = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];  
   repeated AssetDao asset_dao = 3;
 }
 

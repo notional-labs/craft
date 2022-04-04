@@ -17,7 +17,8 @@ func NewQuerier(k ExpKeeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 			return queryParams(ctx, k, legacyQuerierCdc)
 		case types.QueryWhiteList:
 			return queryWhiteList(ctx, k, legacyQuerierCdc)
-
+		case types.QueryDaoTokenPrice:
+			return queryDaoTokenPrice(ctx, k, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
