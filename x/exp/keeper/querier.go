@@ -17,8 +17,8 @@ func NewQuerier(k ExpKeeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 			return queryParams(ctx, k, legacyQuerierCdc)
 		case types.QueryWhiteList:
 			return queryWhiteList(ctx, k, legacyQuerierCdc)
-		case types.QueryDaoTokenPrice:
-			return queryDaoTokenPrice(ctx, k, legacyQuerierCdc)
+		case types.QueryDaoAsset:
+			return queryAsset(ctx, k, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
@@ -42,6 +42,19 @@ func queryWhiteList(ctx sdk.Context, k ExpKeeper, legacyQuerierCdc *codec.Legacy
 		return nil, err
 	}
 	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, daoInfo)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return res, nil
+}
+
+func queryAsset(ctx sdk.Context, k ExpKeeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+	daoAssetInfo, err := k.GetDaoAssetInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, daoAssetInfo)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

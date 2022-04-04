@@ -12,7 +12,9 @@ type msgServer struct {
 	ExpKeeper
 }
 
-// NewMsgServerImpl returns an implementation of the bank MsgServer interface
+var _ types.MsgServer = msgServer{}
+
+// NewMsgServerImpl returns an implementation of the exp MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper ExpKeeper) types.MsgServer {
 	return &msgServer{
@@ -20,7 +22,7 @@ func NewMsgServerImpl(keeper ExpKeeper) types.MsgServer {
 	}
 }
 
-func (k ExpKeeper) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintAndAllocateExp) (*types.MsgMintAndAllocateExpResponse, error) {
+func (k msgServer) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintAndAllocateExp) (*types.MsgMintAndAllocateExpResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	fromAddress, err := sdk.AccAddressFromBech32(msg.FromAddress)
@@ -52,7 +54,7 @@ func (k ExpKeeper) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintA
 	return &types.MsgMintAndAllocateExpResponse{}, nil
 }
 
-func (k ExpKeeper) BurnAndRemoveMember(goCtx context.Context, msg *types.MsgBurnAndRemoveMember) (*types.MsgBurnAndRemoveMemberResponse, error) {
+func (k msgServer) BurnAndRemoveMember(goCtx context.Context, msg *types.MsgBurnAndRemoveMember) (*types.MsgBurnAndRemoveMemberResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	from, err := sdk.AccAddressFromBech32(msg.FromAddress)
@@ -75,7 +77,7 @@ func (k ExpKeeper) BurnAndRemoveMember(goCtx context.Context, msg *types.MsgBurn
 	return &types.MsgBurnAndRemoveMemberResponse{}, nil
 }
 
-func (k ExpKeeper) JoinDao(goCtx context.Context, msg *types.MsgJoinDaoByNonIbcAsset) (*types.MsgJoinDaoByNonIbcAssetResponse, error) {
+func (k msgServer) JoinDaoByNonIbcAsset(goCtx context.Context, msg *types.MsgJoinDaoByNonIbcAsset) (*types.MsgJoinDaoByNonIbcAssetResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	joinAddress, err := sdk.AccAddressFromBech32(msg.JoinAddress)
@@ -103,4 +105,12 @@ func (k ExpKeeper) JoinDao(goCtx context.Context, msg *types.MsgJoinDaoByNonIbcA
 	)
 
 	return &types.MsgJoinDaoByNonIbcAssetResponse{}, nil
+}
+
+func (k msgServer) FundExpModule(gpCtx context.Context, msg *types.MsgFundExpModule) (*types.MsgFundExpModuleResponse, error) {
+	return &types.MsgFundExpModuleResponse{}, nil
+}
+
+func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDaoByIbcAsset) (*types.MsgJoinDaoByIbcAssetResponse, error) {
+	return &types.MsgJoinDaoByIbcAssetResponse{}, nil
 }

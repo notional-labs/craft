@@ -8,9 +8,9 @@ const (
 	StoreKey = ModuleName
 
 	// Query endpoints supported by the exp querier .
-	QueryParameters    = "parameters"
-	QueryWhiteList     = "whiteList"
-	QueryDaoTokenPrice = "daotokenprice"
+	QueryParameters = "parameters"
+	QueryWhiteList  = "whiteList"
+	QueryDaoAsset   = "daoasset"
 )
 
 var (
@@ -19,4 +19,6 @@ var (
 
 	// KeyDaoInfo defines key to store the DaoInfo .
 	KeyDaoInfo = []byte{0x01}
+	// KeyDaoAssetInfo defines key to store the DaoAssetInfo .
+	KeyDaoAssetInfo = []byte{0x02}
 )

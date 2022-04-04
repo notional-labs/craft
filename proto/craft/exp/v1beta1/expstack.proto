@@ -21,9 +21,8 @@ message MintRequest{
     option (gogoproto.goproto_stringer)        = true;
   
     string account                      = 1;
-    uint32 gov_id                       = 2;
-    uint64 dao_token_mint  = 3;
-    uint64 stable_token_left  = 4;
+    uint64 dao_token_mint  = 2;
+    uint64 stable_token_left  = 3;
 }
 
 message RequestList {

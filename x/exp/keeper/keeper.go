@@ -180,7 +180,3 @@ func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccA
 	k.SetDaoInfo(ctx, newDaoInfo)
 	return nil
 }
-
-func (k ExpKeeper) GetDaoTokenPrice(ctx sdk.Context) sdk.Dec {
-
-}

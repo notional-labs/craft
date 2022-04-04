@@ -24,5 +24,4 @@ message Params {
     google.protobuf.Duration close_pool_period = 5 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
     google.protobuf.Duration vesting_period_end= 6 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
     google.protobuf.Duration burn_exp_period   = 7 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
-
 }

@@ -8,6 +8,7 @@ import "cosmos/auth/v1beta1/auth.proto";
 import "craft/exp/v1beta1/daoinfo.proto";
 import "google/protobuf/duration.proto";
 import "craft/exp/v1beta1/params.proto";
+
 option go_package = "x/exp/types";
 
 // GenesisState defines the exp module's genesis state.
