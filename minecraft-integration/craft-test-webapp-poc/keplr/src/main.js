@@ -44,9 +44,9 @@ window.onload = async () => {
                     // Staking coin information
                     stakeCurrency: {
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "CRAFT",
+                        coinDenom: "EXP",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "ucraft",
+                        coinMinimalDenom: "uexp",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -71,6 +71,16 @@ window.onload = async () => {
                     // List of all coin/tokens used in this chain.
                     currencies: [{
                         // Coin denomination to be displayed to the user.
+                        coinDenom: "EXP",
+                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
+                        coinMinimalDenom: "uexp",
+                        // # of decimal points to convert minimal denomination to user-facing denomination.
+                        coinDecimals: 6,
+                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
+                        // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
+                        // coinGeckoId: ""
+                    },{
+                        // Coin denomination to be displayed to the user.
                         coinDenom: "CRAFT",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
                         coinMinimalDenom: "ucraft",
@@ -78,7 +88,7 @@ window.onload = async () => {
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-                        // coinGeckoId: ""
+                        coinGeckoId: "dig-chain"
                     }],
                     // List of coin/tokens used as a fee token in this chain.
                     feeCurrencies: [{
@@ -90,7 +100,7 @@ window.onload = async () => {
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-                        // coinGeckoId: ""
+                        coinGeckoId: "dig-chain"
                     }],
                     coinType: 118,
                     // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
