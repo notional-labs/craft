@@ -10,12 +10,10 @@ import {
     SigningStargateClient,
 } from '@cosmjs/stargate'
 
-// do not use Nodejs 17, nvm use 16.x.x
+// do not use Nodejs 17, nvm use 16.x.x. nvm run 16.13.1
 const request = require('request');
 
-// example redis key, osmo address is reece's for testing
-// set tx_osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p_0ce3e0e6-8e17-11ec-b909-0242ac120002 "{\"body\":{\"messages\":[{\"@type\":\"/cosmos.bank.v1beta1.MsgSend\",\"from_address\":\"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p\",\"to_address\":\"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p\",\"amount\":[{\"denom\":\"token\",\"amount\":\"0.01\"}]}],\"memo\":\"Tx1 is here\",\"timeout_height\":\"0\",\"extension_options\":[],\"non_critical_extension_options\":[]},\"auth_info\":{\"signer_infos\":[],\"fee\":{\"amount\":[],\"gas_limit\":\"200000\",\"payer\":\"\",\"granter\":\"\"}},\"signatures\":[]}"
-// set tx_osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p_7b6580dc-8e18-11ec-b909-0242ac120002 "{\"body\":{\"messages\":[{\"@type\":\"/cosmos.bank.v1beta1.MsgSend\",\"from_address\":\"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p\",\"to_address\":\"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p\",\"amount\":[{\"denom\":\"token\",\"amount\":\"0.02\"}]}],\"memo\":\"Tx2 desc is here\",\"timeout_height\":\"0\",\"extension_options\":[],\"non_critical_extension_options\":[]},\"auth_info\":{\"signer_infos\":[],\"fee\":{\"amount\":[],\"gas_limit\":\"200000\",\"payer\":\"\",\"granter\":\"\"}},\"signatures\":[]}"
+// npm install webpack-dev-server -g
 
 const name = "Craft Testnet v4"
 const CHAIN_ID = "craft-v4";
@@ -150,7 +148,7 @@ window.onload = async () => {
     // });
     // document.getElementById("txs").append(tools.getKeys());
 
-    const myWallet = "osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"
+    const myWallet = accounts[0].address
     
     // https://api.crafteconomy.io/v1/tx/all/craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0
     request('https://api.crafteconomy.io/v1/tx/all/'+myWallet, { json: true }, (err, res, body) => {
@@ -173,7 +171,8 @@ window.onload = async () => {
                 <div class="card card-body">
                 <li>Desc: ${body[txID]["description"]}</li>
                 <li>Paying: ${body[txID]["to_address"]}</li>
-                <li>Amount: ${String(body[txID]["amount"])} ${body[txID]["denom"]} (in uosmo for testing)</li> 
+                <li>Amount: ${String(body[txID]["amount"])} ${body[txID]["denom"]}</li> 
+                <li>Tax: ${String(body[txID]["tax"]["amount"])} ${body[txID]["denom"]}</li> 
                 <li>ID: ${txID}</li> 
                 </div>
             </div>
@@ -185,10 +184,8 @@ window.onload = async () => {
                 // Shows the Tx Value
                 alert(JSON.stringify(body[txID]));
 
-                // makes osmo request
                 sendTx(
-                    body[txID]["to_address"], 
-                    // since we pass through OSMO value, we convert back to uosmo
+                    body[txID]["to_address"],                     
                     parseInt(body[txID]["amount"]), 
                     body[txID]["denom"],
                     txID,
@@ -279,6 +276,7 @@ function sendTx(recipient, amount, denom, txID, memo) {
             gas: '200000',
         }
         const result = await client.sendTokens(accounts[0].address, recipient, [amountFinal], fee, memo)
+        // TODO: Also add tax message here, which is paid to another address 
         // assertIsBroadcastTxSuccess(result)
 
         console.log(result);
