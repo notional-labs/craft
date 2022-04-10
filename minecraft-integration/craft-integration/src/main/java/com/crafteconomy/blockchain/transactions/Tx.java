@@ -36,6 +36,14 @@ public class Tx implements Serializable {
     private String toWallet;
     private long amount;
 
+    // used when submitting a tx. Done like a builder
+    // Tx tx = api.createServerTx(uuid, amount, "ESCROWING " + amount + "FOR " + uuid.toString(), depositEscrowLogic(uuid, amount));        
+    // tx = tx.sendDescription().sendTxIDClickable().sendWebappLink();
+    // tx.submit();
+    private boolean includeTxClickable = false;
+    private boolean sendDescMessage = false;
+    private boolean sendWebappLink = false;
+
     public Tx(UUID playerUUID, String TO_WALLET, int amount, String description, Consumer<UUID> function){
         this.setFromUUID(playerUUID);        
         this.setDescription(description);
@@ -77,10 +85,23 @@ public class Tx implements Serializable {
         }
     }
 
+    public Tx sendTxIDClickable() {
+        includeTxClickable = true;
+        return this;
+    }
+    public Tx sendDescription() {
+        sendDescMessage = true;
+        return this;
+    }
+    public Tx sendWebappLink() {
+        sendWebappLink = true;
+        return this;
+    }
+
     /**
      * Submit the transaction to redis for the webapp to sign & send link to sign it
      */
-    public ErrorTypes submit(boolean includeTxClickable, boolean sendDescMessage, boolean sendWebappLink) {
+    public ErrorTypes submit() {
         ErrorTypes returnType = api.submit(this);
         if(returnType == ErrorTypes.NO_ERROR) {
             Player player = Bukkit.getPlayer(this.fromUUID);
@@ -90,8 +111,10 @@ public class Tx implements Serializable {
                 }
                 if(sendDescMessage) {
                     player.sendMessage(this.getDescription());
-                }            
-                api.sendWebappForSigning(player);
+                }    
+                if(sendWebappLink) {
+                    api.sendWebappForSigning(player);
+                }                
             }            
         }
         return returnType;
