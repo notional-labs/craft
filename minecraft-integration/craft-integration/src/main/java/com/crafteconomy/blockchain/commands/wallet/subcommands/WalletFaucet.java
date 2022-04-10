@@ -48,10 +48,10 @@ public class WalletFaucet implements SubCommand {
             amount = Long.parseLong(args[2]);
             if(amount <= 0) { return; }
 
-            if(amount > CraftBlockchainPlugin.MAX_FAUCET_AMOUNT) {
-                Util.logSevere("\n\n&cConsole just tried to faucet an amount too high: " + amount + "\n\n");
-                return;
-            }
+            // if(amount > CraftBlockchainPlugin.MAX_FAUCET_AMOUNT) {
+            //     Util.logSevere("\n\n&cConsole just tried to faucet an amount too high: " + amount + "\n\n");
+            //     return;
+            // }
 
         } catch (Exception e) {
             Util.colorMsg(sender, "&cInvalid amount " + args[2]);
