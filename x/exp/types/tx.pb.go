@@ -322,9 +322,9 @@ var xxx_messageInfo_MsgJoinDaoByNonIbcAssetResponse proto.InternalMessageInfo
 
 type MsgJoinDaoByIbcAsset struct {
 	// join_address defines the member who want join Dao.
-	JoinAddress string `protobuf:"bytes,1,opt,name=join_address,json=joinAddress,proto3" json:"join_address,omitempty"`
-	GovAddress  string `protobuf:"bytes,2,opt,name=gov_address,json=govAddress,proto3" json:"gov_address,omitempty"`
-	Amount      uint64 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	JoinAddress string                                 `protobuf:"bytes,1,opt,name=join_address,json=joinAddress,proto3" json:"join_address,omitempty"`
+	GovAddress  string                                 `protobuf:"bytes,2,opt,name=gov_address,json=govAddress,proto3" json:"gov_address,omitempty"`
+	Amount      github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,3,opt,name=amount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"amount"`
 }
 
 func (m *MsgJoinDaoByIbcAsset) Reset()         { *m = MsgJoinDaoByIbcAsset{} }
@@ -374,13 +374,6 @@ func (m *MsgJoinDaoByIbcAsset) GetGovAddress() string {
 	return ""
 }
 
-func (m *MsgJoinDaoByIbcAsset) GetAmount() uint64 {
-	if m != nil {
-		return m.Amount
-	}
-	return 0
-}
-
 type MsgJoinDaoByIbcAssetResponse struct {
 }
 
@@ -417,24 +410,24 @@ func (m *MsgJoinDaoByIbcAssetResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgJoinDaoByIbcAssetResponse proto.InternalMessageInfo
 
-type MsgFundExpModule struct {
+type MsgFundExpPool struct {
 	// from_address defines the member who want fund.
 	FromAddress string                                   `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
 	Amount      github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
 }
 
-func (m *MsgFundExpModule) Reset()         { *m = MsgFundExpModule{} }
-func (m *MsgFundExpModule) String() string { return proto.CompactTextString(m) }
-func (*MsgFundExpModule) ProtoMessage()    {}
-func (*MsgFundExpModule) Descriptor() ([]byte, []int) {
+func (m *MsgFundExpPool) Reset()         { *m = MsgFundExpPool{} }
+func (m *MsgFundExpPool) String() string { return proto.CompactTextString(m) }
+func (*MsgFundExpPool) ProtoMessage()    {}
+func (*MsgFundExpPool) Descriptor() ([]byte, []int) {
 	return fileDescriptor_ea0f2c4d268ca6db, []int{8}
 }
-func (m *MsgFundExpModule) XXX_Unmarshal(b []byte) error {
+func (m *MsgFundExpPool) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgFundExpModule) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgFundExpPool) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgFundExpModule.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgFundExpPool.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -444,47 +437,47 @@ func (m *MsgFundExpModule) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *MsgFundExpModule) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgFundExpModule.Merge(m, src)
+func (m *MsgFundExpPool) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgFundExpPool.Merge(m, src)
 }
-func (m *MsgFundExpModule) XXX_Size() int {
+func (m *MsgFundExpPool) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgFundExpModule) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgFundExpModule.DiscardUnknown(m)
+func (m *MsgFundExpPool) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgFundExpPool.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgFundExpModule proto.InternalMessageInfo
+var xxx_messageInfo_MsgFundExpPool proto.InternalMessageInfo
 
-func (m *MsgFundExpModule) GetFromAddress() string {
+func (m *MsgFundExpPool) GetFromAddress() string {
 	if m != nil {
 		return m.FromAddress
 	}
 	return ""
 }
 
-func (m *MsgFundExpModule) GetAmount() github_com_cosmos_cosmos_sdk_types.Coins {
+func (m *MsgFundExpPool) GetAmount() github_com_cosmos_cosmos_sdk_types.Coins {
 	if m != nil {
 		return m.Amount
 	}
 	return nil
 }
 
-type MsgFundExpModuleResponse struct {
+type MsgFundExpPoolResponse struct {
 }
 
-func (m *MsgFundExpModuleResponse) Reset()         { *m = MsgFundExpModuleResponse{} }
-func (m *MsgFundExpModuleResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgFundExpModuleResponse) ProtoMessage()    {}
-func (*MsgFundExpModuleResponse) Descriptor() ([]byte, []int) {
+func (m *MsgFundExpPoolResponse) Reset()         { *m = MsgFundExpPoolResponse{} }
+func (m *MsgFundExpPoolResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgFundExpPoolResponse) ProtoMessage()    {}
+func (*MsgFundExpPoolResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_ea0f2c4d268ca6db, []int{9}
 }
-func (m *MsgFundExpModuleResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgFundExpPoolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgFundExpModuleResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgFundExpPoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgFundExpModuleResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgFundExpPoolResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -494,17 +487,17 @@ func (m *MsgFundExpModuleResponse) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *MsgFundExpModuleResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgFundExpModuleResponse.Merge(m, src)
+func (m *MsgFundExpPoolResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgFundExpPoolResponse.Merge(m, src)
 }
-func (m *MsgFundExpModuleResponse) XXX_Size() int {
+func (m *MsgFundExpPoolResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgFundExpModuleResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgFundExpModuleResponse.DiscardUnknown(m)
+func (m *MsgFundExpPoolResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgFundExpPoolResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgFundExpModuleResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgFundExpPoolResponse proto.InternalMessageInfo
 
 type MsgAdjustDaoTokenPrice struct {
 	// from_address defines the address who want adjust dao_token_price.
@@ -552,6 +545,95 @@ func (m *MsgAdjustDaoTokenPrice) GetFromAddress() string {
 	return ""
 }
 
+type MsgSpendIbcAssetToExp struct {
+	// from_address defines the member who want fund.
+	FromAddress string                                   `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	Amount      github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
+}
+
+func (m *MsgSpendIbcAssetToExp) Reset()         { *m = MsgSpendIbcAssetToExp{} }
+func (m *MsgSpendIbcAssetToExp) String() string { return proto.CompactTextString(m) }
+func (*MsgSpendIbcAssetToExp) ProtoMessage()    {}
+func (*MsgSpendIbcAssetToExp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ea0f2c4d268ca6db, []int{11}
+}
+func (m *MsgSpendIbcAssetToExp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSpendIbcAssetToExp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSpendIbcAssetToExp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSpendIbcAssetToExp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSpendIbcAssetToExp.Merge(m, src)
+}
+func (m *MsgSpendIbcAssetToExp) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSpendIbcAssetToExp) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSpendIbcAssetToExp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSpendIbcAssetToExp proto.InternalMessageInfo
+
+func (m *MsgSpendIbcAssetToExp) GetFromAddress() string {
+	if m != nil {
+		return m.FromAddress
+	}
+	return ""
+}
+
+func (m *MsgSpendIbcAssetToExp) GetAmount() github_com_cosmos_cosmos_sdk_types.Coins {
+	if m != nil {
+		return m.Amount
+	}
+	return nil
+}
+
+type MsgSpendIbcAssetToExpResponse struct {
+}
+
+func (m *MsgSpendIbcAssetToExpResponse) Reset()         { *m = MsgSpendIbcAssetToExpResponse{} }
+func (m *MsgSpendIbcAssetToExpResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSpendIbcAssetToExpResponse) ProtoMessage()    {}
+func (*MsgSpendIbcAssetToExpResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ea0f2c4d268ca6db, []int{12}
+}
+func (m *MsgSpendIbcAssetToExpResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSpendIbcAssetToExpResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSpendIbcAssetToExpResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSpendIbcAssetToExpResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSpendIbcAssetToExpResponse.Merge(m, src)
+}
+func (m *MsgSpendIbcAssetToExpResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSpendIbcAssetToExpResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSpendIbcAssetToExpResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSpendIbcAssetToExpResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgMintAndAllocateExp)(nil), "craft.exp.v1beta1.MsgMintAndAllocateExp")
 	proto.RegisterType((*MsgMintAndAllocateExpResponse)(nil), "craft.exp.v1beta1.MsgMintAndAllocateExpResponse")
@@ -561,55 +643,59 @@ func init() {
 	proto.RegisterType((*MsgJoinDaoByNonIbcAssetResponse)(nil), "craft.exp.v1beta1.MsgJoinDaoByNonIbcAssetResponse")
 	proto.RegisterType((*MsgJoinDaoByIbcAsset)(nil), "craft.exp.v1beta1.MsgJoinDaoByIbcAsset")
 	proto.RegisterType((*MsgJoinDaoByIbcAssetResponse)(nil), "craft.exp.v1beta1.MsgJoinDaoByIbcAssetResponse")
-	proto.RegisterType((*MsgFundExpModule)(nil), "craft.exp.v1beta1.MsgFundExpModule")
-	proto.RegisterType((*MsgFundExpModuleResponse)(nil), "craft.exp.v1beta1.MsgFundExpModuleResponse")
+	proto.RegisterType((*MsgFundExpPool)(nil), "craft.exp.v1beta1.MsgFundExpPool")
+	proto.RegisterType((*MsgFundExpPoolResponse)(nil), "craft.exp.v1beta1.MsgFundExpPoolResponse")
 	proto.RegisterType((*MsgAdjustDaoTokenPrice)(nil), "craft.exp.v1beta1.MsgAdjustDaoTokenPrice")
+	proto.RegisterType((*MsgSpendIbcAssetToExp)(nil), "craft.exp.v1beta1.MsgSpendIbcAssetToExp")
+	proto.RegisterType((*MsgSpendIbcAssetToExpResponse)(nil), "craft.exp.v1beta1.MsgSpendIbcAssetToExpResponse")
 }
 
 func init() { proto.RegisterFile("craft/exp/v1beta1/tx.proto", fileDescriptor_ea0f2c4d268ca6db) }
 
 var fileDescriptor_ea0f2c4d268ca6db = []byte{
-	// 635 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0xdd, 0x4e, 0xd4, 0x40,
-	0x14, 0xde, 0xb2, 0x84, 0xc0, 0x59, 0x89, 0x52, 0x11, 0x97, 0x46, 0xbb, 0x50, 0xa3, 0xae, 0x18,
-	0x5b, 0xc0, 0x27, 0xd8, 0x15, 0x34, 0x98, 0xd4, 0x98, 0x8d, 0xd1, 0xc4, 0x9b, 0xcd, 0x6c, 0x3b,
-	0xd4, 0x02, 0x9d, 0xd3, 0x74, 0x66, 0x37, 0xe5, 0x2d, 0x4c, 0xbc, 0xf3, 0x01, 0xbc, 0xe0, 0x01,
-	0xf4, 0x15, 0xb8, 0xe4, 0xd2, 0x78, 0x01, 0x06, 0x5e, 0xc4, 0xf4, 0x57, 0xd8, 0x1d, 0x63, 0x2f,
-	0xf4, 0xaa, 0x9d, 0x39, 0xdf, 0x39, 0xdf, 0x77, 0xce, 0x9c, 0x33, 0x03, 0x9a, 0x13, 0x91, 0x5d,
-	0x61, 0xd1, 0x38, 0xb4, 0x46, 0x1b, 0x03, 0x2a, 0xc8, 0x86, 0x25, 0x62, 0x33, 0x8c, 0x50, 0xa0,
-	0xba, 0x90, 0xda, 0x4c, 0x1a, 0x87, 0x66, 0x6e, 0xd3, 0x16, 0x3d, 0xf4, 0x30, 0xb5, 0x5a, 0xc9,
-	0x5f, 0x06, 0xd4, 0x74, 0x07, 0x79, 0x80, 0xdc, 0x1a, 0x10, 0x4e, 0xcb, 0x30, 0x0e, 0xfa, 0x2c,
-	0xb7, 0x2f, 0x67, 0xf6, 0x7e, 0xe6, 0x98, 0x2d, 0x32, 0x93, 0xf1, 0x4d, 0x81, 0x5b, 0x36, 0xf7,
-	0x6c, 0x9f, 0x89, 0x0e, 0x73, 0x3b, 0x07, 0x07, 0xe8, 0x10, 0x41, 0xb7, 0xe3, 0x50, 0x75, 0x60,
-	0x86, 0x04, 0x38, 0x64, 0xa2, 0xa9, 0xac, 0xd4, 0xdb, 0x8d, 0xcd, 0x65, 0x33, 0x77, 0x4c, 0x58,
-	0x0a, 0x41, 0xe6, 0x33, 0xf4, 0x59, 0x77, 0xfd, 0xf8, 0xb4, 0x55, 0x3b, 0x3a, 0x6b, 0xb5, 0x3d,
-	0x5f, 0x7c, 0x18, 0x0e, 0x4c, 0x07, 0x83, 0x9c, 0x25, 0xff, 0x3c, 0xe1, 0xee, 0xbe, 0x25, 0x0e,
-	0x43, 0xca, 0x53, 0x07, 0xde, 0xcb, 0x43, 0xab, 0xab, 0x70, 0x6d, 0x37, 0xc2, 0xa0, 0x4f, 0x5c,
-	0x37, 0xa2, 0x9c, 0x37, 0xa7, 0x56, 0x94, 0xf6, 0x5c, 0xaf, 0x91, 0xec, 0x75, 0xb2, 0x2d, 0x75,
-	0x09, 0x66, 0x02, 0x1a, 0x0c, 0x68, 0xd4, 0xac, 0xa7, 0xc6, 0x7c, 0x65, 0xb4, 0xe0, 0xae, 0x54,
-	0x78, 0x8f, 0xf2, 0x10, 0x19, 0xa7, 0xc6, 0x3b, 0x58, 0xb2, 0xb9, 0xd7, 0x1d, 0x46, 0xac, 0xc3,
-	0xdc, 0x1e, 0x0d, 0x70, 0x44, 0xed, 0xd4, 0x75, 0x82, 0x55, 0x99, 0x64, 0xd5, 0x60, 0x36, 0xa0,
-	0x82, 0xb8, 0x44, 0x90, 0x5c, 0x54, 0xb9, 0x36, 0x56, 0x40, 0x97, 0x07, 0x2e, 0xa9, 0xbf, 0x28,
-	0x70, 0xdb, 0xe6, 0xde, 0x4b, 0xf4, 0xd9, 0x16, 0xc1, 0xee, 0xe1, 0x2b, 0x64, 0x3b, 0x03, 0xa7,
-	0xc3, 0x39, 0x4d, 0x53, 0xde, 0x43, 0x9f, 0x8d, 0x93, 0x27, 0x7b, 0x05, 0x79, 0x0b, 0x1a, 0x1e,
-	0x8e, 0xc6, 0x8a, 0x02, 0x1e, 0x8e, 0x0a, 0xc0, 0x0b, 0x98, 0x0b, 0x48, 0xdc, 0x17, 0xb8, 0x4f,
-	0x59, 0x5a, 0x96, 0x7a, 0x77, 0xed, 0xe8, 0xac, 0xf5, 0xa0, 0x42, 0xfd, 0x77, 0x98, 0xe8, 0xcd,
-	0x06, 0x24, 0x7e, 0x93, 0xf8, 0x1a, 0xab, 0xd0, 0xfa, 0x83, 0xce, 0x32, 0x97, 0x08, 0x16, 0x2f,
-	0x43, 0xfe, 0x69, 0x1e, 0x4b, 0x65, 0x8f, 0x25, 0x49, 0x4c, 0x17, 0x6d, 0x61, 0xe8, 0x70, 0x47,
-	0xc6, 0x59, 0x6a, 0xfa, 0xac, 0xc0, 0x0d, 0x9b, 0x7b, 0xcf, 0x87, 0xcc, 0xdd, 0x8e, 0x43, 0x1b,
-	0xdd, 0xe1, 0x01, 0xad, 0x72, 0xaa, 0xbf, 0x7b, 0x7a, 0xea, 0xbf, 0xf5, 0xb4, 0xa1, 0x41, 0x73,
-	0x5c, 0x5b, 0x29, 0xfc, 0x93, 0x92, 0x36, 0x65, 0xc7, 0xdd, 0x1b, 0x72, 0xb1, 0x45, 0x30, 0x3d,
-	0x85, 0xd7, 0x91, 0xef, 0x54, 0x92, 0xff, 0x16, 0xae, 0xbb, 0x04, 0xb3, 0x63, 0xef, 0x87, 0x89,
-	0x57, 0x56, 0xd3, 0xae, 0x99, 0x88, 0xfd, 0x71, 0x5a, 0xa9, 0x01, 0xb6, 0xa8, 0xd3, 0x9b, 0x77,
-	0x2f, 0x53, 0x6f, 0x7e, 0x9d, 0x86, 0xba, 0xcd, 0x3d, 0x35, 0x04, 0x55, 0x72, 0x11, 0xb4, 0xcd,
-	0x89, 0x7b, 0xc8, 0x94, 0x4e, 0x9e, 0xb6, 0x5e, 0x15, 0x59, 0xd4, 0x43, 0xe5, 0x70, 0x53, 0x36,
-	0xa0, 0x8f, 0xe4, 0x81, 0x24, 0x50, 0x6d, 0xa3, 0x32, 0xb4, 0x24, 0x1d, 0xc1, 0xa2, 0x74, 0x32,
-	0xd7, 0xe4, 0xa1, 0x64, 0x58, 0x6d, 0xb3, 0x3a, 0xb6, 0xe4, 0x0d, 0x60, 0x61, 0x72, 0x8c, 0x1e,
-	0xfe, 0x25, 0x50, 0xc9, 0x68, 0x55, 0x04, 0x96, 0x74, 0x04, 0xe6, 0xaf, 0x0e, 0xc8, 0x3d, 0x79,
-	0x84, 0x2b, 0x20, 0xed, 0x71, 0x05, 0x50, 0x41, 0xd1, 0xbd, 0x7f, 0x7c, 0xae, 0x2b, 0x27, 0xe7,
-	0xba, 0xf2, 0xf3, 0x5c, 0x57, 0x3e, 0x5e, 0xe8, 0xb5, 0x93, 0x0b, 0xbd, 0xf6, 0xfd, 0x42, 0xaf,
-	0xbd, 0x6f, 0xc4, 0xe9, 0x9b, 0x96, 0xb6, 0xdc, 0x60, 0x26, 0x7d, 0x6b, 0x9e, 0xfe, 0x0a, 0x00,
-	0x00, 0xff, 0xff, 0x88, 0xac, 0xa7, 0xb6, 0xed, 0x06, 0x00, 0x00,
+	// 666 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x55, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0x8e, 0x1b, 0x54, 0xb5, 0x1b, 0x7e, 0x54, 0x53, 0x4a, 0x6a, 0x81, 0xd3, 0x5a, 0x02, 0xd2,
+	0x4a, 0xd8, 0x6d, 0x79, 0x82, 0x84, 0xb6, 0xa8, 0x48, 0x46, 0x55, 0xa8, 0x40, 0x82, 0x43, 0xb4,
+	0xb1, 0xb7, 0xc6, 0x6d, 0xbd, 0x63, 0x79, 0x37, 0x91, 0xfb, 0x16, 0x48, 0x5c, 0xb8, 0x21, 0x71,
+	0xe0, 0xd0, 0x13, 0x37, 0x5e, 0xa1, 0xc7, 0x1e, 0x11, 0x87, 0x16, 0x35, 0x2f, 0x82, 0xbc, 0xfe,
+	0x21, 0x34, 0x8b, 0x6a, 0x24, 0x90, 0x38, 0x25, 0xde, 0xf9, 0x66, 0xbe, 0x6f, 0xc6, 0xb3, 0x9f,
+	0x91, 0xe6, 0x44, 0x78, 0x97, 0x5b, 0x24, 0x0e, 0xad, 0xc1, 0x6a, 0x8f, 0x70, 0xbc, 0x6a, 0xf1,
+	0xd8, 0x0c, 0x23, 0xe0, 0xa0, 0xce, 0x88, 0x98, 0x49, 0xe2, 0xd0, 0xcc, 0x62, 0xda, 0xac, 0x07,
+	0x1e, 0x88, 0xa8, 0x95, 0xfc, 0x4b, 0x81, 0x9a, 0xee, 0x00, 0x0b, 0x80, 0x59, 0x3d, 0xcc, 0x48,
+	0x51, 0xc6, 0x01, 0x9f, 0x66, 0xf1, 0xf9, 0x34, 0xde, 0x4d, 0x13, 0xd3, 0x87, 0x34, 0x64, 0x7c,
+	0x51, 0xd0, 0x2d, 0x9b, 0x79, 0xb6, 0x4f, 0x79, 0x8b, 0xba, 0xad, 0x83, 0x03, 0x70, 0x30, 0x27,
+	0x1b, 0x71, 0xa8, 0x3a, 0x68, 0x12, 0x07, 0xd0, 0xa7, 0xbc, 0xae, 0x2c, 0x54, 0x9b, 0xb5, 0xb5,
+	0x79, 0x33, 0x4b, 0x4c, 0x58, 0x72, 0x41, 0xe6, 0x63, 0xf0, 0x69, 0x7b, 0xe5, 0xf8, 0xb4, 0x51,
+	0x39, 0x3a, 0x6b, 0x34, 0x3d, 0x9f, 0xbf, 0xe9, 0xf7, 0x4c, 0x07, 0x82, 0x8c, 0x25, 0xfb, 0x79,
+	0xc8, 0xdc, 0x7d, 0x8b, 0x1f, 0x86, 0x84, 0x89, 0x04, 0xd6, 0xc9, 0x4a, 0xab, 0x8b, 0xe8, 0xea,
+	0x6e, 0x04, 0x41, 0x17, 0xbb, 0x6e, 0x44, 0x18, 0xab, 0x4f, 0x2c, 0x28, 0xcd, 0xe9, 0x4e, 0x2d,
+	0x39, 0x6b, 0xa5, 0x47, 0xea, 0x1c, 0x9a, 0x0c, 0x48, 0xd0, 0x23, 0x51, 0xbd, 0x2a, 0x82, 0xd9,
+	0x93, 0xd1, 0x40, 0x77, 0xa5, 0xc2, 0x3b, 0x84, 0x85, 0x40, 0x19, 0x31, 0x5e, 0xa2, 0x39, 0x9b,
+	0x79, 0xed, 0x7e, 0x44, 0x5b, 0xd4, 0xed, 0x90, 0x00, 0x06, 0xc4, 0x16, 0xa9, 0x63, 0xac, 0xca,
+	0x38, 0xab, 0x86, 0xa6, 0x02, 0xc2, 0xb1, 0x8b, 0x39, 0xce, 0x44, 0x15, 0xcf, 0xc6, 0x02, 0xd2,
+	0xe5, 0x85, 0x0b, 0xea, 0x4f, 0x0a, 0xba, 0x6d, 0x33, 0xef, 0x29, 0xf8, 0x74, 0x1d, 0x43, 0xfb,
+	0xf0, 0x19, 0xd0, 0xad, 0x9e, 0xd3, 0x62, 0x8c, 0x88, 0x96, 0xf7, 0xc0, 0xa7, 0x17, 0xc9, 0x93,
+	0xb3, 0x9c, 0xbc, 0x81, 0x6a, 0x1e, 0x0c, 0x2e, 0x0c, 0x05, 0x79, 0x30, 0xc8, 0x01, 0x4f, 0xd0,
+	0x74, 0x80, 0xe3, 0x2e, 0x87, 0x7d, 0x42, 0xc5, 0x58, 0xaa, 0xed, 0xe5, 0xa3, 0xb3, 0xc6, 0xfd,
+	0x12, 0xf3, 0xdf, 0xa2, 0xbc, 0x33, 0x15, 0xe0, 0x78, 0x27, 0xc9, 0x35, 0x16, 0x51, 0xe3, 0x37,
+	0x3a, 0x8b, 0x5e, 0x3e, 0x2a, 0x68, 0x76, 0x14, 0xf3, 0x57, 0x1b, 0xd9, 0x2c, 0x96, 0x4c, 0xbc,
+	0xdc, 0xb6, 0x99, 0x6c, 0xd2, 0xb7, 0xd3, 0x52, 0x9d, 0xac, 0x13, 0x27, 0xdf, 0x23, 0x43, 0x47,
+	0x77, 0x64, 0x1a, 0x8b, 0x26, 0xde, 0x2b, 0xe8, 0xba, 0xcd, 0xbc, 0xcd, 0x3e, 0x75, 0x37, 0xe2,
+	0x70, 0x1b, 0xe0, 0xa0, 0xcc, 0x12, 0xfc, 0xbc, 0x02, 0x13, 0xff, 0xec, 0x0a, 0x18, 0x75, 0xb1,
+	0xa6, 0x23, 0xca, 0x0a, 0xd1, 0xef, 0x14, 0x11, 0x6a, 0xb9, 0x7b, 0x7d, 0xc6, 0xd7, 0x31, 0x88,
+	0x57, 0xb6, 0x1d, 0xf9, 0x0e, 0x29, 0x23, 0xfe, 0x05, 0xba, 0xe1, 0x62, 0x48, 0x77, 0xa4, 0x1b,
+	0x26, 0x59, 0xe9, 0xfc, 0xff, 0x78, 0xc6, 0xd7, 0xdc, 0x51, 0x6a, 0xe3, 0x43, 0xea, 0x18, 0xcf,
+	0x43, 0x42, 0xdd, 0x7c, 0xce, 0x3b, 0x90, 0x38, 0xc6, 0xff, 0x32, 0xd1, 0xd4, 0x19, 0xc6, 0x05,
+	0xe6, 0x83, 0x5d, 0xfb, 0x7c, 0x05, 0x55, 0x6d, 0xe6, 0xa9, 0x21, 0x52, 0x25, 0xc6, 0xd7, 0x34,
+	0xc7, 0x7c, 0xd7, 0x94, 0x3a, 0x8d, 0xb6, 0x52, 0x16, 0x99, 0x33, 0xab, 0x0c, 0xdd, 0x94, 0x19,
+	0xd2, 0x92, 0xbc, 0x90, 0x04, 0xaa, 0xad, 0x96, 0x86, 0x16, 0xa4, 0x03, 0x34, 0x2b, 0x75, 0xa2,
+	0x65, 0x79, 0x29, 0x19, 0x56, 0x5b, 0x2b, 0x8f, 0x2d, 0x78, 0x03, 0x34, 0x33, 0xee, 0x1a, 0x0f,
+	0x2e, 0x29, 0x54, 0x30, 0x5a, 0x25, 0x81, 0x05, 0xdd, 0x6b, 0x54, 0xfb, 0xe5, 0x7e, 0xcb, 0xf3,
+	0x47, 0x20, 0xda, 0xd2, 0xa5, 0x90, 0xbc, 0x78, 0xfb, 0xde, 0xf1, 0xb9, 0xae, 0x9c, 0x9c, 0xeb,
+	0xca, 0xf7, 0x73, 0x5d, 0x79, 0x3b, 0xd4, 0x2b, 0x27, 0x43, 0xbd, 0xf2, 0x75, 0xa8, 0x57, 0x5e,
+	0xd5, 0x62, 0xf1, 0xf5, 0x16, 0x8b, 0xd8, 0x9b, 0x14, 0x5f, 0xd5, 0x47, 0x3f, 0x02, 0x00, 0x00,
+	0xff, 0xff, 0x35, 0x5c, 0x8e, 0xd0, 0xd7, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -628,7 +714,7 @@ type MsgClient interface {
 	BurnAndRemoveMember(ctx context.Context, in *MsgBurnAndRemoveMember, opts ...grpc.CallOption) (*MsgBurnAndRemoveMemberResponse, error)
 	JoinDaoByNonIbcAsset(ctx context.Context, in *MsgJoinDaoByNonIbcAsset, opts ...grpc.CallOption) (*MsgJoinDaoByNonIbcAssetResponse, error)
 	JoinDaoByIbcAsset(ctx context.Context, in *MsgJoinDaoByIbcAsset, opts ...grpc.CallOption) (*MsgJoinDaoByIbcAssetResponse, error)
-	FundExpModule(ctx context.Context, in *MsgFundExpModule, opts ...grpc.CallOption) (*MsgFundExpModuleResponse, error)
+	FundExpPool(ctx context.Context, in *MsgFundExpPool, opts ...grpc.CallOption) (*MsgFundExpPoolResponse, error)
 }
 
 type msgClient struct {
@@ -675,9 +761,9 @@ func (c *msgClient) JoinDaoByIbcAsset(ctx context.Context, in *MsgJoinDaoByIbcAs
 	return out, nil
 }
 
-func (c *msgClient) FundExpModule(ctx context.Context, in *MsgFundExpModule, opts ...grpc.CallOption) (*MsgFundExpModuleResponse, error) {
-	out := new(MsgFundExpModuleResponse)
-	err := c.cc.Invoke(ctx, "/craft.exp.v1beta1.Msg/FundExpModule", in, out, opts...)
+func (c *msgClient) FundExpPool(ctx context.Context, in *MsgFundExpPool, opts ...grpc.CallOption) (*MsgFundExpPoolResponse, error) {
+	out := new(MsgFundExpPoolResponse)
+	err := c.cc.Invoke(ctx, "/craft.exp.v1beta1.Msg/FundExpPool", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -690,7 +776,7 @@ type MsgServer interface {
 	BurnAndRemoveMember(context.Context, *MsgBurnAndRemoveMember) (*MsgBurnAndRemoveMemberResponse, error)
 	JoinDaoByNonIbcAsset(context.Context, *MsgJoinDaoByNonIbcAsset) (*MsgJoinDaoByNonIbcAssetResponse, error)
 	JoinDaoByIbcAsset(context.Context, *MsgJoinDaoByIbcAsset) (*MsgJoinDaoByIbcAssetResponse, error)
-	FundExpModule(context.Context, *MsgFundExpModule) (*MsgFundExpModuleResponse, error)
+	FundExpPool(context.Context, *MsgFundExpPool) (*MsgFundExpPoolResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -709,8 +795,8 @@ func (*UnimplementedMsgServer) JoinDaoByNonIbcAsset(ctx context.Context, req *Ms
 func (*UnimplementedMsgServer) JoinDaoByIbcAsset(ctx context.Context, req *MsgJoinDaoByIbcAsset) (*MsgJoinDaoByIbcAssetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method JoinDaoByIbcAsset not implemented")
 }
-func (*UnimplementedMsgServer) FundExpModule(ctx context.Context, req *MsgFundExpModule) (*MsgFundExpModuleResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FundExpModule not implemented")
+func (*UnimplementedMsgServer) FundExpPool(ctx context.Context, req *MsgFundExpPool) (*MsgFundExpPoolResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FundExpPool not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -789,20 +875,20 @@ func _Msg_JoinDaoByIbcAsset_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_FundExpModule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgFundExpModule)
+func _Msg_FundExpPool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgFundExpPool)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).FundExpModule(ctx, in)
+		return srv.(MsgServer).FundExpPool(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/craft.exp.v1beta1.Msg/FundExpModule",
+		FullMethod: "/craft.exp.v1beta1.Msg/FundExpPool",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).FundExpModule(ctx, req.(*MsgFundExpModule))
+		return srv.(MsgServer).FundExpPool(ctx, req.(*MsgFundExpPool))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -828,8 +914,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_JoinDaoByIbcAsset_Handler,
 		},
 		{
-			MethodName: "FundExpModule",
-			Handler:    _Msg_FundExpModule_Handler,
+			MethodName: "FundExpPool",
+			Handler:    _Msg_FundExpPool_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1055,11 +1141,16 @@ func (m *MsgJoinDaoByIbcAsset) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Amount != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
-		i--
-		dAtA[i] = 0x18
+	{
+		size := m.Amount.Size()
+		i -= size
+		if _, err := m.Amount.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
 	if len(m.GovAddress) > 0 {
 		i -= len(m.GovAddress)
 		copy(dAtA[i:], m.GovAddress)
@@ -1100,7 +1191,7 @@ func (m *MsgJoinDaoByIbcAssetResponse) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgFundExpModule) Marshal() (dAtA []byte, err error) {
+func (m *MsgFundExpPool) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1110,12 +1201,12 @@ func (m *MsgFundExpModule) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgFundExpModule) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgFundExpPool) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgFundExpModule) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgFundExpPool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1144,7 +1235,7 @@ func (m *MsgFundExpModule) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgFundExpModuleResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgFundExpPoolResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1154,12 +1245,12 @@ func (m *MsgFundExpModuleResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgFundExpModuleResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgFundExpPoolResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgFundExpModuleResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgFundExpPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1204,6 +1295,73 @@ func (m *MsgAdjustDaoTokenPrice) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i--
 		dAtA[i] = 0xa
 	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSpendIbcAssetToExp) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSpendIbcAssetToExp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSpendIbcAssetToExp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Amount) > 0 {
+		for iNdEx := len(m.Amount) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Amount[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.FromAddress) > 0 {
+		i -= len(m.FromAddress)
+		copy(dAtA[i:], m.FromAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.FromAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSpendIbcAssetToExpResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSpendIbcAssetToExpResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSpendIbcAssetToExpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
 	return len(dAtA) - i, nil
 }
 
@@ -1319,9 +1477,8 @@ func (m *MsgJoinDaoByIbcAsset) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Amount != 0 {
-		n += 1 + sovTx(uint64(m.Amount))
-	}
+	l = m.Amount.Size()
+	n += 1 + l + sovTx(uint64(l))
 	return n
 }
 
@@ -1334,7 +1491,7 @@ func (m *MsgJoinDaoByIbcAssetResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgFundExpModule) Size() (n int) {
+func (m *MsgFundExpPool) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1353,7 +1510,7 @@ func (m *MsgFundExpModule) Size() (n int) {
 	return n
 }
 
-func (m *MsgFundExpModuleResponse) Size() (n int) {
+func (m *MsgFundExpPoolResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1374,6 +1531,34 @@ func (m *MsgAdjustDaoTokenPrice) Size() (n int) {
 	}
 	l = m.DaoTokenPrice.Size()
 	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgSpendIbcAssetToExp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.FromAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.Amount) > 0 {
+		for _, e := range m.Amount {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSpendIbcAssetToExpResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -2022,10 +2207,10 @@ func (m *MsgJoinDaoByIbcAsset) Unmarshal(dAtA []byte) error {
 			m.GovAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 			}
-			m.Amount = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -2035,11 +2220,26 @@ func (m *MsgJoinDaoByIbcAsset) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Amount |= uint64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -2111,7 +2311,7 @@ func (m *MsgJoinDaoByIbcAssetResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgFundExpModule) Unmarshal(dAtA []byte) error {
+func (m *MsgFundExpPool) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2134,10 +2334,10 @@ func (m *MsgFundExpModule) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgFundExpModule: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgFundExpPool: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgFundExpModule: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgFundExpPool: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2227,7 +2427,7 @@ func (m *MsgFundExpModule) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgFundExpModuleResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgFundExpPoolResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2250,10 +2450,10 @@ func (m *MsgFundExpModuleResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgFundExpModuleResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgFundExpPoolResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgFundExpModuleResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgFundExpPoolResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -2372,6 +2572,172 @@ func (m *MsgAdjustDaoTokenPrice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSpendIbcAssetToExp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSpendIbcAssetToExp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSpendIbcAssetToExp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FromAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Amount = append(m.Amount, types.Coin{})
+			if err := m.Amount[len(m.Amount)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSpendIbcAssetToExpResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSpendIbcAssetToExpResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSpendIbcAssetToExpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
