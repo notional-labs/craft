@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -34,10 +35,17 @@ func (k ExpKeeper) GetBurnExpPeriod(ctx sdk.Context) (duration time.Duration) {
 // GetParams gets the exp module's parameters.
 func (k ExpKeeper) GetParams(ctx sdk.Context) (params types.Params) {
 	k.paramSpace.GetParamSet(ctx, &params)
-	return types.DefaultParams()
+	return params
 }
 
 //SetParams sets the exp module's parameters.
 func (k ExpKeeper) SetParams(ctx sdk.Context, params types.Params) {
+	fmt.Println(params)
 	k.paramSpace.SetParamSet(ctx, &params)
+}
+
+//GetIbcDenom get ibc denom
+func (k ExpKeeper) GetIbcDenom(ctx sdk.Context) (denom string) {
+	k.paramSpace.Get(ctx, types.ParamStoreIbcDenom, &denom)
+	return denom
 }

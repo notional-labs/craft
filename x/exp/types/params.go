@@ -27,8 +27,9 @@ var (
 	ParamStoreKeyDaoAccount       = []byte("daoAccount")
 	ParamStoreKeyDenom            = []byte("denom")
 	ParamStoreKeyClosePoolPeriod  = []byte("closepool")
-	ParamStoreKeyVestingPeriodEnd = []byte("vestingperiodend")
-	ParamStoreKeyBurnPeriod       = []byte("vestingperiodend")
+	ParamStoreKeyVestingPeriodEnd = []byte("vestingperiodvestend")
+	ParamStoreKeyBurnPeriod       = []byte("vestingperiodburnend")
+	ParamStoreIbcDenom            = []byte("ibcassetdenom")
 )
 
 // ParamKeyTable for exp module.
@@ -45,6 +46,7 @@ func NewParams(maxCoinMint uint64, daoAccount string, denom string) Params {
 	}
 }
 
+//DefaultParams
 func DefaultParams() Params {
 	return Params{
 		MaxCoinMint:      uint64(100000),
@@ -52,6 +54,8 @@ func DefaultParams() Params {
 		Denom:            "exp",
 		ClosePoolPeriod:  DefaultClosePoolPeriod,
 		VestingPeriodEnd: DefaultVestingPeriodEnd,
+		IbcAssetDenom:    "ucraft",
+		BurnExpPeriod:    DefaultBurnPeriod,
 	}
 }
 
@@ -63,6 +67,7 @@ func (p Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(ParamStoreKeyClosePoolPeriod, &p.ClosePoolPeriod, validatePeriod),
 		paramtypes.NewParamSetPair(ParamStoreKeyVestingPeriodEnd, &p.VestingPeriodEnd, validatePeriod),
 		paramtypes.NewParamSetPair(ParamStoreKeyBurnPeriod, &p.BurnExpPeriod, validatePeriod),
+		paramtypes.NewParamSetPair(ParamStoreIbcDenom, &p.IbcAssetDenom, validateDenom),
 	}
 }
 

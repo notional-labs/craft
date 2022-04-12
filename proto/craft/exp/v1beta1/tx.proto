@@ -15,7 +15,7 @@ service Msg {
     rpc BurnAndRemoveMember(MsgBurnAndRemoveMember) returns (MsgBurnAndRemoveMemberResponse);
     rpc JoinDaoByNonIbcAsset(MsgJoinDaoByNonIbcAsset) returns (MsgJoinDaoByNonIbcAssetResponse);
     rpc JoinDaoByIbcAsset(MsgJoinDaoByIbcAsset) returns (MsgJoinDaoByIbcAssetResponse);
-    rpc FundExpModule(MsgFundExpModule) returns (MsgFundExpModuleResponse);
+    rpc FundExpPool(MsgFundExpPool) returns (MsgFundExpPoolResponse);
 }
 
 message MsgMintAndAllocateExp {
@@ -59,19 +59,23 @@ message MsgJoinDaoByIbcAsset{
   // join_address defines the member who want join Dao.
   string join_address = 1 ;
   string gov_address = 2;
-  uint64  amount = 3 ;
+  string amount = 3 
+  [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];
 }
 
 message MsgJoinDaoByIbcAssetResponse{}
 
-message MsgFundExpModule {
+message MsgFundExpPool {
     // from_address defines the member who want fund.
   string from_address = 1 ;
   repeated cosmos.base.v1beta1.Coin amount = 2 
   [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 }
 
-message MsgFundExpModuleResponse {}
+message MsgFundExpPoolResponse {}
 
 message MsgAdjustDaoTokenPrice{
     // from_address defines the address who want adjust dao_token_price.
@@ -82,3 +86,13 @@ message MsgAdjustDaoTokenPrice{
     (gogoproto.nullable)   = false
   ]; ;
 }
+
+message MsgSpendIbcAssetToExp{
+  // from_address defines the member who want fund.
+  string from_address = 1 ;
+  repeated cosmos.base.v1beta1.Coin amount = 2 
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  
+}
+
+message MsgSpendIbcAssetToExpResponse{}

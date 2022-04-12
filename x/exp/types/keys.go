@@ -21,4 +21,8 @@ var (
 	KeyDaoInfo = []byte{0x01}
 	// KeyDaoAssetInfo defines key to store the DaoAssetInfo .
 	KeyDaoAssetInfo = []byte{0x02}
+
+	KeyMintRequestList = []byte{0x03}
+
+	KeyBurnRequestList = []byte{0x03}
 )
