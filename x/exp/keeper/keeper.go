@@ -92,7 +92,7 @@ func (k ExpKeeper) burnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddr
 	for index, ar := range whiteList {
 		if ar.Account == memberAccount.String() {
 			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
-			if time.Now().Before(timeCheck) {
+			if ctx.BlockTime().Before(timeCheck) {
 				return sdkerrors.Wrap(types.ErrTimeOut, "exp in vesting time, cannot burn")
 			}
 			newDaoInfo = types.DaoInfo{
@@ -128,7 +128,7 @@ func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddre
 			}
 			// vesting time check, give one day for DAO sign
 			timeCheck := accountRecord.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
-			if time.Now().After(timeCheck) {
+			if ctx.BlockTime().After(timeCheck) {
 				return types.ErrTimeOut
 			}
 			return nil
@@ -150,6 +150,14 @@ func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) 
 		}
 	}
 	return types.ErrAddressdNotFound
+}
+
+func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, ar *types.AccountRecord) error {
+	balance := k.bankKeeper.GetBalance(ctx, memberAccount, k.GetDenom(ctx))
+	if ar.MaxToken.Amount.Equal(balance.Amount) {
+		return types.ErrStaking
+	}
+	return nil
 }
 
 func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, maxToken sdk.Coin) error {
@@ -179,4 +187,93 @@ func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccA
 
 	k.SetDaoInfo(ctx, newDaoInfo)
 	return nil
+}
+
+// FundExpPool allows an account to directly fund the exp fund pool.
+// The amount is first added to the distribution module account and then directly
+// added to the pool. An error is returned if the amount cannot be sent to the
+// module account.
+func (k ExpKeeper) FundExpPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error {
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amount); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (k ExpKeeper) requestBurnCoin(ctx sdk.Context, memberAccount sdk.AccAddress) error {
+	var newDaoInfo types.DaoInfo
+
+	daoInfo, err := k.GetDaoInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	whiteList := daoInfo.GetWhitelist()
+
+	for index, ar := range whiteList {
+		if ar.Account == memberAccount.String() {
+			err := k.stakingCheck(ctx, memberAccount, ar)
+			if err != nil {
+				return err
+			}
+
+			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
+			if ctx.BlockTime().Before(timeCheck) {
+				return sdkerrors.Wrap(types.ErrTimeOut, "exp in vesting time, cannot burn")
+			}
+			newDaoInfo = types.DaoInfo{
+				Whitelist: append(whiteList[:index], whiteList[index+1:]...),
+			}
+
+			k.SetDaoInfo(ctx, newDaoInfo)
+			k.addAddressToBurnRequestList(ctx, ar.GetAccount(), ar.MaxToken)
+
+			return nil
+		}
+	}
+	return types.ErrAddressdNotFound
+}
+
+// func (k ExpKeeper) getPoolAmount(ctx sdk.Context) sdk.Coins {
+// 	k.bankKeeper.GetBalance()
+// }
+
+func (k ExpKeeper) executeMintRequest(ctx sdk.Context, fromAdress sdk.AccAddress, coin sdk.Coin) error {
+	mintList, err := k.GetMintRequestList(ctx)
+	if err != nil {
+		return err
+	}
+
+	mintRequestList := mintList.MintRequestList
+
+	for index, mintRequest := range mintRequestList {
+		if mintRequest.Status == types.StatusOnGoingRequest && mintRequest.Account == fromAdress.String() {
+			expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
+			if expWillGet.GTE(mintRequest.DaoTokenLeft) {
+				coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
+
+				err := k.FundExpPool(ctx, sdk.NewCoins(coinSpend), fromAdress)
+				if err != nil {
+					return err
+				}
+
+				mintRequest.DaoTokenLeft = sdk.NewDec(0)
+				mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
+				mintRequest.Status = types.StatusCompleteRequest
+			}
+			err := k.FundExpPool(ctx, sdk.NewCoins(coin), fromAdress)
+			if err != nil {
+				return err
+			}
+
+			mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Add(expWillGet.Neg())
+			mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(expWillGet)
+		}
+		mintRequestList[index] = mintRequest
+		mintList.MintRequestList = mintRequestList
+		k.SetMintRequestList(ctx, mintList)
+	}
+
+	return types.ErrWrongFundDenom
 }

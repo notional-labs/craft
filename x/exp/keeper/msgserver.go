@@ -62,7 +62,7 @@ func (k msgServer) BurnAndRemoveMember(goCtx context.Context, msg *types.MsgBurn
 		return nil, err
 	}
 
-	err = k.burnCoinAndExitDao(ctx, from)
+	err = k.requestBurnCoin(ctx, from)
 	if err != nil {
 		return nil, err
 	}
@@ -107,10 +107,60 @@ func (k msgServer) JoinDaoByNonIbcAsset(goCtx context.Context, msg *types.MsgJoi
 	return &types.MsgJoinDaoByNonIbcAssetResponse{}, nil
 }
 
-func (k msgServer) FundExpModule(gpCtx context.Context, msg *types.MsgFundExpModule) (*types.MsgFundExpModuleResponse, error) {
-	return &types.MsgFundExpModuleResponse{}, nil
+func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDaoByIbcAsset) (*types.MsgJoinDaoByIbcAssetResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	joinAddress, err := sdk.AccAddressFromBech32(msg.JoinAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeKeyMintExp),
+			sdk.NewAttribute(sdk.AttributeKeySender, joinAddress.String()),
+		),
+	)
+	return &types.MsgJoinDaoByIbcAssetResponse{}, nil
 }
 
-func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDaoByIbcAsset) (*types.MsgJoinDaoByIbcAssetResponse, error) {
-	return &types.MsgJoinDaoByIbcAssetResponse{}, nil
+func (k msgServer) FundExpPool(goCtx context.Context, msg *types.MsgFundExpPool) (*types.MsgFundExpPoolResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	fromAddress, err := sdk.AccAddressFromBech32(msg.FromAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	k.ExpKeeper.FundExpPool(ctx, msg.Amount, fromAddress)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeKeyMintExp),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.FromAddress),
+		),
+	)
+	return &types.MsgFundExpPoolResponse{}, nil
+}
+
+func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpendIbcAssetToExp) (*types.MsgSpendIbcAssetToExpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	fromAddress, err := sdk.AccAddressFromBech32(msg.FromAddress)
+	if err != nil {
+		return nil, err
+	}
+	if len(msg.Amount) != 1 {
+		return nil, types.ErrDenomNotMatch
+	}
+
+	err = k.ExpKeeper.executeMintRequest(ctx, fromAddress, msg.Amount[0])
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgSpendIbcAssetToExpResponse{}, nil
 }

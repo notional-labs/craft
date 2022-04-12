@@ -45,7 +45,7 @@ func (k ExpKeeper) GetDaoAssetInfo(ctx sdk.Context) (types.DaoAssetInfo, error) 
 	return daoAssetInfo, nil
 }
 
-func (k ExpKeeper) SetDaoAssetInfo(ctx sdk.Context, daoInfo types.DaoInfo) {
+func (k ExpKeeper) SetDaoAssetInfo(ctx sdk.Context, daoInfo types.DaoAssetInfo) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&daoInfo)
 	store.Set(types.KeyDaoInfo, bz)
