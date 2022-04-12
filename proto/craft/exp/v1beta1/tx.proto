@@ -16,6 +16,7 @@ service Msg {
     rpc JoinDaoByNonIbcAsset(MsgJoinDaoByNonIbcAsset) returns (MsgJoinDaoByNonIbcAssetResponse);
     rpc JoinDaoByIbcAsset(MsgJoinDaoByIbcAsset) returns (MsgJoinDaoByIbcAssetResponse);
     rpc FundExpPool(MsgFundExpPool) returns (MsgFundExpPoolResponse);
+    rpc SpendIbcAssetToExp(MsgSpendIbcAssetToExp) returns (MsgSpendIbcAssetToExpResponse);
 }
 
 message MsgMintAndAllocateExp {
