@@ -201,7 +201,7 @@ func (k ExpKeeper) FundExpPool(ctx sdk.Context, amount sdk.Coins, sender sdk.Acc
 	return nil
 }
 
-func (k ExpKeeper) requestBurnCoin(ctx sdk.Context, memberAccount sdk.AccAddress) error {
+func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk.AccAddress) error {
 	var newDaoInfo types.DaoInfo
 
 	daoInfo, err := k.GetDaoInfo(ctx)

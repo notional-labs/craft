@@ -215,3 +215,10 @@ func (m MsgSpendIbcAssetToExp) ValidateBasic() error {
 	}
 	return nil
 }
+
+func NewMsgSpendIbcAssetToExp(fromAddress string, amount sdk.Coins) *MsgSpendIbcAssetToExp {
+	return &MsgSpendIbcAssetToExp{
+		FromAddress: fromAddress,
+		Amount:      amount,
+	}
+}

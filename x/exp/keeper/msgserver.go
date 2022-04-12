@@ -62,7 +62,7 @@ func (k msgServer) BurnAndRemoveMember(goCtx context.Context, msg *types.MsgBurn
 		return nil, err
 	}
 
-	err = k.requestBurnCoin(ctx, from)
+	err = k.requestBurnCoinFromAddress(ctx, from)
 	if err != nil {
 		return nil, err
 	}

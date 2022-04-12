@@ -22,6 +22,7 @@ func NewTxCmd() *cobra.Command {
 
 	txCmd.AddCommand(NewMintExpCmd())
 	txCmd.AddCommand(NewBurnExpCmd())
+	txCmd.AddCommand(NewSpendIbcAssetForExpCmd())
 	return txCmd
 }
 
@@ -68,6 +69,33 @@ func NewBurnExpCmd() *cobra.Command {
 			}
 
 			msg := types.NewMsgBurnAndRemoveMember(clientCtx.GetFromAddress(), args[0])
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewSpendIbcAssetForExpCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "spend [coins]",
+		Short: `Spend ibc asset for receive exp and join DAO.`,
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			coins, err := sdk.ParseCoinsNormalized(args[1])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgSpendIbcAssetToExp(clientCtx.GetFromAddress().String(), coins)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
