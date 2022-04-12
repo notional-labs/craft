@@ -151,3 +151,67 @@ func (m MsgJoinDaoByIbcAsset) ValidateBasic() error {
 
 	return nil
 }
+
+var _ sdk.Msg = &MsgFundExpPool{}
+
+// Route Implements Msg.
+func (m MsgFundExpPool) Route() string { return sdk.MsgTypeURL(&m) }
+
+// Type Implements Msg.
+func (m MsgFundExpPool) Type() string { return sdk.MsgTypeURL(&m) }
+
+// GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
+func (m MsgFundExpPool) GetSigners() []sdk.AccAddress {
+	daoAccount, err := sdk.AccAddressFromBech32(m.FromAddress)
+	if err != nil {
+		panic(err)
+	}
+
+	return []sdk.AccAddress{daoAccount}
+}
+
+// GetSignBytes Implements Msg.
+func (m MsgFundExpPool) GetSignBytes() []byte {
+	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
+}
+
+// ValidateBasic does a sanity check on the provided data.
+func (m MsgFundExpPool) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.FromAddress)
+	if err != nil {
+		return sdkerrors.Wrap(err, "join address must be valid address")
+	}
+	return nil
+}
+
+var _ sdk.Msg = &MsgSpendIbcAssetToExp{}
+
+// Route Implements Msg.
+func (m MsgSpendIbcAssetToExp) Route() string { return sdk.MsgTypeURL(&m) }
+
+// Type Implements Msg.
+func (m MsgSpendIbcAssetToExp) Type() string { return sdk.MsgTypeURL(&m) }
+
+// GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
+func (m MsgSpendIbcAssetToExp) GetSigners() []sdk.AccAddress {
+	fromAddr, err := sdk.AccAddressFromBech32(m.FromAddress)
+	if err != nil {
+		panic(err)
+	}
+
+	return []sdk.AccAddress{fromAddr}
+}
+
+// GetSignBytes Implements Msg.
+func (m MsgSpendIbcAssetToExp) GetSignBytes() []byte {
+	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
+}
+
+// ValidateBasic does a sanity check on the provided data.
+func (m MsgSpendIbcAssetToExp) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.FromAddress)
+	if err != nil {
+		return sdkerrors.Wrap(err, "join address must be valid address")
+	}
+	return nil
+}

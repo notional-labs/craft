@@ -1,14 +1,16 @@
 package types
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/libs/time"
 )
 
 // NewGenesisState creates a new GenesisState object .
-func NewGenesisState(whiteList []*AccountRecord, params Params) *GenesisState {
+func NewGenesisState(whiteList []*AccountRecord, params Params, daoAssetInfo DaoAssetInfo) *GenesisState {
 	return &GenesisState{
 		WhiteList: whiteList,
+		DaoAsset:  &daoAssetInfo,
 		Params:    params,
 	}
 }
@@ -25,6 +27,10 @@ func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
 		WhiteList: []*AccountRecord{
 			&data,
+		},
+		DaoAsset: &DaoAssetInfo{
+			DaoTokenPrice: sdk.NewDec(1),
+			AssetDao:      nil,
 		},
 		Params: DefaultParams(),
 	}
