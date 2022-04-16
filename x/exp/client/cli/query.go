@@ -46,7 +46,7 @@ func GetWhiteList() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintObjectLegacy(res.AccountRecord)
+			return clientCtx.PrintObjectLegacy(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

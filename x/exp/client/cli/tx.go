@@ -90,7 +90,7 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 				return err
 			}
 
-			coins, err := sdk.ParseCoinsNormalized(args[1])
+			coins, err := sdk.ParseCoinsNormalized(args[0])
 			if err != nil {
 				return err
 			}

@@ -36,7 +36,7 @@ func (k ExpKeeper) GetDaoAssetInfo(ctx sdk.Context) (types.DaoAssetInfo, error) 
 		return types.DaoAssetInfo{}, types.ErrInvalidKey
 	}
 
-	bz := store.Get(types.KeyDaoInfo)
+	bz := store.Get(types.KeyDaoAssetInfo)
 	err := k.cdc.Unmarshal(bz, &daoAssetInfo)
 	if err != nil {
 		return types.DaoAssetInfo{}, err
@@ -45,8 +45,8 @@ func (k ExpKeeper) GetDaoAssetInfo(ctx sdk.Context) (types.DaoAssetInfo, error) 
 	return daoAssetInfo, nil
 }
 
-func (k ExpKeeper) SetDaoAssetInfo(ctx sdk.Context, daoInfo types.DaoAssetInfo) {
+func (k ExpKeeper) SetDaoAssetInfo(ctx sdk.Context, daoAssetInfo types.DaoAssetInfo) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshal(&daoInfo)
-	store.Set(types.KeyDaoInfo, bz)
+	bz := k.cdc.MustMarshal(&daoAssetInfo)
+	store.Set(types.KeyDaoAssetInfo, bz)
 }

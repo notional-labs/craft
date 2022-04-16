@@ -15,9 +15,13 @@ func EndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) {
 
 	err := BurnRequestListEndBlocker(ctx, keeper)
 	if err != nil {
-		panic("wrong logic")
+		panic(err)
 	}
 
+	err = MintRequestListEndBlocker(ctx, keeper)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func BurnRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {

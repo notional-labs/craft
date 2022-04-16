@@ -1,8 +1,6 @@
 package exp
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/notional-labs/craft/x/exp/keeper"
 	"github.com/notional-labs/craft/x/exp/types"
@@ -11,9 +9,13 @@ import (
 // InitGenesis new exp genesis .
 func InitGenesis(ctx sdk.Context, keeper keeper.ExpKeeper, ak types.AccountKeeper, data *types.GenesisState) {
 	keeper.SetParams(ctx, data.Params)
+	//set daoInfo
 	keeper.SetDaoInfo(ctx, types.DaoInfo{Whitelist: data.WhiteList})
-	fmt.Println(data.DaoAsset)
 	keeper.SetDaoAssetInfo(ctx, *data.DaoAsset)
+	// set burn mint request list
+	keeper.SetBurnRequestList(ctx, types.BurnRequestList{})
+	keeper.SetMintRequestList(ctx, types.MintRequestList{})
+
 	ak.GetModuleAccount(ctx, types.ModuleName)
 }
 

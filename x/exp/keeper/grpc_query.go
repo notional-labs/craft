@@ -16,6 +16,7 @@ func (k ExpKeeper) WhiteList(c context.Context, _ *types.QueryWhiteListRequest) 
 	if err != nil {
 		return nil, err
 	}
+
 	return &types.QueryWhiteListResponse{AccountRecord: daoInfo.Whitelist}, nil
 }
 

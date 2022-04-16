@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/notional-labs/craft/x/exp/types"
 )
 
@@ -74,7 +75,7 @@ func (k ExpKeeper) GetMintRequestList(ctx sdk.Context) (types.MintRequestList, e
 
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(types.KeyMintRequestList) {
-		return types.MintRequestList{}, types.ErrInvalidKey
+		return types.MintRequestList{}, sdkerrors.Wrapf(types.ErrInvalidKey, "mintRequest")
 	}
 
 	bz := store.Get(types.KeyMintRequestList)
@@ -97,7 +98,7 @@ func (k ExpKeeper) GetBurnRequestList(ctx sdk.Context) (types.BurnRequestList, e
 
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(types.KeyBurnRequestList) {
-		return types.BurnRequestList{}, types.ErrInvalidKey
+		return types.BurnRequestList{}, sdkerrors.Wrapf(types.ErrInvalidKey, "burnRequest")
 	}
 
 	bz := store.Get(types.KeyMintRequestList)

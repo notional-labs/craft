@@ -54,7 +54,7 @@ func (k msgServer) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintA
 	return &types.MsgMintAndAllocateExpResponse{}, nil
 }
 
-func (k msgServer) BurnAndRemoveMember(goCtx context.Context, msg *types.MsgBurnAndRemoveMember) (*types.MsgBurnAndRemoveMemberResponse, error) {
+func (k msgServer) RequestBurnCoinAndExitDao(goCtx context.Context, msg *types.MsgBurnAndRemoveMember) (*types.MsgBurnAndRemoveMemberResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	from, err := sdk.AccAddressFromBech32(msg.FromAddress)
