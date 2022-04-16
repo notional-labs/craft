@@ -108,7 +108,6 @@ func (k ExpKeeper) burnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddr
 
 // verify Dao member: balances, whitelist .
 func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddress sdk.AccAddress) error {
-
 	params := k.GetParams(ctx)
 
 	if params.DaoAccount != daoAddress.String() {
