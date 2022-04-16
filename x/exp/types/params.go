@@ -49,9 +49,9 @@ func NewParams(maxCoinMint uint64, daoAccount string, denom string) Params {
 // DefaultParams of ExpModule .
 func DefaultParams() Params {
 	return Params{
-		MaxCoinMint:      uint64(100000),
+		MaxCoinMint:      uint64(10000000000),
 		DaoAccount:       "craft1pzsr988fmdrg2fez2mfz5r5pcxg2kcsmz89jwa",
-		Denom:            "exp",
+		Denom:            "uexp",
 		ClosePoolPeriod:  DefaultClosePoolPeriod,
 		VestingPeriodEnd: DefaultVestingPeriodEnd,
 		IbcAssetDenom:    "ucraft",
@@ -59,7 +59,7 @@ func DefaultParams() Params {
 	}
 }
 
-func (p Params) ParamSetPairs() paramtypes.ParamSetPairs {
+func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(ParamStoreKeyMaxCoinMint, &p.MaxCoinMint, validateMaxCoinMint),
 		paramtypes.NewParamSetPair(ParamStoreKeyDaoAccount, &p.DaoAccount, validateDaoAccount),
