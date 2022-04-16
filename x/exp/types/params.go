@@ -8,7 +8,7 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-// Exp params default values
+// Exp params default values .
 const (
 	// After pass, ISO 8601 format for when they can no longer mint EXP from this proposal
 	// TODO: Justify our choice of default here.
@@ -18,7 +18,7 @@ const (
 	// TODO: Justify our choice of default here.
 	DefaultVestingPeriodEnd time.Duration = time.Hour * 24 * 7 * 3
 
-	// Burning time
+	// Burning time .
 	DefaultBurnPeriod time.Duration = time.Hour * 24 * 7 * 3
 )
 
@@ -46,7 +46,7 @@ func NewParams(maxCoinMint uint64, daoAccount string, denom string) Params {
 	}
 }
 
-//DefaultParams
+// DefaultParams of ExpModule .
 func DefaultParams() Params {
 	return Params{
 		MaxCoinMint:      uint64(100000),

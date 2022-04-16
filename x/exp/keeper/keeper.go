@@ -227,8 +227,11 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 			}
 
 			k.SetDaoInfo(ctx, newDaoInfo)
-			k.addAddressToBurnRequestList(ctx, ar.GetAccount(), ar.MaxToken)
+			err = k.addAddressToBurnRequestList(ctx, ar.GetAccount(), ar.MaxToken)
 
+			if err != nil {
+				return err
+			}
 			return nil
 		}
 	}

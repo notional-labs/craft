@@ -13,9 +13,9 @@ option go_package = "x/exp/types";
 // Params holds parameters for the exp module
 message Params {
     uint64 max_coin_mint = 1 [
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
-    (gogoproto.moretags) = "yaml:\"max_coin_mint\"",
-    (gogoproto.nullable) = true
+        (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+        (gogoproto.moretags) = "yaml:\"max_coin_mint\"",
+        (gogoproto.nullable) = true
     ];
     string daoAccount   = 2;
     string denom        = 3;

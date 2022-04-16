@@ -38,13 +38,13 @@ func (k ExpKeeper) GetParams(ctx sdk.Context) (params types.Params) {
 	return params
 }
 
-//SetParams sets the exp module's parameters.
+// SetParams sets the exp module's parameters.
 func (k ExpKeeper) SetParams(ctx sdk.Context, params types.Params) {
 	fmt.Println(params)
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
-//GetIbcDenom get ibc denom
+// GetIbcDenom get ibc denom .
 func (k ExpKeeper) GetIbcDenom(ctx sdk.Context) (denom string) {
 	k.paramSpace.Get(ctx, types.ParamStoreIbcDenom, &denom)
 	return denom

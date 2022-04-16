@@ -12,7 +12,7 @@ func (k ExpKeeper) addAddressToBurnRequestList(ctx sdk.Context, memberAccount st
 		return err
 	}
 
-	newBurnRequestList := append(
+	burnRequestList.BurnRequestList = append(
 		burnRequestList.BurnRequestList,
 		&types.BurnRequest{
 			Account:       memberAccount,
@@ -21,7 +21,7 @@ func (k ExpKeeper) addAddressToBurnRequestList(ctx sdk.Context, memberAccount st
 		},
 	)
 
-	k.SetBurnRequestList(ctx, types.BurnRequestList{BurnRequestList: newBurnRequestList})
+	k.SetBurnRequestList(ctx, types.BurnRequestList{BurnRequestList: burnRequestList.BurnRequestList})
 
 	return nil
 }
@@ -38,7 +38,7 @@ func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sd
 
 	stableTokenLeft := tokenLeft.Mul(expPrice)
 
-	newBurnRequestList := append(
+	mintRequestList.MintRequestList = append(
 		mintRequestList.MintRequestList,
 		&types.MintRequest{
 			Account:        memberAccount.String(),
@@ -48,12 +48,12 @@ func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sd
 		},
 	)
 
-	k.SetMintRequestList(ctx, types.MintRequestList{MintRequestList: newBurnRequestList})
+	k.SetMintRequestList(ctx, types.MintRequestList{MintRequestList: mintRequestList.MintRequestList})
 
 	return nil
 }
 
-//need modify
+// need modify for better performance .
 func (k ExpKeeper) calculateDaoTokenPrice(ctx sdk.Context) (sdk.Dec, error) {
 	asset, err := k.GetDaoAssetInfo(ctx)
 	if err != nil {
@@ -63,7 +63,7 @@ func (k ExpKeeper) calculateDaoTokenPrice(ctx sdk.Context) (sdk.Dec, error) {
 	return asset.DaoTokenPrice, nil
 }
 
-// calculate exp value by ibc asset
+// calculate exp value by ibc asset .
 func (k ExpKeeper) calculateDaoTokenValue(ctx sdk.Context, amount sdk.Int) sdk.Dec {
 	daoTokenPrice, _ := k.calculateDaoTokenPrice(ctx)
 
@@ -118,7 +118,6 @@ func (k ExpKeeper) SetBurnRequestList(ctx sdk.Context, burnRequestList types.Bur
 
 func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest) (types.BurnRequest, error) {
 	burnAccount, err := sdk.AccAddressFromBech32(burnRequest.Account)
-
 	if err != nil {
 		return burnRequest, err
 	}
@@ -156,18 +155,22 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 	memberAccount, _ := sdk.AccAddressFromBech32(mintRequest.Account)
 	maxToken := sdk.NewCoin(k.GetDenom(ctx), mintRequest.DaoTokenMinted.TruncateInt())
 
-	k.addAddressToWhiteList(ctx, memberAccount, maxToken)
+	err := k.addAddressToWhiteList(ctx, memberAccount, maxToken)
+	if err != nil {
+		return types.MintRequest{}, err
+	}
 
 	if mintRequest.Status == types.StatusOnGoingRequest {
 		mintRequest.Status = types.StatusExpiredRequest
 	}
+
 	return mintRequest, nil
 }
 
-//need modify
+// should modify .
 func (k ExpKeeper) calculateStableTokenReturn(ctx sdk.Context, expCoin sdk.Coin) (sdk.Dec, error) {
 	if expCoin.Denom != k.GetDenom(ctx) {
-		return sdk.NewDec(-1), types.ErrInputOutputMismatch
+		return sdk.NewDec(0), types.ErrInputOutputMismatch
 	}
 	daoTokenPrice, _ := k.calculateDaoTokenPrice(ctx)
 	return daoTokenPrice.AddMut(expCoin.Amount.ToDec()), nil

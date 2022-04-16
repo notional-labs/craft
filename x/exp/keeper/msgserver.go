@@ -115,7 +115,10 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 		return nil, err
 	}
 
-	k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)
+	err = k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)
+	if err != nil {
+		return nil, err
+	}
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -134,7 +137,10 @@ func (k msgServer) FundExpPool(goCtx context.Context, msg *types.MsgFundExpPool)
 		return nil, err
 	}
 
-	k.ExpKeeper.FundExpPool(ctx, msg.Amount, fromAddress)
+	err = k.ExpKeeper.FundExpPool(ctx, msg.Amount, fromAddress)
+	if err != nil {
+		return nil, err
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(

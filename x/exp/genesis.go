@@ -9,7 +9,7 @@ import (
 // InitGenesis new exp genesis .
 func InitGenesis(ctx sdk.Context, keeper keeper.ExpKeeper, ak types.AccountKeeper, data *types.GenesisState) {
 	keeper.SetParams(ctx, data.Params)
-	//set daoInfo
+	// set daoInfo
 	keeper.SetDaoInfo(ctx, types.DaoInfo{Whitelist: data.WhiteList})
 	keeper.SetDaoAssetInfo(ctx, *data.DaoAsset)
 	// set burn mint request list
