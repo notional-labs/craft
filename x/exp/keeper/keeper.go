@@ -238,10 +238,6 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 	return types.ErrAddressdNotFound
 }
 
-// func (k ExpKeeper) getPoolAmount(ctx sdk.Context) sdk.Coins {
-// 	k.bankKeeper.GetBalance()
-// }
-
 func (k ExpKeeper) executeMintRequest(ctx sdk.Context, fromAdress sdk.AccAddress, coin sdk.Coin) error {
 	mintList, err := k.GetMintRequestList(ctx)
 	if err != nil {

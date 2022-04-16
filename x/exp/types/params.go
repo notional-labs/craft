@@ -12,14 +12,14 @@ import (
 const (
 	// After pass, ISO 8601 format for when they can no longer mint EXP from this proposal
 	// TODO: Justify our choice of default here.
-	DefaultClosePoolPeriod time.Duration = time.Hour * 24 * 7 * 3
+	DefaultClosePoolPeriod time.Duration = time.Minute * 5
 
 	// After pass, ISO 8601 format for when they can no longer burn EXP
 	// TODO: Justify our choice of default here.
-	DefaultVestingPeriodEnd time.Duration = time.Hour * 24 * 7 * 3
+	DefaultVestingPeriodEnd time.Duration = time.Minute * 5
 
 	// Burning time .
-	DefaultBurnPeriod time.Duration = time.Hour * 24 * 7 * 3
+	DefaultBurnPeriod time.Duration = time.Minute * 5
 )
 
 var (
