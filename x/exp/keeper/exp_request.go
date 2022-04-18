@@ -116,7 +116,7 @@ func (k ExpKeeper) SetBurnRequestList(ctx sdk.Context, burnRequestList types.Bur
 	store.Set(types.KeyBurnRequestList, bz)
 }
 
-func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest) (types.BurnRequest, error) {
+func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest *types.BurnRequest) (*types.BurnRequest, error) {
 	burnAccount, err := sdk.AccAddressFromBech32(burnRequest.Account)
 	if err != nil {
 		return burnRequest, err
@@ -133,6 +133,7 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 			return burnRequest, err
 		}
 		burnRequest.BurnTokenLeft.Amount = coin.SubAmount(coin.Amount).Amount
+		k.BurnExpFromAccount(ctx, sdk.NewCoins(coin), burnAccount)
 		return burnRequest, nil
 	}
 
@@ -140,13 +141,13 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 	if err != nil {
 		return burnRequest, nil
 	}
-
+	k.BurnExpFromAccount(ctx, sdk.NewCoins(*burnRequest.BurnTokenLeft), burnAccount)
 	burnRequest.BurnTokenLeft = nil
 
 	return burnRequest, nil
 }
 
-func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest) (types.MintRequest, error) {
+func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest *types.MintRequest) (*types.MintRequest, error) {
 	if mintRequest.DaoTokenMinted == sdk.NewDec(0) {
 		mintRequest.Status = types.StatusNoFundRequest
 		return mintRequest, nil
@@ -157,7 +158,12 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 
 	err := k.addAddressToWhiteList(ctx, memberAccount, maxToken)
 	if err != nil {
-		return types.MintRequest{}, err
+		return &types.MintRequest{}, err
+	}
+
+	err = k.MintExpForAccount(ctx, sdk.NewCoins(maxToken), memberAccount)
+	if err != nil {
+		return &types.MintRequest{}, err
 	}
 
 	if mintRequest.Status == types.StatusOnGoingRequest {

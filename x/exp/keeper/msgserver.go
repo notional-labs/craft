@@ -39,7 +39,7 @@ func (k msgServer) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintA
 		return nil, err
 	}
 
-	err = k.mintExpForAccount(ctx, msg.Amount, memberAddress)
+	err = k.MintExpForAccount(ctx, msg.Amount, memberAddress)
 	if err != nil {
 		return nil, err
 	}

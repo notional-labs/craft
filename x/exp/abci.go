@@ -40,8 +40,8 @@ func BurnRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 			continue
 		}
 
-		b, _ := keeper.ExecuteBurnExp(ctx, *burnRequest)
-		burnList[i] = &b
+		b, _ := keeper.ExecuteBurnExp(ctx, burnRequest)
+		burnList[i] = b
 	}
 	burnListRequest.BurnRequestList = burnList
 	keeper.SetBurnRequestList(ctx, burnListRequest)
@@ -64,8 +64,8 @@ func MintRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 			continue
 		}
 
-		m, _ := keeper.ExecuteMintExp(ctx, *mintRequst)
-		mintList[i] = &m
+		m, _ := keeper.ExecuteMintExp(ctx, mintRequst)
+		mintList[i] = m
 	}
 	mintRequestList.MintRequestList = mintList
 	keeper.SetMintRequestList(ctx, mintRequestList)

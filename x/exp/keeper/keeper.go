@@ -54,7 +54,7 @@ func (k ExpKeeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", "x/"+types.ModuleName)
 }
 
-func (k ExpKeeper) mintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAccount sdk.AccAddress) error {
+func (k ExpKeeper) MintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAccount sdk.AccAddress) error {
 	if newCoins.Empty() {
 		// skip as no coins need to be minted
 		return nil
@@ -74,6 +74,31 @@ func (k ExpKeeper) mintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAcc
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, dstAccount, newCoins)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAccount sdk.AccAddress) error {
+	if newCoins.Empty() {
+		// skip as no coins need to be minted
+		return nil
+	}
+	// only mint one denom
+	if newCoins.Len() != 1 && newCoins[0].Denom != k.GetDenom(ctx) {
+		return errors.New("Exp module only burn exp")
+	}
+
+	// send coin from account to module
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, dstAccount, types.ModuleName, newCoins)
+	if err != nil {
+		return err
+	}
+
+	// mint coin for exp module
+	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, newCoins)
+	if err != nil {
+		return nil
 	}
 
 	return nil
