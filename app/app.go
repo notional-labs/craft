@@ -957,7 +957,7 @@ func (app *CraftApp) setTxHandler(txConfig client.TxConfig, indexEventsStr []str
 		TxDecoder:         txConfig.TxDecoder(),
 		WasmConfig:        &wasmConfig,
 		TXCounterStoreKey: keys[wasm.StoreKey],
-		ChannelKeeper:     app.IBCKeeper.ChannelKeeper,
+		IBCKeeper:         app.IBCKeeper,
 	})
 	if err != nil {
 		panic(err)

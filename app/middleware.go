@@ -4,6 +4,7 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -39,11 +40,15 @@ func ComposeMiddlewares(txHandler tx.Handler, middlewares ...tx.Middleware) tx.H
 type TxHandlerOptions struct {
 	Debug bool
 
+	TxDecoder sdk.TxDecoder
+
 	authmiddleware.TxHandlerOptions
 	IBCKeeper         *keeper.Keeper
 	WasmConfig        *wasmTypes.WasmConfig
 	TXCounterStoreKey storetypes.StoreKey
-	MsgServiceRouter  *authmiddleware.MsgServiceRouter
+	LegacyRouter      sdk.Router
+	MsgServiceRouter  *middleware.MsgServiceRouter
+	IndexEvents       map[string]struct{}
 
 	AccountKeeper   authmiddleware.AccountKeeper
 	BankKeeper      types.BankKeeper
