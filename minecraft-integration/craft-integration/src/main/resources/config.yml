@@ -9,7 +9,6 @@ Redis:
   port: 6379
   password: ""
 TAX_RATE: 0.05
-API_ENDPOINT: https://lcd-osmosis.blockapsis.com/cosmos/bank/v1beta1
-TOKEN_FAUCET_ENDPOINT: "http://0.0.0.0:4500/"
-SERVER_WALLET_ADDRESS: osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p
-SIGNING_WEBAPP_LINK: https://127.0.0.1:8081
+API_ENDPOINT: http://65.108.125.182:1317/cosmos/bank/v1beta1
+SERVER_WALLET_ADDRESS: craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0
+SIGNING_WEBAPP_LINK: http://65.108.71.66:8081/

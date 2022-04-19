@@ -10,12 +10,15 @@ import {
     SigningStargateClient,
 } from '@cosmjs/stargate'
 
-// do not use Nodejs 17, nvm use 16.x.x
+// do not use Nodejs 17, nvm use 16.x.x. nvm run 16.13.1
 const request = require('request');
 
-// example redis key, osmo address is reece's for testing
-// set tx_osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p_0ce3e0e6-8e17-11ec-b909-0242ac120002 "{\"body\":{\"messages\":[{\"@type\":\"/cosmos.bank.v1beta1.MsgSend\",\"from_address\":\"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p\",\"to_address\":\"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p\",\"amount\":[{\"denom\":\"token\",\"amount\":\"0.01\"}]}],\"memo\":\"Tx1 is here\",\"timeout_height\":\"0\",\"extension_options\":[],\"non_critical_extension_options\":[]},\"auth_info\":{\"signer_infos\":[],\"fee\":{\"amount\":[],\"gas_limit\":\"200000\",\"payer\":\"\",\"granter\":\"\"}},\"signatures\":[]}"
-// set tx_osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p_7b6580dc-8e18-11ec-b909-0242ac120002 "{\"body\":{\"messages\":[{\"@type\":\"/cosmos.bank.v1beta1.MsgSend\",\"from_address\":\"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p\",\"to_address\":\"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p\",\"amount\":[{\"denom\":\"token\",\"amount\":\"0.02\"}]}],\"memo\":\"Tx2 desc is here\",\"timeout_height\":\"0\",\"extension_options\":[],\"non_critical_extension_options\":[]},\"auth_info\":{\"signer_infos\":[],\"fee\":{\"amount\":[],\"gas_limit\":\"200000\",\"payer\":\"\",\"granter\":\"\"}},\"signatures\":[]}"
+// npm install webpack-dev-server -g
+
+const name = "Craft Testnet v4"
+const CHAIN_ID = "craft-v4";
+const RPC_ENDPOINT = "http://65.108.125.182:26657/";
+const REST_ENDPOINT = "http://65.108.125.182:1317/";
 
 window.onload = async () => {
     // Keplr extension injects the offline signer that is compatible with cosmJS.
@@ -29,19 +32,19 @@ window.onload = async () => {
             try {
                 await window.keplr.experimentalSuggestChain({
                     // Chain-id of the Osmosis chain.
-                    chainId: "osmosis-1",
+                    chainId: CHAIN_ID,
                     // The name of the chain to be displayed to the user.
-                    chainName: "Osmosis mainnet",
+                    chainName: name,
                     // RPC endpoint of the chain. In this case we are using blockapsis, as it's accepts connections from any host currently. No Cors limitations.
-                    rpc: "https://rpc-osmosis.blockapsis.com",
+                    rpc: RPC_ENDPOINT,
                     // REST endpoint of the chain.
-                    rest: "https://lcd-osmosis.blockapsis.com",
+                    rest: REST_ENDPOINT,
                     // Staking coin information
                     stakeCurrency: {
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "OSMO",
+                        coinDenom: "EXP",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "uosmo",
+                        coinMinimalDenom: "uexp",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -56,36 +59,46 @@ window.onload = async () => {
                     // Bech32 configuration to show the address to user.
                     // This field is the interface of
                     bech32Config: {
-                        bech32PrefixAccAddr: "osmo",
-                        bech32PrefixAccPub: "osmopub",
-                        bech32PrefixValAddr: "osmovaloper",
-                        bech32PrefixValPub: "osmovaloperpub",
-                        bech32PrefixConsAddr: "osmovalcons",
-                        bech32PrefixConsPub: "osmovalconspub"
+                        bech32PrefixAccAddr: "craft",
+                        bech32PrefixAccPub: "craftpub",
+                        bech32PrefixValAddr: "craftvaloper",
+                        bech32PrefixValPub: "craftvaloperpub",
+                        bech32PrefixConsAddr: "craftvalcons",
+                        bech32PrefixConsPub: "craftvalconspub"
                     },
                     // List of all coin/tokens used in this chain.
                     currencies: [{
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "OSMO",
+                        coinDenom: "EXP",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "uosmo",
+                        coinMinimalDenom: "uexp",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
                         // coinGeckoId: ""
+                    },{
+                        // Coin denomination to be displayed to the user.
+                        coinDenom: "CRAFT",
+                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
+                        coinMinimalDenom: "ucraft",
+                        // # of decimal points to convert minimal denomination to user-facing denomination.
+                        coinDecimals: 6,
+                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
+                        // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
+                        coinGeckoId: "dig-chain"
                     }],
                     // List of coin/tokens used as a fee token in this chain.
                     feeCurrencies: [{
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "OSMO",
+                        coinDenom: "CRAFT",
                         // Actual denom (i.e. uosmo, uscrt) used by the blockchain.
-                        coinMinimalDenom: "uosmo",
+                        coinMinimalDenom: "ucraft",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-                        // coinGeckoId: ""
+                        coinGeckoId: "dig-chain"
                     }],
                     coinType: 118,
                     // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
@@ -103,15 +116,13 @@ window.onload = async () => {
         }
     }
 
-    const chainId = "osmosis-1";
-
     // You should request Keplr to enable the wallet.
     // This method will ask the user whether or not to allow access if they haven't visited this website.
     // Also, it will request user to unlock the wallet if the wallet is locked.
     // If you don't request enabling before usage, there is no guarantee that other methods will work.
-    await window.keplr.enable(chainId);
+    await window.keplr.enable(CHAIN_ID);
 
-    const offlineSigner = window.getOfflineSigner(chainId);
+    const offlineSigner = window.getOfflineSigner(CHAIN_ID);
 
     // You can get the address/public keys by `getAccounts` method.
     // It can return the array of address/public key.
@@ -125,7 +136,7 @@ window.onload = async () => {
 
     // Initialize the gaia api with the offline signer that is injected by Keplr extension.
     const cosmJS = new SigningCosmosClient(
-        "https://rpc-osmosis.blockapsis.com",
+        RPC_ENDPOINT,
         accounts[0].address,
         offlineSigner,
     );
@@ -137,7 +148,7 @@ window.onload = async () => {
     // });
     // document.getElementById("txs").append(tools.getKeys());
 
-    const myWallet = "osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"
+    const myWallet = accounts[0].address
     
     // https://api.crafteconomy.io/v1/tx/all/craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0
     request('https://api.crafteconomy.io/v1/tx/all/'+myWallet, { json: true }, (err, res, body) => {
@@ -160,7 +171,8 @@ window.onload = async () => {
                 <div class="card card-body">
                 <li>Desc: ${body[txID]["description"]}</li>
                 <li>Paying: ${body[txID]["to_address"]}</li>
-                <li>Amount: ${String(body[txID]["amount"])} ${body[txID]["denom"]} (in uosmo for testing)</li> 
+                <li>Amount: ${String(body[txID]["amount"])} ${body[txID]["denom"]}</li> 
+                <li>Tax: ${String(body[txID]["tax"]["amount"])} ${body[txID]["denom"]}</li> 
                 <li>ID: ${txID}</li> 
                 </div>
             </div>
@@ -172,10 +184,8 @@ window.onload = async () => {
                 // Shows the Tx Value
                 alert(JSON.stringify(body[txID]));
 
-                // makes osmo request
                 sendTx(
-                    body[txID]["to_address"], 
-                    // since we pass through OSMO value, we convert back to uosmo
+                    body[txID]["to_address"],                     
                     parseInt(body[txID]["amount"]), 
                     body[txID]["denom"],
                     txID,
@@ -245,14 +255,12 @@ function sendTx(recipient, amount, denom, txID, memo) {
     amount = Math.floor(amount);
 
     (async () => {
-        // See above.
-        const chainId = "osmosis-1";
-        await window.keplr.enable(chainId);
-        const offlineSigner = window.getOfflineSigner(chainId);
+        await window.keplr.enable(CHAIN_ID);
+        const offlineSigner = window.getOfflineSigner(CHAIN_ID);
         const accounts = await offlineSigner.getAccounts();
 
         const client = await SigningStargateClient.connectWithSigner(
-            "https://rpc-osmosis.blockapsis.com",
+            RPC_ENDPOINT,
             offlineSigner
         )
 
@@ -263,11 +271,12 @@ function sendTx(recipient, amount, denom, txID, memo) {
         const fee = {
             amount: [{
                 denom: denom,
-                amount: '5000',
+                amount: '4000',
             }, ],
             gas: '200000',
         }
         const result = await client.sendTokens(accounts[0].address, recipient, [amountFinal], fee, memo)
+        // TODO: Also add tax message here, which is paid to another address 
         // assertIsBroadcastTxSuccess(result)
 
         console.log(result);

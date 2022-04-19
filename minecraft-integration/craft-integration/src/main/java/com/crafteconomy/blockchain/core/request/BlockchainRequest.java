@@ -1,5 +1,6 @@
 package com.crafteconomy.blockchain.core.request;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
@@ -16,20 +17,15 @@ import org.json.JSONObject;
 public class BlockchainRequest {
     
     private static CraftBlockchainPlugin blockchainPlugin = CraftBlockchainPlugin.getInstance();
-
     private static RedisManager redisDB = blockchainPlugin.getRedis();
     private static String SERVER_ADDRESS = blockchainPlugin.getServersWalletAddress();
 
-    // http://IP:PORT/cosmos/bank/v1beta1
+    // http://65.108.125.182:1317/cosmos/bank/v1beta1
     private static final String API_ENDPOINT = blockchainPlugin.getApiEndpoint();
 
-    // osmosis endpoints (https://osmo.api.ping.pub/). Found via https://v1.cosmos.network/rpc/v0.41.4
-    // https://lcd-osmosis.blockapsis.com/cosmos/bank/v1beta1/balances/osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p/by_denom?denom=uosmo
+    // Found via https://v1.cosmos.network/rpc/v0.41.4
     private static final String BALANCES_ENDPOINT = API_ENDPOINT + "/balances/%address%/by_denom?denom=%denomination%";
-    private static final String SUPPLY_ENDPOINT = API_ENDPOINT + "/supply/%denomination%";
-    // TODO: For denominations in uosmo/ucraft, ensure to *1000000
-
-    private static final String TOKEN_DENOMINATION = blockchainPlugin.getTokenDenom(true);
+    private static final String SUPPLY_ENDPOINT = API_ENDPOINT + "/supply/by_denom?denom=%denomination%";
 
     // -= BALANCES =-
     public static long getBalance(String craft_address, String denomination) {
@@ -42,16 +38,19 @@ public class BlockchainRequest {
             return (long) cacheAmount; 
         }
         
+        // TODO: Add uexp as well, only show if >0 OR just loop through directly:
+        // http://65.108.125.182:1317/cosmos/bank/v1beta1/balances/craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0
+
         String req_url = BALANCES_ENDPOINT.replace("%address%", craft_address).replace("%denomination%", denomination);
 
-        long amount = Long.parseLong(EndpointQuery.req(req_url, RequestTypes.BALANCE, "Balance Web Request").toString());
+        long amount = Long.parseLong(EndpointQuery.req(req_url, RequestTypes.BALANCE, "Balance Request").toString());
 
         Caches.put(RequestTypes.BALANCE, craft_address, amount);
         return amount;
     }
 
     public static long getBalance(String craft_address) {
-        return getBalance(craft_address, TOKEN_DENOMINATION);
+        return getBalance(craft_address, "ucraft") / 1_000_000;
     }
 
 
@@ -63,14 +62,14 @@ public class BlockchainRequest {
         }
 
         String URL = SUPPLY_ENDPOINT.replace("%denomination%", denomination);
-        long supply = Long.parseLong(EndpointQuery.req(URL, RequestTypes.SUPPLY, "Total Supply Web Request").toString());
+        long supply = Long.parseLong(EndpointQuery.req(URL, RequestTypes.SUPPLY, "Total Supply Request").toString());
 
         Caches.put(RequestTypes.SUPPLY, denomination, supply);
         return supply;
     }
 
     public static long getTotalSupply() {
-        return getTotalSupply(TOKEN_DENOMINATION);
+        return getTotalSupply("ucraft");
     }
 
     // -= GIVING TOKENS =-
@@ -79,15 +78,31 @@ public class BlockchainRequest {
             return "NO_WALLET";
         }
 
-        String body = "{  \"address\": \""+craft_address+"\",  \"coins\": [    \""+amount+"token\"  ]}";
-        String log = "Faucet: " + craft_address + " " + amount;
-
-        if(CraftBlockchainPlugin.ENABLED_FAUCET == true) { // used since trying to request tokens from osmo would crash
-            return (String) EndpointQuery.req(CraftBlockchainPlugin.getInstance().getTokenFaucet(), RequestTypes.FAUCET, body, log);
-        } else {
-            return "";
-        }
+        // TODO: new, run a command through shell. THIS IS CURRENTLY ONLY FOR TESTING, DO NOT USE THIS IN PRODUCTION
+        // Ensure that wallet has funds
         
+        /*
+        craftd keys add test --recover --keyring-backend test
+        multiply security charge attack minor logic staff belt want mixture sick rebuild sadness canvas twelve mango embark emotion bulb popular remind rebel circle blouse
+        # craft1s4yczg3zgr4qdxussx3wpgezangh2388xgkkz9
+        */
+
+        // String[] args = new String[] {"craftd", "tx", "bank", "send", "test", craft_address, amount+"ucraft", "--keyring-backend", "test", "--yes", "--node", "http://65.108.125.182:26657", "--chain-id", "craft-v4"};
+        String[] args = ("craftd tx bank send test " + craft_address + " " + amount + "ucraft --keyring-backend test --yes --chain-id craft-v4 --node http://65.108.125.182:26657").split(" ");
+        try {
+            // get the Tx hash here to prove it worked?
+            Process process = new ProcessBuilder(args).start();
+            String result = new String(process.getInputStream().readAllBytes());
+            System.out.println(result);
+
+            String r2 = new String(process.getErrorStream().readAllBytes());
+            System.out.println(r2);
+
+            return "SUCCESS"; // return txhash in future            
+        } catch (IOException e) {
+            e.printStackTrace();            
+        }
+        return "FAILED";
     }
 
 
@@ -128,8 +143,7 @@ public class BlockchainRequest {
         return ErrorTypes.NO_ERROR;
     }
 
-    // TODO: Small value for now to make testing easier
-    private static String tokenDenom = blockchainPlugin.getTokenDenom(true);
+    // private static String tokenDenom = blockchainPlugin.getTokenDenom(true);
 
     /**
      * Generates a JSON object for a transaction used by the blockchain
@@ -140,14 +154,13 @@ public class BlockchainRequest {
      * @return String JSON Amino (Readable by webapp)
      */
     private static String generateJSONAminoTx(String FROM, String TO, long AMOUNT, String DESCRIPTION) {    
-        // TODO: long updatedAmount = AMOUNT * 1000000;
-        long updatedAmount = AMOUNT;  // less for testing purposes
+        long updatedAmount = AMOUNT * 1_000_000;  // converts craft -> ucraft value
         double taxAmount = updatedAmount * blockchainPlugin.getTaxRate();
         
         // EX: {"amount":"2","description":"Purchase Business License for 2","to_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p","tax":{"amount":0.1,"address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"},"denom":"uosmo","from_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"}
         
         // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
-        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"amount\": \""+updatedAmount+"\",\"denom\": \""+tokenDenom+"\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
+        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"amount\": \""+updatedAmount+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
         // System.out.println(v);
         return json;
     }

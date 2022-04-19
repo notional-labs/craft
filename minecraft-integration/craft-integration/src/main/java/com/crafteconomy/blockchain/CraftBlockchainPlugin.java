@@ -48,8 +48,6 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     private static MongoDB mongoDB;
 
-    public static long MAX_FAUCET_AMOUNT = 100_000; // TODO: Change to cryptography
-
     private Double TAX_RATE;
 
     private String SERVER_WALLET = null;
@@ -90,8 +88,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         TAX_RATE = getConfig().getDouble("TAX_RATE");
         if(TAX_RATE == null) TAX_RATE = 0.0;
 
-        if(getTokenFaucet() == null || getApiEndpoint() == null) {
-            getLogger().severe("Faucet token OR API endpoints not set in config.yml, disabling plugin");
+        if(getApiEndpoint() == null) {
+            getLogger().severe("API REST (lcd) endpoint not set in config.yml, disabling plugin");
             getPluginLoader().disablePlugin(this);
             return;
         }
@@ -190,7 +188,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     }
 
     public String getWalletPrefix() {        
-        return "osmo"; // TODO: Update -> ex. osmo or craft, make lowercase
+        return "craft"; 
     }
     public int getWalletLength() {    
         return 39 + getWalletPrefix().length();
@@ -211,8 +209,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     public String getTokenDenom(boolean smallerValue) {
         if(smallerValue) {
-            return "uosmo";
+            return "ucraft";
         }
-        return "osmo";
+        return "craft";
     }
 }

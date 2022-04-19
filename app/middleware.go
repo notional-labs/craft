@@ -3,15 +3,17 @@ package app
 import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/types/tx"
-	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	channelkeeper "github.com/cosmos/ibc-go/v3/modules/core/04-channel/keeper"
+
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/tx"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	authmiddleware "github.com/cosmos/cosmos-sdk/x/auth/middleware"
+	IBCKeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	ibcmiddleware "github.com/cosmos/ibc-go/v3/modules/core/middleware"
 )
 
@@ -39,25 +41,21 @@ func ComposeMiddlewares(txHandler tx.Handler, middlewares ...tx.Middleware) tx.H
 type TxHandlerOptions struct {
 	Debug bool
 
-	// TxDecoder is used to decode the raw tx bytes into a sdk.Tx.
 	TxDecoder sdk.TxDecoder
 
-	// IndexEvents defines the set of events in the form {eventType}.{attributeKey},
-	// which informs Tendermint what to index. If empty, all events will be indexed.
-	IndexEvents map[string]struct{}
+	authmiddleware.TxHandlerOptions
+	IBCKeeper         *IBCKeeper.Keeper
+	WasmConfig        *wasmTypes.WasmConfig
+	TXCounterStoreKey storetypes.StoreKey
+	LegacyRouter      sdk.Router
+	MsgServiceRouter  *middleware.MsgServiceRouter
+	IndexEvents       map[string]struct{}
 
-	LegacyRouter     sdk.Router
-	MsgServiceRouter *middleware.MsgServiceRouter
-
-	AccountKeeper   middleware.AccountKeeper
+	AccountKeeper   authmiddleware.AccountKeeper
 	BankKeeper      types.BankKeeper
-	FeegrantKeeper  middleware.FeegrantKeeper
+	FeegrantKeeper  authmiddleware.FeegrantKeeper
 	SignModeHandler authsigning.SignModeHandler
 	SigGasConsumer  func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
-
-	TXCounterStoreKey storetypes.StoreKey
-	WasmConfig        *wasmTypes.WasmConfig
-	ChannelKeeper     channelkeeper.Keeper
 }
 
 // NewDefaultTxHandler defines a TxHandler middleware stacks that should work
@@ -81,12 +79,12 @@ func NewDefaultTxHandler(options TxHandlerOptions) (tx.Handler, error) {
 
 	sigGasConsumer := options.SigGasConsumer
 	if sigGasConsumer == nil {
-		sigGasConsumer = middleware.DefaultSigVerificationGasConsumer
+		sigGasConsumer = authmiddleware.DefaultSigVerificationGasConsumer
 	}
 
 	return ComposeMiddlewares(
-		middleware.NewRunMsgsTxHandler(options.MsgServiceRouter, options.LegacyRouter),
-		middleware.NewTxDecoderMiddleware(options.TxDecoder),
+		authmiddleware.NewRunMsgsTxHandler(options.MsgServiceRouter, options.LegacyRouter),
+		authmiddleware.NewTxDecoderMiddleware(options.TxDecoder),
 		// Wasm Middleware
 		wasmkeeper.CountTxMiddleware(options.TXCounterStoreKey),
 		wasmkeeper.LimitSimulationGasMiddleware(options.WasmConfig.SimulationGasLimit),
@@ -95,21 +93,21 @@ func NewDefaultTxHandler(options TxHandlerOptions) (tx.Handler, error) {
 		// Make sure the Gas middleware is outside of all other middlewares
 		// that reads the GasMeter. In our case, the Recovery middleware reads
 		// the GasMeter to populate GasInfo.
-		middleware.GasTxMiddleware,
+		authmiddleware.GasTxMiddleware,
 		// Recover from panics. Panics outside of this middleware won't be
 		// caught, be careful!
-		middleware.RecoveryTxMiddleware,
+		authmiddleware.RecoveryTxMiddleware,
 		// Choose which events to index in Tendermint. Make sure no events are
 		// emitted outside of this middleware.
-		middleware.NewIndexEventsTxMiddleware(options.IndexEvents),
+		authmiddleware.NewIndexEventsTxMiddleware(options.IndexEvents),
 		// Reject all extension options which can optionally be included in the
 		// tx.
-		middleware.RejectExtensionOptionsMiddleware,
-		middleware.MempoolFeeMiddleware,
-		middleware.ValidateBasicMiddleware,
-		middleware.TxTimeoutHeightMiddleware,
-		middleware.ValidateMemoMiddleware(options.AccountKeeper),
-		middleware.ConsumeTxSizeGasMiddleware(options.AccountKeeper),
+		//		middleware.RejectExtensionOptionsMiddleware,
+		//middleware.MempoolFeeMiddleware,
+		authmiddleware.ValidateBasicMiddleware,
+		authmiddleware.TxTimeoutHeightMiddleware,
+		authmiddleware.ValidateMemoMiddleware(options.AccountKeeper),
+		authmiddleware.ConsumeTxSizeGasMiddleware(options.AccountKeeper),
 		// Wasm Middleware
 		wasmkeeper.CountTxMiddleware(options.TXCounterStoreKey),
 		wasmkeeper.LimitSimulationGasMiddleware(options.WasmConfig.SimulationGasLimit),
@@ -117,23 +115,23 @@ func NewDefaultTxHandler(options TxHandlerOptions) (tx.Handler, error) {
 		// ComposeMiddlewares godoc for details.
 		// `DeductFeeMiddleware` and `IncrementSequenceMiddleware` should be put outside of `WithBranchedStore` middleware,
 		// so their storage writes are not discarded when tx fails.
-		middleware.DeductFeeMiddleware(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
-		middleware.TxPriorityMiddleware,
-		middleware.SetPubKeyMiddleware(options.AccountKeeper),
-		middleware.ValidateSigCountMiddleware(options.AccountKeeper),
-		middleware.SigGasConsumeMiddleware(options.AccountKeeper, sigGasConsumer),
-		middleware.SigVerificationMiddleware(options.AccountKeeper, options.SignModeHandler),
-		middleware.IncrementSequenceMiddleware(options.AccountKeeper),
+		authmiddleware.DeductFeeMiddleware(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
+		//		middleware.TxPriorityMiddleware,
+		authmiddleware.SetPubKeyMiddleware(options.AccountKeeper),
+		authmiddleware.ValidateSigCountMiddleware(options.AccountKeeper),
+		authmiddleware.SigGasConsumeMiddleware(options.AccountKeeper, sigGasConsumer),
+		authmiddleware.SigVerificationMiddleware(options.AccountKeeper, options.SignModeHandler),
+		authmiddleware.IncrementSequenceMiddleware(options.AccountKeeper),
 		// Creates a new MultiStore branch, discards downstream writes if the downstream returns error.
 		// These kinds of middlewares should be put under this:
 		// - Could return error after messages executed successfully.
 		// - Storage writes should be discarded together when tx failed.
-		middleware.WithBranchedStore,
+		authmiddleware.WithBranchedStore,
 		// Consume block gas. All middlewares whose gas consumption after their `next` handler
 		// should be accounted for, should go below this middleware.
-		middleware.ConsumeBlockGasMiddleware,
-		middleware.NewTipMiddleware(options.BankKeeper),
+		authmiddleware.ConsumeBlockGasMiddleware,
+		authmiddleware.NewTipMiddleware(options.BankKeeper),
 		// Ibc v3 middleware
-		ibcmiddleware.IbcTxMiddleware(options.ChannelKeeper),
+		ibcmiddleware.IBCTxMiddleware(options.IBCKeeper),
 	), nil
 }

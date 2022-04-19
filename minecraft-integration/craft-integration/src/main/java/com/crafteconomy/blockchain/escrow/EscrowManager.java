@@ -71,8 +71,11 @@ public class EscrowManager {
         // Get the most the user can withdraw from CRAFT wallet or what they want, which would be the minimum of the 2
         amount = Math.min(api.getBalance(uuid), amount);
 
-        Tx tx = api.createServerTx(uuid, amount, "ESCROWING " + amount + "FOR " + uuid.toString(), depositEscrowLogic(uuid, amount));
-        tx.submit(true, true, true); // submit & send TxClickable, Description, & WebappLink
+        Tx tx = api.createServerTx(uuid, amount, "ESCROWING " + amount + "FOR " + uuid.toString(), depositEscrowLogic(uuid, amount));        
+        tx = tx.sendDescription().sendTxIDClickable().sendWebappLink();
+        tx.submit();
+
+
         return EscrowErrors.SUCCESS;
     }
 
