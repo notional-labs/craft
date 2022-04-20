@@ -44,7 +44,7 @@ func SetupTestingAppWithLevelDb(isCheckTx bool) (app *craftapp.CraftApp, cleanup
 	dir := "craft_testing"
 	encCdc := simapp.MakeTestEncodingConfig()
 
-	db, err := sdk.NewLevelDB("osmosis_leveldb_testing", dir)
+	db, err := sdk.NewLevelDB("leveldb_testing", dir)
 	if err != nil {
 		panic(err)
 	}
