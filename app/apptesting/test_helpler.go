@@ -38,13 +38,13 @@ func Setup(isCheckTx bool) *craftapp.CraftApp {
 	return app
 }
 
-// SetupTestingAppWithLevelDb initializes a new CraftApp intended for testing,
+// SetupTestingAppWithLevelDB initializes a new CraftApp intended for testing,
 // with LevelDB as a db.
-func SetupTestingAppWithLevelDb(isCheckTx bool) (app *craftapp.CraftApp, cleanupFn func()) {
+func SetupTestingAppWithLevelDB(isCheckTx bool) (app *craftapp.CraftApp, cleanupFn func()) {
 	dir := "craft_testing"
 	encCdc := simapp.MakeTestEncodingConfig()
 
-	db, err := sdk.NewLevelDB("leveldb_testing", dir)
+	db, err := dbm.NewDB("leveldb_testing", "goleveldb", dir)
 	if err != nil {
 		panic(err)
 	}
