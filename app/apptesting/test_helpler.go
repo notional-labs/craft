@@ -66,7 +66,10 @@ func SetupTestingAppWithLevelDb(isCheckTx bool) (app *craftapp.CraftApp, cleanup
 	}
 
 	cleanupFn = func() {
-		db.Close()
+		err = db.Close()
+		if err != nil {
+			panic(err)
+		}
 		err = os.RemoveAll(dir)
 		if err != nil {
 			panic(err)
