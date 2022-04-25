@@ -92,7 +92,6 @@ public class BlockchainRequest {
 
         // TODO: new, run a command through shell. THIS IS CURRENTLY ONLY FOR TESTING, DO NOT USE THIS IN PRODUCTION
         // This code & commands are also so yuck. Improve readability
-        // Ensure that wallet has funds? Make a script / discord notifications to send out notif when wallet funds get low
         
         /*
         TO NOT USE THESE MONIKERS, THEY ARE ONLY FOR PRIVATE TESTING
