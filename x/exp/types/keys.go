@@ -33,7 +33,9 @@ var (
 	// KeyMintRequestList defines key to store the MintRequestList .
 	KeyMintRequestList = []byte{0x03}
 	// KeyBurnRequestList defines key to store the BurnRequestList .
-	KeyBurnRequestList = []byte{0x03}
+	KeyBurnRequestList = []byte{0x04}
+	// KeyWhiteList defines key to store the WhiteList .
+	KeyWhiteList = []byte{0x05}
 )
 
 func GetMintRequestsStatusBytes(requestStatus int) (mintRequestsBytes []byte) {
@@ -62,6 +64,12 @@ func GetBurnRequestsStatusBytes(requestStatus int) (burnRequestsBytes []byte) {
 func GetBurnRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress) []byte {
 	var burnRequestsBytes = make([]byte, 8)
 	binary.BigEndian.PutUint64(KeyBurnRequestList, uint64(requestStatus))
+
+	return append(burnRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
+}
+
+func GetWhiteListByAddressBytes(addressRequest sdk.AccAddress) []byte {
+	var burnRequestsBytes = make([]byte, 8)
 
 	return append(burnRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
 }

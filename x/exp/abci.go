@@ -50,24 +50,20 @@ func BurnRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 }
 
 func MintRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
-	mintRequestList, err := keeper.GetMintRequestList(ctx)
-	if err != nil {
-		return nil
-	}
-	mintList := mintRequestList.MintRequestList
-	if len(mintList) == 0 {
+	mintListOnGoing := keeper.GetMintRequestsByStatus(ctx, int(types.StatusOnGoingRequest))
+	if len(mintListOnGoing) == 0 {
 		return nil
 	}
 
-	for i, mintRequst := range mintList {
-		if !keeper.ValidateMintRequestByTime(ctx, *mintRequst) {
+	for _, mintRequst := range mintListOnGoing {
+		if !keeper.ValidateMintRequestByTime(ctx, mintRequst) {
 			continue
 		}
 
-		m, _ := keeper.ExecuteMintExp(ctx, mintRequst)
-		mintList[i] = m
+		err := keeper.ExecuteMintExp(ctx, mintRequst)
+		if err != nil {
+			return err
+		}
 	}
-	mintRequestList.MintRequestList = mintList
-	keeper.SetMintRequestList(ctx, mintRequestList)
 	return nil
 }

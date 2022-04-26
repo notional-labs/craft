@@ -7,21 +7,12 @@ import (
 )
 
 func (k ExpKeeper) addAddressToBurnRequestList(ctx sdk.Context, memberAccount string, tokenLeft *sdk.Coin) error {
-	burnRequestList, err := k.GetBurnRequestList(ctx)
-	if err != nil {
-		return err
+	burnReques := types.BurnRequest{
+		Account:       memberAccount,
+		BurnTokenLeft: tokenLeft,
+		Status:        types.StatusOnGoingRequest,
 	}
-
-	burnRequestList.BurnRequestList = append(
-		burnRequestList.BurnRequestList,
-		&types.BurnRequest{
-			Account:       memberAccount,
-			BurnTokenLeft: tokenLeft,
-			Status:        types.StatusOnGoingRequest,
-		},
-	)
-
-	k.SetBurnRequestList(ctx, types.BurnRequestList{BurnRequestList: burnRequestList.BurnRequestList})
+	k.SetBurnRequest(ctx, burnReques)
 
 	return nil
 }
@@ -33,6 +24,7 @@ func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sd
 	}
 
 	stableTokenLeft := tokenLeft.Mul(expPrice)
+
 	mintRequest := types.MintRequest{
 		Account:        memberAccount.String(),
 		DaoTokenLeft:   tokenLeft,
@@ -339,13 +331,14 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest *types.BurnReques
 	k.BurnExpFromAccount(ctx, sdk.NewCoins(*burnRequest.BurnTokenLeft), burnAccount)
 	burnRequest.BurnTokenLeft = nil
 
+	k.SetBurnRequest(ctx, *burnRequest)
 	return burnRequest, nil
 }
 
-func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest *types.MintRequest) (*types.MintRequest, error) {
+func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest) error {
 	if mintRequest.DaoTokenMinted == sdk.NewDec(0) {
 		mintRequest.Status = types.StatusNoFundRequest
-		return mintRequest, nil
+		return nil
 	}
 
 	memberAccount, _ := sdk.AccAddressFromBech32(mintRequest.Account)
@@ -353,19 +346,19 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest *types.MintReques
 
 	err := k.addAddressToWhiteList(ctx, memberAccount, maxToken)
 	if err != nil {
-		return &types.MintRequest{}, err
+		return err
 	}
 
 	err = k.MintExpForAccount(ctx, sdk.NewCoins(maxToken), memberAccount)
 	if err != nil {
-		return &types.MintRequest{}, err
+		return err
 	}
 
 	if mintRequest.Status == types.StatusOnGoingRequest {
 		mintRequest.Status = types.StatusExpiredRequest
 	}
-
-	return mintRequest, nil
+	k.SetMintRequest(ctx, mintRequest)
+	return nil
 }
 
 // should modify .
