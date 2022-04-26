@@ -18,21 +18,23 @@ craftd config keyring-backend $KEYRING
 craftd config chain-id $CHAINID
 
 # if $KEY exists it should be deleted
-craftd keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO
-
+# decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry
+echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
+craftd keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO --recover
 # Set moniker and chain-id for Evmos (Moniker can be anything, chain-id must be an integer)
 craftd init $MONIKER --chain-id $CHAINID 
 
 # Set gas limit in genesis
 cat $HOME/.craftd/config/genesis.json | jq '.consensus_params["block"]["max_gas"]="100000000"' > $HOME/.craftd/config/tmp_genesis.json && mv $HOME/.craftd/config/tmp_genesis.json $HOME/.craftd/config/genesis.json
+cat $HOME/.craftd/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="15s"' > $HOME/.craftd/config/tmp_genesis.json && mv $HOME/.craftd/config/tmp_genesis.json $HOME/.craftd/config/genesis.json
 
 # Allocate genesis accounts (cosmos formatted addresses)
-craftd add-genesis-account $KEY 100000000000000000000000000stake --keyring-backend $KEYRING
+craftd add-genesis-account $KEY 100000000000000000000000000stake,10000000000token --keyring-backend $KEYRING
 
 # Sign genesis transaction
 craftd gentx $KEY 1000000000000000000000stake --keyring-backend $KEYRING --chain-id $CHAINID
 
-# Collect genesis tx
+Collect genesis tx
 craftd collect-gentxs
 
 # Run this to ensure everything worked and that the genesis file is setup correctly

@@ -172,7 +172,6 @@ func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, a
 
 func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, maxToken sdk.Coin) error {
 	whiteList := k.GetWhiteList(ctx)
-
 	for _, ar := range whiteList {
 		if ar.Account == memberAccount.String() {
 			return sdkerrors.Wrap(types.ErrDuplicate, "address already in whitelist")
@@ -182,7 +181,7 @@ func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccA
 	accountRecord := types.AccountRecord{
 		Account:     memberAccount.String(),
 		MaxToken:    &maxToken,
-		JoinDaoTime: time.Now(),
+		JoinDaoTime: ctx.BlockHeader().Time,
 	}
 
 	k.SetAccountRecord(ctx, memberAccount, accountRecord)

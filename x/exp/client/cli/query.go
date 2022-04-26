@@ -21,6 +21,7 @@ func GetQueryCmd() *cobra.Command {
 
 	cmd.AddCommand(
 		GetWhiteList(),
+		GetDaoAsset(),
 	)
 
 	return cmd
@@ -51,6 +52,34 @@ func GetWhiteList() *cobra.Command {
 	}
 	flags.AddQueryFlagsToCmd(cmd)
 	flags.AddPaginationFlagsToCmd(cmd, "white list")
+
+	return cmd
+}
+
+func GetDaoAsset() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "daoasset",
+		Short: "Query DAO asset",
+		Long:  strings.TrimSpace(fmt.Sprintf(`Query dao asset. etc`)),
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			ctx := cmd.Context()
+
+			res, err := queryClient.DaoAsset(ctx, &types.QueryDaoAssetRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintObjectLegacy(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }

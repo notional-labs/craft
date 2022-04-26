@@ -1,12 +1,12 @@
 {
   "messages": [
     {
-      "@type": "/craft.exp.v1beta1.MsgJoinDao",
-      "join_address": "craft1gdwmpjde9ke008jt7w2nt0d929vgh557uujje3",
+      "@type": "/craft.exp.v1beta1.MsgJoinDaoByIbcAsset",
+      "join_address": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl",
       "gov_address": "craft10d07y265gmmuvt4z0w9aw880jnsr700jm5qjn0",
-      "max_token": 100000
+      "amount": "1000000"
     }
   ],
   "metadata": "4pIMOgIGx1vZGU=", 
-  "deposit": "1000000000stake"
+  "deposit": "100000000000stake"
 }

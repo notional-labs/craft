@@ -54,7 +54,7 @@ func DefaultParams() Params {
 		Denom:            "uexp",
 		ClosePoolPeriod:  DefaultClosePoolPeriod,
 		VestingPeriodEnd: DefaultVestingPeriodEnd,
-		IbcAssetDenom:    "ucraft",
+		IbcAssetDenom:    "token",
 		BurnExpPeriod:    DefaultBurnPeriod,
 	}
 }
