@@ -105,25 +105,15 @@ func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAc
 }
 
 func (k ExpKeeper) burnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddress) error {
-	var newDaoInfo types.DaoInfo
+	whiteList := k.GetWhiteList(ctx)
 
-	daoInfo, err := k.GetDaoInfo(ctx)
-	if err != nil {
-		return err
-	}
-
-	whiteList := daoInfo.GetWhitelist()
-
-	for index, ar := range whiteList {
+	for _, ar := range whiteList {
 		if ar.Account == memberAccount.String() {
 			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
 			if ctx.BlockTime().Before(timeCheck) {
 				return sdkerrors.Wrap(types.ErrTimeOut, "exp in vesting time, cannot burn")
 			}
-			newDaoInfo = types.DaoInfo{
-				Whitelist: append(whiteList[:index], whiteList[index+1:]...),
-			}
-			k.SetDaoInfo(ctx, newDaoInfo)
+			k.RemoveRecord(ctx, memberAccount)
 			return nil
 		}
 	}
@@ -139,12 +129,10 @@ func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddre
 		return sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, daoAddress.String())
 	}
 
-	daoInfo, err := k.GetDaoInfo(ctx)
-	if err != nil {
-		return err
-	}
+	whiteList := k.GetWhiteList(ctx)
+
 	// check if dstAddress in whitelist .
-	for _, accountRecord := range daoInfo.Whitelist {
+	for _, accountRecord := range whiteList {
 		if dstAddress.String() == accountRecord.Account {
 			dstAddressBalances := k.bankKeeper.GetBalance(ctx, dstAddress, params.Denom)
 			// amount check
@@ -164,12 +152,9 @@ func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddre
 
 func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) error {
 	// check if dstAddress in whitelist .
-	daoInfo, err := k.GetDaoInfo(ctx)
-	if err != nil {
-		return err
-	}
+	whiteList := k.GetWhiteList(ctx)
 
-	for _, accountRecord := range daoInfo.Whitelist {
+	for _, accountRecord := range whiteList {
 		if memberAddress.String() == accountRecord.Account {
 			return nil
 		}
@@ -177,7 +162,7 @@ func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) 
 	return types.ErrAddressdNotFound
 }
 
-func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, ar *types.AccountRecord) error {
+func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, ar types.AccountRecord) error {
 	balance := k.bankKeeper.GetBalance(ctx, memberAccount, k.GetDenom(ctx))
 	if ar.MaxToken.Amount.Equal(balance.Amount) {
 		return types.ErrStaking
@@ -186,13 +171,7 @@ func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, a
 }
 
 func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, maxToken sdk.Coin) error {
-	var newDaoInfo types.DaoInfo
-
-	daoInfo, err := k.GetDaoInfo(ctx)
-	if err != nil {
-		return err
-	}
-	whiteList := daoInfo.GetWhitelist()
+	whiteList := k.GetWhiteList(ctx)
 
 	for _, ar := range whiteList {
 		if ar.Account == memberAccount.String() {
@@ -200,17 +179,14 @@ func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccA
 		}
 	}
 
-	accountRecord := &types.AccountRecord{
+	accountRecord := types.AccountRecord{
 		Account:     memberAccount.String(),
 		MaxToken:    &maxToken,
 		JoinDaoTime: time.Now(),
 	}
 
-	newDaoInfo = types.DaoInfo{
-		Whitelist: append(whiteList, accountRecord),
-	}
+	k.SetAccountRecord(ctx, memberAccount, accountRecord)
 
-	k.SetDaoInfo(ctx, newDaoInfo)
 	return nil
 }
 
@@ -227,16 +203,9 @@ func (k ExpKeeper) FundExpPool(ctx sdk.Context, amount sdk.Coins, sender sdk.Acc
 }
 
 func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk.AccAddress) error {
-	var newDaoInfo types.DaoInfo
+	whiteList := k.GetWhiteList(ctx)
 
-	daoInfo, err := k.GetDaoInfo(ctx)
-	if err != nil {
-		return err
-	}
-
-	whiteList := daoInfo.GetWhitelist()
-
-	for index, ar := range whiteList {
+	for _, ar := range whiteList {
 		if ar.Account == memberAccount.String() {
 			err := k.stakingCheck(ctx, memberAccount, ar)
 			if err != nil {
@@ -247,11 +216,8 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 			if ctx.BlockTime().Before(timeCheck) {
 				return sdkerrors.Wrap(types.ErrTimeOut, "exp in vesting time, cannot burn")
 			}
-			newDaoInfo = types.DaoInfo{
-				Whitelist: append(whiteList[:index], whiteList[index+1:]...),
-			}
 
-			k.SetDaoInfo(ctx, newDaoInfo)
+			k.RemoveRecord(ctx, memberAccount)
 			err = k.addAddressToBurnRequestList(ctx, ar.GetAccount(), ar.MaxToken)
 
 			if err != nil {
