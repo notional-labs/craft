@@ -22,7 +22,7 @@ service Query {
 
 message QueryWhiteListRequest {}
 message QueryWhiteListResponse {
-  repeated AccountRecord accountRecord = 1;
+  repeated AccountRecord accountRecord = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryDaoAssetRequest {}

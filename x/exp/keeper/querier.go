@@ -37,11 +37,9 @@ func queryParams(ctx sdk.Context, k ExpKeeper, legacyQuerierCdc *codec.LegacyAmi
 }
 
 func queryWhiteList(ctx sdk.Context, k ExpKeeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	daoInfo, err := k.GetDaoInfo(ctx)
-	if err != nil {
-		return nil, err
-	}
-	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, daoInfo)
+	whiteList := k.GetWhiteList(ctx)
+
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, whiteList)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

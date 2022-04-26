@@ -12,12 +12,9 @@ var _ types.QueryServer = ExpKeeper{}
 // Params returns params of the exp module.
 func (k ExpKeeper) WhiteList(c context.Context, _ *types.QueryWhiteListRequest) (*types.QueryWhiteListResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-	daoInfo, err := k.GetDaoInfo(ctx)
-	if err != nil {
-		return nil, err
-	}
+	whiteList := k.GetWhiteList(ctx)
 
-	return &types.QueryWhiteListResponse{AccountRecord: daoInfo.Whitelist}, nil
+	return &types.QueryWhiteListResponse{AccountRecord: &whiteList}, nil
 }
 
 func (k ExpKeeper) DaoAsset(c context.Context, _ *types.QueryDaoAssetRequest) (*types.QueryDaoAssetResponse, error) {

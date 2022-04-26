@@ -7,7 +7,7 @@ import (
 )
 
 // NewGenesisState creates a new GenesisState object .
-func NewGenesisState(whiteList []*AccountRecord, params Params, daoAssetInfo DaoAssetInfo) *GenesisState {
+func NewGenesisState(whiteList AccountRecords, params Params, daoAssetInfo DaoAssetInfo) *GenesisState {
 	return &GenesisState{
 		WhiteList: whiteList,
 		DaoAsset:  &daoAssetInfo,
@@ -25,8 +25,8 @@ func DefaultGenesisState() *GenesisState {
 	}
 
 	return &GenesisState{
-		WhiteList: []*AccountRecord{
-			&data,
+		WhiteList: []AccountRecord{
+			data,
 		},
 		DaoAsset: &DaoAssetInfo{
 			DaoTokenPrice: sdk.NewDec(1),
@@ -45,9 +45,9 @@ func ValidateGenesis(data GenesisState) error {
 	return ValidateWhiteList(data.WhiteList)
 }
 
-func ValidateWhiteList(whiteList []*AccountRecord) error {
+func ValidateWhiteList(whiteList []AccountRecord) error {
 	for _, accRecord := range whiteList {
-		err := ValidateAccoutRecord(*accRecord)
+		err := ValidateAccoutRecord(accRecord)
 		if err != nil {
 			return err
 		}

@@ -10,7 +10,11 @@ import (
 func InitGenesis(ctx sdk.Context, keeper keeper.ExpKeeper, ak types.AccountKeeper, data *types.GenesisState) {
 	keeper.SetParams(ctx, data.Params)
 	// set daoInfo
-	keeper.SetDaoInfo(ctx, types.DaoInfo{Whitelist: data.WhiteList})
+	for _, record := range data.WhiteList {
+		accAddress, _ := sdk.AccAddressFromBech32(record.GetAccount())
+		keeper.SetAccountRecord(ctx, accAddress, record)
+	}
+
 	keeper.SetDaoAssetInfo(ctx, *data.DaoAsset)
 	// set burn mint request list
 	keeper.SetBurnRequestList(ctx, types.BurnRequestList{})
@@ -22,7 +26,7 @@ func InitGenesis(ctx sdk.Context, keeper keeper.ExpKeeper, ak types.AccountKeepe
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func ExportGenesis(ctx sdk.Context, keeper keeper.ExpKeeper) *types.GenesisState {
 	params := keeper.GetParams(ctx)
-	daoInfo, _ := keeper.GetDaoInfo(ctx)
+	whiteList := keeper.GetWhiteList(ctx)
 	daoAssetInfo, _ := keeper.GetDaoAssetInfo(ctx)
-	return types.NewGenesisState(daoInfo.Whitelist, params, daoAssetInfo)
+	return types.NewGenesisState(whiteList, params, daoAssetInfo)
 }

@@ -69,7 +69,5 @@ func GetBurnRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress
 }
 
 func GetWhiteListByAddressBytes(addressRequest sdk.AccAddress) []byte {
-	var burnRequestsBytes = make([]byte, 8)
-
-	return append(burnRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
+	return append(KeyWhiteList, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
