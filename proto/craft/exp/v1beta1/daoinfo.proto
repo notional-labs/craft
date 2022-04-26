@@ -17,10 +17,6 @@ message AccountRecord {
   google.protobuf.Timestamp join_dao_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
-message DaoInfo {
-  repeated AccountRecord whitelist = 1 [ (gogoproto.moretags) = "yaml:\"dao_info\"" ];
-}
-
 message DaoAssetInfo{
   string dao_token_price = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
