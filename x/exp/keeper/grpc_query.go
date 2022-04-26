@@ -14,7 +14,7 @@ func (k ExpKeeper) WhiteList(c context.Context, _ *types.QueryWhiteListRequest) 
 	ctx := sdk.UnwrapSDKContext(c)
 	whiteList := k.GetWhiteList(ctx)
 
-	return &types.QueryWhiteListResponse{AccountRecord: &whiteList}, nil
+	return &types.QueryWhiteListResponse{AccountRecord: whiteList}, nil
 }
 
 func (k ExpKeeper) DaoAsset(c context.Context, _ *types.QueryDaoAssetRequest) (*types.QueryDaoAssetResponse, error) {
