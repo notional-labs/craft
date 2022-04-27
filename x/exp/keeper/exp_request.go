@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/notional-labs/craft/x/exp/types"
@@ -322,12 +320,10 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 }
 
 func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest) error {
-	fmt.Println(mintRequest)
 	if mintRequest.DaoTokenMinted == sdk.NewDec(0) {
 		mintRequest.Status = types.StatusNoFundRequest
 		return nil
 	}
-	fmt.Println(k.GetAllMintRequest(ctx))
 
 	memberAccount, _ := sdk.AccAddressFromBech32(mintRequest.Account)
 	maxToken := sdk.NewCoin(k.GetDenom(ctx), mintRequest.DaoTokenMinted.TruncateInt())

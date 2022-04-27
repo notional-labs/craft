@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -154,8 +153,6 @@ func (k msgServer) FundExpPool(goCtx context.Context, msg *types.MsgFundExpPool)
 }
 
 func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpendIbcAssetToExp) (*types.MsgSpendIbcAssetToExpResponse, error) {
-	fmt.Println("===========================================")
-	fmt.Println("what happend")
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	fromAddress, err := sdk.AccAddressFromBech32(msg.FromAddress)
@@ -163,10 +160,6 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("===========================================")
-	fmt.Println(k.GetIbcDenom(ctx))
-	fmt.Println(msg.Amount[0].Denom)
 
 	if len(msg.Amount) != 1 || msg.Amount[0].Denom != k.GetIbcDenom(ctx) {
 		return nil, types.ErrDenomNotMatch

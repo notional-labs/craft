@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -173,8 +172,6 @@ func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, a
 
 func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, maxToken sdk.Coin) error {
 	whiteList := k.GetWhiteList(ctx)
-	fmt.Println("=========whitelist=========")
-	fmt.Println(whiteList)
 	for _, ar := range whiteList {
 		if ar.Account == memberAccount.String() {
 			return sdkerrors.Wrap(types.ErrDuplicate, "address already in whitelist")
@@ -198,7 +195,6 @@ func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccA
 // module account.
 func (k ExpKeeper) FundPoolForExp(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error {
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amount); err != nil {
-		fmt.Println(err)
 		return err
 	}
 
@@ -242,7 +238,6 @@ func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 
 		err := k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), fromAddress)
 		if err != nil {
-			fmt.Println(err)
 			return err
 		}
 
@@ -261,7 +256,6 @@ func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(coin.Amount.ToDec())
 	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(coin.Amount.ToDec())
 
-	fmt.Println(mintRequest)
 	k.SetMintRequest(ctx, mintRequest)
 
 	return nil
