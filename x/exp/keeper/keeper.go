@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -164,7 +165,7 @@ func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) 
 
 func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, ar types.AccountRecord) error {
 	balance := k.bankKeeper.GetBalance(ctx, memberAccount, k.GetDenom(ctx))
-	if ar.MaxToken.Amount.Equal(balance.Amount) {
+	if !ar.MaxToken.Amount.Equal(balance.Amount) {
 		return types.ErrStaking
 	}
 	return nil
@@ -172,6 +173,8 @@ func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, a
 
 func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccAddress, maxToken sdk.Coin) error {
 	whiteList := k.GetWhiteList(ctx)
+	fmt.Println("=========whitelist=========")
+	fmt.Println(whiteList)
 	for _, ar := range whiteList {
 		if ar.Account == memberAccount.String() {
 			return sdkerrors.Wrap(types.ErrDuplicate, "address already in whitelist")
@@ -189,12 +192,13 @@ func (k ExpKeeper) addAddressToWhiteList(ctx sdk.Context, memberAccount sdk.AccA
 	return nil
 }
 
-// FundExpPool allows an account to directly fund the exp fund pool.
+// FundPoolForExp allows an account to directly fund the exp fund pool.
 // The amount is first added to the distribution module account and then directly
 // added to the pool. An error is returned if the amount cannot be sent to the
 // module account.
-func (k ExpKeeper) FundExpPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error {
+func (k ExpKeeper) FundPoolForExp(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error {
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amount); err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -228,41 +232,37 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 	return types.ErrAddressdNotFound
 }
 
-func (k ExpKeeper) executeMintRequest(ctx sdk.Context, fromAdress sdk.AccAddress, coin sdk.Coin) error {
-	mintList, err := k.GetMintRequestList(ctx)
-	if err != nil {
-		return err
-	}
+func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin) error {
+	mintRequest, _ := k.GetMintRequest(ctx, fromAddress)
+	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
 
-	mintRequestList := mintList.MintRequestList
+	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
 
-	for index, mintRequest := range mintRequestList {
-		if mintRequest.Status == types.StatusOnGoingRequest && mintRequest.Account == fromAdress.String() {
-			expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
-			if expWillGet.GTE(mintRequest.DaoTokenLeft) {
-				coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
+		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
 
-				err := k.FundExpPool(ctx, sdk.NewCoins(coinSpend), fromAdress)
-				if err != nil {
-					return err
-				}
-
-				mintRequest.DaoTokenLeft = sdk.NewDec(0)
-				mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
-				mintRequest.Status = types.StatusCompleteRequest
-			}
-			err := k.FundExpPool(ctx, sdk.NewCoins(coin), fromAdress)
-			if err != nil {
-				return err
-			}
-
-			mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Add(expWillGet.Neg())
-			mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(expWillGet)
+		err := k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), fromAddress)
+		if err != nil {
+			fmt.Println(err)
+			return err
 		}
-		mintRequestList[index] = mintRequest
-		mintList.MintRequestList = mintRequestList
-		k.SetMintRequestList(ctx, mintList)
-	}
 
-	return types.ErrWrongFundDenom
+		mintRequest.DaoTokenLeft = sdk.NewDec(0)
+		mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
+
+		k.RemoveMintRequest(ctx, mintRequest)
+		k.SetMintRequest(ctx, mintRequest)
+	}
+	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), fromAddress)
+	if err != nil {
+		return sdkerrors.Wrap(err, "fund error")
+	}
+	k.RemoveMintRequest(ctx, mintRequest)
+
+	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(coin.Amount.ToDec())
+	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(coin.Amount.ToDec())
+
+	fmt.Println(mintRequest)
+	k.SetMintRequest(ctx, mintRequest)
+
+	return nil
 }

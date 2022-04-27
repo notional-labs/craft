@@ -43,14 +43,16 @@ func GetMintRequestsStatusBytes(requestStatus int) (mintRequestsBytes []byte) {
 	mintRequestsBytes = make([]byte, 8)
 	binary.BigEndian.PutUint64(mintRequestsBytes, uint64(requestStatus))
 
-	return mintRequestsBytes
+	return append(KeyMintRequestList, mintRequestsBytes...)
 }
 
 func GetMintRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress) []byte {
 	var mintRequestsBytes = make([]byte, 8)
 	binary.BigEndian.PutUint64(mintRequestsBytes, uint64(requestStatus))
 
-	return append(mintRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
+	temp := append(mintRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
+	return append(KeyMintRequestList, temp...)
+
 }
 
 func GetBurnRequestsStatusBytes(requestStatus int) (burnRequestsBytes []byte) {
@@ -58,14 +60,15 @@ func GetBurnRequestsStatusBytes(requestStatus int) (burnRequestsBytes []byte) {
 	burnRequestsBytes = make([]byte, 8)
 	binary.BigEndian.PutUint64(burnRequestsBytes, uint64(requestStatus))
 
-	return burnRequestsBytes
+	return append(KeyBurnRequestList, burnRequestsBytes...)
 }
 
 func GetBurnRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress) []byte {
 	var burnRequestsBytes = make([]byte, 8)
 	binary.BigEndian.PutUint64(KeyBurnRequestList, uint64(requestStatus))
 
-	return append(burnRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
+	temp := append(burnRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
+	return append(KeyBurnRequestList, temp...)
 }
 
 func GetWhiteListByAddressBytes(addressRequest sdk.AccAddress) []byte {
