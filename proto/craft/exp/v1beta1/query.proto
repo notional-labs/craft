@@ -29,3 +29,13 @@ message QueryDaoAssetRequest {}
 message QueryDaoAssetResponse {
   DaoAssetInfo dao_asset = 1;
 }
+
+message QueryMintRequestListRequest {}
+message QueryMintRequestListRequestResponse {
+  repeated AccountRecord accountRecord = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryBurnRequestListRequest {}
+message QueryBurnRequestListRequestResponse {
+  DaoAssetInfo dao_asset = 1;
+}
