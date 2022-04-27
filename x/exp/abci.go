@@ -1,6 +1,7 @@
 package exp
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
@@ -25,32 +26,35 @@ func EndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) {
 }
 
 func BurnRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
-	burnListRequest, err := keeper.GetBurnRequestList(ctx)
-	if err != nil {
-		return err
-	}
+	burnList := keeper.GetBurnRequestsByStatus(ctx, int(types.StatusOnGoingRequest))
 
-	burnList := burnListRequest.BurnRequestList
+	fmt.Println("=========burn=========")
+	fmt.Println(burnList)
+	fmt.Println("==================")
+
 	if len(burnList) == 0 {
 		return nil
 	}
 
-	for i, burnRequest := range burnList {
-		if !keeper.ValidateBurnRequestByTime(ctx, *burnRequest) {
+	for _, burnRequest := range burnList {
+		if !keeper.ValidateBurnRequestByTime(ctx, burnRequest) {
 			continue
 		}
 
-		b, _ := keeper.ExecuteBurnExp(ctx, burnRequest)
-		burnList[i] = b
+		err := keeper.ExecuteBurnExp(ctx, burnRequest)
+		if err != nil {
+			return err
+		}
 	}
-	burnListRequest.BurnRequestList = burnList
-	keeper.SetBurnRequestList(ctx, burnListRequest)
 
 	return nil
 }
 
 func MintRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 	mintListOnGoing := keeper.GetMintRequestsByStatus(ctx, int(types.StatusOnGoingRequest))
+	fmt.Println("========mint==========")
+	fmt.Println(mintListOnGoing)
+	fmt.Println("==================")
 	if len(mintListOnGoing) == 0 {
 		return nil
 	}

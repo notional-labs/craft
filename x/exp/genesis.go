@@ -16,10 +16,6 @@ func InitGenesis(ctx sdk.Context, keeper keeper.ExpKeeper, ak types.AccountKeepe
 	}
 
 	keeper.SetDaoAssetInfo(ctx, *data.DaoAsset)
-	// set burn mint request list
-	keeper.SetBurnRequestList(ctx, types.BurnRequestList{})
-	keeper.SetMintRequestList(ctx, types.MintRequestList{})
-
 	ak.GetModuleAccount(ctx, types.ModuleName)
 }
 
