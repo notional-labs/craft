@@ -29,8 +29,11 @@ func NewTxCmd() *cobra.Command {
 func NewMintExpCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mintexp [dao_member_address] [amount]",
-		Short: `Mint exp for a dao member`,
-		Args:  cobra.ExactArgs(2),
+		Short: `Mint exp for a dao member, this only execute by DAO account`,
+		Long: `Mint exp for a dao member, this only execute by DAO account. [dao_member_address] should be on whitelist first.
+You can check DAO account address by following command:  craftd q params subspace exp daoAccount
+Also you can check whitelist by following command: 		craftd q exp whitelist`,
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -106,6 +109,7 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 	return cmd
 }
 
+// This func only for testing
 // func NewJoinDaoCmd() *cobra.Command {
 // 	cmd := &cobra.Command{
 // 		Use:   "join [dao_member_address]",
