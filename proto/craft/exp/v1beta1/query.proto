@@ -1,6 +1,7 @@
 syntax = "proto3";
 package craft.exp.v1beta1;
 
+import "craft/exp/v1beta1/exp_request.proto";
 import "craft/exp/v1beta1/daoinfo.proto";
 import "google/api/annotations.proto";
 import "gogoproto/gogo.proto";
@@ -18,6 +19,13 @@ service Query {
   rpc DaoAsset(QueryDaoAssetRequest) returns (QueryDaoAssetResponse){
     option (google.api.http).get = "/craft.exp.v1beta1/daoasset";
   }
+
+  rpc MintRequestList(QueryMintRequestListRequest) returns (QueryDaoAssetResponse){
+    option (google.api.http).get = "/craft.exp.v1beta1/mintrequests";
+  }
+  rpc BurnRequestList(QueryBurnRequestListRequest) returns (QueryBurnRequestListRequestResponse){
+    option (google.api.http).get = "/craft.exp.v1beta1/burnrequests";
+  }
 }
 
 message QueryWhiteListRequest {}
@@ -32,10 +40,10 @@ message QueryDaoAssetResponse {
 
 message QueryMintRequestListRequest {}
 message QueryMintRequestListRequestResponse {
-  repeated AccountRecord accountRecord = 1 [(gogoproto.nullable) = false];
+  repeated MintRequest mintrequests = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryBurnRequestListRequest {}
 message QueryBurnRequestListRequestResponse {
-  DaoAssetInfo dao_asset = 1;
+  repeated BurnRequest burnrequests = 1 [(gogoproto.nullable) = false];
 }
