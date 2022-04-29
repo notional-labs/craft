@@ -20,7 +20,7 @@ service Query {
     option (google.api.http).get = "/craft.exp.v1beta1/daoasset";
   }
 
-  rpc MintRequestList(QueryMintRequestListRequest) returns (QueryDaoAssetResponse){
+  rpc MintRequestList(QueryMintRequestListRequest) returns (QueryMintRequestListRequestResponse){
     option (google.api.http).get = "/craft.exp.v1beta1/mintrequests";
   }
   rpc BurnRequestList(QueryBurnRequestListRequest) returns (QueryBurnRequestListRequestResponse){
@@ -40,10 +40,10 @@ message QueryDaoAssetResponse {
 
 message QueryMintRequestListRequest {}
 message QueryMintRequestListRequestResponse {
-  repeated MintRequest mintrequests = 1 [(gogoproto.nullable) = false];
+  repeated MintRequest mint_requests = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryBurnRequestListRequest {}
 message QueryBurnRequestListRequestResponse {
-  repeated BurnRequest burnrequests = 1 [(gogoproto.nullable) = false];
+  repeated BurnRequest burn_requests = 1 [(gogoproto.nullable) = false];
 }

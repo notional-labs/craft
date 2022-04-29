@@ -22,6 +22,8 @@ func GetQueryCmd() *cobra.Command {
 	cmd.AddCommand(
 		GetWhiteList(),
 		GetDaoAsset(),
+		GetMintRequestList(),
+		GetBurnRequestList(),
 	)
 
 	return cmd
@@ -72,6 +74,62 @@ func GetDaoAsset() *cobra.Command {
 			ctx := cmd.Context()
 
 			res, err := queryClient.DaoAsset(ctx, &types.QueryDaoAssetRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintObjectLegacy(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetMintRequestList() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "mint_request",
+		Short: "Query mint request list ",
+		Long:  strings.TrimSpace(fmt.Sprintf(`Query mint request list. etc`)),
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			ctx := cmd.Context()
+
+			res, err := queryClient.MintRequestList(ctx, &types.QueryMintRequestListRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintObjectLegacy(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetBurnRequestList() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "burn_request",
+		Short: "Query burn request list ",
+		Long:  strings.TrimSpace(fmt.Sprintf(`Query burn request list. etc`)),
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			ctx := cmd.Context()
+
+			res, err := queryClient.BurnRequestList(ctx, &types.QueryBurnRequestListRequest{})
 			if err != nil {
 				return err
 			}
