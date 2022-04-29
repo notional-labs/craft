@@ -25,3 +25,15 @@ func (k ExpKeeper) DaoAsset(c context.Context, _ *types.QueryDaoAssetRequest) (*
 	}
 	return &types.QueryDaoAssetResponse{DaoAsset: &daoAssetInfo}, nil
 }
+
+func (k ExpKeeper) MintRequestList(c context.Context, _ *types.QueryMintRequestListRequest) (*types.QueryMintRequestListRequestResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	mintRequestList := k.GetAllMintRequest(ctx)
+	return &types.QueryMintRequestListRequestResponse{MintRequests: mintRequestList}, nil
+}
+
+func (k ExpKeeper) BurnRequestList(c context.Context, _ *types.QueryBurnRequestListRequest) (*types.QueryBurnRequestListRequestResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	burnRequestList := k.GetAllBurnRequests(ctx)
+	return &types.QueryBurnRequestListRequestResponse{BurnRequests: burnRequestList}, nil
+}
