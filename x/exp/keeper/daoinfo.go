@@ -55,7 +55,7 @@ func (k ExpKeeper) GetWhiteList(ctx sdk.Context) (records types.AccountRecords) 
 
 func (k ExpKeeper) SetAccountRecord(ctx sdk.Context, address sdk.AccAddress, record types.AccountRecord) {
 	store := ctx.KVStore(k.storeKey)
-	keys := types.GetWhiteListByAddressBytes(address)
+	keys := types.GetAccountRecordByAddressBytes(address)
 
 	bz := k.cdc.MustMarshal(&record)
 	store.Set(keys, bz)
@@ -63,7 +63,7 @@ func (k ExpKeeper) SetAccountRecord(ctx sdk.Context, address sdk.AccAddress, rec
 
 func (k ExpKeeper) RemoveRecord(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	keys := types.GetWhiteListByAddressBytes(address)
+	keys := types.GetAccountRecordByAddressBytes(address)
 
 	store.Delete(keys)
 }

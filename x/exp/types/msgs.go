@@ -184,6 +184,13 @@ func (m MsgFundExpPool) ValidateBasic() error {
 	return nil
 }
 
+func NewMsgFundExpPool(fromAddress string, amount sdk.Coins) *MsgFundExpPool {
+	return &MsgFundExpPool{
+		FromAddress: fromAddress,
+		Amount:      amount,
+	}
+}
+
 var _ sdk.Msg = &MsgSpendIbcAssetToExp{}
 
 // Route Implements Msg.

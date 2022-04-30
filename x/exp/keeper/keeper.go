@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -184,6 +185,7 @@ func (k ExpKeeper) FundPoolForExp(ctx sdk.Context, amount sdk.Coins, sender sdk.
 	return nil
 }
 
+// TODO: need change logic . don't loop whiteList
 func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk.AccAddress) error {
 	whiteList := k.GetWhiteList(ctx)
 
@@ -194,14 +196,13 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 				return err
 			}
 
-			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
-			if ctx.BlockTime().Before(timeCheck) {
-				return sdkerrors.Wrap(types.ErrTimeOut, "exp in vesting time, cannot burn")
-			}
+			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx))
 
+			if ctx.BlockTime().Before(timeCheck) {
+				return sdkerrors.Wrap(types.ErrTimeOut, fmt.Sprintf("exp in vesting time, cannot burn, UNLOCK TIME %s", timeCheck))
+			}
 			k.RemoveRecord(ctx, memberAccount)
 			err = k.addAddressToBurnRequestList(ctx, ar.GetAccount(), ar.MaxToken)
-
 			if err != nil {
 				return err
 			}

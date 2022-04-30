@@ -65,12 +65,13 @@ func GetBurnRequestsStatusBytes(requestStatus int) (burnRequestsBytes []byte) {
 
 func GetBurnRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress) []byte {
 	var burnRequestsBytes = make([]byte, 8)
-	binary.BigEndian.PutUint64(KeyBurnRequestList, uint64(requestStatus))
+
+	binary.BigEndian.PutUint64(burnRequestsBytes, uint64(requestStatus))
 
 	temp := append(burnRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
 	return append(KeyBurnRequestList, temp...)
 }
 
-func GetWhiteListByAddressBytes(addressRequest sdk.AccAddress) []byte {
+func GetAccountRecordByAddressBytes(addressRequest sdk.AccAddress) []byte {
 	return append(KeyWhiteList, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
