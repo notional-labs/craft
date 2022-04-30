@@ -4,6 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/notional-labs/craft/x/exp/types"
 )
@@ -171,4 +172,15 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 	}
 
 	return &types.MsgSpendIbcAssetToExpResponse{}, nil
+}
+
+func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDaoTokenPrice) (*types.MsgAdjustDaoTokenPriceResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	params := k.GetParams(ctx)
+
+	if params.DaoAccount != msg.FromAddress {
+		return nil, sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, msg.FromAddress)
+	}
+
 }

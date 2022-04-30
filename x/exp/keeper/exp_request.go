@@ -34,18 +34,15 @@ func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sd
 }
 
 // need modify for better performance .
-func (k ExpKeeper) calculateDaoTokenPrice(ctx sdk.Context) (sdk.Dec, error) {
-	asset, err := k.GetDaoAssetInfo(ctx)
-	if err != nil {
-		return sdk.NewDec(-1), err
-	}
+func (k ExpKeeper) GetDaoTokenPrice(ctx sdk.Context) sdk.Dec {
+	asset, _ := k.GetDaoAssetInfo(ctx)
 
-	return asset.DaoTokenPrice, nil
+	return asset.DaoTokenPrice
 }
 
 // calculate exp value by ibc asset .
 func (k ExpKeeper) calculateDaoTokenValue(ctx sdk.Context, amount sdk.Int) sdk.Dec {
-	daoTokenPrice, _ := k.calculateDaoTokenPrice(ctx)
+	daoTokenPrice := k.GetDaoTokenPrice(ctx)
 
 	return daoTokenPrice.MulInt(amount)
 }
@@ -320,6 +317,8 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 	k.BurnExpFromAccount(ctx, sdk.NewCoins(*burnRequest.BurnTokenLeft), burnAccount)
 	burnRequest.BurnTokenLeft = nil
 
+	k.RemoveBurnRequest(ctx, burnRequest)
+	burnRequest.Status = types.StatusCompleteRequest
 	k.SetBurnRequest(ctx, burnRequest)
 
 	return nil
@@ -362,8 +361,8 @@ func (k ExpKeeper) calculateStableTokenReturn(ctx sdk.Context, expCoin sdk.Coin)
 	if expCoin.Denom != k.GetDenom(ctx) {
 		return sdk.NewDec(0), types.ErrInputOutputMismatch
 	}
-	daoTokenPrice, _ := k.calculateDaoTokenPrice(ctx)
-	return daoTokenPrice.AddMut(expCoin.Amount.ToDec()), nil
+	daoTokenPrice := k.GetDaoTokenPrice(ctx)
+	return daoTokenPrice.Mul(expCoin.Amount.ToDec()), nil
 }
 
 func (k ExpKeeper) ValidateBurnRequestByTime(ctx sdk.Context, burnRequest types.BurnRequest) bool {

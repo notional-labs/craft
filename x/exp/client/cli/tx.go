@@ -23,6 +23,7 @@ func NewTxCmd() *cobra.Command {
 	txCmd.AddCommand(NewMintExpCmd())
 	txCmd.AddCommand(NewBurnExpCmd())
 	txCmd.AddCommand(NewSpendIbcAssetForExpCmd())
+	txCmd.AddCommand(NewFundToExpModule())
 	return txCmd
 }
 

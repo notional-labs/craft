@@ -229,3 +229,43 @@ func NewMsgSpendIbcAssetToExp(fromAddress string, amount sdk.Coins) *MsgSpendIbc
 		Amount:      amount,
 	}
 }
+
+var _ sdk.Msg = &MsgAdjustDaoTokenPrice{}
+
+// Route Implements Msg.
+func (m MsgAdjustDaoTokenPrice) Route() string { return sdk.MsgTypeURL(&m) }
+
+// Type Implements Msg.
+func (m MsgAdjustDaoTokenPrice) Type() string { return sdk.MsgTypeURL(&m) }
+
+// GetSigners returns the expected signers for a MsgAdjustDaoTokenPrice.
+func (m MsgAdjustDaoTokenPrice) GetSigners() []sdk.AccAddress {
+	fromAddr, err := sdk.AccAddressFromBech32(m.FromAddress)
+	if err != nil {
+		panic(err)
+	}
+
+	return []sdk.AccAddress{fromAddr}
+}
+
+// GetSignBytes Implements Msg.
+func (m MsgAdjustDaoTokenPrice) GetSignBytes() []byte {
+	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
+}
+
+// ValidateBasic does a sanity check on the provided data.
+func (m MsgAdjustDaoTokenPrice) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.FromAddress)
+	if err != nil {
+		return sdkerrors.Wrap(err, "join address must be valid address")
+	}
+	return nil
+}
+
+// NewMsgAdjustDaoTokenPrice create a new Msg.
+func NewMsgAdjustDaoTokenPrice(fromAddress string, price sdk.Dec) *MsgAdjustDaoTokenPrice {
+	return &MsgAdjustDaoTokenPrice{
+		FromAddress:   fromAddress,
+		DaoTokenPrice: price,
+	}
+}

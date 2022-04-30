@@ -499,52 +499,6 @@ func (m *MsgFundExpPoolResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgFundExpPoolResponse proto.InternalMessageInfo
 
-type MsgAdjustDaoTokenPrice struct {
-	// from_address defines the address who want adjust dao_token_price.
-	FromAddress   string                                 `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
-	DaoTokenPrice github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=dao_token_price,json=daoTokenPrice,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"dao_token_price"`
-}
-
-func (m *MsgAdjustDaoTokenPrice) Reset()         { *m = MsgAdjustDaoTokenPrice{} }
-func (m *MsgAdjustDaoTokenPrice) String() string { return proto.CompactTextString(m) }
-func (*MsgAdjustDaoTokenPrice) ProtoMessage()    {}
-func (*MsgAdjustDaoTokenPrice) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ea0f2c4d268ca6db, []int{10}
-}
-func (m *MsgAdjustDaoTokenPrice) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgAdjustDaoTokenPrice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgAdjustDaoTokenPrice.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgAdjustDaoTokenPrice) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgAdjustDaoTokenPrice.Merge(m, src)
-}
-func (m *MsgAdjustDaoTokenPrice) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgAdjustDaoTokenPrice) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgAdjustDaoTokenPrice.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgAdjustDaoTokenPrice proto.InternalMessageInfo
-
-func (m *MsgAdjustDaoTokenPrice) GetFromAddress() string {
-	if m != nil {
-		return m.FromAddress
-	}
-	return ""
-}
-
 type MsgSpendIbcAssetToExp struct {
 	// from_address defines the member who want fund.
 	FromAddress string                                   `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
@@ -555,7 +509,7 @@ func (m *MsgSpendIbcAssetToExp) Reset()         { *m = MsgSpendIbcAssetToExp{} }
 func (m *MsgSpendIbcAssetToExp) String() string { return proto.CompactTextString(m) }
 func (*MsgSpendIbcAssetToExp) ProtoMessage()    {}
 func (*MsgSpendIbcAssetToExp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ea0f2c4d268ca6db, []int{11}
+	return fileDescriptor_ea0f2c4d268ca6db, []int{10}
 }
 func (m *MsgSpendIbcAssetToExp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -605,7 +559,7 @@ func (m *MsgSpendIbcAssetToExpResponse) Reset()         { *m = MsgSpendIbcAssetT
 func (m *MsgSpendIbcAssetToExpResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSpendIbcAssetToExpResponse) ProtoMessage()    {}
 func (*MsgSpendIbcAssetToExpResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ea0f2c4d268ca6db, []int{12}
+	return fileDescriptor_ea0f2c4d268ca6db, []int{11}
 }
 func (m *MsgSpendIbcAssetToExpResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -634,6 +588,88 @@ func (m *MsgSpendIbcAssetToExpResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSpendIbcAssetToExpResponse proto.InternalMessageInfo
 
+type MsgAdjustDaoTokenPrice struct {
+	// from_address defines the address who want adjust dao_token_price.
+	FromAddress   string                                 `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	DaoTokenPrice github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=dao_token_price,json=daoTokenPrice,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"dao_token_price"`
+}
+
+func (m *MsgAdjustDaoTokenPrice) Reset()         { *m = MsgAdjustDaoTokenPrice{} }
+func (m *MsgAdjustDaoTokenPrice) String() string { return proto.CompactTextString(m) }
+func (*MsgAdjustDaoTokenPrice) ProtoMessage()    {}
+func (*MsgAdjustDaoTokenPrice) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ea0f2c4d268ca6db, []int{12}
+}
+func (m *MsgAdjustDaoTokenPrice) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAdjustDaoTokenPrice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAdjustDaoTokenPrice.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAdjustDaoTokenPrice) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAdjustDaoTokenPrice.Merge(m, src)
+}
+func (m *MsgAdjustDaoTokenPrice) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAdjustDaoTokenPrice) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAdjustDaoTokenPrice.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAdjustDaoTokenPrice proto.InternalMessageInfo
+
+func (m *MsgAdjustDaoTokenPrice) GetFromAddress() string {
+	if m != nil {
+		return m.FromAddress
+	}
+	return ""
+}
+
+type MsgAdjustDaoTokenPriceResponse struct {
+}
+
+func (m *MsgAdjustDaoTokenPriceResponse) Reset()         { *m = MsgAdjustDaoTokenPriceResponse{} }
+func (m *MsgAdjustDaoTokenPriceResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAdjustDaoTokenPriceResponse) ProtoMessage()    {}
+func (*MsgAdjustDaoTokenPriceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ea0f2c4d268ca6db, []int{13}
+}
+func (m *MsgAdjustDaoTokenPriceResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAdjustDaoTokenPriceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAdjustDaoTokenPriceResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAdjustDaoTokenPriceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAdjustDaoTokenPriceResponse.Merge(m, src)
+}
+func (m *MsgAdjustDaoTokenPriceResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAdjustDaoTokenPriceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAdjustDaoTokenPriceResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAdjustDaoTokenPriceResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgMintAndAllocateExp)(nil), "craft.exp.v1beta1.MsgMintAndAllocateExp")
 	proto.RegisterType((*MsgMintAndAllocateExpResponse)(nil), "craft.exp.v1beta1.MsgMintAndAllocateExpResponse")
@@ -645,59 +681,61 @@ func init() {
 	proto.RegisterType((*MsgJoinDaoByIbcAssetResponse)(nil), "craft.exp.v1beta1.MsgJoinDaoByIbcAssetResponse")
 	proto.RegisterType((*MsgFundExpPool)(nil), "craft.exp.v1beta1.MsgFundExpPool")
 	proto.RegisterType((*MsgFundExpPoolResponse)(nil), "craft.exp.v1beta1.MsgFundExpPoolResponse")
-	proto.RegisterType((*MsgAdjustDaoTokenPrice)(nil), "craft.exp.v1beta1.MsgAdjustDaoTokenPrice")
 	proto.RegisterType((*MsgSpendIbcAssetToExp)(nil), "craft.exp.v1beta1.MsgSpendIbcAssetToExp")
 	proto.RegisterType((*MsgSpendIbcAssetToExpResponse)(nil), "craft.exp.v1beta1.MsgSpendIbcAssetToExpResponse")
+	proto.RegisterType((*MsgAdjustDaoTokenPrice)(nil), "craft.exp.v1beta1.MsgAdjustDaoTokenPrice")
+	proto.RegisterType((*MsgAdjustDaoTokenPriceResponse)(nil), "craft.exp.v1beta1.MsgAdjustDaoTokenPriceResponse")
 }
 
 func init() { proto.RegisterFile("craft/exp/v1beta1/tx.proto", fileDescriptor_ea0f2c4d268ca6db) }
 
 var fileDescriptor_ea0f2c4d268ca6db = []byte{
-	// 697 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xdf, 0x4e, 0xd4, 0x4e,
-	0x14, 0xde, 0xb2, 0xf9, 0x11, 0x98, 0xfd, 0xa9, 0xa1, 0x41, 0x5c, 0x1a, 0xed, 0x42, 0x13, 0x75,
-	0x21, 0xb1, 0x05, 0x7c, 0x82, 0xae, 0x80, 0xc1, 0xa4, 0x86, 0xac, 0x44, 0x13, 0xbd, 0xd8, 0xcc,
-	0xb6, 0x43, 0x2d, 0xd0, 0x39, 0xb5, 0x33, 0xbb, 0x29, 0x6f, 0x61, 0xe2, 0x8d, 0x77, 0x26, 0x5e,
-	0x18, 0xc3, 0x0b, 0xf8, 0x0a, 0x5c, 0x72, 0x69, 0xbc, 0x00, 0x03, 0x2f, 0x62, 0x3a, 0xfd, 0xe3,
-	0x4a, 0xbb, 0xa1, 0x26, 0x9a, 0x78, 0xb5, 0x3b, 0x73, 0xbe, 0x73, 0xbe, 0x33, 0x67, 0xbe, 0xf9,
-	0x76, 0x91, 0x62, 0x87, 0x78, 0x97, 0x1b, 0x24, 0x0a, 0x8c, 0xe1, 0x6a, 0x9f, 0x70, 0xbc, 0x6a,
-	0xf0, 0x48, 0x0f, 0x42, 0xe0, 0x20, 0xcf, 0x88, 0x98, 0x4e, 0xa2, 0x40, 0x4f, 0x63, 0xca, 0xac,
-	0x0b, 0x2e, 0x88, 0xa8, 0x11, 0x7f, 0x4b, 0x80, 0x8a, 0x6a, 0x03, 0xf3, 0x81, 0x19, 0x7d, 0xcc,
-	0x48, 0x5e, 0xc6, 0x06, 0x8f, 0xa6, 0xf1, 0xf9, 0x24, 0xde, 0x4b, 0x12, 0x93, 0x45, 0x12, 0xd2,
-	0xbe, 0x48, 0xe8, 0xa6, 0xc5, 0x5c, 0xcb, 0xa3, 0xdc, 0xa4, 0x8e, 0x79, 0x70, 0x00, 0x36, 0xe6,
-	0x64, 0x23, 0x0a, 0x64, 0x1b, 0x4d, 0x62, 0x1f, 0x06, 0x94, 0x37, 0xa5, 0x85, 0x7a, 0xbb, 0xb1,
-	0x36, 0xaf, 0xa7, 0x89, 0x31, 0x4b, 0xd6, 0x90, 0xfe, 0x08, 0x3c, 0xda, 0x59, 0x39, 0x3e, 0x6d,
-	0xd5, 0x8e, 0xce, 0x5a, 0x6d, 0xd7, 0xe3, 0xaf, 0x07, 0x7d, 0xdd, 0x06, 0x3f, 0x65, 0x49, 0x3f,
-	0x1e, 0x30, 0x67, 0xdf, 0xe0, 0x87, 0x01, 0x61, 0x22, 0x81, 0x75, 0xd3, 0xd2, 0xf2, 0x22, 0xfa,
-	0x7f, 0x37, 0x04, 0xbf, 0x87, 0x1d, 0x27, 0x24, 0x8c, 0x35, 0x27, 0x16, 0xa4, 0xf6, 0x74, 0xb7,
-	0x11, 0xef, 0x99, 0xc9, 0x96, 0x3c, 0x87, 0x26, 0x7d, 0xe2, 0xf7, 0x49, 0xd8, 0xac, 0x8b, 0x60,
-	0xba, 0xd2, 0x5a, 0xe8, 0x4e, 0x69, 0xe3, 0x5d, 0xc2, 0x02, 0xa0, 0x8c, 0x68, 0x2f, 0xd0, 0x9c,
-	0xc5, 0xdc, 0xce, 0x20, 0xa4, 0x26, 0x75, 0xba, 0xc4, 0x87, 0x21, 0xb1, 0x44, 0x6a, 0x81, 0x55,
-	0x2a, 0xb2, 0x2a, 0x68, 0xca, 0x27, 0x1c, 0x3b, 0x98, 0xe3, 0xb4, 0xa9, 0x7c, 0xad, 0x2d, 0x20,
-	0xb5, 0xbc, 0x70, 0x4e, 0xfd, 0x49, 0x42, 0xb7, 0x2c, 0xe6, 0x3e, 0x01, 0x8f, 0xae, 0x63, 0xe8,
-	0x1c, 0x3e, 0x05, 0xba, 0xd5, 0xb7, 0x4d, 0xc6, 0x88, 0x38, 0xf2, 0x1e, 0x78, 0xf4, 0x32, 0x79,
-	0xbc, 0x97, 0x91, 0xb7, 0x50, 0xc3, 0x85, 0xe1, 0xa5, 0xa1, 0x20, 0x17, 0x86, 0x19, 0xe0, 0x31,
-	0x9a, 0xf6, 0x71, 0xd4, 0xe3, 0xb0, 0x4f, 0xa8, 0x18, 0x4b, 0xbd, 0xb3, 0x7c, 0x74, 0xd6, 0xba,
-	0x57, 0x61, 0xfe, 0x5b, 0x94, 0x77, 0xa7, 0x7c, 0x1c, 0xed, 0xc4, 0xb9, 0xda, 0x22, 0x6a, 0x8d,
-	0xe9, 0x33, 0x3f, 0xcb, 0x47, 0x09, 0xcd, 0x8e, 0x62, 0xfe, 0xe8, 0x41, 0x36, 0x73, 0x91, 0x89,
-	0xcb, 0xed, 0xe8, 0xb1, 0x92, 0xbe, 0x9d, 0x56, 0x3a, 0xc9, 0x3a, 0xb1, 0x33, 0x1d, 0x69, 0x2a,
-	0xba, 0x5d, 0xd6, 0x63, 0x7e, 0x88, 0xf7, 0x12, 0xba, 0x6e, 0x31, 0x77, 0x73, 0x40, 0x9d, 0x8d,
-	0x28, 0xd8, 0x06, 0x38, 0xa8, 0x22, 0x82, 0x9f, 0x4f, 0x60, 0xe2, 0xaf, 0x3d, 0x01, 0xad, 0x29,
-	0x64, 0x3a, 0xd2, 0x59, 0xde, 0xf4, 0x3b, 0x49, 0x84, 0x4c, 0x67, 0x6f, 0xc0, 0xf8, 0x3a, 0x06,
-	0x71, 0x65, 0xdb, 0xa1, 0x67, 0x93, 0x2a, 0xcd, 0x3f, 0x47, 0x37, 0x1c, 0x0c, 0x89, 0x46, 0x7a,
-	0x41, 0x9c, 0x95, 0xcc, 0xff, 0xb7, 0x67, 0x7c, 0xcd, 0x19, 0xa5, 0xd6, 0x3e, 0x24, 0x8e, 0xf1,
-	0x2c, 0x20, 0xd4, 0xc9, 0xe6, 0xbc, 0x03, 0xb1, 0x63, 0xfc, 0x2b, 0x13, 0x4d, 0x9c, 0xa1, 0xd8,
-	0x60, 0x36, 0xd8, 0xb5, 0xcf, 0xff, 0xa1, 0xba, 0xc5, 0x5c, 0x39, 0x40, 0x72, 0x89, 0xf1, 0xb5,
-	0xf5, 0x82, 0xef, 0xea, 0xa5, 0x4e, 0xa3, 0xac, 0x54, 0x45, 0x66, 0xcc, 0xf2, 0x21, 0x9a, 0xef,
-	0x92, 0x37, 0x03, 0xc2, 0x78, 0x6c, 0x1f, 0x71, 0xdb, 0x66, 0x7c, 0xef, 0x5e, 0x7c, 0xbd, 0xf2,
-	0x52, 0x79, 0xb9, 0x12, 0xa3, 0x51, 0x56, 0x2b, 0x43, 0x73, 0xea, 0x21, 0x9a, 0x2d, 0xf5, 0xa3,
-	0xe5, 0xf2, 0x52, 0x65, 0x58, 0x65, 0xad, 0x3a, 0x36, 0xe7, 0xf5, 0xd1, 0x4c, 0xd1, 0x3b, 0xee,
-	0x5f, 0x51, 0x28, 0x67, 0x34, 0x2a, 0x02, 0x73, 0xba, 0x57, 0xa8, 0xf1, 0xcb, 0x2b, 0x2f, 0xcf,
-	0x1f, 0x81, 0x28, 0x4b, 0x57, 0x42, 0xf2, 0xe2, 0x01, 0x92, 0x4b, 0x74, 0x3f, 0x46, 0x30, 0x45,
-	0xe4, 0x38, 0xc1, 0x8c, 0x97, 0x6a, 0xe7, 0xee, 0xf1, 0xb9, 0x2a, 0x9d, 0x9c, 0xab, 0xd2, 0xf7,
-	0x73, 0x55, 0x7a, 0x7b, 0xa1, 0xd6, 0x4e, 0x2e, 0xd4, 0xda, 0xd7, 0x0b, 0xb5, 0xf6, 0xb2, 0x11,
-	0x89, 0x7f, 0x0d, 0xe2, 0x01, 0xf4, 0x27, 0xc5, 0xaf, 0xf9, 0xc3, 0x1f, 0x01, 0x00, 0x00, 0xff,
-	0xff, 0x7b, 0xe7, 0xf4, 0x38, 0x4f, 0x08, 0x00, 0x00,
+	// 716 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xcf, 0x4e, 0xd4, 0x40,
+	0x1c, 0xde, 0xb2, 0xc9, 0x06, 0x66, 0x15, 0x43, 0x83, 0xb8, 0x34, 0xda, 0x85, 0x26, 0xea, 0x42,
+	0x62, 0x0b, 0xf8, 0x04, 0x5d, 0x01, 0x83, 0x49, 0x0d, 0x59, 0x89, 0x26, 0x7a, 0xd8, 0xcc, 0xb6,
+	0x43, 0x2d, 0xd0, 0x99, 0xda, 0x99, 0xdd, 0x94, 0xb7, 0x30, 0xf1, 0xc2, 0xcd, 0xc4, 0x83, 0x07,
+	0x5e, 0xc0, 0x57, 0xe0, 0xc8, 0xd1, 0x78, 0x00, 0x03, 0x2f, 0x62, 0x3a, 0x6d, 0xc7, 0x95, 0x9d,
+	0x95, 0x9a, 0x68, 0xe2, 0x09, 0x66, 0x7e, 0x7f, 0xbe, 0xef, 0x37, 0xfb, 0x7d, 0xbf, 0x14, 0x68,
+	0x6e, 0x0c, 0x77, 0x99, 0x85, 0x92, 0xc8, 0x1a, 0xac, 0xf6, 0x10, 0x83, 0xab, 0x16, 0x4b, 0xcc,
+	0x28, 0x26, 0x8c, 0xa8, 0x33, 0x3c, 0x66, 0xa2, 0x24, 0x32, 0xf3, 0x98, 0x36, 0xeb, 0x13, 0x9f,
+	0xf0, 0xa8, 0x95, 0xfe, 0x97, 0x25, 0x6a, 0xba, 0x4b, 0x68, 0x48, 0xa8, 0xd5, 0x83, 0x14, 0x89,
+	0x36, 0x2e, 0x09, 0x70, 0x1e, 0x9f, 0xcf, 0xe2, 0xdd, 0xac, 0x30, 0x3b, 0x64, 0x21, 0xe3, 0x8b,
+	0x02, 0x6e, 0x3b, 0xd4, 0x77, 0x02, 0xcc, 0x6c, 0xec, 0xd9, 0x07, 0x07, 0xc4, 0x85, 0x0c, 0x6d,
+	0x24, 0x91, 0xea, 0x82, 0x1a, 0x0c, 0x49, 0x1f, 0xb3, 0x86, 0xb2, 0x50, 0x6d, 0xd5, 0xd7, 0xe6,
+	0xcd, 0xbc, 0x30, 0x45, 0x29, 0x08, 0x99, 0x4f, 0x48, 0x80, 0xdb, 0x2b, 0x27, 0x67, 0xcd, 0xca,
+	0xf1, 0x79, 0xb3, 0xe5, 0x07, 0xec, 0x6d, 0xbf, 0x67, 0xba, 0x24, 0xcc, 0x51, 0xf2, 0x3f, 0x8f,
+	0xa8, 0xb7, 0x6f, 0xb1, 0xc3, 0x08, 0x51, 0x5e, 0x40, 0x3b, 0x79, 0x6b, 0x75, 0x11, 0xdc, 0xd8,
+	0x8d, 0x49, 0xd8, 0x85, 0x9e, 0x17, 0x23, 0x4a, 0x1b, 0x13, 0x0b, 0x4a, 0x6b, 0xaa, 0x53, 0x4f,
+	0xef, 0xec, 0xec, 0x4a, 0x9d, 0x03, 0xb5, 0x10, 0x85, 0x3d, 0x14, 0x37, 0xaa, 0x3c, 0x98, 0x9f,
+	0x8c, 0x26, 0xb8, 0x27, 0x25, 0xde, 0x41, 0x34, 0x22, 0x98, 0x22, 0xe3, 0x15, 0x98, 0x73, 0xa8,
+	0xdf, 0xee, 0xc7, 0xd8, 0xc6, 0x5e, 0x07, 0x85, 0x64, 0x80, 0x1c, 0x5e, 0x3a, 0x82, 0xaa, 0x8c,
+	0xa2, 0x6a, 0x60, 0x32, 0x44, 0x0c, 0x7a, 0x90, 0xc1, 0x9c, 0x94, 0x38, 0x1b, 0x0b, 0x40, 0x97,
+	0x37, 0x16, 0xd0, 0x9f, 0x15, 0x70, 0xc7, 0xa1, 0xfe, 0x33, 0x12, 0xe0, 0x75, 0x48, 0xda, 0x87,
+	0xcf, 0x09, 0xde, 0xea, 0xb9, 0x36, 0xa5, 0x88, 0x8f, 0xbc, 0x47, 0x02, 0x7c, 0x15, 0x3c, 0xbd,
+	0x2b, 0xc0, 0x9b, 0xa0, 0xee, 0x93, 0xc1, 0x95, 0x47, 0x01, 0x3e, 0x19, 0x14, 0x09, 0x4f, 0xc1,
+	0x54, 0x08, 0x93, 0x2e, 0x23, 0xfb, 0x08, 0xf3, 0x67, 0xa9, 0xb6, 0x97, 0x8f, 0xcf, 0x9b, 0x0f,
+	0x4a, 0xbc, 0xff, 0x16, 0x66, 0x9d, 0xc9, 0x10, 0x26, 0x3b, 0x69, 0xad, 0xb1, 0x08, 0x9a, 0x63,
+	0x78, 0x8a, 0x59, 0x3e, 0x29, 0x60, 0x76, 0x38, 0xe7, 0xaf, 0x0e, 0xb2, 0x29, 0x44, 0xc6, 0x7f,
+	0xdc, 0xb6, 0x99, 0x2a, 0xe9, 0xdb, 0x59, 0xa9, 0x49, 0xd6, 0x91, 0x5b, 0xe8, 0xc8, 0xd0, 0xc1,
+	0x5d, 0x19, 0x47, 0x31, 0xc4, 0x91, 0x02, 0xa6, 0x1d, 0xea, 0x6f, 0xf6, 0xb1, 0xb7, 0x91, 0x44,
+	0xdb, 0x84, 0x1c, 0x94, 0x11, 0xc1, 0x4f, 0x0b, 0x4c, 0xfc, 0x33, 0x0b, 0x18, 0x0d, 0x2e, 0xd3,
+	0x21, 0x66, 0x82, 0xf4, 0xc7, 0xcc, 0x9b, 0x2f, 0x22, 0x84, 0xbd, 0x62, 0xa2, 0x1d, 0x92, 0x7a,
+	0xf3, 0x7f, 0xe1, 0x9e, 0x79, 0x70, 0x94, 0xa0, 0x18, 0xe1, 0x83, 0xc2, 0xa7, 0xb3, 0xbd, 0xbd,
+	0x3e, 0x65, 0xeb, 0x90, 0x70, 0xd5, 0x6d, 0xc7, 0x81, 0x8b, 0xca, 0xcc, 0xf0, 0x12, 0xdc, 0xf2,
+	0x20, 0xc9, 0x64, 0xde, 0x8d, 0xd2, 0xaa, 0x4c, 0x42, 0x7f, 0x2c, 0x93, 0x9b, 0xde, 0x30, 0x74,
+	0x6e, 0x60, 0x09, 0xa9, 0x82, 0xf7, 0xda, 0x51, 0x0d, 0x54, 0x1d, 0xea, 0xab, 0x11, 0x50, 0x25,
+	0xab, 0xb1, 0x65, 0x8e, 0x6c, 0x66, 0x53, 0xba, 0x8b, 0xb4, 0x95, 0xb2, 0x99, 0x05, 0xb2, 0x7a,
+	0x08, 0xe6, 0x3b, 0xe8, 0x5d, 0x1f, 0x51, 0x96, 0x2e, 0x98, 0xf4, 0xb9, 0xed, 0x54, 0x19, 0x41,
+	0x4a, 0x54, 0x5d, 0x92, 0xb7, 0x93, 0xac, 0x22, 0x6d, 0xb5, 0x74, 0xaa, 0x80, 0x1e, 0x80, 0x59,
+	0xe9, 0xc6, 0x5a, 0x96, 0xb7, 0x92, 0xe5, 0x6a, 0x6b, 0xe5, 0x73, 0x05, 0x6e, 0x08, 0x66, 0x46,
+	0xb7, 0xcb, 0xc3, 0x6b, 0x1a, 0x09, 0x44, 0xab, 0x64, 0xa2, 0x80, 0x7b, 0x03, 0xea, 0xbf, 0xec,
+	0x01, 0x79, 0xfd, 0x50, 0x8a, 0xb6, 0x74, 0x6d, 0x8a, 0x68, 0x1e, 0x01, 0x55, 0xe2, 0xd7, 0x31,
+	0x82, 0x19, 0xcd, 0x1c, 0x27, 0x98, 0xf1, 0x16, 0x53, 0x31, 0x98, 0x16, 0x4a, 0xce, 0x9c, 0x35,
+	0x86, 0xae, 0x44, 0xef, 0xe3, 0x54, 0xf2, 0x1b, 0x6b, 0xb4, 0xef, 0x9f, 0x5c, 0xe8, 0xca, 0xe9,
+	0x85, 0xae, 0x7c, 0xbf, 0xd0, 0x95, 0xf7, 0x97, 0x7a, 0xe5, 0xf4, 0x52, 0xaf, 0x7c, 0xbd, 0xd4,
+	0x2b, 0xaf, 0xeb, 0x09, 0xff, 0x8e, 0xe1, 0xb6, 0xeb, 0xd5, 0xf8, 0xf7, 0xc5, 0xe3, 0x1f, 0x01,
+	0x00, 0x00, 0xff, 0xff, 0x54, 0x00, 0x08, 0x1a, 0xe1, 0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -718,6 +756,7 @@ type MsgClient interface {
 	JoinDaoByIbcAsset(ctx context.Context, in *MsgJoinDaoByIbcAsset, opts ...grpc.CallOption) (*MsgJoinDaoByIbcAssetResponse, error)
 	FundExpPool(ctx context.Context, in *MsgFundExpPool, opts ...grpc.CallOption) (*MsgFundExpPoolResponse, error)
 	SpendIbcAssetToExp(ctx context.Context, in *MsgSpendIbcAssetToExp, opts ...grpc.CallOption) (*MsgSpendIbcAssetToExpResponse, error)
+	AdjustDaoPrice(ctx context.Context, in *MsgAdjustDaoTokenPrice, opts ...grpc.CallOption) (*MsgAdjustDaoTokenPriceResponse, error)
 }
 
 type msgClient struct {
@@ -782,6 +821,15 @@ func (c *msgClient) SpendIbcAssetToExp(ctx context.Context, in *MsgSpendIbcAsset
 	return out, nil
 }
 
+func (c *msgClient) AdjustDaoPrice(ctx context.Context, in *MsgAdjustDaoTokenPrice, opts ...grpc.CallOption) (*MsgAdjustDaoTokenPriceResponse, error) {
+	out := new(MsgAdjustDaoTokenPriceResponse)
+	err := c.cc.Invoke(ctx, "/craft.exp.v1beta1.Msg/AdjustDaoPrice", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	MintAndAllocateExp(context.Context, *MsgMintAndAllocateExp) (*MsgMintAndAllocateExpResponse, error)
@@ -790,6 +838,7 @@ type MsgServer interface {
 	JoinDaoByIbcAsset(context.Context, *MsgJoinDaoByIbcAsset) (*MsgJoinDaoByIbcAssetResponse, error)
 	FundExpPool(context.Context, *MsgFundExpPool) (*MsgFundExpPoolResponse, error)
 	SpendIbcAssetToExp(context.Context, *MsgSpendIbcAssetToExp) (*MsgSpendIbcAssetToExpResponse, error)
+	AdjustDaoPrice(context.Context, *MsgAdjustDaoTokenPrice) (*MsgAdjustDaoTokenPriceResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -813,6 +862,9 @@ func (*UnimplementedMsgServer) FundExpPool(ctx context.Context, req *MsgFundExpP
 }
 func (*UnimplementedMsgServer) SpendIbcAssetToExp(ctx context.Context, req *MsgSpendIbcAssetToExp) (*MsgSpendIbcAssetToExpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SpendIbcAssetToExp not implemented")
+}
+func (*UnimplementedMsgServer) AdjustDaoPrice(ctx context.Context, req *MsgAdjustDaoTokenPrice) (*MsgAdjustDaoTokenPriceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdjustDaoPrice not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -927,6 +979,24 @@ func _Msg_SpendIbcAssetToExp_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_AdjustDaoPrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAdjustDaoTokenPrice)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AdjustDaoPrice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/craft.exp.v1beta1.Msg/AdjustDaoPrice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AdjustDaoPrice(ctx, req.(*MsgAdjustDaoTokenPrice))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "craft.exp.v1beta1.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -954,6 +1024,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SpendIbcAssetToExp",
 			Handler:    _Msg_SpendIbcAssetToExp_Handler,
+		},
+		{
+			MethodName: "AdjustDaoPrice",
+			Handler:    _Msg_AdjustDaoPrice_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1296,46 +1370,6 @@ func (m *MsgFundExpPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgAdjustDaoTokenPrice) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgAdjustDaoTokenPrice) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgAdjustDaoTokenPrice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size := m.DaoTokenPrice.Size()
-		i -= size
-		if _, err := m.DaoTokenPrice.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x12
-	if len(m.FromAddress) > 0 {
-		i -= len(m.FromAddress)
-		copy(dAtA[i:], m.FromAddress)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.FromAddress)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *MsgSpendIbcAssetToExp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1396,6 +1430,69 @@ func (m *MsgSpendIbcAssetToExpResponse) MarshalTo(dAtA []byte) (int, error) {
 }
 
 func (m *MsgSpendIbcAssetToExpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgAdjustDaoTokenPrice) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAdjustDaoTokenPrice) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAdjustDaoTokenPrice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.DaoTokenPrice.Size()
+		i -= size
+		if _, err := m.DaoTokenPrice.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.FromAddress) > 0 {
+		i -= len(m.FromAddress)
+		copy(dAtA[i:], m.FromAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.FromAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgAdjustDaoTokenPriceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAdjustDaoTokenPriceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAdjustDaoTokenPriceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1557,21 +1654,6 @@ func (m *MsgFundExpPoolResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgAdjustDaoTokenPrice) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.FromAddress)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = m.DaoTokenPrice.Size()
-	n += 1 + l + sovTx(uint64(l))
-	return n
-}
-
 func (m *MsgSpendIbcAssetToExp) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1592,6 +1674,30 @@ func (m *MsgSpendIbcAssetToExp) Size() (n int) {
 }
 
 func (m *MsgSpendIbcAssetToExpResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgAdjustDaoTokenPrice) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.FromAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.DaoTokenPrice.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgAdjustDaoTokenPriceResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2515,122 +2621,6 @@ func (m *MsgFundExpPoolResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgAdjustDaoTokenPrice) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgAdjustDaoTokenPrice: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgAdjustDaoTokenPrice: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FromAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DaoTokenPrice", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.DaoTokenPrice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *MsgSpendIbcAssetToExp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2774,6 +2764,172 @@ func (m *MsgSpendIbcAssetToExpResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgSpendIbcAssetToExpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAdjustDaoTokenPrice) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAdjustDaoTokenPrice: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAdjustDaoTokenPrice: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FromAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DaoTokenPrice", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DaoTokenPrice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAdjustDaoTokenPriceResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAdjustDaoTokenPriceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAdjustDaoTokenPriceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
