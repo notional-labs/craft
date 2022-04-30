@@ -8,5 +8,6 @@ const (
 	AttributeKeyBurnExp = "burnexp"
 	AttributeKeyJoinDao = "joindao"
 
-	AttributeMember = "member"
+	AttributeMember              = "member"
+	AttributeAdjustDaoTokenPrice = "adjust_price"
 )

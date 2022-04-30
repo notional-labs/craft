@@ -24,6 +24,7 @@ func NewTxCmd() *cobra.Command {
 	txCmd.AddCommand(NewBurnExpCmd())
 	txCmd.AddCommand(NewSpendIbcAssetForExpCmd())
 	txCmd.AddCommand(NewFundToExpModule())
+	txCmd.AddCommand(NewAdjustDaoTokenPrice())
 	return txCmd
 }
 
@@ -127,6 +128,33 @@ func NewFundToExpModule() *cobra.Command {
 			}
 
 			msg := types.NewMsgFundExpPool(clientCtx.GetFromAddress().String(), coins)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewAdjustDaoTokenPrice() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "adjust [price]",
+		Short: `adjust dao token price to [price] .`,
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			price, err := sdk.NewDecFromStr(args[0])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgAdjustDaoTokenPrice(clientCtx.GetFromAddress().String(), price)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},

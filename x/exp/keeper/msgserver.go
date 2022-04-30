@@ -101,7 +101,7 @@ func (k msgServer) JoinDaoByNonIbcAsset(goCtx context.Context, msg *types.MsgJoi
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeKeyJoinDao),
+			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyJoinDao),
 		),
 	)
 
@@ -123,7 +123,7 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeKeyMintExp),
+			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyMintExp),
 			sdk.NewAttribute(sdk.AttributeKeySender, joinAddress.String()),
 		),
 	)
@@ -146,7 +146,6 @@ func (k msgServer) FundExpPool(goCtx context.Context, msg *types.MsgFundExpPool)
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeKeyMintExp),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.FromAddress),
 		),
 	)
@@ -183,4 +182,21 @@ func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDao
 		return nil, sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, msg.FromAddress)
 	}
 
+	daoAssetInfo, err := k.GetDaoAssetInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	daoAssetInfo.DaoTokenPrice = msg.DaoTokenPrice
+	k.SetDaoAssetInfo(ctx, daoAssetInfo)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeAdjustDaoTokenPrice),
+			sdk.NewAttribute("new_price", daoAssetInfo.DaoTokenPrice.String()),
+		),
+	)
+
+	return &types.MsgAdjustDaoTokenPriceResponse{}, nil
 }

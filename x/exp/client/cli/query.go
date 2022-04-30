@@ -31,7 +31,7 @@ func GetQueryCmd() *cobra.Command {
 
 func GetWhiteList() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "whitelist",
+		Use:   "white_list",
 		Short: "Query whitelist",
 		Long:  strings.TrimSpace(fmt.Sprintf(`Query whitelist. etc`)),
 		Args:  cobra.ExactArgs(0),
@@ -60,7 +60,7 @@ func GetWhiteList() *cobra.Command {
 
 func GetDaoAsset() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "daoasset",
+		Use:   "dao_asset",
 		Short: "Query DAO asset",
 		Long:  strings.TrimSpace(fmt.Sprintf(`Query dao asset. etc`)),
 		Args:  cobra.ExactArgs(0),
