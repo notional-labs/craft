@@ -100,7 +100,7 @@ func (k msgServer) JoinDaoByNonIbcAsset(goCtx context.Context, msg *types.MsgJoi
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeKeyBurnExp),
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeKeyJoinDao),
 		),
 	)
 

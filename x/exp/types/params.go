@@ -10,16 +10,17 @@ import (
 
 // Exp params default values .
 const (
+	// MUST MODIFY IN GENESIS WHEN MAINNET
 	// After pass, ISO 8601 format for when they can no longer mint EXP from this proposal
 	// TODO: Justify our choice of default here.
-	DefaultClosePoolPeriod time.Duration = time.Minute * 5
+	DefaultClosePoolPeriod time.Duration = time.Minute * 1
 
 	// After pass, ISO 8601 format for when they can no longer burn EXP
 	// TODO: Justify our choice of default here.
-	DefaultVestingPeriodEnd time.Duration = time.Minute * 5
+	DefaultVestingPeriodEnd time.Duration = time.Minute * 1
 
 	// Burning time .
-	DefaultBurnPeriod time.Duration = time.Minute * 5
+	DefaultBurnPeriod time.Duration = time.Minute * 1
 )
 
 var (
@@ -50,7 +51,7 @@ func NewParams(maxCoinMint uint64, daoAccount string, denom string) Params {
 func DefaultParams() Params {
 	return Params{
 		MaxCoinMint:      uint64(10000000000),
-		DaoAccount:       "craft1pzsr988fmdrg2fez2mfz5r5pcxg2kcsmz89jwa",
+		DaoAccount:       "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl",
 		Denom:            "uexp",
 		ClosePoolPeriod:  DefaultClosePoolPeriod,
 		VestingPeriodEnd: DefaultVestingPeriodEnd,

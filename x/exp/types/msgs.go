@@ -122,7 +122,7 @@ func (m MsgJoinDaoByIbcAsset) Route() string { return sdk.MsgTypeURL(&m) }
 // Type Implements Msg.
 func (m MsgJoinDaoByIbcAsset) Type() string { return sdk.MsgTypeURL(&m) }
 
-// GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
+// GetSigners returns the expected signers for a MsgJoinDaoByIbcAsset.
 func (m MsgJoinDaoByIbcAsset) GetSigners() []sdk.AccAddress {
 	daoAccount, err := sdk.AccAddressFromBech32(m.GovAddress)
 	if err != nil {
@@ -160,7 +160,7 @@ func (m MsgFundExpPool) Route() string { return sdk.MsgTypeURL(&m) }
 // Type Implements Msg.
 func (m MsgFundExpPool) Type() string { return sdk.MsgTypeURL(&m) }
 
-// GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
+// GetSigners returns the expected signers for a MsgFundExpPool.
 func (m MsgFundExpPool) GetSigners() []sdk.AccAddress {
 	daoAccount, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {
@@ -192,7 +192,7 @@ func (m MsgSpendIbcAssetToExp) Route() string { return sdk.MsgTypeURL(&m) }
 // Type Implements Msg.
 func (m MsgSpendIbcAssetToExp) Type() string { return sdk.MsgTypeURL(&m) }
 
-// GetSigners returns the expected signers for a MsgBurnAndRemoveMember.
+// GetSigners returns the expected signers for a MsgSpendIbcAssetToExp.
 func (m MsgSpendIbcAssetToExp) GetSigners() []sdk.AccAddress {
 	fromAddr, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {

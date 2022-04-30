@@ -104,23 +104,6 @@ func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAc
 	return nil
 }
 
-func (k ExpKeeper) burnCoinAndExitDao(ctx sdk.Context, memberAccount sdk.AccAddress) error {
-	whiteList := k.GetWhiteList(ctx)
-
-	for _, ar := range whiteList {
-		if ar.Account == memberAccount.String() {
-			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
-			if ctx.BlockTime().Before(timeCheck) {
-				return sdkerrors.Wrap(types.ErrTimeOut, "exp in vesting time, cannot burn")
-			}
-			k.RemoveRecord(ctx, memberAccount)
-			return nil
-		}
-	}
-
-	return types.ErrAddressdNotFound
-}
-
 // verify Dao member: balances, whitelist .
 func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddress sdk.AccAddress) error {
 	params := k.GetParams(ctx)

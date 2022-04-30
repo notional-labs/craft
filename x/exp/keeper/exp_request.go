@@ -10,6 +10,7 @@ func (k ExpKeeper) addAddressToBurnRequestList(ctx sdk.Context, memberAccount st
 	burnReques := types.BurnRequest{
 		Account:       memberAccount,
 		BurnTokenLeft: tokenLeft,
+		RequestTime:   ctx.BlockTime(),
 		Status:        types.StatusOnGoingRequest,
 	}
 	k.SetBurnRequest(ctx, burnReques)
@@ -293,24 +294,29 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 
 	tokenReturn, _ := k.calculateStableTokenReturn(ctx, *burnRequest.BurnTokenLeft)
 
-	coin := sdk.NewCoin(k.GetIbcDenom(ctx), tokenReturn.TruncateInt())
-	coinModule := k.bankKeeper.GetBalance(ctx, k.accountKeeper.GetModuleAccount(ctx, types.ModuleName).GetAddress(), k.GetDenom(ctx))
-
-	if coin.IsGTE(coinModule) {
+	coinWilReceive := sdk.NewCoin(k.GetIbcDenom(ctx), tokenReturn.TruncateInt())
+	coinModule := k.bankKeeper.GetBalance(ctx, k.accountKeeper.GetModuleAccount(ctx, types.ModuleName).GetAddress(), k.GetIbcDenom(ctx))
+	// if coin module don't have money .
+	if coinModule.Amount == sdk.NewInt(0) {
+		return nil
+	}
+	// logic when amount in exp module < amount need pay to member
+	if coinWilReceive.IsGTE(coinModule) {
 		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, burnAccount, sdk.NewCoins(coinModule))
 		if err != nil {
 			return err
 		}
 
-		burnRequest.BurnTokenLeft.Amount = coin.SubAmount(coin.Amount).Amount
-		k.BurnExpFromAccount(ctx, sdk.NewCoins(coin), burnAccount)
+		burnRequest.BurnTokenLeft.Amount = coinWilReceive.Amount.Sub(coinModule.Amount)
+		k.BurnExpFromAccount(ctx, sdk.NewCoins(coinModule), burnAccount)
 		return nil
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, burnAccount, sdk.NewCoins(coin))
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, burnAccount, sdk.NewCoins(coinWilReceive))
 	if err != nil {
 		return nil
 	}
+
 	k.BurnExpFromAccount(ctx, sdk.NewCoins(*burnRequest.BurnTokenLeft), burnAccount)
 	burnRequest.BurnTokenLeft = nil
 
