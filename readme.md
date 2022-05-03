@@ -14,9 +14,18 @@ This chain is a DAO.
 ## Basic Dev Roadmap
 
 * ~~Testnet one makes sure that we got the vesting right and we didn't make a horrible mistake choosing SDK 0.46.0 and tm 0.35.1~~
-  * ibc-go v3.0.0
-  * cosmos-sdk v0.46.0
-  * x/wasm with support for ibc v3.0.0 and interchain accounts
+  * ~~ibc-go v3.0.0~~
+  * ~~cosmos-sdk v0.46.0~~
+  * ~~x/wasm with support for ibc v3.0.0 and interchain accounts~~
+
+
+Craft economy is functionally complete, and features:
+
+* group module daos
+* native cosmos NFTs
+* ibc v3 with interchain accounts
+* a novel dao construction that governs the chain 
+* integration with minecraft
 
 
 * More feature development occurs while tn one is running.  We will use tn one to provide feedback and insights to the sdk team.  Both Seahorse and An1 are looking into these versions, too.

@@ -44,6 +44,7 @@ public class EndpointQuery {
             if (httpResponse.getEntity() != null) {                
                 String html = EntityUtils.toString(httpResponse.getEntity());
 
+                
                 if (type == RequestTypes.FAUCET) {
                     Util.log("Faucet Request " + html);
                     return html; // {"transfers":[{"coin":"1token","status":"ok"}]}
@@ -51,6 +52,13 @@ public class EndpointQuery {
 
                 json = (JSONObject) parser.parse(html);            
                 
+                if(type == RequestTypes.ACCOUNT) {
+                    // http://65.108.125.182:1317/cosmos/auth/v1beta1/accounts/craft1s4yczg3zgr4qdxussx3wpgezangh2388xgkkz9
+                    System.out.println("JSON " + json);
+                    json = (JSONObject) json.get("account");                    
+                    return json.get("sequence").toString();
+                }
+
                 // gets the key based on the type's name, 
                 // so TotalSupply = amount. balance = balance
                 json = (JSONObject) json.get(type.json_key);

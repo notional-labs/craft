@@ -4,7 +4,6 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -12,6 +11,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+
 	authmiddleware "github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	IBCKeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	ibcmiddleware "github.com/cosmos/ibc-go/v3/modules/core/middleware"
@@ -48,7 +48,7 @@ type TxHandlerOptions struct {
 	WasmConfig        *wasmTypes.WasmConfig
 	TXCounterStoreKey storetypes.StoreKey
 	LegacyRouter      sdk.Router
-	MsgServiceRouter  *middleware.MsgServiceRouter
+	MsgServiceRouter  *authmiddleware.MsgServiceRouter
 	IndexEvents       map[string]struct{}
 
 	AccountKeeper   authmiddleware.AccountKeeper
