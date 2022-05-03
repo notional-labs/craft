@@ -19,7 +19,6 @@ func (k ExpKeeper) addAddressToBurnRequestList(ctx sdk.Context, memberAccount st
 }
 
 func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sdk.AccAddress, tokenLeft sdk.Dec) error {
-
 	mintRequest := types.MintRequest{
 		Account:        memberAccount.String(),
 		DaoTokenLeft:   tokenLeft,
@@ -167,7 +166,6 @@ func (k ExpKeeper) RemoveMintRequest(ctx sdk.Context, mintRequest types.MintRequ
 	accAddress, _ := sdk.AccAddressFromBech32(mintRequest.Account)
 	if store.Has(types.GetMintRequestAddressBytes(int(mintRequest.Status), accAddress)) {
 		store.Delete(types.GetMintRequestAddressBytes(int(mintRequest.Status), accAddress))
-
 	}
 }
 
@@ -346,7 +344,6 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 
 	if mintRequest.DaoTokenLeft == sdk.NewDec(0) {
 		mintRequest.Status = types.StatusCompleteRequest
-
 	} else {
 		mintRequest.Status = types.StatusExpiredRequest
 	}

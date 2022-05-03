@@ -39,7 +39,6 @@ var (
 )
 
 func GetMintRequestsStatusBytes(requestStatus int) (mintRequestsBytes []byte) {
-
 	mintRequestsBytes = make([]byte, 8)
 	binary.BigEndian.PutUint64(mintRequestsBytes, uint64(requestStatus))
 
@@ -47,16 +46,14 @@ func GetMintRequestsStatusBytes(requestStatus int) (mintRequestsBytes []byte) {
 }
 
 func GetMintRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress) []byte {
-	var mintRequestsBytes = make([]byte, 8)
+	mintRequestsBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(mintRequestsBytes, uint64(requestStatus))
 
 	temp := append(mintRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
 	return append(KeyMintRequestList, temp...)
-
 }
 
 func GetBurnRequestsStatusBytes(requestStatus int) (burnRequestsBytes []byte) {
-
 	burnRequestsBytes = make([]byte, 8)
 	binary.BigEndian.PutUint64(burnRequestsBytes, uint64(requestStatus))
 
@@ -64,7 +61,7 @@ func GetBurnRequestsStatusBytes(requestStatus int) (burnRequestsBytes []byte) {
 }
 
 func GetBurnRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress) []byte {
-	var burnRequestsBytes = make([]byte, 8)
+	burnRequestsBytes := make([]byte, 8)
 
 	binary.BigEndian.PutUint64(burnRequestsBytes, uint64(requestStatus))
 

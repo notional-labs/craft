@@ -156,7 +156,6 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	fromAddress, err := sdk.AccAddressFromBech32(msg.FromAddress)
-
 	if err != nil {
 		return nil, err
 	}

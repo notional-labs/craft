@@ -103,7 +103,7 @@ func NewDefaultTxHandler(options TxHandlerOptions) (tx.Handler, error) {
 		// Reject all extension options which can optionally be included in the
 		// tx.
 		//		middleware.RejectExtensionOptionsMiddleware,
-		//middleware.MempoolFeeMiddleware,
+		// middleware.MempoolFeeMiddleware,
 		authmiddleware.ValidateBasicMiddleware,
 		authmiddleware.TxTimeoutHeightMiddleware,
 		authmiddleware.ValidateMemoMiddleware(options.AccountKeeper),
