@@ -359,7 +359,7 @@ func (k ExpKeeper) calculateStableTokenReturn(ctx sdk.Context, expCoin sdk.Coin)
 		return sdk.NewDec(0), types.ErrInputOutputMismatch
 	}
 	daoTokenPrice := k.GetDaoTokenPrice(ctx)
-	return daoTokenPrice.Mul(expCoin.Amount().ToDec), nil
+	return daoTokenPrice.MulInt(expCoin.Amount), nil
 }
 
 func (k ExpKeeper) ValidateBurnRequestByTime(ctx sdk.Context, burnRequest types.BurnRequest) bool {
