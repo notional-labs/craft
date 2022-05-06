@@ -104,8 +104,8 @@ func (k ExpKeeper) setEndedBurnRequest(ctx sdk.Context, burnRequest types.BurnRe
 }
 
 // GetAllBurnRequest returns all the burn request from store .
-func (keeper ExpKeeper) GetAllBurnRequests(ctx sdk.Context) (burnRequests types.BurnRequests) {
-	keeper.IterateBurnRequests(ctx, func(burnRequest types.BurnRequest) bool {
+func (k ExpKeeper) GetAllBurnRequests(ctx sdk.Context) (burnRequests types.BurnRequests) {
+	k.IterateBurnRequests(ctx, func(burnRequest types.BurnRequest) bool {
 		burnRequests = append(burnRequests, burnRequest)
 		return false
 	})
@@ -131,7 +131,6 @@ func (k ExpKeeper) IterateBurnRequests(ctx sdk.Context, cb func(burnRequest type
 	}
 }
 
-// not good logic need modify
 func (k ExpKeeper) removeBurnRequest(ctx sdk.Context, burnRequest types.BurnRequest) {
 	store := ctx.KVStore(k.storeKey)
 	accAddress, _ := sdk.AccAddressFromBech32(burnRequest.Account)
@@ -148,9 +147,7 @@ func (k ExpKeeper) GetBurnRequestsByStatus(ctx sdk.Context, status int) (burnReq
 	return
 }
 
-// not good logic need modify
 func (k ExpKeeper) GetBurnRequest(ctx sdk.Context, accAddress sdk.AccAddress) (types.BurnRequest, error) {
-
 	return k.GetBurnRequestByKey(ctx, types.GetBurnRequestAddressBytes(accAddress))
 }
 
@@ -173,7 +170,6 @@ func (k ExpKeeper) IterateStatusBurnRequests(ctx sdk.Context, status int, cb fun
 	}
 }
 
-// not good logic need modify
 func (k ExpKeeper) removeMintRequest(ctx sdk.Context, mintRequest types.MintRequest) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -203,8 +199,8 @@ func (k ExpKeeper) GetMintRequestsByStatus(ctx sdk.Context, status int) (mintReq
 }
 
 // GetAllMintRequest returns all the MintRequest from store .
-func (keeper ExpKeeper) GetAllMintRequest(ctx sdk.Context) (mintRequests types.MintRequests) {
-	keeper.IterateMintRequest(ctx, func(mintRequest types.MintRequest) bool {
+func (k ExpKeeper) GetAllMintRequest(ctx sdk.Context) (mintRequests types.MintRequests) {
+	k.IterateMintRequest(ctx, func(mintRequest types.MintRequest) bool {
 		mintRequests = append(mintRequests, mintRequest)
 		return false
 	})
@@ -216,7 +212,6 @@ func (k ExpKeeper) setEndedMintRequest(ctx sdk.Context, mintRequest types.MintRe
 	bz := k.cdc.MustMarshal(&mintRequest)
 
 	accAddress, err := sdk.AccAddressFromBech32(mintRequest.Account)
-
 	if err != nil {
 		panic(err)
 	}

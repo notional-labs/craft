@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -40,7 +39,6 @@ func (k ExpKeeper) GetParams(ctx sdk.Context) (params types.Params) {
 
 // SetParams sets the exp module's parameters.
 func (k ExpKeeper) SetParams(ctx sdk.Context, params types.Params) {
-	fmt.Println(params)
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 

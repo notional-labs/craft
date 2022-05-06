@@ -183,31 +183,28 @@ func (k ExpKeeper) FundPoolForExp(ctx sdk.Context, amount sdk.Coins, sender sdk.
 	return nil
 }
 
-// TODO: need change logic . don't loop whiteList
 func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk.AccAddress) error {
-	whiteList := k.GetWhiteList(ctx)
+	ar := k.GetAccountRecord(ctx, memberAccount)
 
-	for _, ar := range whiteList {
-		if ar.Account == memberAccount.String() {
-			err := k.stakingCheck(ctx, memberAccount, ar)
-			if err != nil {
-				return err
-			}
-
-			timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx))
-
-			if ctx.BlockTime().Before(timeCheck) {
-				return sdkerrors.Wrap(types.ErrTimeOut, fmt.Sprintf("exp in vesting time, cannot burn, UNLOCK TIME %s", timeCheck))
-			}
-			k.RemoveRecord(ctx, memberAccount)
-			err = k.addAddressToBurnRequestList(ctx, ar.GetAccount(), ar.MaxToken)
-			if err != nil {
-				return err
-			}
-			return nil
-		}
+	if (ar == types.AccountRecord{}) {
+		return types.ErrAddressdNotFound
 	}
-	return types.ErrAddressdNotFound
+
+	err := k.stakingCheck(ctx, memberAccount, ar)
+	if err != nil {
+		return err
+	}
+	timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx))
+
+	if ctx.BlockTime().Before(timeCheck) {
+		return sdkerrors.Wrap(types.ErrTimeOut, fmt.Sprintf("exp in vesting time, cannot burn, UNLOCK TIME %s", timeCheck))
+	}
+	k.RemoveRecord(ctx, memberAccount)
+	err = k.addAddressToBurnRequestList(ctx, ar.GetAccount(), ar.MaxToken)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin) error {
@@ -215,7 +212,6 @@ func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
 
 	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
-
 		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
 
 		err := k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), fromAddress)

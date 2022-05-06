@@ -59,25 +59,3 @@ func queryAsset(ctx sdk.Context, k ExpKeeper, legacyQuerierCdc *codec.LegacyAmin
 
 	return res, nil
 }
-
-func queryMintRequests(ctx sdk.Context, k ExpKeeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	mintRequests := k.GetAllMintRequest(ctx)
-
-	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, mintRequests)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return res, nil
-}
-
-func queryBurnRequests(ctx sdk.Context, k ExpKeeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	burnRequests := k.GetAllBurnRequests(ctx)
-
-	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, burnRequests)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return res, nil
-}

@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -129,10 +128,6 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 	}
 
 	err = k.verifyAccountToWhiteList(ctx, joinAddress)
-	fmt.Println("=====================")
-	fmt.Println(err)
-	fmt.Println(k.GetWhiteList(ctx))
-	fmt.Println("=====================")
 
 	if err != nil {
 		return &types.MsgJoinDaoByIbcAssetResponse{}, err
