@@ -205,7 +205,6 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 		return err
 	}
 	return nil
-
 }
 
 func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin) error {
