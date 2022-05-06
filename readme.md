@@ -2,7 +2,7 @@
 **craft** is a DAO that operates minecraft server(s).
 
 
-## How it work:
+## How it works:
 
 This chain is a DAO.
 
@@ -33,7 +33,13 @@ Craft economy is functionally complete, and features:
   * The second testnet will be used to look into the minecraft integrations and overall product quality
 * Testnet3, is hopefully a brief affair that leads directly into mainnet, with a feature freeze starting at the launch of tn2.  
 
-## EXP Governance
+</br>
+
+# Airdrop-Repo
+### https://github.com/notional-labs/craft-airdrop
+</br>
+
+# EXP Governance
  - Tax/Revenue paid directly to a wallet (automation with modulewallet in future)
  - Taxes are "optional" in game (If not paid in time, lose that item/asset you were paying tax on).
 
