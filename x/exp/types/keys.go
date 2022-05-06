@@ -1,8 +1,6 @@
 package types
 
 import (
-	"encoding/binary"
-
 	"github.com/cosmos/cosmos-sdk/types/address"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,7 +19,8 @@ const (
 	QueryDaoAsset   = "daoasset"
 )
 
-// MintRequest key in kvstore is : KeyMintRequest + Status + AddressByte
+// MintRequest key in kvstore is : KeyMintRequest + AddressByte
+// BurnRequest key in kvstore is : KeyBurnRequest + AddressByte
 
 var (
 	// ExpKey is the key to use for the keeper store .
@@ -34,39 +33,28 @@ var (
 	KeyMintRequestList = []byte{0x03}
 	// KeyBurnRequestList defines key to store the BurnRequestList .
 	KeyBurnRequestList = []byte{0x04}
+	// KeyMintRequestList defines key to store the CompletedMintRequest .
+	KeyCompletedMintRequest = []byte{0x05}
+	// KeyBurnRequestList defines key to store the CompletedBurnRequest .
+	KeyCompletedBurnRequest = []byte{0x06}
 	// KeyWhiteList defines key to store the WhiteList .
-	KeyWhiteList = []byte{0x05}
+	KeyWhiteList = []byte{0x07}
 )
 
-func GetMintRequestsStatusBytes(requestStatus int) (mintRequestsBytes []byte) {
-	mintRequestsBytes = make([]byte, 8)
-	binary.BigEndian.PutUint64(mintRequestsBytes, uint64(requestStatus))
-
-	return append(KeyMintRequestList, mintRequestsBytes...)
+func GetMintRequestAddressBytes(addressRequest sdk.AccAddress) (mintRequestsBytes []byte) {
+	return append(KeyMintRequestList, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 
-func GetMintRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress) []byte {
-	mintRequestsBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(mintRequestsBytes, uint64(requestStatus))
-
-	temp := append(mintRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
-	return append(KeyMintRequestList, temp...)
+func GetCompletedMintRequestByAddressBytes(addressRequest sdk.AccAddress) []byte {
+	return append(KeyCompletedMintRequest, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 
-func GetBurnRequestsStatusBytes(requestStatus int) (burnRequestsBytes []byte) {
-	burnRequestsBytes = make([]byte, 8)
-	binary.BigEndian.PutUint64(burnRequestsBytes, uint64(requestStatus))
-
-	return append(KeyBurnRequestList, burnRequestsBytes...)
+func GetBurnRequestAddressBytes(addressRequest sdk.AccAddress) (mintRequestsBytes []byte) {
+	return append(KeyBurnRequestList, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 
-func GetBurnRequestAddressBytes(requestStatus int, addressRequest sdk.AccAddress) []byte {
-	burnRequestsBytes := make([]byte, 8)
-
-	binary.BigEndian.PutUint64(burnRequestsBytes, uint64(requestStatus))
-
-	temp := append(burnRequestsBytes, address.MustLengthPrefix(addressRequest.Bytes())...)
-	return append(KeyBurnRequestList, temp...)
+func GetCompletedBurnRequestByAddressBytes(addressRequest sdk.AccAddress) []byte {
+	return append(KeyCompletedBurnRequest, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 
 func GetAccountRecordByAddressBytes(addressRequest sdk.AccAddress) []byte {

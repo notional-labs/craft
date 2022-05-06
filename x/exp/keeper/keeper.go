@@ -3,7 +3,6 @@ package keeper
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -123,8 +122,7 @@ func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddre
 			if dstAddressBalances.Amount.GT(accountRecord.MaxToken.Amount) {
 				return types.ErrInputOutputMismatch
 			}
-			// vesting time check, give one day for DAO sign
-			timeCheck := accountRecord.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
+			timeCheck := accountRecord.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx))
 			if ctx.BlockTime().After(timeCheck) {
 				return types.ErrTimeOut
 			}
@@ -228,7 +226,6 @@ func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 		mintRequest.DaoTokenLeft = sdk.NewDec(0)
 		mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
 
-		k.RemoveMintRequest(ctx, mintRequest)
 		k.SetMintRequest(ctx, mintRequest)
 	}
 	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), fromAddress)
