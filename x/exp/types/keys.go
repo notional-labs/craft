@@ -57,6 +57,6 @@ func GetEndedBurnRequestKey(addressRequest sdk.AccAddress) []byte {
 	return append(KeyCompletedBurnRequest, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 
-func GetAccountRecordByAddressBytes(addressRequest sdk.AccAddress) []byte {
+func GetAccountRecordKey(addressRequest sdk.AccAddress) []byte {
 	return append(KeyWhiteList, address.MustLengthPrefix(addressRequest.Bytes())...)
 }

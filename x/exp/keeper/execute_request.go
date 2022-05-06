@@ -5,7 +5,6 @@ import (
 	"github.com/notional-labs/craft/x/exp/types"
 )
 
-// not good logic need modify
 func (k ExpKeeper) GetMintRequest(ctx sdk.Context, accAddress sdk.AccAddress) (types.MintRequest, error) {
 	return k.GetMintRequestByKey(ctx, types.GetMintRequestAddressBytes(accAddress))
 }
@@ -52,7 +51,7 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 		return err
 	}
 
-	//set burn request state
+	// set burn request state
 	burnRequest.BurnTokenLeft = nil
 	burnRequest.Status = types.StatusCompleteRequest
 
