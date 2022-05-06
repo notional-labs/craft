@@ -303,8 +303,8 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 		}
 
 		burnRequest.BurnTokenLeft.Amount = coinWilReceive.Amount.Sub(coinModule.Amount)
-		k.BurnExpFromAccount(ctx, sdk.NewCoins(coinModule), burnAccount)
-		return nil
+		return k.BurnExpFromAccount(ctx, sdk.NewCoins(coinModule), burnAccount)
+
 	}
 
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, burnAccount, sdk.NewCoins(coinWilReceive))
@@ -312,7 +312,11 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 		return nil
 	}
 
-	k.BurnExpFromAccount(ctx, sdk.NewCoins(*burnRequest.BurnTokenLeft), burnAccount)
+	err = k.BurnExpFromAccount(ctx, sdk.NewCoins(*burnRequest.BurnTokenLeft), burnAccount)
+	if err != nil {
+		return err
+	}
+
 	burnRequest.BurnTokenLeft = nil
 
 	k.RemoveBurnRequest(ctx, burnRequest)
