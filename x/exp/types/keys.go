@@ -45,7 +45,7 @@ func GetMintRequestAddressBytes(addressRequest sdk.AccAddress) (mintRequestsByte
 	return append(KeyMintRequestList, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 
-func GetCompletedMintRequestByAddressBytes(addressRequest sdk.AccAddress) []byte {
+func GetEndedMintRequestKey(addressRequest sdk.AccAddress) []byte {
 	return append(KeyCompletedMintRequest, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 
@@ -53,7 +53,7 @@ func GetBurnRequestAddressBytes(addressRequest sdk.AccAddress) (mintRequestsByte
 	return append(KeyBurnRequestList, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 
-func GetCompletedBurnRequestByAddressBytes(addressRequest sdk.AccAddress) []byte {
+func GetEndedBurnRequestKey(addressRequest sdk.AccAddress) []byte {
 	return append(KeyCompletedBurnRequest, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
 

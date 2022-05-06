@@ -232,7 +232,7 @@ func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 	if err != nil {
 		return sdkerrors.Wrap(err, "fund error")
 	}
-	k.RemoveMintRequest(ctx, mintRequest)
+	k.removeMintRequest(ctx, mintRequest)
 	decCoin := sdk.NewDecFromInt(coin.Amount)
 
 	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)

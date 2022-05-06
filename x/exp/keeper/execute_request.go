@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/notional-labs/craft/x/exp/types"
 )
@@ -17,7 +19,7 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 	}
 
 	if burnRequest.BurnTokenLeft.Amount == sdk.NewInt(0) {
-		k.RemoveBurnRequest(ctx, burnRequest)
+		k.removeBurnRequest(ctx, burnRequest)
 		burnRequest.Status = types.StatusCompleteRequest
 		k.SetBurnRequest(ctx, burnRequest)
 	}
@@ -26,10 +28,11 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 
 	coinWilReceive := sdk.NewCoin(k.GetIbcDenom(ctx), tokenReturn.TruncateInt())
 	coinModule := k.bankKeeper.GetBalance(ctx, k.accountKeeper.GetModuleAccount(ctx, types.ModuleName).GetAddress(), k.GetIbcDenom(ctx))
-	// if coin module don't have money .
+	// if coin module don't have money return err .
 	if coinModule.Amount == sdk.NewInt(0) {
 		return nil
 	}
+
 	// logic when amount in exp module < amount need pay to member
 	if coinWilReceive.IsGTE(coinModule) {
 		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, burnAccount, sdk.NewCoins(coinModule))
@@ -51,18 +54,18 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 		return err
 	}
 
+	//set burn request state
 	burnRequest.BurnTokenLeft = nil
-
-	k.RemoveBurnRequest(ctx, burnRequest)
 	burnRequest.Status = types.StatusCompleteRequest
-	k.SetBurnRequest(ctx, burnRequest)
 
+	k.completeBurnRequest(ctx, burnRequest)
 	return nil
 }
 
 func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest) error {
 	if mintRequest.DaoTokenMinted == sdk.NewDec(0) {
 		mintRequest.Status = types.StatusNoFundRequest
+		k.completeMintRequest(ctx, mintRequest)
 		return nil
 	}
 
@@ -78,7 +81,6 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 	if err != nil {
 		return err
 	}
-	k.RemoveMintRequest(ctx, mintRequest)
 
 	if mintRequest.DaoTokenLeft == sdk.NewDec(0) {
 		mintRequest.Status = types.StatusCompleteRequest
@@ -86,7 +88,11 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 		mintRequest.Status = types.StatusExpiredRequest
 	}
 
-	k.SetMintRequest(ctx, mintRequest)
+	k.completeMintRequest(ctx, mintRequest)
+	fmt.Println("==============================")
+	fmt.Println(k.GetWhiteList(ctx))
+	fmt.Println(k.GetAllMintRequest(ctx))
+	fmt.Println("==============================")
 
 	return nil
 }
