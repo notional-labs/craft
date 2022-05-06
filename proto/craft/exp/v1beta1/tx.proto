@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package craft.exp.v1beta1;
+
+option go_package = "x/exp/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+
+
+// Msg is the cosmos.group.v1 Msg service.
+service Msg {
+    rpc MintAndAllocateExp(MsgMintAndAllocateExp) returns (MsgMintAndAllocateExpResponse);
+    rpc RequestBurnCoinAndExitDao(MsgBurnAndRemoveMember) returns (MsgBurnAndRemoveMemberResponse);
+    rpc JoinDaoByNonIbcAsset(MsgJoinDaoByNonIbcAsset) returns (MsgJoinDaoByNonIbcAssetResponse);
+    rpc JoinDaoByIbcAsset(MsgJoinDaoByIbcAsset) returns (MsgJoinDaoByIbcAssetResponse);
+    rpc FundExpPool(MsgFundExpPool) returns (MsgFundExpPoolResponse);
+    rpc SpendIbcAssetToExp(MsgSpendIbcAssetToExp) returns (MsgSpendIbcAssetToExpResponse);
+    rpc AdjustDaoPrice(MsgAdjustDaoTokenPrice) returns (MsgAdjustDaoTokenPriceResponse);
+}
+
+message MsgMintAndAllocateExp {
+  repeated cosmos.base.v1beta1.Coin amount = 1 
+    [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+
+  //string FromAdd
+  string from_address = 2;
+
+  // members defines the Dao members address.
+  string member = 3 ;
+
+}
+
+message MsgMintAndAllocateExpResponse {}
+
+// MsgBurnAndRemoveMember 
+message MsgBurnAndRemoveMember {
+   // from_address defines the member who want exit Dao and get their money.
+  string from_address = 1 ;
+
+  // metadata is any arbitrary metadata to attached.
+  string metadata = 2;
+}
+
+message MsgBurnAndRemoveMemberResponse{}
+
+// MsgBurnAndRemoveMember 
+message MsgJoinDaoByNonIbcAsset {
+  // join_address defines the member who want join Dao.
+  string join_address = 1 ;
+  // gov_address defines the gov chain address.
+  string gov_address = 2;
+  // max_coin_mint is maximum exp can be mint.
+  int64 max_token = 3 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Int"] ;
+}
+
+message MsgJoinDaoByNonIbcAssetResponse{}
+
+message MsgJoinDaoByIbcAsset{
+  // join_address defines the member who want join Dao.
+  string join_address = 1 ;
+  string gov_address = 2;
+  string amount = 3 
+  [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];
+}
+
+message MsgJoinDaoByIbcAssetResponse{}
+
+message MsgFundExpPool {
+    // from_address defines the member who want fund.
+  string from_address = 1 ;
+  repeated cosmos.base.v1beta1.Coin amount = 2 
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+}
+
+message MsgFundExpPoolResponse {}
+
+message MsgSpendIbcAssetToExp{
+  // from_address defines the member who want fund.
+  string from_address = 1 ;
+  repeated cosmos.base.v1beta1.Coin amount = 2 
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  
+}
+
+message MsgSpendIbcAssetToExpResponse{}
+
+message MsgAdjustDaoTokenPrice{
+  // from_address defines the address who want adjust dao_token_price.
+  string from_address = 1 ;
+  string dao_token_price = 2
+  [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];
+}
+
+message MsgAdjustDaoTokenPriceResponse{}

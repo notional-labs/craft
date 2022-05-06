@@ -157,8 +157,12 @@ import (
 	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
 
 	// API documentation.
-
 	appparameters "github.com/notional-labs/craft/app/params"
+
+	// Exp module .
+	"github.com/notional-labs/craft/x/exp"
+	expkeeper "github.com/notional-labs/craft/x/exp/keeper"
+	exptypes "github.com/notional-labs/craft/x/exp/types"
 )
 
 const (
@@ -242,6 +246,7 @@ var (
 		vesting.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
+		exp.AppModuleBasic{},
 	)
 
 	// module account permissions.
@@ -256,6 +261,7 @@ var (
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		icatypes.ModuleName:            nil,
 		wasm.ModuleName:                {authtypes.Burner},
+		exptypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -311,7 +317,7 @@ type CraftApp struct {
 	EvidenceKeeper      evidencekeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 	WasmKeeper          wasm.Keeper
-
+	ExpKeeper           expkeeper.ExpKeeper
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper      capabilitykeeper.ScopedKeeper
@@ -381,6 +387,7 @@ func NewCraftApp(
 		nftkeeper.StoreKey,
 		group.StoreKey,
 		wasm.StoreKey,
+		exptypes.StoreKey,
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -505,6 +512,8 @@ func NewCraftApp(
 	)
 	app.NFTKeeper = nftkeeper.NewKeeper(keys[nftkeeper.StoreKey], appCodec, app.AccountKeeper, app.BankKeeper)
 
+	// expKeeper
+	app.ExpKeeper = expkeeper.NewKeeper(keys[exptypes.StoreKey], appCodec, app.GetSubspace(exptypes.ModuleName), app.AccountKeeper, app.BankKeeper)
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, keys[evidencetypes.StoreKey], &app.StakingKeeper, app.SlashingKeeper,
@@ -657,6 +666,7 @@ func NewCraftApp(
 		transferModule,
 		icaModule,
 		mockModule,
+		exp.NewAppModule(appCodec, app.ExpKeeper, app.AccountKeeper, app.BankKeeper),
 	// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -688,6 +698,7 @@ func NewCraftApp(
 		feegrant.ModuleName,
 		nft.ModuleName,
 		group.ModuleName,
+		exptypes.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		icatypes.ModuleName,
@@ -712,6 +723,7 @@ func NewCraftApp(
 		feegrant.ModuleName,
 		nft.ModuleName,
 		group.ModuleName,
+		exptypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
@@ -743,6 +755,7 @@ func NewCraftApp(
 		icatypes.ModuleName,
 		ibcmock.ModuleName,
 		feegrant.ModuleName,
+		exptypes.ModuleName,
 		nft.ModuleName,
 		group.ModuleName,
 		vestingtypes.ModuleName,
@@ -935,12 +948,7 @@ func (app *CraftApp) RegisterTxService(clientCtx client.Context) {
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *CraftApp) RegisterTendermintService(clientCtx client.Context) {
-	tmservice.RegisterTendermintService(
-		clientCtx,
-		app.BaseApp.GRPCQueryRouter(),
-		app.interfaceRegistry,
-		app.Query,
-	)
+	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
 // Set Transaction Handler.
@@ -997,6 +1005,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(exptypes.ModuleName)
 
 	return paramsKeeper
 }

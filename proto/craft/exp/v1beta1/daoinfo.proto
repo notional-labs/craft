@@ -1,0 +1,32 @@
+syntax = "proto3";
+package craft.exp.v1beta1;
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "x/exp/types";
+
+message AccountRecord {
+  option (gogoproto.goproto_getters)         = true;
+  option (gogoproto.goproto_stringer)        = true;
+
+  string account                      = 1;
+  cosmos.base.v1beta1.Coin max_token  = 2;
+  google.protobuf.Timestamp join_dao_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message DaoAssetInfo{
+  string dao_token_price = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];  
+  repeated AssetDao asset_dao = 3;
+}
+
+
+message AssetDao {
+  string denom = 1;
+  uint64 amount = 2;
+}
