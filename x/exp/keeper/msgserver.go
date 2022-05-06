@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -85,6 +86,7 @@ func (k msgServer) JoinDaoByNonIbcAsset(goCtx context.Context, msg *types.MsgJoi
 	if err != nil {
 		return nil, err
 	}
+
 	if k.accountKeeper.GetModuleAccount(ctx, govtypes.ModuleName).GetAddress().String() != msg.GovAddress {
 		return nil, types.ErrGov
 	}
@@ -93,6 +95,12 @@ func (k msgServer) JoinDaoByNonIbcAsset(goCtx context.Context, msg *types.MsgJoi
 		Amount: sdk.NewInt(msg.MaxToken),
 		Denom:  k.GetDenom(ctx),
 	}
+
+	err = k.verifyAccountToWhiteList(ctx, joinAddress)
+	if err != nil {
+		return &types.MsgJoinDaoByNonIbcAssetResponse{}, err
+	}
+
 	err = k.addAddressToWhiteList(ctx, joinAddress, MaxCoinMint)
 	if err != nil {
 		return nil, err
@@ -114,6 +122,20 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 	joinAddress, err := sdk.AccAddressFromBech32(msg.JoinAddress)
 	if err != nil {
 		return nil, err
+	}
+
+	if k.accountKeeper.GetModuleAccount(ctx, govtypes.ModuleName).GetAddress().String() != msg.GovAddress {
+		return nil, types.ErrGov
+	}
+
+	err = k.verifyAccountToWhiteList(ctx, joinAddress)
+	fmt.Println("=====================")
+	fmt.Println(err)
+	fmt.Println(k.GetWhiteList(ctx))
+	fmt.Println("=====================")
+
+	if err != nil {
+		return &types.MsgJoinDaoByIbcAssetResponse{}, err
 	}
 
 	err = k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)

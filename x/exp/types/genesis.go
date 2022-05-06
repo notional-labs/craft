@@ -19,7 +19,7 @@ func NewGenesisState(whiteList AccountRecords, params Params, daoAssetInfo DaoAs
 func DefaultGenesisState() *GenesisState {
 	coin := types.NewCoin("uexp", types.NewInt(100000))
 	data := AccountRecord{
-		Account:     "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl",
+		Account:     "craft1q3ts5qhrh3m6t970egemuuwywhlhpnmmza6pqj",
 		MaxToken:    &coin,
 		JoinDaoTime: time.Now(),
 	}

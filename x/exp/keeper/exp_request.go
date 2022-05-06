@@ -18,6 +18,15 @@ func (k ExpKeeper) addAddressToBurnRequestList(ctx sdk.Context, memberAccount st
 	return nil
 }
 
+func (k ExpKeeper) completeBurnRequest(ctx sdk.Context, burnRequest types.BurnRequest) {
+	k.removeBurnRequest(ctx, burnRequest)
+	// unexcepted status
+	if burnRequest.Status == types.StatusOnGoingRequest {
+		burnRequest.Status = -1
+	}
+	k.setEndedBurnRequest(ctx, burnRequest)
+}
+
 func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sdk.AccAddress, tokenLeft sdk.Dec) error {
 	mintRequest := types.MintRequest{
 		Account:        memberAccount.String(),
@@ -30,6 +39,15 @@ func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sd
 	k.SetMintRequest(ctx, mintRequest)
 
 	return nil
+}
+
+func (k ExpKeeper) completeMintRequest(ctx sdk.Context, mintRequest types.MintRequest) {
+	k.removeMintRequest(ctx, mintRequest)
+	// unexcepted status
+	if mintRequest.Status == types.StatusOnGoingRequest {
+		mintRequest.Status = -1
+	}
+	k.setEndedMintRequest(ctx, mintRequest)
 }
 
 // need modify for better performance .
@@ -54,7 +72,7 @@ func (k ExpKeeper) SetBurnRequest(ctx sdk.Context, burnRequest types.BurnRequest
 	if err != nil {
 		panic(err)
 	}
-	store.Set(types.GetBurnRequestAddressBytes(int(burnRequest.Status), accAddress), bz)
+	store.Set(types.GetBurnRequestAddressBytes(accAddress), bz)
 }
 
 func (k ExpKeeper) GetBurnRequestByKey(ctx sdk.Context, key []byte) (types.BurnRequest, error) {
@@ -72,6 +90,17 @@ func (k ExpKeeper) GetBurnRequestByKey(ctx sdk.Context, key []byte) (types.BurnR
 	}
 
 	return burnRequest, nil
+}
+
+func (k ExpKeeper) setEndedBurnRequest(ctx sdk.Context, burnRequest types.BurnRequest) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshal(&burnRequest)
+
+	accAddress, err := sdk.AccAddressFromBech32(burnRequest.Account)
+	if err != nil {
+		panic(err)
+	}
+	store.Set(types.GetEndedBurnRequestKey(accAddress), bz)
 }
 
 // GetAllBurnRequest returns all the burn request from store .
@@ -103,11 +132,11 @@ func (k ExpKeeper) IterateBurnRequests(ctx sdk.Context, cb func(burnRequest type
 }
 
 // not good logic need modify
-func (k ExpKeeper) RemoveBurnRequest(ctx sdk.Context, burnRequest types.BurnRequest) {
+func (k ExpKeeper) removeBurnRequest(ctx sdk.Context, burnRequest types.BurnRequest) {
 	store := ctx.KVStore(k.storeKey)
 	accAddress, _ := sdk.AccAddressFromBech32(burnRequest.Account)
-	if store.Has(types.GetBurnRequestAddressBytes(int(burnRequest.Status), accAddress)) {
-		store.Delete(types.GetBurnRequestAddressBytes(int(burnRequest.Status), accAddress))
+	if store.Has(types.GetBurnRequestAddressBytes(accAddress)) {
+		store.Delete(types.GetBurnRequestAddressBytes(accAddress))
 	}
 }
 
@@ -121,31 +150,15 @@ func (k ExpKeeper) GetBurnRequestsByStatus(ctx sdk.Context, status int) (burnReq
 
 // not good logic need modify
 func (k ExpKeeper) GetBurnRequest(ctx sdk.Context, accAddress sdk.AccAddress) (types.BurnRequest, error) {
-	store := ctx.KVStore(k.storeKey)
 
-	if store.Has(types.GetBurnRequestAddressBytes(int(types.StatusCompleteRequest), accAddress)) {
-		return k.GetBurnRequestByKey(ctx, types.GetBurnRequestAddressBytes(int(types.StatusCompleteRequest), accAddress))
-	}
-
-	if store.Has(types.GetBurnRequestAddressBytes(int(types.StatusNoFundRequest), accAddress)) {
-		return k.GetBurnRequestByKey(ctx, types.GetBurnRequestAddressBytes(int(types.StatusNoFundRequest), accAddress))
-	}
-	if store.Has(types.GetBurnRequestAddressBytes(int(types.StatusOnGoingRequest), accAddress)) {
-		return k.GetBurnRequestByKey(ctx, types.GetBurnRequestAddressBytes(int(types.StatusOnGoingRequest), accAddress))
-	}
-
-	if store.Has(types.GetBurnRequestAddressBytes(int(types.StatusExpiredRequest), accAddress)) {
-		return k.GetBurnRequestByKey(ctx, types.GetBurnRequestAddressBytes(int(types.StatusExpiredRequest), accAddress))
-	}
-
-	return types.BurnRequest{}, sdkerrors.Wrapf(types.ErrInvalidKey, "burnRequest")
+	return k.GetBurnRequestByKey(ctx, types.GetBurnRequestAddressBytes(accAddress))
 }
 
 // IterateBurnRequest iterates over the all the BurnRequest and performs a callback function .
 func (k ExpKeeper) IterateStatusBurnRequests(ctx sdk.Context, status int, cb func(burnRequest types.BurnRequest) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, types.GetBurnRequestsStatusBytes(status))
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyBurnRequestList)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var burnRequest types.BurnRequest
@@ -161,11 +174,12 @@ func (k ExpKeeper) IterateStatusBurnRequests(ctx sdk.Context, status int, cb fun
 }
 
 // not good logic need modify
-func (k ExpKeeper) RemoveMintRequest(ctx sdk.Context, mintRequest types.MintRequest) {
+func (k ExpKeeper) removeMintRequest(ctx sdk.Context, mintRequest types.MintRequest) {
 	store := ctx.KVStore(k.storeKey)
+
 	accAddress, _ := sdk.AccAddressFromBech32(mintRequest.Account)
-	if store.Has(types.GetMintRequestAddressBytes(int(mintRequest.Status), accAddress)) {
-		store.Delete(types.GetMintRequestAddressBytes(int(mintRequest.Status), accAddress))
+	if store.Has(types.GetMintRequestAddressBytes(accAddress)) {
+		store.Delete(types.GetMintRequestAddressBytes(accAddress))
 	}
 }
 
@@ -177,7 +191,7 @@ func (k ExpKeeper) SetMintRequest(ctx sdk.Context, mintRequest types.MintRequest
 	if err != nil {
 		panic(err)
 	}
-	store.Set(types.GetMintRequestAddressBytes(int(mintRequest.Status), accAddress), bz)
+	store.Set(types.GetMintRequestAddressBytes(accAddress), bz)
 }
 
 func (k ExpKeeper) GetMintRequestsByStatus(ctx sdk.Context, status int) (mintRequests types.MintRequests) {
@@ -195,6 +209,18 @@ func (keeper ExpKeeper) GetAllMintRequest(ctx sdk.Context) (mintRequests types.M
 		return false
 	})
 	return
+}
+
+func (k ExpKeeper) setEndedMintRequest(ctx sdk.Context, mintRequest types.MintRequest) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshal(&mintRequest)
+
+	accAddress, err := sdk.AccAddressFromBech32(mintRequest.Account)
+
+	if err != nil {
+		panic(err)
+	}
+	store.Set(types.GetEndedMintRequestKey(accAddress), bz)
 }
 
 func (k ExpKeeper) GetMintRequestByKey(ctx sdk.Context, key []byte) (types.MintRequest, error) {
@@ -237,7 +263,7 @@ func (k ExpKeeper) IterateMintRequest(ctx sdk.Context, cb func(mintRequest types
 func (k ExpKeeper) IterateStatusMintRequests(ctx sdk.Context, status int, cb func(mintRequest types.MintRequest) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, types.GetMintRequestsStatusBytes(status))
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyMintRequestList)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var mintRequest types.MintRequest
@@ -250,127 +276,4 @@ func (k ExpKeeper) IterateStatusMintRequests(ctx sdk.Context, status int, cb fun
 			break
 		}
 	}
-}
-
-// not good logic need modify
-func (k ExpKeeper) GetMintRequest(ctx sdk.Context, accAddress sdk.AccAddress) (types.MintRequest, error) {
-	store := ctx.KVStore(k.storeKey)
-
-	if store.Has(types.GetMintRequestAddressBytes(int(types.StatusCompleteRequest), accAddress)) {
-		return k.GetMintRequestByKey(ctx, types.GetMintRequestAddressBytes(int(types.StatusCompleteRequest), accAddress))
-	}
-
-	if store.Has(types.GetMintRequestAddressBytes(int(types.StatusNoFundRequest), accAddress)) {
-		return k.GetMintRequestByKey(ctx, types.GetMintRequestAddressBytes(int(types.StatusNoFundRequest), accAddress))
-	}
-
-	if store.Has(types.GetMintRequestAddressBytes(int(types.StatusOnGoingRequest), accAddress)) {
-		return k.GetMintRequestByKey(ctx, types.GetMintRequestAddressBytes(int(types.StatusOnGoingRequest), accAddress))
-	}
-
-	if store.Has(types.GetMintRequestAddressBytes(int(types.StatusExpiredRequest), accAddress)) {
-		return k.GetMintRequestByKey(ctx, types.GetMintRequestAddressBytes(int(types.StatusExpiredRequest), accAddress))
-	}
-
-	return types.MintRequest{}, sdkerrors.Wrapf(types.ErrInvalidKey, "mintRequest")
-}
-
-func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest) error {
-	burnAccount, err := sdk.AccAddressFromBech32(burnRequest.Account)
-	if err != nil {
-		return err
-	}
-
-	if burnRequest.BurnTokenLeft.Amount == sdk.NewInt(0) {
-		k.RemoveBurnRequest(ctx, burnRequest)
-		burnRequest.Status = types.StatusCompleteRequest
-		k.SetBurnRequest(ctx, burnRequest)
-	}
-
-	tokenReturn, _ := k.calculateStableTokenReturn(ctx, *burnRequest.BurnTokenLeft)
-
-	coinWilReceive := sdk.NewCoin(k.GetIbcDenom(ctx), tokenReturn.TruncateInt())
-	coinModule := k.bankKeeper.GetBalance(ctx, k.accountKeeper.GetModuleAccount(ctx, types.ModuleName).GetAddress(), k.GetIbcDenom(ctx))
-	// if coin module don't have money .
-	if coinModule.Amount == sdk.NewInt(0) {
-		return nil
-	}
-	// logic when amount in exp module < amount need pay to member
-	if coinWilReceive.IsGTE(coinModule) {
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, burnAccount, sdk.NewCoins(coinModule))
-		if err != nil {
-			return err
-		}
-
-		burnRequest.BurnTokenLeft.Amount = coinWilReceive.Amount.Sub(coinModule.Amount)
-		return k.BurnExpFromAccount(ctx, sdk.NewCoins(coinModule), burnAccount)
-	}
-
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, burnAccount, sdk.NewCoins(coinWilReceive))
-	if err != nil {
-		return nil
-	}
-
-	err = k.BurnExpFromAccount(ctx, sdk.NewCoins(*burnRequest.BurnTokenLeft), burnAccount)
-	if err != nil {
-		return err
-	}
-
-	burnRequest.BurnTokenLeft = nil
-
-	k.RemoveBurnRequest(ctx, burnRequest)
-	burnRequest.Status = types.StatusCompleteRequest
-	k.SetBurnRequest(ctx, burnRequest)
-
-	return nil
-}
-
-func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest) error {
-	if mintRequest.DaoTokenMinted == sdk.NewDec(0) {
-		mintRequest.Status = types.StatusNoFundRequest
-		return nil
-	}
-
-	memberAccount, _ := sdk.AccAddressFromBech32(mintRequest.Account)
-	maxToken := sdk.NewCoin(k.GetDenom(ctx), mintRequest.DaoTokenMinted.TruncateInt())
-
-	err := k.addAddressToWhiteList(ctx, memberAccount, maxToken)
-	if err != nil {
-		return err
-	}
-
-	err = k.MintExpForAccount(ctx, sdk.NewCoins(maxToken), memberAccount)
-	if err != nil {
-		return err
-	}
-	k.RemoveMintRequest(ctx, mintRequest)
-
-	if mintRequest.DaoTokenLeft == sdk.NewDec(0) {
-		mintRequest.Status = types.StatusCompleteRequest
-	} else {
-		mintRequest.Status = types.StatusExpiredRequest
-	}
-
-	k.SetMintRequest(ctx, mintRequest)
-
-	return nil
-}
-
-// should modify .
-func (k ExpKeeper) calculateStableTokenReturn(ctx sdk.Context, expCoin sdk.Coin) (sdk.Dec, error) {
-	if expCoin.Denom != k.GetDenom(ctx) {
-		return sdk.NewDec(0), types.ErrInputOutputMismatch
-	}
-	daoTokenPrice := k.GetDaoTokenPrice(ctx)
-	return daoTokenPrice.MulInt(expCoin.Amount), nil
-}
-
-func (k ExpKeeper) ValidateBurnRequestByTime(ctx sdk.Context, burnRequest types.BurnRequest) bool {
-	burnPeriod := k.GetBurnExpPeriod(ctx)
-	return burnRequest.RequestTime.Add(burnPeriod).Before(ctx.BlockTime())
-}
-
-func (k ExpKeeper) ValidateMintRequestByTime(ctx sdk.Context, mintRequest types.MintRequest) bool {
-	mintPeriod := k.GetBurnExpPeriod(ctx)
-	return mintRequest.RequestTime.Add(mintPeriod).Before(ctx.BlockTime())
 }

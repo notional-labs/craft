@@ -3,7 +3,6 @@ package keeper
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -123,8 +122,7 @@ func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddre
 			if dstAddressBalances.Amount.GT(accountRecord.MaxToken.Amount) {
 				return types.ErrInputOutputMismatch
 			}
-			// vesting time check, give one day for DAO sign
-			timeCheck := accountRecord.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx)).Add(time.Hour * 24)
+			timeCheck := accountRecord.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx))
 			if ctx.BlockTime().After(timeCheck) {
 				return types.ErrTimeOut
 			}
@@ -134,16 +132,16 @@ func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddre
 	return types.ErrAddressdNotFound
 }
 
-func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) error {
-	// check if dstAddress in whitelist .
+func (k ExpKeeper) verifyAccountToWhiteList(ctx sdk.Context, memberAddress sdk.AccAddress) error {
+	// check if dstAddress already in whitelist .
 	whiteList := k.GetWhiteList(ctx)
 
 	for _, accountRecord := range whiteList {
 		if memberAddress.String() == accountRecord.Account {
-			return nil
+			return types.ErrAddressdNotFound
 		}
 	}
-	return types.ErrAddressdNotFound
+	return nil
 }
 
 func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, ar types.AccountRecord) error {
@@ -228,14 +226,13 @@ func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 		mintRequest.DaoTokenLeft = sdk.NewDec(0)
 		mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
 
-		k.RemoveMintRequest(ctx, mintRequest)
 		k.SetMintRequest(ctx, mintRequest)
 	}
 	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), fromAddress)
 	if err != nil {
 		return sdkerrors.Wrap(err, "fund error")
 	}
-	k.RemoveMintRequest(ctx, mintRequest)
+	k.removeMintRequest(ctx, mintRequest)
 	decCoin := sdk.NewDecFromInt(coin.Amount)
 
 	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
