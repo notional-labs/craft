@@ -132,16 +132,16 @@ func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddre
 	return types.ErrAddressdNotFound
 }
 
-func (k ExpKeeper) verifyAccount(ctx sdk.Context, memberAddress sdk.AccAddress) error {
-	// check if dstAddress in whitelist .
+func (k ExpKeeper) verifyAccountToWhiteList(ctx sdk.Context, memberAddress sdk.AccAddress) error {
+	// check if dstAddress already in whitelist .
 	whiteList := k.GetWhiteList(ctx)
 
 	for _, accountRecord := range whiteList {
 		if memberAddress.String() == accountRecord.Account {
-			return nil
+			return types.ErrAddressdNotFound
 		}
 	}
-	return types.ErrAddressdNotFound
+	return nil
 }
 
 func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, ar types.AccountRecord) error {
