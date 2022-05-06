@@ -948,12 +948,7 @@ func (app *CraftApp) RegisterTxService(clientCtx client.Context) {
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *CraftApp) RegisterTendermintService(clientCtx client.Context) {
-	tmservice.RegisterTendermintService(
-		clientCtx,
-		app.BaseApp.GRPCQueryRouter(),
-		app.interfaceRegistry,
-		app.Query,
-	)
+	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
 // Set Transaction Handler.
