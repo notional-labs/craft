@@ -10,6 +10,13 @@ This chain is a DAO.
 * Monetary token called craft for the purchase of in-game items
 * Flutter mobile app for smooth signing
 
+## Testnets on your dev workstation
+
+```bash
+craftd testnet start --enable-logging
+```
+
+
 
 ## Basic Dev Roadmap
 
