@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -33,7 +32,7 @@ func GetWhiteList() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "white_list",
 		Short: "Query whitelist",
-		Long:  strings.TrimSpace(fmt.Sprintf(`Query whitelist. etc`)),
+		Long:  strings.TrimSpace("Query whitelist. etc"),
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -62,7 +61,7 @@ func GetDaoAsset() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dao_asset",
 		Short: "Query DAO asset",
-		Long:  strings.TrimSpace(fmt.Sprintf(`Query dao asset. etc`)),
+		Long:  strings.TrimSpace("Query dao asset. etc"),
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -90,7 +89,7 @@ func GetMintRequestList() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mint_request",
 		Short: "Query mint request list ",
-		Long:  strings.TrimSpace(fmt.Sprintf(`Query mint request list. etc`)),
+		Long:  strings.TrimSpace("Query mint request list. etc"),
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -118,7 +117,7 @@ func GetBurnRequestList() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "burn_request",
 		Short: "Query burn request list ",
-		Long:  strings.TrimSpace(fmt.Sprintf(`Query burn request list. etc`)),
+		Long:  strings.TrimSpace("Query burn request list. etc"),
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
