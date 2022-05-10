@@ -18,7 +18,7 @@ service Msg {
     rpc FundExpPool(MsgFundExpPool) returns (MsgFundExpPoolResponse);
     rpc SpendIbcAssetToExp(MsgSpendIbcAssetToExp) returns (MsgSpendIbcAssetToExpResponse);
     rpc AdjustDaoPrice(MsgAdjustDaoTokenPrice) returns (MsgAdjustDaoTokenPriceResponse);
-    rpc SendCoinsByDAO(MsgSendCoinsByDAO) returns (MsgSendCoinsByDAOResponse);
+    rpc SendCoinsByDAO(MsgSendCoinsFromModuleToDAO) returns (MsgSendCoinsFromModuleToDAOResponse);
 }
 
 message MsgMintAndAllocateExp {
@@ -102,12 +102,11 @@ message MsgAdjustDaoTokenPrice{
 
 message MsgAdjustDaoTokenPriceResponse{}
 
-message MsgSendCoinsByDAO{
-  string from_address = 1;
-  string to_address = 2;
+message MsgSendCoinsFromModuleToDAO{
+  string to_address = 1;
 
-  repeated cosmos.base.v1beta1.Coin amount = 3
+  repeated cosmos.base.v1beta1.Coin amount = 2
   [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 }
 
-message MsgSendCoinsByDAOResponse{}
+message MsgSendCoinsFromModuleToDAOResponse{}

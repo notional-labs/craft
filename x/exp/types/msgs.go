@@ -270,16 +270,16 @@ func NewMsgAdjustDaoTokenPrice(fromAddress string, price sdk.Dec) *MsgAdjustDaoT
 	}
 }
 
-var _ sdk.Msg = &MsgSendCoinsByDAO{}
+var _ sdk.Msg = &MsgSendCoinsFromModuleToDAO{}
 
 // Route Implements Msg.
-func (m MsgSendCoinsByDAO) Route() string { return sdk.MsgTypeURL(&m) }
+func (m MsgSendCoinsFromModuleToDAO) Route() string { return sdk.MsgTypeURL(&m) }
 
 // Type Implements Msg.
-func (m MsgSendCoinsByDAO) Type() string { return sdk.MsgTypeURL(&m) }
+func (m MsgSendCoinsFromModuleToDAO) Type() string { return sdk.MsgTypeURL(&m) }
 
 // GetSigners returns the expected signers for a MsgAdjustDaoTokenPrice.
-func (m MsgSendCoinsByDAO) GetSigners() []sdk.AccAddress {
+func (m MsgSendCoinsFromModuleToDAO) GetSigners() []sdk.AccAddress {
 	fromAddr, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {
 		panic(err)
@@ -289,12 +289,12 @@ func (m MsgSendCoinsByDAO) GetSigners() []sdk.AccAddress {
 }
 
 // GetSignBytes Implements Msg.
-func (m MsgSendCoinsByDAO) GetSignBytes() []byte {
+func (m MsgSendCoinsFromModuleToDAO) GetSignBytes() []byte {
 	return sdk.MustSortJSON(legacy.Cdc.MustMarshalJSON(&m))
 }
 
 // ValidateBasic does a sanity check on the provided data.
-func (m MsgSendCoinsByDAO) ValidateBasic() error {
+func (m MsgSendCoinsFromModuleToDAO) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {
 		return sdkerrors.Wrap(err, "join address must be valid address")
@@ -302,9 +302,9 @@ func (m MsgSendCoinsByDAO) ValidateBasic() error {
 	return nil
 }
 
-// NewMsgSendCoinsByDAO create a new Msg.
-func NewMsgSendCoinsByDAO(fromAddress, toAddress string, amount sdk.Coins) *MsgSendCoinsByDAO {
-	return &MsgSendCoinsByDAO{
+// NewMsgSendCoinsFromModuleToDAO create a new Msg.
+func NewMsgSendCoinsFromModuleToDAO(fromAddress, toAddress string, amount sdk.Coins) *MsgSendCoinsFromModuleToDAO {
+	return &MsgSendCoinsFromModuleToDAO{
 		FromAddress: fromAddress,
 		ToAddress:   toAddress,
 		Amount:      amount,

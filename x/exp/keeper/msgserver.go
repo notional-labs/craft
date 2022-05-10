@@ -217,7 +217,7 @@ func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDao
 	return &types.MsgAdjustDaoTokenPriceResponse{}, nil
 }
 
-func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoinsByDAO) (*types.MsgSendCoinsByDAOResponse, error) {
+func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoinsFromModuleToDAO) (*types.MsgSendCoinsFromModuleToDAOResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	params := k.GetParams(ctx)
@@ -236,5 +236,5 @@ func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoins
 
 	}
 
-	return &types.MsgSendCoinsByDAOResponse{}, nil
+	return &types.MsgSendCoinsFromModuleToDAOResponse{}, nil
 }
