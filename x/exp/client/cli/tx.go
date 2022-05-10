@@ -165,6 +165,33 @@ func NewAdjustDaoTokenPrice() *cobra.Command {
 	return cmd
 }
 
+func NewSendCoinsByDAO() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "adjust [price]",
+		Short: `adjust dao token price to [price] .`,
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			price, err := sdk.NewDecFromStr(args[0])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgAdjustDaoTokenPrice(clientCtx.GetFromAddress().String(), price)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
 // This func only for testing
 // func NewJoinDaoCmd() *cobra.Command {
 // 	cmd := &cobra.Command{

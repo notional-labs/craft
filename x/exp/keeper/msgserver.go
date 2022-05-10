@@ -216,3 +216,25 @@ func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDao
 
 	return &types.MsgAdjustDaoTokenPriceResponse{}, nil
 }
+
+func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoinsByDAO) (*types.MsgSendCoinsByDAOResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	params := k.GetParams(ctx)
+
+	if params.DaoAccount != msg.FromAddress {
+		return nil, sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, msg.FromAddress)
+	}
+	acc, err := sdk.AccAddressFromBech32(msg.FromAddress)
+	if err != nil {
+		return nil, sdkerrors.ErrInvalidAddress
+	}
+
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, acc, msg.Amount)
+	if err != nil {
+		return nil, types.ErrInputOutputMismatch
+
+	}
+
+	return &types.MsgSendCoinsByDAOResponse{}, nil
+}
