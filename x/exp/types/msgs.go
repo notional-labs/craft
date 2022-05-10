@@ -280,7 +280,7 @@ func (m MsgSendCoinsFromModuleToDAO) Type() string { return sdk.MsgTypeURL(&m) }
 
 // GetSigners returns the expected signers for a MsgAdjustDaoTokenPrice.
 func (m MsgSendCoinsFromModuleToDAO) GetSigners() []sdk.AccAddress {
-	fromAddr, err := sdk.AccAddressFromBech32(m.FromAddress)
+	fromAddr, err := sdk.AccAddressFromBech32(m.ToAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -295,7 +295,7 @@ func (m MsgSendCoinsFromModuleToDAO) GetSignBytes() []byte {
 
 // ValidateBasic does a sanity check on the provided data.
 func (m MsgSendCoinsFromModuleToDAO) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(m.FromAddress)
+	_, err := sdk.AccAddressFromBech32(m.ToAddress)
 	if err != nil {
 		return sdkerrors.Wrap(err, "join address must be valid address")
 	}
@@ -303,10 +303,9 @@ func (m MsgSendCoinsFromModuleToDAO) ValidateBasic() error {
 }
 
 // NewMsgSendCoinsFromModuleToDAO create a new Msg.
-func NewMsgSendCoinsFromModuleToDAO(fromAddress, toAddress string, amount sdk.Coins) *MsgSendCoinsFromModuleToDAO {
+func NewMsgSendCoinsFromModuleToDAO(toAddress string, amount sdk.Coins) *MsgSendCoinsFromModuleToDAO {
 	return &MsgSendCoinsFromModuleToDAO{
-		FromAddress: fromAddress,
-		ToAddress:   toAddress,
-		Amount:      amount,
+		ToAddress: toAddress,
+		Amount:    amount,
 	}
 }

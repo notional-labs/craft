@@ -222,10 +222,10 @@ func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoins
 
 	params := k.GetParams(ctx)
 
-	if params.DaoAccount != msg.FromAddress {
-		return nil, sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, msg.FromAddress)
+	if params.DaoAccount != msg.ToAddress {
+		return nil, sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, msg.ToAddress)
 	}
-	acc, err := sdk.AccAddressFromBech32(msg.FromAddress)
+	acc, err := sdk.AccAddressFromBech32(msg.ToAddress)
 	if err != nil {
 		return nil, sdkerrors.ErrInvalidAddress
 	}
