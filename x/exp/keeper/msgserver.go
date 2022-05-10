@@ -133,10 +133,8 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 		return &types.MsgJoinDaoByIbcAssetResponse{}, err
 	}
 
-	err = k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)
-	if err != nil {
-		return nil, err
-	}
+	k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -233,7 +231,6 @@ func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoins
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, acc, msg.Amount)
 	if err != nil {
 		return nil, types.ErrInputOutputMismatch
-
 	}
 
 	return &types.MsgSendCoinsFromModuleToDAOResponse{}, nil

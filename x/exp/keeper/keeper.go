@@ -61,13 +61,13 @@ func (k ExpKeeper) MintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAcc
 	}
 	// only mint one denom
 	if newCoins.Len() != 1 && newCoins[0].Denom != k.GetDenom(ctx) {
-		return errors.New("Exp module only mint exp")
+		return errors.New("exp module only mint exp")
 	}
 
 	// mint coin for exp module
 	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, newCoins)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	// send coin to account
@@ -86,7 +86,7 @@ func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAc
 	}
 	// only mint one denom
 	if newCoins.Len() != 1 && newCoins[0].Denom != k.GetDenom(ctx) {
-		return errors.New("Exp module only burn exp")
+		return errors.New("exp module only burn exp")
 	}
 
 	// send coin from account to module
@@ -98,7 +98,7 @@ func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAc
 	// mint coin for exp module
 	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, newCoins)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return nil
