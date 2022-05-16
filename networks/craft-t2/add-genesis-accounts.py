@@ -9,7 +9,7 @@ Then will generate all the commands to add balances for all gentxs
 '''
 
 # cd networks/craft-t2
-LAUNCH_TIME = "2022-05-12T15:15:00Z"
+LAUNCH_TIME = "2022-05-16T10:15:00Z"
 CHAIN_ID = "craft-t2"
 EXP_SEND = [{"denom": "uexp","enabled": True}]
 
@@ -66,8 +66,8 @@ validatorAddresses = {
 
 def main():
     outputDetails()
-    resetGenesisFile()
-    createGenesisAccountsCommands()
+    # resetGenesisFile()
+    # createGenesisAccountsCommands()
     pass
 
 def resetGenesisFile():
