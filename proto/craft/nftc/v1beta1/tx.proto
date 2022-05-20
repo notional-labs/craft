@@ -1,0 +1,93 @@
+syntax = "proto3";
+package cosmos.nft.v1beta1;
+
+option go_package = "x/nftc/types";
+
+import "cosmos/msg/v1/msg.proto";
+
+// Msg defines the nft Msg service.
+service Msg {
+  // Send defines a method to send a nft from one account to another account.
+  rpc Send(MsgSend) returns (MsgSendResponse);
+  rpc Mint(MsgMint) returns (MsgMintResponse);
+  rpc Burn(MsgBurn) returns (MsgBurnResponse);
+  rpc CreateClass(MsgCreateClass) returns (MsgCreateClassResponse);
+}
+// MsgSend represents a message to send a nft from one account to another account.
+message MsgSend {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  // class_id defines the unique identifier of the nft classification, similar to the contract address of ERC721
+  string class_id = 1;
+
+  // id defines the unique identification of nft
+  string id = 2;
+
+  // sender is the address of the owner of nft
+  string sender = 3;
+
+  // receiver is the receiver address of nft
+  string receiver = 4;
+}
+// MsgSendResponse defines the Msg/Send response type.
+message MsgSendResponse {}
+
+message MsgMint {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  // class_id defines the unique identifier of the nft classification, similar to the contract address of ERC721
+  string class_id = 1;
+
+  // id defines the unique identification of nft
+  string id = 2;
+
+  // sender is the address of the owner of nft
+  string sender = 3;
+
+  // receiver is the receiver address of nft
+  string receiver = 4;
+}
+
+message MsgMintResponse{}
+
+message MsgCreateClass {
+  // id defines the unique identifier of the NFT classification, similar to the contract address of ERC721
+  string id = 1;
+
+  // name defines the human-readable name of the NFT classification. Optional
+  string name = 2;
+
+  // symbol is an abbreviated name for nft classification. Optional
+  string symbol = 3;
+
+  // description is a brief description of nft classification. Optional
+  string description = 4;
+
+  // uri for the class metadata stored off chain. It can define schema for Class and NFT `Data` attributes. Optional
+  string uri = 5;
+
+  // uri_hash is a hash of the document pointed by uri. Optional
+  string uri_hash = 6;
+
+  // limit: limited amount of NFT can be mint
+  uint64 limit = 7;
+
+  // data is the app specific metadata of the NFT class. Optional
+  google.protobuf.Any data = 8;
+}
+message MsgCreateClassResponse{}
+
+message MsgBurn {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  // class_id defines the unique identifier of the nft classification, similar to the contract address of ERC721
+  string class_id = 1;
+
+  // id defines the unique identification of nft
+  string id = 2;
+
+  // sender is the address of the owner of nft
+  string sender = 3;
+}
+
+message MsgBurnResponse{}
