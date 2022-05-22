@@ -31,6 +31,7 @@ import (
 	oldgovtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -58,14 +59,11 @@ import (
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	// bech32ibckeeper "github.com/osmosis-labs/bech32-ibc/x/bech32ibc/keeper"
-	// bech32ibctypes "github.com/osmosis-labs/bech32-ibc/x/bech32ibc/types"
-	// bech32ics20keeper "github.com/osmosis-labs/bech32-ibc/x/bech32ics20/keeper"
 )
 
 type AppKeepers struct {
-	msgSvcRouter *authmiddleware.MsgServiceRouter
-	legacyRouter sdk.Router
+	MsgSvcRouter *authmiddleware.MsgServiceRouter
+	LegacyRouter sdk.Router
 
 	// keepers, by order of initialization
 	// "Special" keepers
@@ -86,6 +84,7 @@ type AppKeepers struct {
 	StakingKeeper  stakingkeeper.Keeper
 	SlashingKeeper slashingkeeper.Keeper
 	DistrKeeper    distrkeeper.Keeper
+	MintKeeper     mintkeeper.Keeper
 	GovKeeper      govkeeper.Keeper
 	AuthzKeeper    authzkeeper.Keeper
 	FeeGrantKeeper feegrantkeeper.Keeper
@@ -138,7 +137,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	authzKeeper := authzkeeper.NewKeeper(
 		appKeepers.keys[authzkeeper.StoreKey],
 		appCodec,
-		appKeepers.msgSvcRouter,
+		appKeepers.MsgSvcRouter,
 		appKeepers.AccountKeeper,
 	)
 	appKeepers.AuthzKeeper = authzKeeper
@@ -222,7 +221,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedWasmKeeper,
 		appKeepers.TransferKeeper,
-		appKeepers.msgSvcRouter,
+		appKeepers.MsgSvcRouter,
 		bApp.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
@@ -251,7 +250,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, appKeepers.keys[govtypes.StoreKey],
 		appKeepers.GetSubspace(govtypes.ModuleName), appKeepers.AccountKeeper, appKeepers.BankKeeper,
-		appKeepers.StakingKeeper, govRouter, appKeepers.msgSvcRouter, govtypes.DefaultConfig())
+		appKeepers.StakingKeeper, govRouter, appKeepers.MsgSvcRouter, govtypes.DefaultConfig())
 	appKeepers.GovKeeper = govKeeper
 }
 
