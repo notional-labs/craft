@@ -98,7 +98,7 @@ type AppKeepers struct {
 	WasmKeeper     wasm.Keeper
 
 	// transfer module
-	TransferModule transfer.AppModule
+	TransferModule transfer.IBCModule
 
 	// keys to access the substores
 	keys    map[string]*storetypes.KVStoreKey
@@ -193,12 +193,11 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.ScopedTransferKeeper,
 	)
 	appKeepers.TransferKeeper = transferKeeper
-	appKeepers.TransferModule = transfer.NewAppModule(appKeepers.TransferKeeper)
+	appKeepers.TransferModule = transfer.NewIBCModule(appKeepers.TransferKeeper)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(icahosttypes.SubModuleName, appKeepers.ICAHostKeeper).
-		AddRoute(ibctransfertypes.ModuleName, appKeepers.TransferKeeper)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, appKeepers.TransferModule)
 	// Note: the sealing is done after creating wasmd and wiring that up
 
 	// create evidence keeper with router
