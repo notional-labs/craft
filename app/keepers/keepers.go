@@ -24,6 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
 
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -48,12 +49,6 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
-
-	// Interchain Accounts
-
-	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
-	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
 
 	// IBC transfer module: Enables IBC transfer of coins between accounts using the transfer port on an IBC channel
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
@@ -91,13 +86,12 @@ type AppKeepers struct {
 	GroupKeeper    groupkeeper.Keeper
 	NFTKeeper      nftkeeper.Keeper
 	IBCKeeper      *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	ICAHostKeeper  icahostkeeper.Keeper
 	EvidenceKeeper evidencekeeper.Keeper
 	TransferKeeper ibctransferkeeper.Keeper
 	WasmKeeper     wasm.Keeper
 
 	// transfer module
-	TransferModule transfer.IBCModule
+	TransferModule transfer.AppModule
 
 	// keys to access the substores
 	keys    map[string]*storetypes.KVStoreKey
@@ -132,7 +126,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.GetSubspace(banktypes.ModuleName),
 		blockedAddress,
 	)
-	appKeepers.BankKeeper = &bankKeeper
+	appKeepers.BankKeeper = bankKeeper
 
 	authzKeeper := authzkeeper.NewKeeper(
 		appKeepers.keys[authzkeeper.StoreKey],
@@ -169,6 +163,18 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	)
 	appKeepers.SlashingKeeper = slashingKeeper
 
+	appKeepers.MintKeeper = mintkeeper.NewKeeper(
+		appCodec, appKeepers.keys[minttypes.StoreKey], appKeepers.GetSubspace(minttypes.ModuleName), &stakingKeeper,
+		appKeepers.AccountKeeper, appKeepers.BankKeeper, authtypes.FeeCollectorName,
+	)
+
+	groupConfig := group.DefaultConfig()
+	/*
+		Example of setting group params:
+		groupConfig.MaxMetadataLen = 1000
+	*/
+	appKeepers.GroupKeeper = groupkeeper.NewKeeper(appKeepers.keys[group.StoreKey], appCodec, appKeepers.MsgSvcRouter, appKeepers.AccountKeeper, groupConfig)
+
 	// Create IBC Keeper
 	appKeepers.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
@@ -191,12 +197,13 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.BankKeeper,
 		appKeepers.ScopedTransferKeeper,
 	)
-	appKeepers.TransferKeeper = transferKeeper
-	appKeepers.TransferModule = transfer.NewIBCModule(appKeepers.TransferKeeper)
 
+	appKeepers.TransferKeeper = transferKeeper
+	transferModule := transfer.NewIBCModule(appKeepers.TransferKeeper)
+	appKeepers.TransferModule = transfer.NewAppModule(transferKeeper)
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, appKeepers.TransferModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
 	// Note: the sealing is done after creating wasmd and wiring that up
 
 	// create evidence keeper with router
@@ -302,14 +309,13 @@ func (appKeepers *AppKeepers) initParamsKeeper(appCodec codec.BinaryCodec, legac
 	paramsKeeper.Subspace(authtypes.ModuleName)
 	paramsKeeper.Subspace(banktypes.ModuleName)
 	paramsKeeper.Subspace(stakingtypes.ModuleName)
+	paramsKeeper.Subspace(minttypes.ModuleName)
 	paramsKeeper.Subspace(distrtypes.ModuleName)
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1beta2.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
-	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 
 	return paramsKeeper
@@ -320,6 +326,7 @@ func KVStoreKeys() []string {
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		stakingtypes.StoreKey,
+		minttypes.StoreKey,
 		distrtypes.StoreKey,
 		slashingtypes.StoreKey,
 		govtypes.StoreKey,
@@ -329,8 +336,6 @@ func KVStoreKeys() []string {
 		feegrant.StoreKey,
 		evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey,
-		icacontrollertypes.StoreKey,
-		icahosttypes.StoreKey,
 		capabilitytypes.StoreKey,
 		authzkeeper.StoreKey,
 		nftkeeper.StoreKey,

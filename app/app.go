@@ -40,11 +40,10 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
-	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	ibc "github.com/cosmos/ibc-go/v3/modules/core"
 
 	// Authz.
-	"github.com/cosmos/cosmos-sdk/x/authz"
+
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 
 	// Bank.
@@ -53,7 +52,6 @@ import (
 
 	// Capability.
 	"github.com/cosmos/cosmos-sdk/x/capability"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 
 	// Crisis.
 	"github.com/cosmos/cosmos-sdk/x/crisis"
@@ -66,15 +64,13 @@ import (
 
 	// Evidence.
 	"github.com/cosmos/cosmos-sdk/x/evidence"
-	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 
 	// Fee Grant.
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
+
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
 
 	// Genesis Utility.
 	"github.com/cosmos/cosmos-sdk/x/genutil"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 
 	// Governance.
 	"github.com/cosmos/cosmos-sdk/x/gov"
@@ -82,7 +78,7 @@ import (
 	govv1beta2 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	// Group: Governance, but between only a few users.  Useful for DAOs.
-	"github.com/cosmos/cosmos-sdk/x/group"
+
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 
 	// Mint Coins.
@@ -108,21 +104,12 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	// Interchain Accounts.
-	ica "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts"
-	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
-	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
-	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
-
 	// IBC transfer module: Enables IBC transfer of coins between accounts using the transfer port on an IBC channel.
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 
 	// IBC: These modules enable the base level features of IBC, like clients, connections and channels.
-
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
-	ibcmock "github.com/cosmos/ibc-go/v3/testing/mock"
 
 	// NFT.
 	"github.com/CosmWasm/wasmd/x/wasm"
@@ -134,10 +121,6 @@ import (
 	// API documentation.
 	"github.com/notional-labs/craft/app/keepers"
 	appparameters "github.com/notional-labs/craft/app/params"
-
-	// Exp module .
-	"github.com/notional-labs/craft/x/exp"
-	exptypes "github.com/notional-labs/craft/x/exp/types"
 
 	// Upgrades
 	"github.com/notional-labs/craft/app/upgrades"
@@ -210,7 +193,7 @@ var (
 		staking.AppModuleBasic{},
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
-		gov.NewAppModuleBasic(append(wasmclient.ProposalHandlers, paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.LegacyProposalHandler, upgradeclient.LegacyCancelProposalHandler, ibcclientclient.UpdateClientProposalHandler, ibcclientclient.UpgradeProposalHandler)),
+		gov.NewAppModuleBasic(append(wasmclient.ProposalHandlers, paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.LegacyProposalHandler, upgradeclient.LegacyCancelProposalHandler)),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
@@ -219,14 +202,11 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
-		ibcmock.AppModuleBasic{},
-		ica.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		groupmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
-		exp.AppModuleBasic{},
 	)
 
 	// module account permissions.
@@ -239,9 +219,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		nft.ModuleName:                 nil,
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		icatypes.ModuleName:            nil,
 		wasm.ModuleName:                {authtypes.Burner},
-		exptypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -293,7 +271,6 @@ func NewCraftApp(
 	wasmOpts []wasm.Option,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *CraftApp {
-
 	appCodec := encodingConfig.Codec
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -310,6 +287,9 @@ func NewCraftApp(
 		appCodec:          appCodec,
 		interfaceRegistry: interfaceRegistry,
 	}
+
+	app.LegacyRouter = authmiddleware.NewLegacyRouter()
+	app.MsgSvcRouter = authmiddleware.NewMsgServiceRouter(interfaceRegistry)
 
 	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
@@ -337,6 +317,10 @@ func NewCraftApp(
 		nil,
 	)
 
+	skipGenesisInvariants := cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
+
+	app.mm = module.NewManager(appModules(app, encodingConfig, skipGenesisInvariants)...)
+
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
@@ -346,91 +330,21 @@ func NewCraftApp(
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	// NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
-	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName,
-		capabilitytypes.ModuleName,
-		minttypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		evidencetypes.ModuleName,
-		stakingtypes.ModuleName,
-		ibchost.ModuleName,
-		ibctransfertypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		govtypes.ModuleName,
-		crisistypes.ModuleName,
-		genutiltypes.ModuleName,
-		authz.ModuleName,
-		feegrant.ModuleName,
-		nft.ModuleName,
-		group.ModuleName,
-		exptypes.ModuleName,
-		paramstypes.ModuleName,
-		vestingtypes.ModuleName,
-		icatypes.ModuleName,
-		ibcmock.ModuleName,
-		wasm.ModuleName,
-	)
+	app.mm.SetOrderBeginBlockers(orderBeginBlockers()...)
 
-	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName,
-		govtypes.ModuleName,
-		stakingtypes.ModuleName,
-		capabilitytypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		ibchost.ModuleName,
-		minttypes.ModuleName,
-		genutiltypes.ModuleName,
-		evidencetypes.ModuleName,
-		authz.ModuleName,
-		feegrant.ModuleName,
-		nft.ModuleName,
-		group.ModuleName,
-		exptypes.ModuleName,
-		paramstypes.ModuleName,
-		upgradetypes.ModuleName,
-		vestingtypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		icatypes.ModuleName,
-		ibcmock.ModuleName,
-		wasm.ModuleName,
-	)
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	// NOTE: Capability module must occur first so that it can initialize any capabilities
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
-	app.mm.SetOrderInitGenesis(
-		capabilitytypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
-		slashingtypes.ModuleName,
-		govtypes.ModuleName,
-		minttypes.ModuleName,
-		crisistypes.ModuleName,
-		ibchost.ModuleName,
-		genutiltypes.ModuleName,
-		evidencetypes.ModuleName,
-		authz.ModuleName,
-		ibctransfertypes.ModuleName,
-		icatypes.ModuleName,
-		ibcmock.ModuleName,
-		feegrant.ModuleName,
-		exptypes.ModuleName,
-		nft.ModuleName,
-		group.ModuleName,
-		vestingtypes.ModuleName,
-		upgradetypes.ModuleName,
-		paramstypes.ModuleName,
-		// wasm after ibc transfer
-		wasm.ModuleName,
-	)
+	// Tell the app's module manager how to set the order of EndBlockers, which are run at the end of every block.
+	app.mm.SetOrderEndBlockers(orderEndBlockers()...)
+	// NOTE: The genutils moodule must occur after staking so that pools are
+	// properly initialized with tokens from genesis accounts.
+	// NOTE: Capability module must occur first so that it can initialize any capabilities
+	// so that other modules that want to create or claim capabilities afterwards in InitChain
+	// can do so safely.
+	app.mm.SetOrderInitGenesis(modulesOrderInitGenesis...)
 
 	// Uncomment if you want to set a custom migration order here.
 	// app.mm.SetOrderMigrations(custom order)
@@ -516,16 +430,6 @@ func (app *CraftApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abc
 // LoadHeight loads a particular height.
 func (app *CraftApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height)
-}
-
-// ModuleAccountAddrs returns all the app's module account addresses.
-func (app *CraftApp) ModuleAccountAddrs() map[string]bool {
-	modAccAddrs := make(map[string]bool)
-	for acc := range maccPerms {
-		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
-	}
-
-	return modAccAddrs
 }
 
 // LegacyAmino returns SimApp's amino codec.
@@ -636,10 +540,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
-	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
-	paramsKeeper.Subspace(exptypes.ModuleName)
 
 	return paramsKeeper
 }
