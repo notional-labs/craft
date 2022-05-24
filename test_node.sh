@@ -34,7 +34,7 @@ craftd add-genesis-account $KEY 100000000000000000000000000stake,10000000000toke
 # Sign genesis transaction
 craftd gentx $KEY 1000000000000000000000stake --keyring-backend $KEYRING --chain-id $CHAINID
 
-Collect genesis tx
+# Collect genesis tx
 craftd collect-gentxs
 
 # Run this to ensure everything worked and that the genesis file is setup correctly
