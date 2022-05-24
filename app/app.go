@@ -24,18 +24,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 
 	// Auth: Who can do what -- often used for vesting.
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authmiddleware "github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -48,14 +45,12 @@ import (
 
 	// Bank.
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	// Capability.
 	"github.com/cosmos/cosmos-sdk/x/capability"
 
 	// Crisis.
 	"github.com/cosmos/cosmos-sdk/x/crisis"
-	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 
 	// Distribution.
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
@@ -75,7 +70,6 @@ import (
 	// Governance.
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	govv1beta2 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	// Group: Governance, but between only a few users.  Useful for DAOs.
 
@@ -88,12 +82,10 @@ import (
 	// Parameters.
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
-	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	// Slashing.
 	"github.com/cosmos/cosmos-sdk/x/slashing"
-	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 
 	// Staking.
 	"github.com/cosmos/cosmos-sdk/x/staking"
@@ -109,12 +101,10 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 
 	// IBC: These modules enable the base level features of IBC, like clients, connections and channels.
-	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 
 	// NFT.
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
 
@@ -122,7 +112,7 @@ import (
 	"github.com/notional-labs/craft/app/keepers"
 	appparameters "github.com/notional-labs/craft/app/params"
 
-	// Upgrades
+	// Upgrades.
 	"github.com/notional-labs/craft/app/upgrades"
 )
 
@@ -275,7 +265,7 @@ func NewCraftApp(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
-	bApp := baseapp.NewBaseApp(AppName, logger, db, baseAppOptions...)
+	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
@@ -287,9 +277,6 @@ func NewCraftApp(
 		appCodec:          appCodec,
 		interfaceRegistry: interfaceRegistry,
 	}
-
-	app.LegacyRouter = authmiddleware.NewLegacyRouter()
-	app.MsgSvcRouter = authmiddleware.NewMsgServiceRouter(interfaceRegistry)
 
 	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
@@ -350,8 +337,8 @@ func NewCraftApp(
 	// app.mm.SetOrderMigrations(custom order)
 
 	app.mm.RegisterInvariants(app.CrisisKeeper)
-	app.mm.RegisterRoutes(app.LegacyRouter, app.QueryRouter(), encodingConfig.Amino)
-	app.configurator = module.NewConfigurator(app.appCodec, app.MsgSvcRouter, app.GRPCQueryRouter())
+	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
+	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
@@ -373,7 +360,7 @@ func NewCraftApp(
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 	)
 
@@ -388,7 +375,6 @@ func NewCraftApp(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.setTxHandler(encodingConfig.TxConfig, cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents)), app.GetKVStoreKey(), wasmConfig)
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -489,34 +475,6 @@ func (app *CraftApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
-// Set Transaction Handler.
-func (app *CraftApp) setTxHandler(txConfig client.TxConfig, indexEventsStr []string, keys map[string]*storetypes.KVStoreKey, wasmConfig wasmtypes.WasmConfig) {
-	indexEvents := map[string]struct{}{}
-	for _, e := range indexEventsStr {
-		indexEvents[e] = struct{}{}
-	}
-	txHandler, err := NewDefaultTxHandler(TxHandlerOptions{
-		Debug:             app.Trace(),
-		IndexEvents:       indexEvents,
-		LegacyRouter:      app.LegacyRouter,
-		MsgServiceRouter:  app.MsgSvcRouter,
-		AccountKeeper:     app.AccountKeeper,
-		BankKeeper:        app.BankKeeper,
-		FeegrantKeeper:    app.FeeGrantKeeper,
-		SignModeHandler:   txConfig.SignModeHandler(),
-		SigGasConsumer:    authmiddleware.DefaultSigVerificationGasConsumer,
-		TxDecoder:         txConfig.TxDecoder(),
-		WasmConfig:        &wasmConfig,
-		TXCounterStoreKey: keys[wasm.StoreKey],
-		IBCKeeper:         app.IBCKeeper,
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	app.SetTxHandler(txHandler)
-}
-
 // GetMaccPerms returns a copy of the module account permissions.
 func GetMaccPerms() map[string][]string {
 	dupMaccPerms := make(map[string][]string)
@@ -526,26 +484,7 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-// initParamsKeeper init params keeper and its subspaces.
-func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
-	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
-
-	paramsKeeper.Subspace(authtypes.ModuleName)
-	paramsKeeper.Subspace(banktypes.ModuleName)
-	paramsKeeper.Subspace(stakingtypes.ModuleName)
-	paramsKeeper.Subspace(minttypes.ModuleName)
-	paramsKeeper.Subspace(distrtypes.ModuleName)
-	paramsKeeper.Subspace(slashingtypes.ModuleName)
-	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1beta2.ParamKeyTable())
-	paramsKeeper.Subspace(crisistypes.ModuleName)
-	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
-	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(wasm.ModuleName)
-
-	return paramsKeeper
-}
-
-// configure store loader that checks if version == upgradeHeight and applies store upgrades
+// configure store loader that checks if version == upgradeHeight and applies store upgrades.
 func (app *CraftApp) setupUpgradeStoreLoaders() {
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {

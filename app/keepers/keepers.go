@@ -7,7 +7,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authmiddleware "github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -50,16 +49,13 @@ import (
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 
-	// IBC transfer module: Enables IBC transfer of coins between accounts using the transfer port on an IBC channel
+	// IBC transfer module: Enables IBC transfer of coins between accounts using the transfer port on an IBC channel.
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 )
 
 type AppKeepers struct {
-	MsgSvcRouter *authmiddleware.MsgServiceRouter
-	LegacyRouter sdk.Router
-
 	// keepers, by order of initialization
 	// "Special" keepers
 	ParamsKeeper     *paramskeeper.Keeper
@@ -131,7 +127,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	authzKeeper := authzkeeper.NewKeeper(
 		appKeepers.keys[authzkeeper.StoreKey],
 		appCodec,
-		appKeepers.MsgSvcRouter,
+		bApp.MsgServiceRouter(),
 		appKeepers.AccountKeeper,
 	)
 	appKeepers.AuthzKeeper = authzKeeper
@@ -173,7 +169,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		Example of setting group params:
 		groupConfig.MaxMetadataLen = 1000
 	*/
-	appKeepers.GroupKeeper = groupkeeper.NewKeeper(appKeepers.keys[group.StoreKey], appCodec, appKeepers.MsgSvcRouter, appKeepers.AccountKeeper, groupConfig)
+	appKeepers.GroupKeeper = groupkeeper.NewKeeper(appKeepers.keys[group.StoreKey], appCodec, bApp.MsgServiceRouter(), appKeepers.AccountKeeper, groupConfig)
 
 	// Create IBC Keeper
 	appKeepers.IBCKeeper = ibckeeper.NewKeeper(
@@ -228,7 +224,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedWasmKeeper,
 		appKeepers.TransferKeeper,
-		appKeepers.MsgSvcRouter,
+		bApp.MsgServiceRouter(),
 		bApp.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
@@ -257,7 +253,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, appKeepers.keys[govtypes.StoreKey],
 		appKeepers.GetSubspace(govtypes.ModuleName), appKeepers.AccountKeeper, appKeepers.BankKeeper,
-		appKeepers.StakingKeeper, govRouter, appKeepers.MsgSvcRouter, govtypes.DefaultConfig())
+		appKeepers.StakingKeeper, govRouter, bApp.MsgServiceRouter(), govtypes.DefaultConfig())
 	appKeepers.GovKeeper = govKeeper
 }
 

@@ -72,7 +72,7 @@ func appModules(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		upgrade.NewAppModule(*app.UpgradeKeeper),
-		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		params.NewAppModule(*app.ParamsKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
@@ -83,7 +83,6 @@ func appModules(
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		app.TransferModule,
 	}
-
 }
 
 // orderBeginBlockers Tell the app's module manager how to set the order of
@@ -166,34 +165,6 @@ var modulesOrderInitGenesis = []string{
 	paramstypes.ModuleName,
 	// wasm after ibc transfer
 	wasm.ModuleName,
-}
-
-// simulationModules returns modules for simulation manager
-func simulationModules(
-	app *CraftApp,
-	encodingConfig appparameters.EncodingConfig,
-	skipGenesisInvariants bool,
-) []module.AppModuleSimulation {
-	appCodec := encodingConfig.Codec
-
-	return []module.AppModuleSimulation{
-		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
-		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
-		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil),
-		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		params.NewAppModule(*app.ParamsKeeper),
-		evidence.NewAppModule(app.EvidenceKeeper),
-		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper),
-		app.TransferModule,
-	}
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
