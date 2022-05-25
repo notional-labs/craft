@@ -116,6 +116,7 @@ import (
 	"github.com/notional-labs/craft/app/upgrades"
 
 	// exptypes
+	"github.com/notional-labs/craft/x/exp"
 	exptypes "github.com/notional-labs/craft/x/exp/types"
 )
 
@@ -200,6 +201,7 @@ var (
 		vesting.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
+		exp.AppModuleBasic{},
 	)
 
 	// module account permissions.
