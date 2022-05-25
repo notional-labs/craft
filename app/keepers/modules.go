@@ -29,6 +29,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
+	"github.com/notional-labs/craft/x/exp"
 )
 
 // ModuleBasics returns ModuleBasics for the module BasicManager.
@@ -54,4 +55,5 @@ var ModuleBasics = module.NewBasicManager(
 	vesting.AppModuleBasic{},
 	nftmodule.AppModuleBasic{},
 	wasm.AppModuleBasic{},
+	exp.AppModuleBasic{},
 )

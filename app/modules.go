@@ -45,6 +45,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	appparameters "github.com/notional-labs/craft/app/params"
+	"github.com/notional-labs/craft/x/exp"
+	exptypes "github.com/notional-labs/craft/x/exp/types"
 )
 
 // appModules return modules to initialize module manager.
@@ -82,6 +84,7 @@ func appModules(
 		params.NewAppModule(*app.ParamsKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		app.TransferModule,
+		exp.NewAppModule(appCodec, app.ExpKeeper, app.AccountKeeper, app.BankKeeper),
 	}
 }
 
@@ -109,6 +112,7 @@ func orderBeginBlockers() []string {
 		group.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
+		exptypes.ModuleName,
 		wasm.ModuleName,
 	}
 }
@@ -137,6 +141,7 @@ func orderEndBlockers() []string {
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		exptypes.ModuleName,
 		wasm.ModuleName,
 	}
 }
@@ -163,6 +168,7 @@ var modulesOrderInitGenesis = []string{
 	vestingtypes.ModuleName,
 	upgradetypes.ModuleName,
 	paramstypes.ModuleName,
+	exptypes.ModuleName,
 	// wasm after ibc transfer
 	wasm.ModuleName,
 }

@@ -49,6 +49,11 @@ import (
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 
+	// exp module
+
+	expkeeper "github.com/notional-labs/craft/x/exp/keeper"
+	exptypes "github.com/notional-labs/craft/x/exp/types"
+
 	// IBC transfer module: Enables IBC transfer of coins between accounts using the transfer port on an IBC channel.
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
@@ -85,6 +90,7 @@ type AppKeepers struct {
 	EvidenceKeeper evidencekeeper.Keeper
 	TransferKeeper ibctransferkeeper.Keeper
 	WasmKeeper     wasm.Keeper
+	ExpKeeper      expkeeper.ExpKeeper
 
 	// transfer module
 	TransferModule transfer.AppModule
@@ -179,6 +185,14 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.StakingKeeper,
 		appKeepers.UpgradeKeeper,
 		appKeepers.ScopedIBCKeeper,
+	)
+
+	appKeepers.ExpKeeper = expkeeper.NewKeeper(
+		appKeepers.keys[exptypes.StoreKey],
+		appCodec,
+		appKeepers.GetSubspace(exptypes.ModuleName),
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
 	)
 
 	// Create Transfer Keepers
@@ -313,6 +327,7 @@ func (appKeepers *AppKeepers) initParamsKeeper(appCodec codec.BinaryCodec, legac
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(exptypes.ModuleName)
 
 	return paramsKeeper
 }
@@ -337,5 +352,6 @@ func KVStoreKeys() []string {
 		nftkeeper.StoreKey,
 		group.StoreKey,
 		wasm.StoreKey,
+		exptypes.StoreKey,
 	}
 }

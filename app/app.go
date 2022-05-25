@@ -114,6 +114,9 @@ import (
 
 	// Upgrades.
 	"github.com/notional-labs/craft/app/upgrades"
+
+	// exptypes
+	exptypes "github.com/notional-labs/craft/x/exp/types"
 )
 
 const (
@@ -210,6 +213,7 @@ var (
 		nft.ModuleName:                 nil,
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
+		exptypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 	}
 )
 
