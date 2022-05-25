@@ -49,7 +49,7 @@ import (
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 
-	// exp module
+	// Exp module.
 	expkeeper "github.com/notional-labs/craft/x/exp/keeper"
 	exptypes "github.com/notional-labs/craft/x/exp/types"
 

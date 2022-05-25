@@ -115,7 +115,7 @@ import (
 	// Upgrades.
 	"github.com/notional-labs/craft/app/upgrades"
 
-	// exptypes
+	// Exptypes.
 	"github.com/notional-labs/craft/x/exp"
 	exptypes "github.com/notional-labs/craft/x/exp/types"
 )
