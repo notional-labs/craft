@@ -13,7 +13,8 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgJoinDaoByNonIbcAsset{},
 		&MsgFundExpPool{},
 		&MsgJoinDaoByIbcAsset{},
-		&MsgMintAndAllocateExp{},
+		&MsgAdjustDaoTokenPrice{},
+		&MsgSendCoinsFromModuleToDAO{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
