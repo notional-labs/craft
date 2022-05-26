@@ -49,7 +49,7 @@
         <groupId>org.mongodb</groupId>
         <artifactId>mongo-java-driver</artifactId>
         <version>3.12.10</version>
-        <scope>provided</scope> <!-- To fix java.lang.LinkageError: loader constraint violation: loader 'craft-companies.jar' error? -->
+        <scope>provided</scope> <!--  To fix java.lang.LinkageError: loader constraint violation: loader 'craft-companies.jar' error? -->
     </dependency>
 
     <dependency>

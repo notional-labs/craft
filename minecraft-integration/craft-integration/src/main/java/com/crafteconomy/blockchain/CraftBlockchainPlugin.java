@@ -67,19 +67,15 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
         getConfig().options().copyDefaults(true);
         saveConfig();
-        redisDB = new RedisManager(
-            getConfig().getString("Redis.host"), 
-            getConfig().getInt("Redis.port"),
-            getConfig().getString("Redis.password")
-        );
 
-        mongoDB = new MongoDB(
-            getConfig().getString("MongoDB.host"), 
-            getConfig().getInt("MongoDB.port"), 
-            getConfig().getString("MongoDB.database"), 
-            getConfig().getString("MongoDB.username"),
-            getConfig().getString("MongoDB.password")
-        );
+        redisDB = new RedisManager(getConfig().getString("Redis.uri"));
+        mongoDB = new MongoDB(getConfig().getString("MongoDB.uri"), getConfig().getString("MongoDB.database"));
+        // redisDB = new RedisManager("redis://:PASSWORD@IP:6379");
+        // mongoDB = new MongoDB("mongodb://USER:PASS@IP:PORT/?authSource=AUTHDB", "crafteconomy");
+
+        System.out.println(redisDB.getRedisConnection().ping());
+        System.out.println("" + mongoDB.getDatabase().getCollection("connections").countDocuments());
+
 
         SERVER_WALLET = getConfig().getString("SERVER_WALLET_ADDRESS");
 

@@ -1,5 +1,6 @@
 package com.crafteconomy.blockchain.storage;
 
+import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
 
@@ -9,6 +10,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
+import redis.clients.jedis.exceptions.InvalidURIException;
+import redis.clients.jedis.util.JedisURIHelper;
 
 // 	Util.log("[DEBUG] Jedis Active: " + redisDB.getPool().getNumActive());
 // 	Util.log("[DEBUG] Jedis Idle: " + redisDB.getPool().getNumIdle());
@@ -25,7 +28,7 @@ public class RedisManager {
 
     private static RedisManager instance;
 
-    public RedisManager(String host, int port, String password) {
+    public RedisManager(String uri) {
         instance = this;
         config = new JedisPoolConfig();  
 
@@ -37,11 +40,19 @@ public class RedisManager {
         // needed for redis pubsub
         config.setMaxWait(Duration.ZERO);
         
-        if(password.length() > 0) {
-            pool = new JedisPool(config, host, port, 0, password, Protocol.DEFAULT_DATABASE);
-        } else {
-            pool = new JedisPool(config, host, port, 0);
+        // if(password.length() > 0) {
+        //     pool = new JedisPool(config, host, port, 0, password, Protocol.DEFAULT_DATABASE);
+        // } else {
+        //     pool = new JedisPool(config, host, port, 0);
+        // }
+        
+        // System.out.println(uri);
+
+        URI redisURI = URI.create(uri);
+        if (!JedisURIHelper.isValid(redisURI)) {
+            throw new InvalidURIException(String.format("Cannot open Redis connection due invalid URI. %s", uri.toString()));
         }
+        pool = new JedisPool(config, redisURI);
     }    
 
     public void debugging() {
