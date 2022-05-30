@@ -8,9 +8,9 @@ option go_package = "x/nftc/types";
 // Msg defines the nft Msg service.
 service Msg {
   // Send defines a method to send a nft from one account to another account.
-  rpc Send(MsgSend) returns (MsgSendResponse);
-  rpc Mint(MsgMint) returns (MsgMintResponse);
-  rpc Burn(MsgBurn) returns (MsgBurnResponse);
+  rpc SendNFT(MsgSend) returns (MsgSendResponse);
+  rpc MintNFT(MsgMint) returns (MsgMintResponse);
+  rpc BurnNFT(MsgBurn) returns (MsgBurnResponse);
   rpc CreateClass(MsgCreateClass) returns (MsgCreateClassResponse);
 }
 // MsgSend represents a message to send a nft from one account to another account.
