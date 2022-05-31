@@ -6,14 +6,14 @@ import (
 	"github.com/notional-labs/craft/x/nftc/types"
 )
 
-// Keeper of the nft store
+// Keeper of the nft store.
 type Keeper struct {
 	cdc      codec.BinaryCodec
 	storeKey storetypes.StoreKey
 	bk       types.BankKeeper
 }
 
-// NewKeeper creates a new nft Keeper instance
+// NewKeeper creates a new nft Keeper instance.
 func NewKeeper(key storetypes.StoreKey,
 	cdc codec.BinaryCodec, ak types.AccountKeeper, bk types.BankKeeper,
 ) Keeper {

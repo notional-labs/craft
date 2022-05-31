@@ -45,18 +45,22 @@ func (k Keeper) SendNFT(goCtx context.Context, msg *types.MsgSend) (*types.MsgSe
 		return nil, err
 	}
 
-	ctx.EventManager().EmitTypedEvent(&types.EventSend{
+	err = ctx.EventManager().EmitTypedEvent(&types.EventSend{
 		ClassId:  msg.ClassId,
 		Id:       msg.Id,
 		Sender:   msg.Sender,
 		Receiver: msg.Receiver,
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.MsgSendResponse{}, nil
 }
 
 // Send implement Send method of the types.MsgServer.
 func (k Keeper) MintNFT(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
-
 	return &types.MsgMintResponse{}, nil
 }
 

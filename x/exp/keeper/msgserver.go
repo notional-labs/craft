@@ -233,7 +233,6 @@ func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoins
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, acc, msg.Amount)
 	if err != nil {
 		return nil, types.ErrInputOutputMismatch
-
 	}
 
 	return &types.MsgSendCoinsByDAOResponse{}, nil

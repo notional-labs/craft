@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	// TypeMsgSend nft message types
+	// TypeMsgSend nft message types .
 	TypeMsgSend = "send"
 )
 
@@ -45,22 +45,22 @@ func (m MsgSend) ValidateBasic() error {
 	return nil
 }
 
-// GetSigners implements Msg
+// GetSigners implements Msg .
 func (m MsgSend) GetSigners() []sdk.AccAddress {
 	signer, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{signer}
 }
 
-// GetSigners implements Msg
+// GetSigners implements Msg .
 func (m MsgMint) GetSigners() []sdk.AccAddress {
 	signer, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{signer}
 }
 
-// Route Implements Msg.
+// Route Implements Msg .
 func (m MsgMint) Route() string { return sdk.MsgTypeURL(&m) }
 
-// Type Implements Msg.
+// Type Implements Msg .
 func (m MsgMint) Type() string { return sdk.MsgTypeURL(&m) }
 
 // GetSignBytes Implements Msg.
@@ -119,7 +119,7 @@ func (m MsgCreateClass) ValidateBasic() error {
 	return nil
 }
 
-// GetSigners implements Msg
+// GetSigners implements Msg.
 func (m MsgCreateClass) GetSigners() []sdk.AccAddress {
 	signer, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{signer}
