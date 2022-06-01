@@ -24,8 +24,8 @@ const (
 )
 
 var (
-	ParamStoreKeyMaxCoinMint      = []byte("maxCoinMint")
-	ParamStoreKeyDaoAccount       = []byte("daoAccount")
+	ParamStoreKeyMaxCoinMint      = []byte("maxcoinmint")
+	ParamStoreKeyDaoAccount       = []byte("daoaccount")
 	ParamStoreKeyDenom            = []byte("denom")
 	ParamStoreKeyClosePoolPeriod  = []byte("closepool")
 	ParamStoreKeyVestingPeriodEnd = []byte("vestingperiodvestend")
