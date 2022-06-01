@@ -40,8 +40,14 @@ message MsgMint {
   // sender is the address of the owner of nft
   string sender = 3;
 
-  // receiver is the receiver address of nft
-  string receiver = 4;
+  // uri for the NFT metadata stored off chain
+  string uri = 4;
+
+  // uri_hash is a hash of the document pointed by uri
+  string uri_hash = 5;
+
+  // data is an app specific data of the NFT. Optional
+  google.protobuf.Any data = 10;
 }
 
 message MsgMintResponse{}
@@ -71,8 +77,8 @@ message MsgCreateClass {
   // data is the app specific metadata of the NFT class. Optional
   google.protobuf.Any data = 8;
 
-    // sender 
-    string sender = 9;
+  // sender 
+  string sender = 9;
 
 }
 message MsgCreateClassResponse{}

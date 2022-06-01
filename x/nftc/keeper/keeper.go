@@ -3,6 +3,8 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/notional-labs/craft/x/nftc/types"
 )
 
@@ -27,4 +29,19 @@ func NewKeeper(key storetypes.StoreKey,
 		storeKey: key,
 		bk:       bk,
 	}
+}
+
+// Authorize checks if the sender is the owner of the given NFT
+// Return the NFT if true, an error otherwise
+func (k Keeper) Authorize(ctx sdk.Context, classID, nftID string, owner sdk.AccAddress) (types.NFT, error) {
+	nft, has := k.GetNFT(ctx, classID, nftID)
+	if has == false {
+		return types.NFT{}, types.ErrInvalidID
+	}
+
+	if !owner.Equals(k.GetOwner(ctx, classID, nftID)) {
+		return types.NFT{}, sdkerrors.Wrap(types.ErrUnauthorized, owner.String())
+	}
+
+	return nft, nil
 }

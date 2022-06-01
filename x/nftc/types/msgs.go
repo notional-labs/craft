@@ -83,10 +83,6 @@ func (m MsgMint) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "Invalid sender address (%s)", m.Sender)
 	}
 
-	_, err = sdk.AccAddressFromBech32(m.Receiver)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "Invalid receiver address (%s)", m.Receiver)
-	}
 	return nil
 }
 

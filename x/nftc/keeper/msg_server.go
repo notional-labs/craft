@@ -61,15 +61,29 @@ func (k Keeper) SendNFT(goCtx context.Context, msg *types.MsgSend) (*types.MsgSe
 
 // Send implement Send method of the types.MsgServer.
 func (k Keeper) MintNFT(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+	nft := types.NFT{
+		ClassId: msg.ClassId,
+		Id:      msg.Id,
+		Uri:     msg.Uri,
+		UriHash: msg.UriHash,
+	}
+
+	k.Mint(ctx, nft, sender)
+
 	return &types.MsgMintResponse{}, nil
 }
 
-// Send implement Send method of the types.MsgServer.
+// BurnNFT implement BurnNFT method of the types.MsgServer.
 func (k Keeper) BurnNFT(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
 	return &types.MsgBurnResponse{}, nil
 }
 
-// Send implement Send method of the types.MsgServer.
+// CreateClass implement CreateClass method of the types.MsgServer.
 func (k Keeper) CreateClass(goCtx context.Context, msg *types.MsgCreateClass) (*types.MsgCreateClassResponse, error) {
 	return &types.MsgCreateClassResponse{}, nil
 }
