@@ -104,6 +104,12 @@ func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAc
 	return nil
 }
 
+//GetDAOAccount return DAO account .
+func (k ExpKeeper) GetDAOAccount(ctx sdk.Context) string {
+	params := k.GetParams(ctx)
+	return params.DaoAccount
+}
+
 // verify Dao member: balances, whitelist .
 func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddress sdk.AccAddress) error {
 	params := k.GetParams(ctx)

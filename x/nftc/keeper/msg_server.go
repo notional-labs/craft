@@ -71,19 +71,61 @@ func (k Keeper) MintNFT(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 		Id:      msg.Id,
 		Uri:     msg.Uri,
 		UriHash: msg.UriHash,
+		Data:    msg.Data,
 	}
 
 	k.Mint(ctx, nft, sender)
+	// TODO: emit events
 
 	return &types.MsgMintResponse{}, nil
 }
 
 // BurnNFT implement BurnNFT method of the types.MsgServer.
 func (k Keeper) BurnNFT(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+	burnNFT, err := k.Authorize(ctx, msg.ClassId, msg.Id, sender)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.Burn(ctx, burnNFT.Id, burnNFT.ClassId)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: emit events
 	return &types.MsgBurnResponse{}, nil
 }
 
 // CreateClass implement CreateClass method of the types.MsgServer.
 func (k Keeper) CreateClass(goCtx context.Context, msg *types.MsgCreateClass) (*types.MsgCreateClassResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+
+	if err != nil {
+		return nil, err
+	}
+	err = k.AuthorizeDAO(ctx, msg.Sender)
+
+	if err != nil {
+		return nil, err
+	}
+
+	newClass := types.Class{
+		Id:          msg.Id,
+		Name:        msg.Name,
+		Symbol:      msg.Symbol,
+		Description: msg.Description,
+		Uri:         msg.Uri,
+		UriHash:     msg.UriHash,
+		Data:        msg.Data,
+	}
+	k.SaveClass(ctx, newClass)
+	// TODO: emit events
+
 	return &types.MsgCreateClassResponse{}, nil
 }

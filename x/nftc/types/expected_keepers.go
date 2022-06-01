@@ -16,3 +16,8 @@ type AccountKeeper interface {
 	GetModuleAddress(name string) sdk.AccAddress
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
 }
+
+// ExpKeeper defines the contract required for exp API.
+type ExpKeeper interface {
+	GetDAOAccount(ctx sdk.Context) string
+}

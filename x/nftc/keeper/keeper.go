@@ -13,6 +13,7 @@ type Keeper struct {
 	cdc      codec.BinaryCodec
 	storeKey storetypes.StoreKey
 	bk       types.BankKeeper
+	ek       types.ExpKeeper
 }
 
 // NewKeeper creates a new nft Keeper instance.
@@ -44,4 +45,14 @@ func (k Keeper) Authorize(ctx sdk.Context, classID, nftID string, owner sdk.AccA
 	}
 
 	return nft, nil
+}
+
+// AuthorizeDAO checks sender is DAO in exp module
+func (k Keeper) AuthorizeDAO(ctx sdk.Context, sender string) error {
+	daoAccount := k.ek.GetDAOAccount(ctx)
+
+	if daoAccount != sender {
+		return sdkerrors.Wrapf(types.ErrUnauthorized, "DAO address must be %s not %s", daoAccount, sender)
+	}
+	return nil
 }
