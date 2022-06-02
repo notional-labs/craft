@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
 import org.bukkit.Bukkit;
@@ -29,6 +30,8 @@ public class Tx implements Serializable {
 
     private UUID TxID;
     private String description;
+
+    private TransactionType txType = TransactionType.DEFAULT; // used for webapp
 
     private Consumer<UUID> function = null;
     private BiConsumer<UUID, UUID> biFunction = null;
@@ -83,6 +86,17 @@ public class Tx implements Serializable {
         } else if(function != null) {
             this.getFunction().accept(this.fromUUID);
         }
+    }
+
+    // TODO Does this mess with the @getter and setter stuff? or override
+    public Tx setTxType(TransactionType txType) {
+        // sets the type of transaction for the webapp to better sort each ID.
+        // (optional)
+        this.txType = txType;
+        return this;
+    }
+    public TransactionType getTxType() {
+        return this.txType;
     }
 
     public Tx sendTxIDClickable() {

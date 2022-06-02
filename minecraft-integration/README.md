@@ -110,6 +110,7 @@ tx.setToUUID(toUUID); // biConsumer only
 tx.setToWallet(to_wallet);
 tx.setAmount(10);
 tx.setDescription("Memo here");
+tx.setTxType(TransactionType.TYPE) // used for webapp, TransactionType.DEFAULT by default
 
 tx.setFunction((Consumer<UUID>) Logic.purchaseBusinessLicense()); // single payments
 OR
@@ -128,6 +129,8 @@ Getting values from a Tx
     String desc      = tx.getDescription();
     String toWallet  = tx.getToWallet();
     Consumer c       = tx.getFunction(); || tx.getBiFunction();
+
+    TransactionType txType  = tx.getTxType();
 
 -
 

@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.core.types.RequestTypes;
+import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.transactions.PendingTransactions;
 import com.crafteconomy.blockchain.transactions.Tx;
@@ -169,13 +170,15 @@ public class BlockchainRequest {
         String to = transaction.getToWallet();
         long amount = transaction.getAmount();
         UUID TxID = transaction.getTxID();
+        String desc = transaction.getDescription();
+        TransactionType txType = transaction.getTxType(); // used for webapp
 
 
         JSONObject jsonObject;
         try {
-            String transactionJson = generateJSONAminoTx(from, to, amount, transaction.getDescription());
+            String transactionJson = generateTxJSON(from, to, amount, desc, txType);
             jsonObject = new JSONObject(transactionJson);
-       }catch (JSONException err){
+       }catch (JSONException err) {
             Util.logSevere("EBlockchainRequest.java Error " + err.toString());
             Util.logSevere("Description: " + transaction.getDescription());
             return ErrorTypes.JSON_PARSE_TRANSACTION;
@@ -197,14 +200,14 @@ public class BlockchainRequest {
      * @param DESCRIPTION
      * @return String JSON Amino (Readable by webapp)
      */
-    private static String generateJSONAminoTx(String FROM, String TO, long AMOUNT, String DESCRIPTION) {    
+    private static String generateTxJSON(String FROM, String TO, long AMOUNT, String DESCRIPTION, TransactionType txType) {    
         long updatedAmount = AMOUNT * 1_000_000;  // converts craft -> ucraft value
         double taxAmount = updatedAmount * blockchainPlugin.getTaxRate();
         
         // EX: {"amount":"2","description":"Purchase Business License for 2","to_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p","tax":{"amount":0.1,"address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"},"denom":"uosmo","from_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"}
         
         // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
-        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"amount\": \""+updatedAmount+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
+        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"amount\": \""+updatedAmount+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
         // System.out.println(v);
         return json;
     }
