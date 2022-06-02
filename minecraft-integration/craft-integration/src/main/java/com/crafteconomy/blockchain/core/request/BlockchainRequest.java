@@ -153,18 +153,25 @@ public class BlockchainRequest {
 
     private static PendingTransactions pTxs = PendingTransactions.getInstance();
 
-    public static ErrorTypes transaction(Tx transaction) {
-        int minuteTTL = 30;
+    public static ErrorTypes transaction(Tx transaction, int RedisMinuteTTL) {
+        // int minuteTTL = 30;
 
-        if(BlockchainRequest.getBalance(transaction.getFromWallet()) < transaction.getAmount()){
-            System.out.println("Not enough tokens to send");
-            return ErrorTypes.NOT_ENOUGH_TO_SEND;
+        // IF we are in dev mode, don't try to send request to the blockchain, just do the transactions
+        if(CraftBlockchainPlugin.getIfInDevMode() == false) {
+            if(BlockchainRequest.getBalance(transaction.getFromWallet()) < transaction.getAmount()){
+                System.out.println("Not enough tokens to send");
+                return ErrorTypes.NOT_ENOUGH_TO_SEND;
+            }
+    
+            if(BlockchainRequest.getBalance(transaction.getToWallet()) < 0) {
+                System.out.println("No wallet balance for address");  
+                return ErrorTypes.NO_WALLET;
+            }
+        } else {
+            Util.coloredBroadcast("&cDEV MODE IS ENABLED FOR THIS TRANSACTION (config.yml, no blockchain request)");
         }
 
-        if(BlockchainRequest.getBalance(transaction.getToWallet()) < 0) {
-            System.out.println("No wallet balance for address");  
-            return ErrorTypes.NO_WALLET;
-        }
+        
 
         String from = transaction.getFromWallet();
         String to = transaction.getToWallet();
@@ -185,7 +192,7 @@ public class BlockchainRequest {
        }
        
         pTxs.addPending(transaction.getTxID(), transaction);     
-        redisDB.submitTxForSigning(from, TxID, jsonObject.toString(), minuteTTL);
+        redisDB.submitTxForSigning(from, TxID, jsonObject.toString(), RedisMinuteTTL);
         
         return ErrorTypes.NO_ERROR;
     }

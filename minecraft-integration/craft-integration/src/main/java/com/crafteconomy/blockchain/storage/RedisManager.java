@@ -86,7 +86,14 @@ public class RedisManager {
         String TxLabel = "tx_" + FROM_ADDRESS + "_" + TxID.toString();
 
         try (Jedis jedis = getRedisConnection()) {
-            jedis.setex(TxLabel, TimeToLiveMinutes*60, JSON_Output);
+
+            // If we deside we dont want expring txs, it will just set it (good for debugging)
+            if(TimeToLiveMinutes <= 0) {
+                jedis.set(TxLabel, JSON_Output);
+            } else {
+                jedis.setex(TxLabel, TimeToLiveMinutes*60, JSON_Output);
+            }            
+
             Util.log("Tx JSON Saved to redis as " + TxLabel + ", "+ JSON_Output + "\n");                        
         } catch (Exception e) {
             Util.logSevere("[RedisManager.java] Error saving Tx JSON to redis: " + e.getMessage());          

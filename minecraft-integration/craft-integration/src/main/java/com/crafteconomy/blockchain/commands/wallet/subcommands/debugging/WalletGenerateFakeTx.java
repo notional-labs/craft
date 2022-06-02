@@ -23,6 +23,8 @@ public class WalletGenerateFakeTx implements SubCommand {
 
     String webapp = CraftBlockchainPlugin.getInstance().getWebappLink();
 
+    int RedisMinuteTTL = CraftBlockchainPlugin.getRedisMinuteTTL();
+
     @Override
     public void onCommand(CommandSender sender, String[] args) {
 
@@ -69,7 +71,7 @@ public class WalletGenerateFakeTx implements SubCommand {
        
         
         try (Jedis jedis = redis.getRedisConnection()) {
-            ErrorTypes error = BlockchainRequest.transaction(TxInfo);
+            ErrorTypes error = BlockchainRequest.transaction(TxInfo, RedisMinuteTTL);
             // if(error != ErrorTypes.NO_ERROR) {
             //     // code
             // }

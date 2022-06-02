@@ -4,7 +4,7 @@
   <groupId>com.crafteconomy</groupId>
   <artifactId>craft-integration</artifactId>
   <name>craft-integration</name>
-  <version>4.0.0</version>
+  <version>4.0.1</version>
   <build>
     <resources>
       <resource>
@@ -61,12 +61,6 @@
       <groupId>io.papermc.paper</groupId>
       <artifactId>paper-api</artifactId>
       <version>1.17.1-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mongodb</groupId>
-      <artifactId>mongo-java-driver</artifactId>
-      <version>3.12.10</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

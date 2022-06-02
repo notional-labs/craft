@@ -60,6 +60,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     public static boolean ENABLED_FAUCET = false;
 
+    private static Integer REDIS_MINUTE_TTL = 30;   
+    private static Boolean DEV_MODE = false;
 
     @Override
     public void onEnable() {
@@ -83,6 +85,12 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
         TAX_RATE = getConfig().getDouble("TAX_RATE");
         if(TAX_RATE == null) TAX_RATE = 0.0;
+
+        REDIS_MINUTE_TTL = getConfig().getInt("TAX_RATE");
+        if(REDIS_MINUTE_TTL == null) REDIS_MINUTE_TTL = 30;
+
+        DEV_MODE = getConfig().getBoolean("DEV_MODE");
+        if(DEV_MODE == null) DEV_MODE = false;
 
         if(getApiEndpoint() == null) {
             getLogger().severe("API REST (lcd) endpoint not set in config.yml, disabling plugin");
@@ -156,6 +164,13 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         PendingTransactions.clearUncompletedTransactionsFromRedis();
         redisDB.closePool();  
         // jedisPubSubClient.close();             
+    }
+
+    public static int getRedisMinuteTTL() {
+        return REDIS_MINUTE_TTL;
+    }
+    public static boolean getIfInDevMode() {
+        return DEV_MODE;
     }
 
     public RedisManager getRedis() {

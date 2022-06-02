@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public class IntegrationAPI {
 
     WalletManager walletManager = WalletManager.getInstance();
+    private int RedisMinuteTTL = CraftBlockchainPlugin.getRedisMinuteTTL();
 
     private CraftBlockchainPlugin blockchainPlugin;
 
@@ -202,7 +203,7 @@ public class IntegrationAPI {
      * @return      The ErrorTypes of the transaction status
      */
     public ErrorTypes submit(Tx tx) {
-        return BlockchainRequest.transaction(tx);
+        return BlockchainRequest.transaction(tx, RedisMinuteTTL);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.crafteconomy.blockchain.commands.wallet.subcommands;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.commands.SubCommand;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
@@ -23,6 +24,7 @@ import org.bukkit.entity.Player;
 public class WalletSend implements SubCommand {
 
     WalletManager walletManager = WalletManager.getInstance();
+    int RedisMinuteTTL = CraftBlockchainPlugin.getRedisMinuteTTL();
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
@@ -79,7 +81,7 @@ public class WalletSend implements SubCommand {
         txInfo.setDescription(player.getName() + " sent " + AMOUNT + " to " + args[1]);
         txInfo.setFunction(getConsumerMessage("&a&lSUCCESS: &fYou have sent " + AMOUNT + "CRAFT to " + args[1]));
 
-        ErrorTypes error = BlockchainRequest.transaction(txInfo);
+        ErrorTypes error = BlockchainRequest.transaction(txInfo, RedisMinuteTTL);
 
         if(error != ErrorTypes.NO_ERROR) {
             Util.colorMsg(sender, "&c&lERROR: &f" + error.toString());
