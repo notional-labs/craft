@@ -1,6 +1,7 @@
 package com.crafteconomy.blockchain.core.request;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
@@ -210,11 +211,14 @@ public class BlockchainRequest {
     private static String generateTxJSON(String FROM, String TO, long AMOUNT, String DESCRIPTION, TransactionType txType) {    
         long updatedAmount = AMOUNT * 1_000_000;  // converts craft -> ucraft value
         double taxAmount = updatedAmount * blockchainPlugin.getTaxRate();
-        
+        long now = Instant.now().getEpochSecond();
+
         // EX: {"amount":"2","description":"Purchase Business License for 2","to_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p","tax":{"amount":0.1,"address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"},"denom":"uosmo","from_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"}
         
+        // ",\"timestamp\": "+variable.toString()+
+
         // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
-        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"amount\": \""+updatedAmount+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
+        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+updatedAmount+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
         // System.out.println(v);
         return json;
     }

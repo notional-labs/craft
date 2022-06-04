@@ -4,6 +4,7 @@ import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.commands.SubCommand;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.transactions.function_testing.Examples;
@@ -52,6 +53,7 @@ public class WalletGenerateFakeTx implements SubCommand {
 
         if(args[1].equalsIgnoreCase("license")) {
             TxInfo.setFunction(Examples.purchaseBusinessLicense());
+            TxInfo.setTxType(TransactionType.COMPANY);
             desc = "Purchase Business License for 2";
             TxInfo.setAmount(2);
         } else {
@@ -60,6 +62,7 @@ public class WalletGenerateFakeTx implements SubCommand {
             }
 
             TxInfo.setFunction(Examples.purchaseSomeItem(itemToPurchase));
+            TxInfo.setTxType(TransactionType.TRADE);
             desc = "Purchasing item " + itemToPurchase + " for 1";
             TxInfo.setAmount(1);
         }
