@@ -17,6 +17,7 @@ public class Testing_Cosmos_Query {
         URL url = null;
         String myMemo = null;
         try {
+            // REDIS:: SET signed_442f82ad-c2b9-481b-8b72-e5b1b414758c 3EFA66F9613EF5E215942257C08904392195FCA1C8A9367704AEF97FCAD6FEAA
             // curl -X GET "https://api.cosmos.network/cosmos/tx/v1beta1/txs/3EFA66F9613EF5E215942257C08904392195FCA1C8A9367704AEF97FCAD6FEAA" -H "accept: application/json"
             url = new URL("https://api.cosmos.network/cosmos/tx/v1beta1/txs/" + tendermintHash);
 
