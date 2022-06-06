@@ -56,7 +56,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     private Jedis jedisPubSubClient = null;
     private RedisKeyListener keyListener = null;
 
-    private String webappLink = null;
+    private static String webappLink = null;
+    private static String TX_QUERY_ENDPOINT = null;
 
     public static boolean ENABLED_FAUCET = false;
 
@@ -82,6 +83,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         SERVER_WALLET = getConfig().getString("SERVER_WALLET_ADDRESS");
 
         webappLink = getConfig().getString("SIGNING_WEBAPP_LINK");
+        TX_QUERY_ENDPOINT = getConfig().getString("TX_QUERY_ENDPOINT");
 
         TAX_RATE = getConfig().getDouble("TAX_RATE");
         if(TAX_RATE == null) TAX_RATE = 0.0;
@@ -171,6 +173,11 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     }
     public static boolean getIfInDevMode() {
         return DEV_MODE;
+    }
+
+    public static String getTxQueryEndpoint() {
+        // https://api.cosmos.network/cosmos/tx/v1beta1/txs/{TENDERMINT_HASH}
+        return TX_QUERY_ENDPOINT;
     }
 
     public RedisManager getRedis() {
