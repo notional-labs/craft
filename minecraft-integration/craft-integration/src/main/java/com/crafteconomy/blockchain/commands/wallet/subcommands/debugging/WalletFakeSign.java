@@ -40,7 +40,8 @@ public class WalletFakeSign implements SubCommand {
         }
 
         try (Jedis jedis = redis.getRedisConnection()) {
-            jedis.set("signed_" + TxID.toString(), "This is done from the webapp, so data here sould be from there");
+            // if DEBUGGING is the value, we will allow it through the tendermint hash check
+            jedis.set("signed_" + TxID.toString(), "DEBUGGING");
             Util.log("signed_" + TxID.toString() + " added to redis, firing event");
         } catch (Exception e) {
             Util.logSevere("[WalletFakeSign] Error setting signed_" + TxID.toString() + " in redis");
