@@ -12,6 +12,7 @@ public class SignedTransactionEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     
     private UUID TxID;
+    private String tednermintHash = null;
 
     public SignedTransactionEvent(UUID TxID) {
         super(true);  // async for RedisKeylistener being async   
@@ -24,6 +25,14 @@ public class SignedTransactionEvent extends Event {
 
     public void setTx(UUID TxID) {
         this.TxID = TxID;
+    }
+
+    public void setTendermintHash(String tednermintHash) {
+        this.tednermintHash = tednermintHash;
+    }
+
+    public String getTednermintHash() {
+        return tednermintHash;
     }
 
     public UUID getTxID() {

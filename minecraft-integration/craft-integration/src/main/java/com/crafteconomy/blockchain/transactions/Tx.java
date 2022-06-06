@@ -67,6 +67,13 @@ public class Tx implements Serializable {
         this.TxID = UUID.randomUUID();    
     }
 
+    public Tx setDescription(String description) {
+        // By doing this, we can ensure a compromised webapp attacker can't reuse the same TxHash to match a similar Tx description
+        // Read about it in docs/README.md -> Security Considerations
+        this.description = description + " time_" + System.currentTimeMillis();
+        return this;
+    }
+
     public String getFromWallet() {
         return walletManager.getAddress(this.fromUUID);
     }
