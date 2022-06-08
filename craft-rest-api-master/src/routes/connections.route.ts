@@ -3,7 +3,7 @@ const router = express.Router();
 import connectionsController from '../controllers/connections.controller';
 
 // Routes for connections
-router.get('/link', connectionsController.getConnectionLink)
-router.post('/link', connectionsController.createConnectionLink)
+router.post('/link', connectionsController.createConnectionLink);
+router.get('/code/:minecraftCode', connectionsController.getMinecraftIDFromCode);
 
 export default router;

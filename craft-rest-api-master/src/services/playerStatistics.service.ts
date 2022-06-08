@@ -1,47 +1,23 @@
-// Mongo
-import * as mongo from 'mongodb';
-
-// Collections for statistics, internal to service
-const collections: { statistics?: mongo.Collection; accounts?: mongo.Collection } = {};
-
-/**
- * Connect to MongoDB
- *
- * @param connectionString Connection string
- * @param dbName Name of database
- */
-export const connectToDatabaseStats = async (connectionString, dbName) => {
-    // Connect to DB
-    const client: mongo.MongoClient = new mongo.MongoClient(connectionString);
-    await client.connect();
-
-    // Set collections
-    const db: mongo.Db = client.db(dbName);
-    const playerStatistics: mongo.Collection = db.collection('playerStatistics');
-    const accounts: mongo.Collection = db.collection('accounts');
-    collections.statistics = playerStatistics;
-    collections.accounts = accounts;
-
-    console.log(`Successfully connected to database (player statistics service) ${db.databaseName}`);
-};
+import { collections } from './database.service';
 
 /**
  * @returns Total registered users that have joined the server
  */
-export const getTotalUsers = async (at: Date) => {
-        return collections?.statistics
-            ?.aggregate([
-                {
-                    $match: {
-                        firstJoined: { $lt: at }
-                    }
-                },
-                {
-                    $group: {
-                        _id: '$_id'
-                    }
+export const getTotalUsers = async (from: Date, at: Date) => {
+    return collections?.statistics
+        ?.aggregate([
+            {
+                $match: {
+                    firstJoined: { $lt: at }
                 }
-            ]).toArray();
+            },
+            {
+                $group: {
+                    _id: '$_id'
+                }
+            }
+        ])
+        .toArray();
 };
 
 /**
@@ -76,7 +52,8 @@ export const getTotalPlaytime = async (from: Date, to: Date) => {
                     }
                 }
             }
-        ]).toArray();
+        ])
+        .toArray();
 };
 
 /**
@@ -99,8 +76,31 @@ export const getNewPlayers = async (from: Date, to: Date) => {
                     _id: '$_id'
                 }
             }
-        ]).toArray();
+        ])
+        .toArray();
 };
+
+/**
+ * Get the total amount of active players (defaults to last 24 hours).
+ * This pretty much tracks how many unique players have joined since the
+ * from data.
+ */
+export const getActivePlayers = async (from: Date, to: Date) => {
+    return collections?.statistics
+        ?.aggregate([
+            {
+                $match: {
+                    lastLogin: {  $gte: from, $lt: to }
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id'
+                }
+            }
+        ])
+        .toArray();
+}
 
 /**
  * Get latest statistics for a user
@@ -108,7 +108,15 @@ export const getNewPlayers = async (from: Date, to: Date) => {
  * @param uuid The UUID of the user
  */
 export const getLatestStatistics = async (uuid: string) => {
-    return collections?.statistics?.find({ _id: uuid }).sort({ timestamp: -1 }).tryNext();
+    let doc = await collections?.statistics?.find({ _id: uuid }).sort({ timestamp: -1 }).tryNext();
+    // Set username
+    if (doc) {
+        let username = await collections?.accounts?.find({ _id: uuid }).next();
+
+        if (username)
+            doc["username"] = username.name;
+    }
+    return doc;
 };
 
 /**
@@ -123,9 +131,4 @@ export const getLatestStatisticsFrom = async (from: Date, to: Date) => {
         ?.find({ timestamp: { $gte: from, $lt: to } })
         .sort({ timestamp: -1 })
         .toArray();
-};
-
-export default {
-    connectToDatabaseStats,
-    getLatestStatistics
 };

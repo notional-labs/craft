@@ -1,34 +1,11 @@
-// Mongo
-import * as mongo from 'mongodb';
-
-// Collections for statistics, internal to service
-const collections: { connections?: mongo.Collection } = {};
+import { collections } from './database.service';
 
 // The options associated with connections
 type LinkOptions = {
     discordId: string;
     keplrId: string;
     minecraftId: string;
-}
-
-/**
- * Connect to MongoDB
- *
- * @param connectionString Connection string
- * @param dbName Name of database
- */
-export const connectToDatabaseConnections = async (connectionString, dbName) => {
-    // Connect to DB
-    const client: mongo.MongoClient = new mongo.MongoClient(connectionString);
-    await client.connect();
-
-    // Set collections
-    const db: mongo.Db = client.db(dbName);
-    collections.connections = db.collection('connections');
-
-    console.log(`Successfully connected to database (connections service) ${db.databaseName}`);
 };
-
 
 /**
  * Get the associated links a user has
@@ -36,31 +13,39 @@ export const connectToDatabaseConnections = async (connectionString, dbName) => 
  * @param options - the available link params
  */
 export const getLink = async (options: LinkOptions) => {
-    console.log("Running get link with options: " + JSON.stringify(options));
     let document;
 
     if (options.discordId) {
         // Get link by Discord
-        console.log("Running discord");
         const discord = await collections?.connections?.find({ discordId: options.discordId }).tryNext();
         if (discord) document = discord;
     }
 
     if (options.keplrId) {
-        console.log("Running keplr");
         // Get links by Keplr id
         const keplr = await collections?.connections?.find({ keplrId: options.keplrId }).tryNext();
         if (keplr) document = keplr;
     }
 
     if (options.minecraftId) {
-        console.log("Running mc");
         //  Get links by Minecraft
-        const minecraft = await collections?.connections?.find({minecraftId: options.minecraftId  }).tryNext();
+        const minecraft = await collections?.connections?.find({ minecraftId: options.minecraftId }).tryNext();
         if (minecraft) document = minecraft;
     }
 
-    console.log(document);
+    return document;
+};
+
+
+/**
+ * Get the uuid of their MC account based on 
+ *
+ * @param code - the available code they generated in game
+ */
+export const getMCUUID = async (minecraftCode: string) => {
+    const document = await collections?.webappSyncCodes?.find({ code: minecraftCode }).tryNext();
+    // console.log(document);
+
     return document;
 };
 
@@ -88,7 +73,6 @@ export const doesLinkExist = async (options: LinkOptions) => {
 };
 
 export default {
-    connectToDatabaseConnections,
     getLink,
     createLink
 };
