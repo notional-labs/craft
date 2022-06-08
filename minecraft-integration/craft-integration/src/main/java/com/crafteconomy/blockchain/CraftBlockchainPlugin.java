@@ -164,8 +164,11 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         // Bukkit.getScheduler().cancelTasks(this);
 
         PendingTransactions.clearUncompletedTransactionsFromRedis();
-        redisDB.closePool();  
-        // jedisPubSubClient.close();             
+        redisDB.closePool();
+        mongoDB.disconnect(); 
+        // jedisPubSubClient.close();          
+        
+        Bukkit.getScheduler().cancelTasks(this);
     }
 
     public static int getRedisMinuteTTL() {

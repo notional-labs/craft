@@ -49,8 +49,8 @@
         <groupId>org.mongodb</groupId>
         <artifactId>mongo-java-driver</artifactId>
         <version>3.12.10</version>
-        <!-- Enable the following when we use craft-bukkit-core -->
-        <!-- <scope>provided</scope>  To fix java.lang.LinkageError: loader constraint violation: loader 'craft-companies.jar' error? -->
+        <!-- Set to 'provided' when using with craft-bukkit-core, comment out when standalone -->
+        <!-- <scope>provided</scope>  -->
     </dependency>
 
     <dependency>
