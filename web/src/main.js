@@ -134,14 +134,14 @@ $('.discord-connect').click(function() {
 });
 
 $('.minecraft-connect').click(function() {
-    const code = window.prompt("Enter your code!", "");
+    const code = window.prompt("Enter your code!", "SSFOQO9G1CYI2ASXV6RR");
     // console.log("[minecraft-connect] Got code: " + code);
     
     // get request to get their UUID
     $.getJSON('https://api.crafteconomy.io/v1/connections/code/' + code, function(data, status){
         // alert("Data: " + data + "\nStatus: " + status);        
         console.log("UUID: " + data["_id"] + "\nStatus: " + status);
-        localStorage.setItem("minecraft_me", JSON.stringify(data["_id"]));
+        localStorage.setItem("minecraft_me", data["_id"]);
         checkLinks();
     });
 });
@@ -201,6 +201,7 @@ function checkLinks() {
 
   // Check if Discord exists and Keplr exists & minecraft is linked
   if (localStorage.getItem("discord_me") !== null && localStorage.getItem("keplr_me") !== null && localStorage.getItem("minecraft_me") !== null) {    
+    // if(true) { // testing
       const discord = localStorage.getItem("discord_me");      
       const keplr = localStorage.getItem("keplr_me");
       const minecraftUUID = localStorage.getItem("minecraft_me");
@@ -215,6 +216,8 @@ function checkLinks() {
           data: {
               discordId: JSON.parse(discord).id,
               keplrId: JSON.parse(keplr).address,
+            //   discordId: "testingid",
+            //   keplrId: "testaddress",
               minecraftId: minecraftUUID
           },
           success: function() {
