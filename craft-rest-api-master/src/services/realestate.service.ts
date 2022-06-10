@@ -20,6 +20,25 @@ export const getPropertyInformation = async (uuid: string) => {
 };
 
 /**
+ * Gets a properties status/state (FOR_RENT, FOR_SALE, RENTED, OWNED)
+ * http://127.0.0.1:4000/v1/realestate/state/FOR_RENT
+ * 
+ * @param state The state to query of the property (FOR_RENT, FOR_SALE, RENTED, OWNED)
+ * @returns The properties with the given state as an array of Strings
+ */
+export const getPropertiesState = async (state: string) => {
+    // FOR_RENT, FOR_SALE, RENTED, OWNED
+    let properties: string[] = [];
+
+    await collections?.reProperties?.find({ state: state }).forEach(doc => {
+        const reID = doc?._id.toString();
+        properties.push(reID);
+    });
+    
+    return properties;    
+};
+
+/**
  * Get a users CRAFT owned NFTs (for now this is the omniflix for onft testing)
  * (Acts more so like middle ware)
  * http://127.0.0.1:4000/v1/realestate/owned/omniflix13na285c3llhnfenq6hl3fh255scljcue4td9nh
