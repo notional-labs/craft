@@ -44,6 +44,10 @@ if [[ $1 == "pending" ]]; then
   echo "pending mode is on, please wait for the first block committed."
 fi
 
+# Opens the RPC endpoint to outside connections
+sed -i '/laddr = "tcp:\/\/127.0.0.1:26657"/c\laddr = "tcp:\/\/0.0.0.0:26657"' ~/.craftd/config/config.toml
+sed -i 's/cors-allowed-origins = \[\]/cors-allowed-origins = \["\*"\]/g' ~/.craftd/config/config.toml
+
 # # Start the node (remove the --pruning=nothing flag if historical queries are not needed)
 craftd start --pruning=nothing  --minimum-gas-prices=0.0001stake --mode validator         
 
