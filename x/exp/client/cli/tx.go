@@ -165,10 +165,10 @@ func NewAdjustDaoTokenPrice() *cobra.Command {
 	return cmd
 }
 
-func NewSendCoinsByDAO() *cobra.Command {
+func NewSendCoinsToDAO() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "adjust [price]",
-		Short: `adjust dao token price to [price] .`,
+		Use:   "send [amount]",
+		Short: `send [amount] from module escrow to DAO address .`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -176,12 +176,12 @@ func NewSendCoinsByDAO() *cobra.Command {
 				return err
 			}
 
-			price, err := sdk.NewDecFromStr(args[0])
+			coins, err := sdk.ParseCoinsNormalized(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgAdjustDaoTokenPrice(clientCtx.GetFromAddress().String(), price)
+			msg := types.NewMsgSendCoinsFromModuleToDAO(clientCtx.GetFromAddress().String(), coins)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},

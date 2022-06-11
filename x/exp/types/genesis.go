@@ -2,7 +2,6 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	types "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/libs/time"
 )
 
@@ -17,7 +16,7 @@ func NewGenesisState(whiteList AccountRecords, params Params, daoAssetInfo DaoAs
 
 // DefaultGenesisState creates a default GenesisState object .
 func DefaultGenesisState() *GenesisState {
-	coin := types.NewCoin("uexp", types.NewInt(100000))
+	coin := sdk.NewCoin("uexp", sdk.NewInt(100000))
 	data := AccountRecord{
 		Account:     "craft1q3ts5qhrh3m6t970egemuuwywhlhpnmmza6pqj",
 		MaxToken:    &coin,

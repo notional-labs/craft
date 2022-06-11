@@ -27,7 +27,7 @@ func (k ExpKeeper) completeBurnRequest(ctx sdk.Context, burnRequest types.BurnRe
 	k.setEndedBurnRequest(ctx, burnRequest)
 }
 
-func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sdk.AccAddress, tokenLeft sdk.Dec) error {
+func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sdk.AccAddress, tokenLeft sdk.Dec) {
 	mintRequest := types.MintRequest{
 		Account:        memberAccount.String(),
 		DaoTokenLeft:   tokenLeft,
@@ -37,8 +37,6 @@ func (k ExpKeeper) addAddressToMintRequestList(ctx sdk.Context, memberAccount sd
 	}
 
 	k.SetMintRequest(ctx, mintRequest)
-
-	return nil
 }
 
 func (k ExpKeeper) completeMintRequest(ctx sdk.Context, mintRequest types.MintRequest) {

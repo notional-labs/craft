@@ -133,10 +133,8 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 		return &types.MsgJoinDaoByIbcAssetResponse{}, err
 	}
 
-	err = k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)
-	if err != nil {
-		return nil, err
-	}
+	k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -217,15 +215,15 @@ func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDao
 	return &types.MsgAdjustDaoTokenPriceResponse{}, nil
 }
 
-func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoinsByDAO) (*types.MsgSendCoinsByDAOResponse, error) {
+func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoinsFromModuleToDAO) (*types.MsgSendCoinsFromModuleToDAOResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	params := k.GetParams(ctx)
 
-	if params.DaoAccount != msg.FromAddress {
-		return nil, sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, msg.FromAddress)
+	if params.DaoAccount != msg.ToAddress {
+		return nil, sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, msg.ToAddress)
 	}
-	acc, err := sdk.AccAddressFromBech32(msg.FromAddress)
+	acc, err := sdk.AccAddressFromBech32(msg.ToAddress)
 	if err != nil {
 		return nil, sdkerrors.ErrInvalidAddress
 	}
@@ -235,5 +233,5 @@ func (k msgServer) SendCoinsByDAO(goCtx context.Context, msg *types.MsgSendCoins
 		return nil, types.ErrInputOutputMismatch
 	}
 
-	return &types.MsgSendCoinsByDAOResponse{}, nil
+	return &types.MsgSendCoinsFromModuleToDAOResponse{}, nil
 }
