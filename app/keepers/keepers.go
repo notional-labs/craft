@@ -7,7 +7,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authmiddleware "github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -24,6 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
 
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -31,6 +31,7 @@ import (
 	oldgovtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -48,25 +49,17 @@ import (
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 
-	// Interchain Accounts
+	// Exp module.
+	expkeeper "github.com/notional-labs/craft/x/exp/keeper"
+	exptypes "github.com/notional-labs/craft/x/exp/types"
 
-	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
-	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
-
-	// IBC transfer module: Enables IBC transfer of coins between accounts using the transfer port on an IBC channel
+	// IBC transfer module: Enables IBC transfer of coins between accounts using the transfer port on an IBC channel.
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	// bech32ibckeeper "github.com/osmosis-labs/bech32-ibc/x/bech32ibc/keeper"
-	// bech32ibctypes "github.com/osmosis-labs/bech32-ibc/x/bech32ibc/types"
-	// bech32ics20keeper "github.com/osmosis-labs/bech32-ibc/x/bech32ics20/keeper"
 )
 
 type AppKeepers struct {
-	msgSvcRouter *authmiddleware.MsgServiceRouter
-	legacyRouter sdk.Router
-
 	// keepers, by order of initialization
 	// "Special" keepers
 	ParamsKeeper     *paramskeeper.Keeper
@@ -86,16 +79,17 @@ type AppKeepers struct {
 	StakingKeeper  stakingkeeper.Keeper
 	SlashingKeeper slashingkeeper.Keeper
 	DistrKeeper    distrkeeper.Keeper
+	MintKeeper     mintkeeper.Keeper
 	GovKeeper      govkeeper.Keeper
 	AuthzKeeper    authzkeeper.Keeper
 	FeeGrantKeeper feegrantkeeper.Keeper
 	GroupKeeper    groupkeeper.Keeper
 	NFTKeeper      nftkeeper.Keeper
 	IBCKeeper      *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	ICAHostKeeper  icahostkeeper.Keeper
 	EvidenceKeeper evidencekeeper.Keeper
 	TransferKeeper ibctransferkeeper.Keeper
 	WasmKeeper     wasm.Keeper
+	ExpKeeper      expkeeper.ExpKeeper
 
 	// transfer module
 	TransferModule transfer.AppModule
@@ -133,12 +127,12 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.GetSubspace(banktypes.ModuleName),
 		blockedAddress,
 	)
-	appKeepers.BankKeeper = &bankKeeper
+	appKeepers.BankKeeper = bankKeeper
 
 	authzKeeper := authzkeeper.NewKeeper(
 		appKeepers.keys[authzkeeper.StoreKey],
 		appCodec,
-		appKeepers.msgSvcRouter,
+		bApp.MsgServiceRouter(),
 		appKeepers.AccountKeeper,
 	)
 	appKeepers.AuthzKeeper = authzKeeper
@@ -170,6 +164,18 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	)
 	appKeepers.SlashingKeeper = slashingKeeper
 
+	appKeepers.MintKeeper = mintkeeper.NewKeeper(
+		appCodec, appKeepers.keys[minttypes.StoreKey], appKeepers.GetSubspace(minttypes.ModuleName), &stakingKeeper,
+		appKeepers.AccountKeeper, appKeepers.BankKeeper, authtypes.FeeCollectorName,
+	)
+
+	groupConfig := group.DefaultConfig()
+	/*
+		Example of setting group params:
+		groupConfig.MaxMetadataLen = 1000
+	*/
+	appKeepers.GroupKeeper = groupkeeper.NewKeeper(appKeepers.keys[group.StoreKey], appCodec, bApp.MsgServiceRouter(), appKeepers.AccountKeeper, groupConfig)
+
 	// Create IBC Keeper
 	appKeepers.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
@@ -178,6 +184,14 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.StakingKeeper,
 		appKeepers.UpgradeKeeper,
 		appKeepers.ScopedIBCKeeper,
+	)
+
+	appKeepers.ExpKeeper = expkeeper.NewKeeper(
+		appKeepers.keys[exptypes.StoreKey],
+		appCodec,
+		appKeepers.GetSubspace(exptypes.ModuleName),
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
 	)
 
 	// Create Transfer Keepers
@@ -192,13 +206,13 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.BankKeeper,
 		appKeepers.ScopedTransferKeeper,
 	)
-	appKeepers.TransferKeeper = transferKeeper
-	appKeepers.TransferModule = transfer.NewAppModule(appKeepers.TransferKeeper)
 
+	appKeepers.TransferKeeper = transferKeeper
+	transferModule := transfer.NewIBCModule(appKeepers.TransferKeeper)
+	appKeepers.TransferModule = transfer.NewAppModule(transferKeeper)
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(icahosttypes.SubModuleName, appKeepers.ICAHostKeeper).
-		AddRoute(ibctransfertypes.ModuleName, appKeepers.TransferKeeper)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
 	// Note: the sealing is done after creating wasmd and wiring that up
 
 	// create evidence keeper with router
@@ -223,7 +237,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedWasmKeeper,
 		appKeepers.TransferKeeper,
-		appKeepers.msgSvcRouter,
+		bApp.MsgServiceRouter(),
 		bApp.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
@@ -252,7 +266,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, appKeepers.keys[govtypes.StoreKey],
 		appKeepers.GetSubspace(govtypes.ModuleName), appKeepers.AccountKeeper, appKeepers.BankKeeper,
-		appKeepers.StakingKeeper, govRouter, appKeepers.msgSvcRouter, govtypes.DefaultConfig())
+		appKeepers.StakingKeeper, govRouter, bApp.MsgServiceRouter(), govtypes.DefaultConfig())
 	appKeepers.GovKeeper = govKeeper
 }
 
@@ -304,15 +318,15 @@ func (appKeepers *AppKeepers) initParamsKeeper(appCodec codec.BinaryCodec, legac
 	paramsKeeper.Subspace(authtypes.ModuleName)
 	paramsKeeper.Subspace(banktypes.ModuleName)
 	paramsKeeper.Subspace(stakingtypes.ModuleName)
+	paramsKeeper.Subspace(minttypes.ModuleName)
 	paramsKeeper.Subspace(distrtypes.ModuleName)
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1beta2.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
-	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(exptypes.ModuleName)
 
 	return paramsKeeper
 }
@@ -322,6 +336,7 @@ func KVStoreKeys() []string {
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		stakingtypes.StoreKey,
+		minttypes.StoreKey,
 		distrtypes.StoreKey,
 		slashingtypes.StoreKey,
 		govtypes.StoreKey,
@@ -331,12 +346,11 @@ func KVStoreKeys() []string {
 		feegrant.StoreKey,
 		evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey,
-		icacontrollertypes.StoreKey,
-		icahosttypes.StoreKey,
 		capabilitytypes.StoreKey,
 		authzkeeper.StoreKey,
 		nftkeeper.StoreKey,
 		group.StoreKey,
 		wasm.StoreKey,
+		exptypes.StoreKey,
 	}
 }
