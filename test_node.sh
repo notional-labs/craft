@@ -30,6 +30,8 @@ cat $HOME/.craftd/config/genesis.json | jq '.app_state["gov"]["voting_params"]["
 
 # Allocate genesis accounts (cosmos formatted addresses)
 craftd add-genesis-account $KEY 100000000000000000000000000stake,10000000000token --keyring-backend $KEYRING
+# Adds token to reece
+craftd add-genesis-account craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0 10000000000token --keyring-backend $KEYRING
 
 # Sign genesis transaction
 craftd gentx $KEY 1000000000000000000000stake --keyring-backend $KEYRING --chain-id $CHAINID
@@ -49,5 +51,5 @@ sed -i '/laddr = "tcp:\/\/127.0.0.1:26657"/c\laddr = "tcp:\/\/0.0.0.0:26657"' ~/
 sed -i 's/cors-allowed-origins = \[\]/cors-allowed-origins = \["\*"\]/g' ~/.craftd/config/config.toml
 
 # # Start the node (remove the --pruning=nothing flag if historical queries are not needed)
-craftd start --pruning=nothing  --minimum-gas-prices=0.0001stake --mode validator         
+craftd start --pruning=nothing  --minimum-gas-prices=0.0001token --mode validator         
 
