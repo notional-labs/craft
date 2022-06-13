@@ -194,6 +194,12 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.BankKeeper,
 	)
 
+	appKeepers.FeeGrantKeeper = feegrantkeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[feegrant.StoreKey],
+		appKeepers.AccountKeeper,
+	)
+
 	// Create Transfer Keepers
 	transferKeeper := ibctransferkeeper.NewKeeper(
 		appCodec,
