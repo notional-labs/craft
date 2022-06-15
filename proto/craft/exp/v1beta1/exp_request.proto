@@ -32,8 +32,6 @@ message BurnRequest {
     (gogoproto.stdtime)  = true
   ];
   RequestStatus status = 4;
-
-
 }
 
 message MintRequest{
