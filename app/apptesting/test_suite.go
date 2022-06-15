@@ -138,7 +138,7 @@ func (s *KeeperTestHelper) BuildTx(
 	return txBuilder.GetTx()
 }
 
-// CreateRandomAccounts is a function return a list of randomly generated AccAddresses
+// CreateRandomAccounts is a function return a list of randomly generated AccAddresses .
 func CreateRandomAccounts(numAccts int) []sdk.AccAddress {
 	testAddrs := make([]sdk.AccAddress, numAccts)
 	for i := 0; i < numAccts; i++ {

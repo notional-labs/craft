@@ -1,9 +1,7 @@
 package keeper_test
 
 import (
-	// "fmt"
 	"fmt"
-	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -315,3 +313,4 @@ func (suite *KeeperTestSuite) TestMintAndAllocateExp() {
 		test.fn()
 	}
 }
+

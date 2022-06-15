@@ -2,9 +2,8 @@ package app
 
 import (
 	"encoding/json"
-	"testing"
-
 	"os"
+	"testing"
 
 	"github.com/notional-labs/craft/x/exp/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -16,7 +15,7 @@ import (
 )
 
 // Setup initializes a new CraftApp.
-func Setup( isCheckTx bool) *CraftApp {
+func Setup(isCheckTx bool) *CraftApp {
 	db := dbm.NewMemDB()
 	encCdc := simapp.MakeTestEncodingConfig()
 	app := NewCraftApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(), GetEnabledProposals(), simapp.EmptyAppOptions{}, nil)

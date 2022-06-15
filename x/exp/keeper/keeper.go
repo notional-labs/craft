@@ -60,7 +60,7 @@ func (k ExpKeeper) MintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAcc
 		return nil
 	}
 	// only mint one denom
-	if newCoins.Len() != 1 && newCoins[0].Denom != k.GetDenom(ctx) {
+	if newCoins.Len() != 1 || newCoins[0].Denom != k.GetDenom(ctx) {
 		return errors.New("exp module only mint exp")
 	}
 
@@ -85,7 +85,7 @@ func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAc
 		return nil
 	}
 	// only mint one denom
-	if newCoins.Len() != 1 && newCoins[0].Denom != k.GetDenom(ctx) {
+	if newCoins.Len() != 1 || newCoins[0].Denom != k.GetDenom(ctx) {
 		return errors.New("exp module only burn exp")
 	}
 
@@ -105,7 +105,7 @@ func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAc
 }
 
 // verify Dao member: balances, whitelist .
-func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddress sdk.AccAddress) error {
+func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddress, dstAddress sdk.AccAddress, amountMint sdk.Coins) error {
 	params := k.GetParams(ctx)
 
 	if params.DaoAccount != daoAddress.String() {
@@ -117,9 +117,8 @@ func (k ExpKeeper) verifyAccountForMint(ctx sdk.Context, daoAddress sdk.AccAddre
 	// check if dstAddress in whitelist .
 	for _, accountRecord := range whiteList {
 		if dstAddress.String() == accountRecord.Account {
-			dstAddressBalances := k.bankKeeper.GetBalance(ctx, dstAddress, params.Denom)
 			// amount check
-			if dstAddressBalances.Amount.GT(accountRecord.MaxToken.Amount) {
+			if amountMint[0].Amount.GT(accountRecord.MaxToken.Amount) {
 				return types.ErrInputOutputMismatch
 			}
 			timeCheck := accountRecord.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx))

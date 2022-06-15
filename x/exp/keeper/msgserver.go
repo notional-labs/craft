@@ -36,7 +36,7 @@ func (k msgServer) MintAndAllocateExp(goCtx context.Context, msg *types.MsgMintA
 		return nil, err
 	}
 
-	if err := k.verifyAccountForMint(ctx, fromAddress, memberAddress); err != nil {
+	if err := k.verifyAccountForMint(ctx, fromAddress, memberAddress, msg.Amount); err != nil {
 		return nil, err
 	}
 

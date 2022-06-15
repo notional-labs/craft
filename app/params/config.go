@@ -7,10 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const (
-	
-	Bech32PrefixAccAddr = "craft"
-)
+const Bech32PrefixAccAddr = "craft"
 
 var (
 	// Bech32PrefixAccPub defines the Bech32 prefix of an account's public key.
