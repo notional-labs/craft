@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	// abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/notional-labs/craft/x/exp/keeper"
@@ -15,10 +15,7 @@ import (
 
 var (
 	defaultAcctFunds  sdk.Coins = sdk.NewCoins(
-		// sdk.NewCoin("uexp", sdk.NewInt(10000000000)),
-		sdk.NewCoin("foo", sdk.NewInt(10000000)),
-		sdk.NewCoin("bar", sdk.NewInt(10000000)),
-		sdk.NewCoin("baz", sdk.NewInt(10000000)),
+		sdk.NewCoin("token", sdk.NewInt(10000000)),
 	)
 	daoAddress = "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 )
@@ -475,6 +472,76 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 
 	for _, test := range tests {
 		suite.SetupTest()		
+		test.fn()
+	}
+}
+
+func (suite *KeeperTestSuite) TestSpendIbcAssetToExp() {
+	tests := []struct {
+		fn func()
+	}{
+		// expected case
+		{
+			fn: func() {
+				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
+				
+				req := types.MsgSpendIbcAssetToExp{
+					FromAddress: suite.TestAccs[0].String(),
+					Amount: sdk.NewCoins(sdk.NewCoin("token", sdk.NewInt(1000000))),
+				}
+				_, err := msgServer.SpendIbcAssetToExp(sdk.WrapSDKContext(suite.Ctx), &req)
+				suite.Require().NoError(err)
+
+				// check balance
+				suite.App.EndBlock(abci.RequestEndBlock{Height: suite.Ctx.BlockHeight()})
+				ibcBalance := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "token")
+				daoBalance := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "uexp")
+
+				// init 10000000, spent 1000000
+				suite.Require().Equal(ibcBalance.Amount, sdk.NewInt(9000000))
+				
+				daoBalanceExpected := suite.App.ExpKeeper.GetDaoTokenPrice(suite.Ctx).Mul(sdk.NewDec(1000000))
+				suite.Require().Equal(daoBalanceExpected, daoBalance.Amount)
+			},
+		},
+
+		// Only accept ibc denom
+		{
+			fn: func() {
+				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
+				req := types.MsgSpendIbcAssetToExp{
+					FromAddress: suite.TestAccs[0].String(),
+					Amount: sdk.NewCoins(sdk.NewCoin("ibc", sdk.NewInt(1000000))),
+				}
+				_, err := msgServer.SpendIbcAssetToExp(sdk.WrapSDKContext(suite.Ctx), &req)
+				suite.Require().Error(err)
+
+				req = types.MsgSpendIbcAssetToExp{
+					FromAddress: suite.TestAccs[0].String(),
+					Amount: sdk.NewCoins(sdk.NewCoin("ibc", sdk.NewInt(1000000)), sdk.NewCoin("token", sdk.NewInt(1000000))),
+				}
+				_, err = msgServer.SpendIbcAssetToExp(sdk.WrapSDKContext(suite.Ctx), &req)
+				suite.Require().Error(err)
+			},
+		},
+	}
+
+	for _, test := range tests {
+		suite.SetupTest()
+
+		for _, acc := range suite.TestAccs {
+			suite.FundAcc(acc, defaultAcctFunds)
+		}
+
+		msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
+				
+		req := types.MsgJoinDaoByIbcAsset{
+			JoinAddress: suite.TestAccs[0].String(),
+			GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+			Amount: sdk.NewDec(1000000),
+		}
+		_, err := msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
+		suite.Require().NoError(err)		
 		test.fn()
 	}
 }
