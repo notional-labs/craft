@@ -423,3 +423,59 @@ func (suite *KeeperTestSuite) TestRequestBurnCoinAndExitDao() {
 	}
 }
 
+func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
+	tests := []struct {
+		fn func()
+	}{
+		// expected case
+		{
+			fn: func() {
+				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
+				
+				req := types.MsgAdjustDaoTokenPrice{
+					FromAddress: daoAddress,
+					DaoTokenPrice: sdk.NewDec(2),
+				}
+				_, err := msgServer.AdjustDaoPrice(sdk.WrapSDKContext(suite.Ctx), &req)
+				suite.Require().NoError(err)
+
+				daoAssetPrice := suite.App.ExpKeeper.GetDaoTokenPrice(suite.Ctx)
+				suite.Require().Equal(daoAssetPrice, sdk.NewDec(2))
+			},
+		},
+
+		// Only execute by DAO address
+		{
+			fn: func() {
+				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
+				
+				req := types.MsgAdjustDaoTokenPrice{
+					FromAddress: suite.TestAccs[1].String(),
+					DaoTokenPrice: sdk.NewDec(10),
+				}
+				_, err := msgServer.AdjustDaoPrice(sdk.WrapSDKContext(suite.Ctx), &req)
+				suite.Require().Error(err)
+			},
+		},
+
+		// Should not set price to 0
+		{
+			fn: func() {
+				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
+				
+				req := types.MsgAdjustDaoTokenPrice{
+					FromAddress: daoAddress,
+					DaoTokenPrice: sdk.NewDec(0),
+				}
+				_, err := msgServer.AdjustDaoPrice(sdk.WrapSDKContext(suite.Ctx), &req)
+				suite.Require().Error(err) // should return err
+			},
+		},
+	}
+
+	for _, test := range tests {
+		suite.SetupTest()		
+		test.fn()
+	}
+}
+
