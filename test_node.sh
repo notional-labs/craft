@@ -19,8 +19,7 @@ craftd config chain-id $CHAINID
 
 # if $KEY exists it should be deleted
 # decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry
-echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
-craftd keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO --recover
+echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | craftd keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO --recover
 # Set moniker and chain-id for Evmos (Moniker can be anything, chain-id must be an integer)
 craftd init $MONIKER --chain-id $CHAINID 
 
