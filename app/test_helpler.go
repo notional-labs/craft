@@ -2,24 +2,29 @@ package app
 
 import (
 	"encoding/json"
+	"testing"
+
 	"os"
 
-	craftapp "github.com/notional-labs/craft/app"
+	"github.com/notional-labs/craft/x/exp/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
+
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/simapp"
 )
 
 // Setup initializes a new CraftApp.
-func Setup(isCheckTx bool) *craftapp.CraftApp {
+func Setup( isCheckTx bool) *CraftApp {
 	db := dbm.NewMemDB()
 	encCdc := simapp.MakeTestEncodingConfig()
-
-	app := craftapp.NewCraftApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, craftapp.DefaultNodeHome, 5, craftapp.MakeEncodingConfig(), craftapp.GetEnabledProposals(), nil, nil)
+	app := NewCraftApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(), GetEnabledProposals(), simapp.EmptyAppOptions{}, nil)
 	if !isCheckTx {
-		genesisState := craftapp.NewDefaultGenesisState(encCdc.Codec)
+		sapp := simapp.NewSimApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, simapp.DefaultNodeHome, 5, encCdc, simapp.EmptyAppOptions{})
+		genesisState := simapp.GenesisStateWithSingleValidator(&testing.T{}, sapp)
+		defaultGenesis := NewDefaultGenesisState(encCdc.Codec)
+		genesisState[types.ModuleName] = defaultGenesis[types.ModuleName]
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)
@@ -39,7 +44,7 @@ func Setup(isCheckTx bool) *craftapp.CraftApp {
 
 // SetupTestingAppWithLevelDB initializes a new CraftApp intended for testing,
 // with LevelDB as a db.
-func SetupTestingAppWithLevelDB(isCheckTx bool) (app *craftapp.CraftApp, cleanupFn func()) {
+func SetupTestingAppWithLevelDB(isCheckTx bool) (app *CraftApp, cleanupFn func()) {
 	dir := "craft_testing"
 	encCdc := simapp.MakeTestEncodingConfig()
 
@@ -47,17 +52,16 @@ func SetupTestingAppWithLevelDB(isCheckTx bool) (app *craftapp.CraftApp, cleanup
 	if err != nil {
 		panic(err)
 	}
-	app = craftapp.NewCraftApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, craftapp.DefaultNodeHome, 5, craftapp.MakeEncodingConfig(), craftapp.GetEnabledProposals(), nil, nil)
+	app = NewCraftApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(), GetEnabledProposals(), nil, nil)
 	if !isCheckTx {
-		genesisState := craftapp.NewDefaultGenesisState(encCdc.Codec)
+		genesisState := NewDefaultGenesisState(encCdc.Codec)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)
 		}
-
 		app.InitChain(
 			abci.RequestInitChain{
-				Validators:      []abci.ValidatorUpdate{},
+				Validators:      []abci.ValidatorUpdate{{}},
 				ConsensusParams: simapp.DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
 			},
