@@ -60,7 +60,7 @@ func (k ExpKeeper) MintExpForAccount(ctx sdk.Context, newCoins sdk.Coins, dstAcc
 		return nil
 	}
 	// only mint one denom
-	if newCoins.Len() != 1 && newCoins[0].Denom != k.GetDenom(ctx) {
+	if newCoins.Len() != 1 || newCoins[0].Denom != k.GetDenom(ctx) {
 		return errors.New("exp module only mint exp")
 	}
 
@@ -85,7 +85,7 @@ func (k ExpKeeper) BurnExpFromAccount(ctx sdk.Context, newCoins sdk.Coins, dstAc
 		return nil
 	}
 	// only mint one denom
-	if newCoins.Len() != 1 && newCoins[0].Denom != k.GetDenom(ctx) {
+	if newCoins.Len() != 1 || newCoins[0].Denom != k.GetDenom(ctx) {
 		return errors.New("exp module only burn exp")
 	}
 
