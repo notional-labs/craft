@@ -100,10 +100,10 @@ func (k ExpKeeper) calculateStableTokenReturn(ctx sdk.Context, expCoin sdk.Coin)
 
 func (k ExpKeeper) ValidateBurnRequestByTime(ctx sdk.Context, burnRequest types.BurnRequest) bool {
 	burnPeriod := k.GetBurnExpPeriod(ctx)
-	return burnRequest.RequestTime.Add(burnPeriod).Before(ctx.BlockTime())
+	return burnRequest.RequestTime.Add(burnPeriod).After(ctx.BlockTime())
 }
 
 func (k ExpKeeper) ValidateMintRequestByTime(ctx sdk.Context, mintRequest types.MintRequest) bool {
 	mintPeriod := k.GetBurnExpPeriod(ctx)
-	return mintRequest.RequestTime.Add(mintPeriod).Before(ctx.BlockTime())
+	return mintRequest.RequestTime.Add(mintPeriod).After(ctx.BlockTime())
 }
