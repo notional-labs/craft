@@ -2,27 +2,35 @@
 
 # NOTE TO SELF, UPDATE CW721 to support sending nfts & offerings
 
-
+```bash
 export KEY="mykey"
 export KEYALGO="secp256k1"
 export CRAFT_CHAIN_ID="test-1"
 export CRAFT_KEYRING_BACKEND="test"
 export CRAFT_NODE="tcp://65.108.125.182:26657"
+```
 
+```bash
 TX20=$(craftd tx wasm store cw20_base.wasm --from $KEY --gas auto -y --output json | jq -r '.txhash')
 TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY --gas auto -y --output json | jq -r '.txhash')
 TXM=$(craftd tx wasm store nftext_manager.wasm --from $KEY --gas auto -y --output json | jq -r '.txhash')
+```
 
+```bash
 C20=$(craftd q tx $TX20 --output json | jq -r '.logs[].events[] | select(.type=="store_code").attributes[].value')
 C721=$(craftd q tx $TX721 --output json | jq -r '.logs[].events[] | select(.type=="store_code").attributes[].value')
 CM=$(craftd q tx $TXM --output json | jq -r '.logs[].events[] | select(.type=="store_code").attributes[].value')
+```
 
+```bash
 echo $C20  # id: 6
 echo $C721 # id: 3
 echo $CM   # id: 5
+```
 
 # now we need to init them
 
+```bash
 craftd tx wasm instantiate $C20 '{
   "name": "craft-cw-20-placeholder",
   "symbol": "CRAFTR",
@@ -39,36 +47,44 @@ craftd tx wasm instantiate $C20 '{
 }' --label "cw20-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY --admin $(craftd keys show $KEY -a)
 
 export ADDR20=craft1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjqwl8xfc
+```
 
-
+```bash
 craftd tx wasm instantiate $C721 '{
   "name": "craftd-realestate-nfts",
   "symbol": "CRE",
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 }' --label "cw721-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --admin $(craftd keys show $KEY -a) --from $KEY
 export ADDR721=craft1qwlgtx52gsdu7dtp0cekka5zehdl0uj3fhp9acg325fvgs8jdzkstnsu5l
+```
 
+```bash
 craftd tx wasm instantiate $CM '{
   "name": "marketplace-nfts"
 }' --label "marketplace" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY --admin $(craftd keys show $KEY -a)
 export ADDRM=craft1j08452mqwadp8xu25kn9rleyl2gufgfjnv0sn8dvynynakkjukcqccenqp
-
+```
 
 ---
 init an NFT w/ data
 
+```bash
 TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"https://gateway.pinata.cloud/ipfs/QmXkGh665GVjCCs3cbLLWYwjc3kug1EBGvdyVmhuZRMgNE"}}' --from $KEY --yes --output json | jq -r '.txhash')
 
 craftd q wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"}}'
-
+```
 
 ----
 https://github.com/BlockscapeNetwork/hackatom_v/tree/master/contracts/marketplace
 
 # sell token
+```sh
+# Example of conversion
 echo '{"address":"$ADDR20","amount":"1"}}' | base64
 --> eyJhZGRyZXNzIjoiJEFERFIyMCIsImFtb3VudCI6IjEifX0K
+```
 
+```bash
 craftd tx wasm execute $ADDR721 '{
   "send_nft": {
     "contract": "craft1qwlgtx52gsdu7dtp0cekka5zehdl0uj3fhp9acg325fvgs8jdzkstnsu5l",
@@ -78,10 +94,12 @@ craftd tx wasm execute $ADDR721 '{
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
 # Error: rpc error: code = Unknown desc = failed to execute message; message index: 0: dispatch: submessages: Error parsing into type cw721_base::msg::ExecuteMsg<core::option::Option<cosmwasm_std::results::empty::Empty>>: unknown variant `receive_nft`, expected one of `transfer_nft`, `send_nft`, `approve`, `revoke`, `approve_all`, `revoke_all`, `mint`, `burn`: execute wasm contract failed: unknown request
 ## probably have to build off the hackatom_v cw721_base.wasm updated to newst OR port over their functions
-
+```
 
 
 
 
 # all offerings
+```bash
 craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
+```
