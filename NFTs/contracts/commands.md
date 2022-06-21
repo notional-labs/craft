@@ -85,15 +85,18 @@ echo '{"address":"$ADDR20","amount":"1"}}' | base64
 ```
 
 ```bash
+# ADDR20
+echo '{"list_price":{"address":"craft1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjqwl8xfc","amount":"1","denom":"CRAFTR"}}' | base64
+# $ADDRM
 craftd tx wasm execute $ADDR721 '{
   "send_nft": {
-    "contract": "craft1qwlgtx52gsdu7dtp0cekka5zehdl0uj3fhp9acg325fvgs8jdzkstnsu5l",
+    "contract": "craft1j08452mqwadp8xu25kn9rleyl2gufgfjnv0sn8dvynynakkjukcqccenqp", 
     "token_id": "1",
-    "msg": "eyJhZGRyZXNzIjoiJEFERFIyMCIsImFtb3VudCI6IjEifX0K"
+    "msg":"eyJsaXN0X3ByaWNlIjp7ImFkZHJlc3MiOiJjcmFmdDE0NjZuZjN6dXhweWE4cTllbXh1a2Q3dmZ0YWY2aDRwc3IwYTA3c3JsNXp3NzR6aDg0eWpxd2w4eGZjIiwiYW1vdW50IjoiMSIsImRlbm9tIjoiQ1JBRlRSIn19Cg=="
   }
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
-# Error: rpc error: code = Unknown desc = failed to execute message; message index: 0: dispatch: submessages: Error parsing into type cw721_base::msg::ExecuteMsg<core::option::Option<cosmwasm_std::results::empty::Empty>>: unknown variant `receive_nft`, expected one of `transfer_nft`, `send_nft`, `approve`, `revoke`, `approve_all`, `revoke_all`, `mint`, `burn`: execute wasm contract failed: unknown request
-## probably have to build off the hackatom_v cw721_base.wasm updated to newst OR port over their functions
+
+
 ```
 
 
@@ -102,4 +105,15 @@ craftd tx wasm execute $ADDR721 '{
 # all offerings
 ```bash
 craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
+
+data:
+  offerings:
+  - contract_addr: craft1qwlgtx52gsdu7dtp0cekka5zehdl0uj3fhp9acg325fvgs8jdzkstnsu5l
+    id: "1"
+    list_price:
+      amount: "1"
+      denom: CRAFTR
+    seller: craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
+    token_id: "1"
+  
 ```
