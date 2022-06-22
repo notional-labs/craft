@@ -7,7 +7,7 @@ export KEY="mykey"
 export KEYALGO="secp256k1"
 export CRAFT_CHAIN_ID="test-1"
 export CRAFT_KEYRING_BACKEND="test"
-export CRAFT_NODE="tcp://65.108.125.182:26657"
+export CRAFTD_NODE="tcp://65.108.125.182:26657"
 ```
 
 ```bash
@@ -69,9 +69,19 @@ export ADDRM=craft1j08452mqwadp8xu25kn9rleyl2gufgfjnv0sn8dvynynakkjukcqccenqp
 init an NFT w/ data
 
 ```bash
-TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"https://gateway.pinata.cloud/ipfs/QmXkGh665GVjCCs3cbLLWYwjc3kug1EBGvdyVmhuZRMgNE"}}' --from $KEY --yes --output json | jq -r '.txhash')
+# TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"https://gateway.pinata.cloud/ipfs/QmXkGh665GVjCCs3cbLLWYwjc3kug1EBGvdyVmhuZRMgNE"}}' --from $KEY --yes --output json | jq -r '.txhash')
+## craftd q wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"}}'
 
-craftd q wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"}}'
+export JSON_ENCODED=`echo '{"uuid": "12345", "name": "My NFT", "type": "HOME", "description": "This is my NFT", "image": "https://image.com/1.png"}' | base64`
+
+TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"6","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"eyJ1dWlkIjogIjEyMzQ1IiwgIm5hbWUiOiAiTXkgTkZUIiwgInR5cGUiOiAiSE9NRSIsICJkZXNjcmlwdGlvbiI6ICJUaGlzIGlzIG15IE5GVCIsICJpbWFnZSI6ICJodHRwczovL2ltYWdlLmNvbS8xLnBuZyJ9Cg=="}}' --from $KEY --yes --output json | jq -r '.txhash')
+
+export QUERY_JSON='{"all_nft_info":{"token_id":"5"}}'
+# craftd q wasm contract-state smart $ADDR721 $QUERY_JSON
+
+# Export Base64 encoded JSON as a raw string (no quotes)
+export JSON_VALUES=`echo $(craftd q wasm contract-state smart $ADDR721 $QUERY_JSON --output json) | jq -r '.data.info.token_uri'`
+echo $JSON_VALUES | base64 --decode | jq '.uuid'
 ```
 
 ----
