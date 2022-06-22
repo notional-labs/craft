@@ -1,17 +1,10 @@
-
 use crate::package::{ContractInfoResponse, OfferingsResponse, QueryOfferingsResult};
 use crate::state::{increment_offerings, Offering, CONTRACT_INFO, OFFERINGS};
 use cosmwasm_std::{
     from_binary, to_binary, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Order, Response,
     StdResult, SubMsg, WasmMsg
 };
-use cw20::{Cw20ReceiveMsg}; // what is this for bank module? use cw20::{Cw20ExecuteMsg}
-use cosmwasm_std::Coin;
-
-// import BankMsg from cosmwasm_bank::msg::BankMsg;
-use cosmwasm_std::{BankMsg};
-// use cosmwasm_std::BankQuery::{AllBalances, Balance}
-
+use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg};
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg};
 use cosmwasm_std::entry_point;
 use crate::error::ContractError;
@@ -64,25 +57,15 @@ pub fn try_receive(
     }
 
     // create transfer cw20 msg
-    // let transfer_cw20_msg = Cw20ExecuteMsg::Transfer {
-    //     recipient: off.seller.clone().into_string(),
-    //     amount: rcv_msg.amount,
-    // };
-
-    let coin_amount = Coin {
-        denom: off.list_price.denom.clone(), // ucraft / token
+    let transfer_cw20_msg = Cw20ExecuteMsg::Transfer {
+        recipient: off.seller.clone().into_string(),
         amount: rcv_msg.amount,
     };
-
-    let transfer_coin_msg = BankMsg::Send {
-        to_address: off.seller.clone().into_string(),
-        amount: vec![coin_amount],
+    let exec_cw20_transfer = WasmMsg::Execute {
+        contract_addr: info.sender.clone().into_string(),
+        msg: to_binary(&transfer_cw20_msg)?,
+        funds: vec![],
     };
-    // let exec_cw20_transfer = WasmMsg::Execute {
-    //     contract_addr: info.sender.clone().into_string(),
-    //     msg: to_binary(&transfer_coin_msg)?,
-    //     funds: vec![],
-    // };
 
     // create transfer cw721 msg
     let transfer_cw721_msg = Cw721ExecuteMsg::TransferNft {
@@ -95,17 +78,15 @@ pub fn try_receive(
         funds: vec![],
     };
 
-
     // if everything is fine transfer cw20 to seller
-    // let cw20_transfer_cosmos_msg: CosmosMsg = exec_cw20_transfer.into();
-    let coin_transfer_msg: CosmosMsg = CosmosMsg::Bank(transfer_coin_msg);
+    let cw20_transfer_cosmos_msg: CosmosMsg = exec_cw20_transfer.into();
     // transfer nft to buyer
     let cw721_transfer_cosmos_msg: CosmosMsg = exec_cw721_transfer.into();
 
-    let coin_submsg = SubMsg::new(coin_transfer_msg);
+    let cw20_submsg = SubMsg::new(cw20_transfer_cosmos_msg);
     let cw721_submsg = SubMsg::new(cw721_transfer_cosmos_msg);
 
-    let cosmos_msgs = vec![coin_submsg, cw721_submsg];
+    let cosmos_msgs = vec![cw20_submsg, cw721_submsg];
 
     //delete offering
     OFFERINGS.remove(deps.storage, &msg.offering_id);
@@ -143,7 +124,7 @@ pub fn try_receive_nft(
 
     OFFERINGS.save(deps.storage, &id, &off)?;
 
-    let price_string = format!("{} {}", msg.list_price.amount, msg.list_price.denom.to_string());
+    let price_string = format!("{} {}", msg.list_price.amount, msg.list_price.address);
 
     Ok(Response::new()
         .add_attribute("action", "sell_nft")
@@ -240,8 +221,8 @@ mod tests {
         let info = mock_info("anyone", &coins(2, "token"));
 
         let sell_msg = SellNft {
-            list_price: Coin {
-                denom: String::from("token"),
+            list_price: Cw20Coin {
+                address: String::from("cw20ContractAddr"),
                 amount: Uint128::new(5),
             },
         };
@@ -292,8 +273,8 @@ mod tests {
         let info = mock_info("anyone", &coins(2, "token"));
 
         let sell_msg = SellNft {
-            list_price: Coin {
-                denom: String::from("token"),
+            list_price: Cw20Coin {
+                address: String::from("cw20ContractAddr"),
                 amount: Uint128::new(5),
             },
         };

@@ -1,5 +1,5 @@
 [package]
-name = "craft_nft_marketplace"
+name = "nftext_manager"
 version = "0.1.0"
 authors = [""]
 edition = "2018"

@@ -3,8 +3,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::{Addr, StdResult, Storage};
-// use cw20::Cw20Coin;
-use cosmwasm_std::Coin;
+use cw20::Cw20Coin;
 use cw_storage_plus::{Index, IndexList, IndexedMap, Item, Map, MultiIndex};
 
 pub static CONFIG_KEY: &[u8] = b"config";
@@ -14,7 +13,7 @@ pub struct Offering {
     pub token_id: String,
     pub contract_addr: Addr,
     pub seller: Addr,
-    pub list_price: Coin, // {"denom":"ucraft","amount":100}
+    pub list_price: Cw20Coin,
 }
 
 /// OFFERINGS is a map which maps the offering_id to an offering. Offering_id is derived from OFFERINGS_COUNT.

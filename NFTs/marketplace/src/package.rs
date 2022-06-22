@@ -1,6 +1,5 @@
 use cosmwasm_std::Addr;
-// use cw20::Cw20Coin;
-use cosmwasm_std::Coin;
+use cw20::Cw20Coin;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +12,7 @@ pub struct ContractInfoResponse {
 pub struct QueryOfferingsResult {
     pub id: String,
     pub token_id: String,
-    pub list_price: Coin,
+    pub list_price: Cw20Coin,
     pub contract_addr: Addr,
     pub seller: Addr,
 }
