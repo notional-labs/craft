@@ -11,8 +11,11 @@ export CRAFTD_NODE="tcp://65.108.125.182:26657"
 ```
 
 ```bash
+cd base_contacts/artifacts
 TX20=$(craftd tx wasm store cw20_base.wasm --from $KEY --gas auto -y --output json | jq -r '.txhash')
 TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY --gas auto -y --output json | jq -r '.txhash')
+
+cd ../../marketplace/artifacts
 TXM=$(craftd tx wasm store nftext_manager.wasm --from $KEY --gas auto -y --output json | jq -r '.txhash')
 ```
 
@@ -46,7 +49,7 @@ craftd tx wasm instantiate $C20 '{
   }
 }' --label "cw20-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY --admin $(craftd keys show $KEY -a)
 
-export ADDR20=craft1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjqwl8xfc
+export ADDR20=craft1tqwwyth34550lg2437m05mjnjp8w7h5ka7m70jtzpxn4uh2ktsmqud0w82
 ```
 
 ```bash
@@ -55,14 +58,14 @@ craftd tx wasm instantiate $C721 '{
   "symbol": "CRE",
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 }' --label "cw721-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --admin $(craftd keys show $KEY -a) --from $KEY
-export ADDR721=craft1qwlgtx52gsdu7dtp0cekka5zehdl0uj3fhp9acg325fvgs8jdzkstnsu5l
+export ADDR721=craft1gurgpv8savnfw66lckwzn4zk7fp394lpe667dhu7aw48u40lj6jshnd885
 ```
 
 ```bash
 craftd tx wasm instantiate $CM '{
-  "name": "marketplace-nfts"
-}' --label "marketplace" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY --admin $(craftd keys show $KEY -a)
-export ADDRM=craft1j08452mqwadp8xu25kn9rleyl2gufgfjnv0sn8dvynynakkjukcqccenqp
+  "name": "craft-marketplace-nfts"
+}' --label "marketplace" --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY --admin $(craftd keys show $KEY -a)
+export ADDRM=craft1999u8suptza3rtxwk7lspve02m406xe7l622erg3np3aq05gawxs2rh8r2
 ```
 
 ---
@@ -74,9 +77,9 @@ init an NFT w/ data
 
 export JSON_ENCODED=`echo '{"uuid": "12345", "name": "My NFT", "type": "HOME", "description": "This is my NFT", "image": "https://image.com/1.png"}' | base64`
 
-TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"6","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"eyJ1dWlkIjogIjEyMzQ1IiwgIm5hbWUiOiAiTXkgTkZUIiwgInR5cGUiOiAiSE9NRSIsICJkZXNjcmlwdGlvbiI6ICJUaGlzIGlzIG15IE5GVCIsICJpbWFnZSI6ICJodHRwczovL2ltYWdlLmNvbS8xLnBuZyJ9Cg=="}}' --from $KEY --yes --output json | jq -r '.txhash')
+TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"11","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"eyJ1dWlkIjogIjEyMzQ1IiwgIm5hbWUiOiAiTXkgTkZUIiwgInR5cGUiOiAiSE9NRSIsICJkZXNjcmlwdGlvbiI6ICJUaGlzIGlzIG15IE5GVCIsICJpbWFnZSI6ICJodHRwczovL2ltYWdlLmNvbS8xLnBuZyJ9Cg=="}}' --from $KEY --yes --output json | jq -r '.txhash')
 
-export QUERY_JSON='{"all_nft_info":{"token_id":"5"}}'
+export QUERY_JSON='{"all_nft_info":{"token_id":"11"}}'
 # craftd q wasm contract-state smart $ADDR721 $QUERY_JSON
 
 # Export Base64 encoded JSON as a raw string (no quotes)
@@ -96,17 +99,19 @@ echo '{"address":"$ADDR20","amount":"1"}}' | base64
 
 ```bash
 # ADDR20
-echo '{"list_price":{"address":"craft1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjqwl8xfc","amount":"1","denom":"CRAFTR"}}' | base64
-# $ADDRM
+# export NFT_LISTING=`echo -e '{"list_price":{"address":"$ADDR20","amount":"1","denom":"CRAFTR"}}' | base64`
+
+export LISTING_FORMAT='{"list_price":{"address":"%s","amount":"1","denom":"CRAFTR"}}'
+export NFT_LISTING_BASE64=`printf $LISTING_FORMAT $ADDR20 | base64 -w 0`
+
+# send_nft contract =  $ADDRM
 craftd tx wasm execute $ADDR721 '{
   "send_nft": {
-    "contract": "craft1j08452mqwadp8xu25kn9rleyl2gufgfjnv0sn8dvynynakkjukcqccenqp", 
-    "token_id": "1",
-    "msg":"eyJsaXN0X3ByaWNlIjp7ImFkZHJlc3MiOiJjcmFmdDE0NjZuZjN6dXhweWE4cTllbXh1a2Q3dmZ0YWY2aDRwc3IwYTA3c3JsNXp3NzR6aDg0eWpxd2w4eGZjIiwiYW1vdW50IjoiMSIsImRlbm9tIjoiQ1JBRlRSIn19Cg=="
+    "contract": "craft1999u8suptza3rtxwk7lspve02m406xe7l622erg3np3aq05gawxs2rh8r2", 
+    "token_id": "11",
+    "msg":"eyJsaXN0X3ByaWNlIjp7ImFkZHJlc3MiOiJjcmFmdDF0cXd3eXRoMzQ1NTBsZzI0MzdtMDVtam5qcDh3N2g1a2E3bTcwanR6cHhuNHVoMmt0c21xdWQwdzgyIiwiYW1vdW50IjoiMSIsImRlbm9tIjoiQ1JBRlRSIn19"
   }
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
-
-
 ```
 
 
@@ -124,6 +129,6 @@ data:
       amount: "1"
       denom: CRAFTR
     seller: craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
-    token_id: "1"
+    token_id: "11"
   
 ```
