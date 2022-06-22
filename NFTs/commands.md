@@ -82,7 +82,3 @@ craftd q wasm contract-state smart $CONTRACT_ADDRESS '{"all_nft_info":{"token_id
 
 craftd q wasm contract-state smart $CONTRACT_ADDRESS '{"nft_info":{"token_id":"1"}}'
 ```
-
-
-Need to find how to do the above queries via RPC
-http://65.108.125.182:26657/abci_query?path=_&data=_&height=_&prove=_
