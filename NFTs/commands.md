@@ -34,10 +34,10 @@ CM=$(craftd q tx $TXM --output json | jq -r '.logs[].events[] | select(.type=="s
 ```bash
 export C20=8
 export C721=9
-export CM=10
+export CM=12
 echo $C20  # id: 8
 echo $C721 # id: 9
-echo $CM   # id: 10
+echo $CM   # id: 12
 ```
 
 # now we need to init them
@@ -58,8 +58,7 @@ craftd tx wasm instantiate $C20 '{
   }
 }' --label "cw20-base" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
 
-export ADDR20=craft1tqwwyth34550lg2437m05mjnjp8w7h5ka7m70jtzpxn4uh2ktsmqud0w82
-# export ADDR20=craft1qmk0v725sdg5ecu6xfh5pt0fv0nfzrstarue2maum3snzk2zrt5qrmk6r8
+export ADDR20=craft1qmk0v725sdg5ecu6xfh5pt0fv0nfzrstarue2maum3snzk2zrt5qrmk6r8
 ```
 
 ```bash
@@ -68,16 +67,14 @@ craftd tx wasm instantiate $C721 '{
   "symbol": "CRE",
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 }' --label "cw721-base-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
-export ADDR721=craft1gurgpv8savnfw66lckwzn4zk7fp394lpe667dhu7aw48u40lj6jshnd885
-# export ADDR721=craft1xqkp8x4gqwjnhemtemc5dqhwll6w6rrgpywvhka7sh8vz8swul9stkc9ga
+export ADDR721=craft1xqkp8x4gqwjnhemtemc5dqhwll6w6rrgpywvhka7sh8vz8swul9stkc9ga
 ```
 
 ```bash
 craftd tx wasm instantiate $CM '{
-  "name": "craft-marketplace-nfts2"
+  "name": "craft-marketplace-nfts3"
 }' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
-export ADDRM=craft1999u8suptza3rtxwk7lspve02m406xe7l622erg3np3aq05gawxs2rh8r2
-# export ADDRM=craft1lv0mhwcu3y4p9av5nafct8j7y4ag6lmlqmar4snhcjrkg7hacvgqnen3dm
+export ADDRM=craft16yzagwlqrzjkjlnaecam5fwvtzgae5zujtcch7y2uf6q9fyksncqz2mlc9
 ```
 
 ---
@@ -88,13 +85,13 @@ init an NFT w/ data
 ## craftd q wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"}}'
 
 export JSON_ENCODED=`echo '{"uuid": "11111","name": "MyNFTproperty", "type": "HOME", "description": "This is my NFT", "image": "https://image.com/1.png"}' | base64 -w 0` #&& echo $JSON_ENCODED
-export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $JSON_ENCODED` && echo $EXECUTED_MINT_JSON
+export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"2","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $JSON_ENCODED` && echo $EXECUTED_MINT_JSON
 
 TXMINT=$(craftd tx wasm execute $ADDR721 $EXECUTED_MINT_JSON --from $KEY --yes --output json | jq -r '.txhash')
 
 
 # Export Base64 encoded JSON as a raw string (no quotes)
-export JSON_VALUES=`echo $(craftd q wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"}}' --output json) | jq -r '.data.info.token_uri'`
+export JSON_VALUES=`echo $(craftd q wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"2"}}' --output json) | jq -r '.data.info.token_uri'`
 echo $JSON_VALUES | base64 --decode #| jq '.uuid'
 ```
 
@@ -104,9 +101,9 @@ https://github.com/BlockscapeNetwork/hackatom_v/tree/master/contracts/marketplac
 # sell token
 ```bash
 # ADDR20 address required
-export NFT_LISTING_BASE64=`printf '{"list_price":{"address":"%s","amount":"11","denom":"CRAFTR"}}' $ADDR20 | base64 -w 0` && echo $NFT_LISTING_BASE64
+export NFT_LISTING_BASE64=`printf '{"list_price":{"address":"%s","amount":"13","denom":"token"}}' $ADDR20 | base64 -w 0` && echo $NFT_LISTING_BASE64
 # send_nft from 721 -> marketplace contract =  $ADDRM
-export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"1","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
+export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"2","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
 craftd tx wasm execute $ADDR721 $SEND_NFT_JSON --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
 ```
 
@@ -123,7 +120,6 @@ craftd query wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"
 
 # If they are offering it for sale, they don't show here / it would be removed from them.
 craftd query wasm contract-state smart $ADDR721 '{"tokens":{"owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","start_after":"0","limit":50}}' # owners token IDs
-
 ```
 
 <!-- The below don't work with current nftext_manager::state::Offering not found -->
@@ -131,23 +127,17 @@ craftd query wasm contract-state smart $ADDR721 '{"tokens":{"owner":"craft1hj5fv
 ```bash
 # If unknown request, double check the offering id. it is not the same as the actuasl token id.
 # nftext_manager::state::Offering not found: execute wasm contract failed: unknown request. Should update this msg
-craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"4"}}' $CRAFTD_COMMAND_ARGS -y
+craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"2"}}' $CRAFTD_COMMAND_ARGS -y
 ```
 
 # Buying an NFT from the marketplace
 ```bash
-export OFFERING_ID_MSG=`printf '{"offering_id":"4"}' | base64 -w 0` && echo $OFFERING_ID_MSG
+export OFFERING_ID_MSG_BASE64=`printf '{"offering_id":"1"}' | base64 -w 0` && echo $OFFERING_ID_MSG
 
 # We execute on the CW20, the contract is the marketplace $ADDRM
-# Error: rpc error: code = Unknown desc = failed to execute message; message index: 0: dispatch: submessages: dispatch: submessages: 0CRAFTR is smaller than 12CRAFTR: insufficient funds: unknown request
-craftd tx wasm execute $ADDR20 '{
-  "send": {
-    "contract": "craft1lv0mhwcu3y4p9av5nafct8j7y4ag6lmlqmar4snhcjrkg7hacvgqnen3dm",
-    "amount": "12",
-    "msg": "eyJvZmZlcmluZ19pZCI6IjQiLCJkZW5vbSI6IkNSQUZUUiJ9"
-  }
-}' --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
-# This should be from key2, but having errors rn
+# The contract address (ADDRM) should match the get_offerings{} query
+export SEND_ADDR20_FOR_NFT_JSON=`printf '{"send": {"contract": "%s","amount": "15","msg": "%s"}}' $ADDRM $OFFERING_ID_MSG_BASE64`
+craftd tx wasm execute $ADDR20  --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY2
 ```
 
 # Sending cw20 balance from KEY -> KEY2 for testing above
@@ -158,6 +148,8 @@ craftd tx wasm execute $ADDR20 '{
     "amount": "5"
   }
 }' --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
+
+craftd tx bank send $KEY $KEY_ADDR2 10000token -y
 
 # Gets the balance of the new key
 craftd query wasm contract-state smart $ADDR20 '{"token_info": {}}' #CRAFTR
