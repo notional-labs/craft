@@ -1,12 +1,19 @@
 ```bash
 export KEY="mykey"
+export KEY2="mykey2"
+export KEY_ADDR=`craftd keys show $KEY -a`
+export KEY_ADDR2=`craftd keys show $KEY2 -a`
 export KEYALGO="secp256k1"
 export CRAFT_CHAIN_ID="test-1"
-export CRAFT_KEYRING_BACKEND="test"
+export CRAFTD_KEYRING_BACKEND="test"
 export CRAFTD_NODE="tcp://65.108.125.182:26657"
+export CRAFTD_COMMAND_ARGS="--gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY"
 
-# This is the same key we use in ./testnode.sh
-echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | craftd keys add $KEY --keyring-backend $CRAFT_KEYRING_BACKEND --algo $KEYALGO --recover
+# This is the same key we use in ./testnode.sh. The 2nd is just a random key generated ONLY for testing with craft NFTs
+# craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
+echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | craftd keys add $KEY --keyring-backend $CRAFTD_KEYRING_BACKEND --algo $KEYALGO --recover
+# craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r
+echo "flag meat remind stamp unveil junior goose first hold atom deny ramp raven party lens jazz tape dad produce wrap citizen common vital hungry" | craftd keys add $KEY2 --keyring-backend $CRAFTD_KEYRING_BACKEND --algo $KEYALGO --recover
 ```
 
 ```bash
@@ -25,6 +32,9 @@ CM=$(craftd q tx $TXM --output json | jq -r '.logs[].events[] | select(.type=="s
 ```
 
 ```bash
+export C20=8
+export C721=9
+export CM=10
 echo $C20  # id: 8
 echo $C721 # id: 9
 echo $CM   # id: 10
@@ -46,25 +56,28 @@ craftd tx wasm instantiate $C20 '{
   "mint": {
     "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
   }
-}' --label "cw20-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY --admin $(craftd keys show $KEY -a)
+}' --label "cw20-base" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
 
 export ADDR20=craft1tqwwyth34550lg2437m05mjnjp8w7h5ka7m70jtzpxn4uh2ktsmqud0w82
+# export ADDR20=craft1qmk0v725sdg5ecu6xfh5pt0fv0nfzrstarue2maum3snzk2zrt5qrmk6r8
 ```
 
 ```bash
 craftd tx wasm instantiate $C721 '{
-  "name": "craftd-realestate-nfts",
+  "name": "craftd-realestate-nfts2",
   "symbol": "CRE",
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
-}' --label "cw721-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --admin $(craftd keys show $KEY -a) --from $KEY
+}' --label "cw721-base-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
 export ADDR721=craft1gurgpv8savnfw66lckwzn4zk7fp394lpe667dhu7aw48u40lj6jshnd885
+# export ADDR721=craft1xqkp8x4gqwjnhemtemc5dqhwll6w6rrgpywvhka7sh8vz8swul9stkc9ga
 ```
 
 ```bash
 craftd tx wasm instantiate $CM '{
-  "name": "craft-marketplace-nfts"
-}' --label "marketplace" --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY --admin $(craftd keys show $KEY -a)
+  "name": "craft-marketplace-nfts2"
+}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
 export ADDRM=craft1999u8suptza3rtxwk7lspve02m406xe7l622erg3np3aq05gawxs2rh8r2
+# export ADDRM=craft1lv0mhwcu3y4p9av5nafct8j7y4ag6lmlqmar4snhcjrkg7hacvgqnen3dm
 ```
 
 ---
@@ -74,15 +87,14 @@ init an NFT w/ data
 # TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"https://gateway.pinata.cloud/ipfs/QmXkGh665GVjCCs3cbLLWYwjc3kug1EBGvdyVmhuZRMgNE"}}' --from $KEY --yes --output json | jq -r '.txhash')
 ## craftd q wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"}}'
 
-export JSON_ENCODED=`echo '{"uuid": "12345", "name": "My NFT", "type": "HOME", "description": "This is my NFT", "image": "https://image.com/1.png"}' | base64 -w 0` && echo $JSON_ENCODED
+export JSON_ENCODED=`echo '{"uuid": "11111","name": "MyNFTproperty", "type": "HOME", "description": "This is my NFT", "image": "https://image.com/1.png"}' | base64 -w 0` #&& echo $JSON_ENCODED
+export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $JSON_ENCODED` && echo $EXECUTED_MINT_JSON
 
-TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"13","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"eyJ1dWlkIjogIjEyMzQ1IiwgIm5hbWUiOiAiTXkgTkZUIiwgInR5cGUiOiAiSE9NRSIsICJkZXNjcmlwdGlvbiI6ICJUaGlzIGlzIG15IE5GVCIsICJpbWFnZSI6ICJodHRwczovL2ltYWdlLmNvbS8xLnBuZyJ9Cg=="}}' --from $KEY --yes --output json | jq -r '.txhash')
+TXMINT=$(craftd tx wasm execute $ADDR721 $EXECUTED_MINT_JSON --from $KEY --yes --output json | jq -r '.txhash')
 
-export QUERY_JSON='{"all_nft_info":{"token_id":"13"}}'
-# OLD -> craftd q wasm contract-state smart $ADDR721 $QUERY_JSON
 
-# NEW -> Export Base64 encoded JSON as a raw string (no quotes)
-export JSON_VALUES=`echo $(craftd q wasm contract-state smart $ADDR721 $QUERY_JSON --output json) | jq -r '.data.info.token_uri'`
+# Export Base64 encoded JSON as a raw string (no quotes)
+export JSON_VALUES=`echo $(craftd q wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"}}' --output json) | jq -r '.data.info.token_uri'`
 echo $JSON_VALUES | base64 --decode #| jq '.uuid'
 ```
 
@@ -92,44 +104,63 @@ https://github.com/BlockscapeNetwork/hackatom_v/tree/master/contracts/marketplac
 # sell token
 ```bash
 # ADDR20 address required
-export NFT_LISTING_BASE64=`printf '{"list_price":{"address":"%s","amount":"3","denom":"CRAFTR"}}' $ADDR20 | base64 -w 0` && echo $NFT_LISTING_BASE64
-
+export NFT_LISTING_BASE64=`printf '{"list_price":{"address":"%s","amount":"11","denom":"CRAFTR"}}' $ADDR20 | base64 -w 0` && echo $NFT_LISTING_BASE64
 # send_nft from 721 -> marketplace contract =  $ADDRM
-craftd tx wasm execute $ADDR721 '{
-  "send_nft": {
-    "contract": "craft1999u8suptza3rtxwk7lspve02m406xe7l622erg3np3aq05gawxs2rh8r2", 
-    "token_id": "13",
-    "msg":"eyJsaXN0X3ByaWNlIjp7ImFkZHJlc3MiOiJjcmFmdDF0cXd3eXRoMzQ1NTBsZzI0MzdtMDVtam5qcDh3N2g1a2E3bTcwanR6cHhuNHVoMmt0c21xdWQwdzgyIiwiYW1vdW50IjoiMyIsImRlbm9tIjoiQ1JBRlRSIn19"
-  }
-}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
+export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"1","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
+craftd tx wasm execute $ADDR721 $SEND_NFT_JSON --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
+```
+
+# Query all NFTs you are selling
+```bash
+craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}' 
+```
+
+# Query all NFTs you hold in the 721
+```bash
+# `owner_of`, `approval`, `approvals`, `all_operators`, `num_tokens`, `contract_info`, `nft_info`, `all_nft_info`, `tokens`, `all_tokens`, `minter`
+craftd query wasm contract-state smart $ADDR721 '{"contract_info":{}}' # name and symbol
+craftd query wasm contract-state smart $ADDR721 '{"all_nft_info":{"token_id":"1"}}' # owner & metadata on an NFT in 1 query
+
+# If they are offering it for sale, they don't show here / it would be removed from them.
+craftd query wasm contract-state smart $ADDR721 '{"tokens":{"owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","start_after":"0","limit":50}}' # owners token IDs
+
 ```
 
 <!-- The below don't work with current nftext_manager::state::Offering not found -->
 # cancel selling
 ```bash
-craftd tx wasm execute $ADDRM '{
-  "withdraw_nft": {
-    "offering_id": "12"
-  }
-}' --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
+# If unknown request, double check the offering id. it is not the same as the actuasl token id.
+# nftext_manager::state::Offering not found: execute wasm contract failed: unknown request. Should update this msg
+craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"4"}}' $CRAFTD_COMMAND_ARGS -y
 ```
 
 # Buying an NFT from the marketplace
 ```bash
-export OFFERING_ID_MSG=`printf '{"offering_id":"12"}' | base64 -w 0` && echo $OFFERING_ID_MSG
+export OFFERING_ID_MSG=`printf '{"offering_id":"4"}' | base64 -w 0` && echo $OFFERING_ID_MSG
 
 # We execute on the CW20, the contract is the marketplace $ADDRM
+# Error: rpc error: code = Unknown desc = failed to execute message; message index: 0: dispatch: submessages: dispatch: submessages: 0CRAFTR is smaller than 12CRAFTR: insufficient funds: unknown request
 craftd tx wasm execute $ADDR20 '{
   "send": {
-    "contract": "craft1999u8suptza3rtxwk7lspve02m406xe7l622erg3np3aq05gawxs2rh8r2",
-    "amount": "2",
-    "msg": "eyJvZmZlcmluZ19pZCI6IjEyIn0="
+    "contract": "craft1lv0mhwcu3y4p9av5nafct8j7y4ag6lmlqmar4snhcjrkg7hacvgqnen3dm",
+    "amount": "12",
+    "msg": "eyJvZmZlcmluZ19pZCI6IjQiLCJkZW5vbSI6IkNSQUZUUiJ9"
   }
 }' --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
+# This should be from key2, but having errors rn
 ```
 
-
-# all offerings
+# Sending cw20 balance from KEY -> KEY2 for testing above
 ```bash
-craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'  
+craftd tx wasm execute $ADDR20 '{
+  "transfer": {
+    "recipient": "craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r",
+    "amount": "5"
+  }
+}' --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
+
+# Gets the balance of the new key
+craftd query wasm contract-state smart $ADDR20 '{"token_info": {}}' #CRAFTR
+craftd query wasm contract-state smart $ADDR20 '{"balance": {"address": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}}' 
+craftd query wasm contract-state smart $ADDR20 '{"balance": {"address": "craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r"}}' 
 ```
