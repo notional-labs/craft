@@ -4,7 +4,7 @@ order: 5
 
 # Parameters
 
-The pylons module contains the following parameters:
+The exp module contains the following parameters:
 
 | Key                                   | Type          | Example                                     	   						  |
 | ------------------------------------- | ------------- | ----------------------------------------------------------------------- |

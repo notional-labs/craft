@@ -7,7 +7,7 @@ parent:
 
 ## Abstract
 
-This document specifies the `pylons` module for the Craft DAO blockchain. 
+This document specifies the `exp` module for the Craft DAO blockchain. 
 
 ## Contents
 
