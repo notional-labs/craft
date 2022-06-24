@@ -44,39 +44,3 @@ Ibc token's denom is used for payment
 ## BurnExpPeriod
 
 Time from request burn token to receive locked token back
-
-## PaymentProcessors
-
-Structure to represent a payment processor (such as Stripe) on-chain.  
-
-Example:
-
-```go
-	DefaultProcessorPercentage  = sdk.ZeroDec()
-    DefaultValidatorsPercentage = sdk.MustNewDecFromStr("0.003")
-    DefaultPylonsIncPubKey      = "EVK1dqjD6K8hGylacMpWAa/ru/OnWUDtCZ+lPkv2TTA=" // this is a testing key, do not use in production!
-    DefaultPaymentProcessors    = []PaymentProcessor{
-        {
-            CoinDenom:            StripeCoinDenom,
-            PubKey:               DefaultPylonsIncPubKey,
-            ProcessorPercentage:  DefaultProcessorPercentage,
-            ValidatorsPercentage: DefaultValidatorsPercentage,
-            Name:                 "Pylons_Inc",
-        },
-    }
-    DefaultPaymentProcessorsTokensBankParams = []types.SendEnabled{
-        {Denom: StripeCoinDenom, Enabled: false},
-    }
-```
-
-## DistrEpochIdentifier
-
-String identifier to choose an epoch length from the `x/epochs` module.
-
-## EngineVersion
-
-Application version.  Planned for use in the future to deprecate recipes.
-
-
-
-
