@@ -51,6 +51,7 @@ The message handling should fail if:
 - from_address different from DAO address
 - member does not exist in whitelist
 - amount contains tokens that are not gov tokens
+- member out of `ClosePoolPeriod`
 
 
 ### `MsgSpendIbcAssetToExp`
@@ -68,6 +69,7 @@ message MsgSpendIbcAssetToExp{
 The message handling should fail if: 
 - from_address does not exist in mint_list
 - amount contains tokens that are not ibc tokens
+- from_address's request out of `ClosePoolPeriod`
 
 
 ### `MsgAdjustDaoTokenPrice`
