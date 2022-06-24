@@ -31,7 +31,7 @@ func BurnRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 	}
 
 	for _, burnRequest := range burnList {
-		if !keeper.ValidateBurnRequestByTime(ctx, burnRequest) {
+		if keeper.ValidateBurnRequestByTime(ctx, burnRequest) {
 			continue
 		}
 		err := keeper.ExecuteBurnExp(ctx, burnRequest)
@@ -51,7 +51,7 @@ func MintRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 	}
 
 	for _, mintRequst := range mintListOnGoing {
-		if !keeper.ValidateMintRequestByTime(ctx, mintRequst) {
+		if keeper.ValidateMintRequestByTime(ctx, mintRequst) {
 			continue
 		}
 
