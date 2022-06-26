@@ -26,6 +26,7 @@ TXM=$(craftd tx wasm store nftext_manager.wasm --from $KEY --gas auto -y --outpu
 ```
 
 ```bash
+# jq -r '.logs[0].events[-1].attributes[0].value'
 C20=$(craftd q tx $TX20 --output json | jq -r '.logs[].events[] | select(.type=="store_code").attributes[].value')
 C721=$(craftd q tx $TX721 --output json | jq -r '.logs[].events[] | select(.type=="store_code").attributes[].value')
 CM=$(craftd q tx $TXM --output json | jq -r '.logs[].events[] | select(.type=="store_code").attributes[].value')
@@ -57,7 +58,8 @@ craftd tx wasm instantiate $C20 '{
     "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
   }
 }' --label "cw20-base" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
-
+# gets latest instantiated contract address
+# export ADDR20=$(craftd q wasm list-contract-by-code $C20 --output json | jq -r '.contracts[-1]')
 export ADDR20=craft1qmk0v725sdg5ecu6xfh5pt0fv0nfzrstarue2maum3snzk2zrt5qrmk6r8
 ```
 
