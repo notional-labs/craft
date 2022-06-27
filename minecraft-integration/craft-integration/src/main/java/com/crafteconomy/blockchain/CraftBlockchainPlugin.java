@@ -48,6 +48,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     private static MongoDB mongoDB;
 
+    public static String ADMIN_PERM = "crafteconomy.admin";
+
     private Double TAX_RATE;
 
     private String SERVER_WALLET = null;

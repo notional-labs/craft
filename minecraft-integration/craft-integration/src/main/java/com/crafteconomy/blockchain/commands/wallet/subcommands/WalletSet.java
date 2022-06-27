@@ -21,14 +21,21 @@ public class WalletSet implements SubCommand {
             return; 
         }
 
+        if(!sender.hasPermission(CraftBlockchainPlugin.ADMIN_PERM)) {
+            Util.colorMsg(sender, "\n&cYou don't have permissions to set a wallet.");
+            Util.clickableWebsite(sender, "https://crafteconomy.io/", 
+                "&2[!] &a&nClick here to connect your wallet to your minecraft account.",
+                "&7&oView the crafteconomy website for connections"    
+            ); 
+            return;
+        }
+
         if(args.length != 2) {
             Util.colorMsg(sender, "&cUsage: &f/wallet set <craft-wallet>");
             Util.clickableWebsite(sender, "https://docs.crafteconomy.io/set-up/wallet", 
                 "&2[!] &a&nClick here to learn how to set up your wallet.",
                 "&7&oView the crafteconomy documentation"    
-            );  
-            
-
+            );          
             return;       
         } 
 
