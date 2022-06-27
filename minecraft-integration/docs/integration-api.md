@@ -19,7 +19,7 @@ You can read a rough overview [HERE](https://github.com/notional-labs/craft/blob
 <dependency>
     <groupId>com.crafteconomy</groupId>
     <artifactId>craft-integration</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.1</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -136,8 +136,8 @@ tx.setBiFunction(Logic.trade(Player1UUID, Player2UUID));
 // You can automatically set sending messages to user on submit
 // These are false by default.
 tx.setIncludeTxClickable(true);
-tx.sendDescMessage(true);
-tx.sendWebappLink(true);
+tx.setSendDescMessage(true);
+tx.setSendWebappLink(true);
 ```
 
 ## Submit Transaction to be signed
