@@ -96,6 +96,17 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         DEV_MODE = getConfig().getBoolean("DEV_MODE");
         if(DEV_MODE == null) DEV_MODE = false;
 
+        if(DEV_MODE) {
+            // async runnable every 4 minutes
+            Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
+                @Override
+                public void run() {
+                    Util.coloredBroadcast("&c&l[!] REMINDER, INTEGRATION DEV MODE ENABLED");
+                }
+            }, 0, 20*60*4);
+        }
+
+
         if(getApiEndpoint() == null) {
             getLogger().severe("API REST (lcd) endpoint not set in config.yml, disabling plugin");
             getPluginLoader().disablePlugin(this);

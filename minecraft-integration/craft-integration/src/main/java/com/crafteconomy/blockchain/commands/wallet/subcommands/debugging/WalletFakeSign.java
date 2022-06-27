@@ -30,6 +30,12 @@ public class WalletFakeSign implements SubCommand {
             Util.colorMsg(sender, "&cUsage: /wallet fakesign txUUIDHere");
             return;
         }
+
+        if(CraftBlockchainPlugin.getIfInDevMode() == false) {
+            Util.colorMsg(sender, "\n&cThis command is only available in dev mode.");
+            Util.colorMsg(sender, "&fplease enable that in: plugins/craft-integration/config.yml");
+            return;    
+        }
         
         UUID TxID = null;
         try {
@@ -42,7 +48,7 @@ public class WalletFakeSign implements SubCommand {
         try (Jedis jedis = redis.getRedisConnection()) {
             // if DEBUGGING is the value, we will allow it through the tendermint hash check
             jedis.set("signed_" + TxID.toString(), "DEBUGGING");
-            Util.log("signed_" + TxID.toString() + " added to redis, firing event");
+            Util.log("signed_" + TxID.toString() + " added to redis, firing event with TX hash of 'DEBUGGING'");
         } catch (Exception e) {
             Util.logSevere("[WalletFakeSign] Error setting signed_" + TxID.toString() + " in redis");
         }            
