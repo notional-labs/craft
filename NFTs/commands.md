@@ -80,7 +80,8 @@ export ADDRM=craft16yzagwlqrzjkjlnaecam5fwvtzgae5zujtcch7y2uf6q9fyksncqz2mlc9
 ```
 
 ---
-init an NFT w/ data
+init an NFT w/ data.
+THIS IS NOW DONE IN THE MintNFTsFromMongodb.py script for automation
 
 ```bash
 # TXMINT=$(craftd tx wasm execute $ADDR721 '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"https://gateway.pinata.cloud/ipfs/QmXkGh665GVjCCs3cbLLWYwjc3kug1EBGvdyVmhuZRMgNE"}}' --from $KEY --yes --output json | jq -r '.txhash')
