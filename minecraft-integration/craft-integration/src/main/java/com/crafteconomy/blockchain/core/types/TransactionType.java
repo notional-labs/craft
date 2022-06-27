@@ -7,5 +7,6 @@ public enum TransactionType {
     LIQUIDITY_POOL,
     COMPANY,
     LAND_CLAIM,
+    AUTHENTICATION,
     REAL_ESTATE;
 }
