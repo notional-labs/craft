@@ -53,7 +53,11 @@ public class MyExampleTransaction implements CommandExecutor {
             txinfo.setDescription("Describe what it does here");
             txinfo.setFunction(Logic.purchaseBusinessLicense());
 
-            ErrorTypes error = txinfo.submit(false, false, false);
+            txinfo.setIncludeTxClickable(false);
+            txinfo.setSendDescMessage(false);
+            txinfo.setSendWebappLink(false);
+
+            ErrorTypes error = txinfo.submit();
 
             if(error == ErrorTypes.NO_ERROR) {
                 // Util.colorMsg(sender,  + txinfo.getTxID());
