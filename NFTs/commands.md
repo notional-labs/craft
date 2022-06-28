@@ -33,12 +33,12 @@ CM=$(craftd q tx $TXM --output json | jq -r '.logs[].events[] | select(.type=="s
 ```
 
 ```bash
-export C20=8
-export C721=9
-export CM=12
-echo $C20  # id: 8
-echo $C721 # id: 9
-echo $CM   # id: 12
+export C20=3
+export C721=2
+export CM=5
+echo $C20
+echo $C721
+echo $CM
 ```
 
 # now we need to init them
@@ -60,7 +60,7 @@ craftd tx wasm instantiate $C20 '{
 }' --label "cw20-base" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
 # gets latest instantiated contract address
 # export ADDR20=$(craftd q wasm list-contract-by-code $C20 --output json | jq -r '.contracts[-1]')
-export ADDR20=craft1qmk0v725sdg5ecu6xfh5pt0fv0nfzrstarue2maum3snzk2zrt5qrmk6r8
+export ADDR20=craft1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3shge3vd
 ```
 
 ```bash
@@ -69,14 +69,14 @@ craftd tx wasm instantiate $C721 '{
   "symbol": "CRE",
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 }' --label "cw721-base-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
-export ADDR721=craft1xqkp8x4gqwjnhemtemc5dqhwll6w6rrgpywvhka7sh8vz8swul9stkc9ga
+export ADDR721=craft1xt4ahzz2x8hpkc0tk6ekte9x6crw4w6u0r67cyt3kz9syh24pd7srxmrrn
 ```
 
 ```bash
 craftd tx wasm instantiate $CM '{
   "name": "craft-marketplace-nfts3"
 }' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
-export ADDRM=craft16yzagwlqrzjkjlnaecam5fwvtzgae5zujtcch7y2uf6q9fyksncqz2mlc9
+export ADDRM=craft1436kxs0w2es6xlqpp9rd35e3d0cjnw4sv8j3a7483sgks29jqwgsmy2ztv
 ```
 
 ---

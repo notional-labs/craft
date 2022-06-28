@@ -2,10 +2,9 @@
 
 ```bash
 export CRAFTD_NODE=http://65.108.125.182:1317
-export CRAFT_721_CONTRACT=craft1qwlgtx52gsdu7dtp0cekka5zehdl0uj3fhp9acg325fvgs8jdzkstnsu5l
 
 # Get information about a contract
-curl $CRAFTD_NODE/cosmwasm/wasm/v1/contract/$CRAFT_721_CONTRACT
+curl $CRAFTD_NODE/cosmwasm/wasm/v1/contract/$ADDR721
 
 # Convert a JSON query -> base64, then pass to rest as a request
 export MY_QUERY=`printf '{"nft_info":{"token_id":"5"}}' | base64`
