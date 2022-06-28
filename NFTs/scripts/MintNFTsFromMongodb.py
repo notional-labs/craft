@@ -146,6 +146,7 @@ class Contract_Instantiate:
 
 
 class Contract_Query:
+    # All moved to official rest API + redis caching. Remove this soon
     @staticmethod
     def getNFTContractInfo(): # CACHE THIS
         # craftd query wasm contract-state smart $ADDR721 '{"contract_info":{}}'

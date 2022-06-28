@@ -87,7 +87,8 @@ export const signTx = async (uuid: string, tenderminthash: string) => {
 
     // Will execute this code if key is found
     for await (const member of foundKeys) {
-        redisClient.set(key, tenderminthash);
+        // 5 day expire time incase the signed doesn't go through
+        redisClient.setEx(key, 60*60*24*5, tenderminthash);
 
         // None
         return {

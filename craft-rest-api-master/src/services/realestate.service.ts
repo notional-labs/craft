@@ -1,18 +1,24 @@
-import { collections } from './database.service';
+import { collections, redisClient } from './database.service';
 
 import axios from 'axios';
 
 /**
- * Get data about a property (name, desc, worldName, imageLink, etc.) - from reProperties
+ * Get data about a property (name, desc, worldName, imageLink, etc.) - from reProperties server database
  * http://127.0.0.1:4000/v1/realestate/dbcd78cb-326e-4842-982b-9252f9ca25a7
  * 
  * @param uuid The UUID of the property
  */
 export const getPropertyInformation = async (uuid: string) => {
-    let doc = await collections?.reProperties?.find({ _id: uuid }).tryNext();
+    const REDIS_KEY = `cache:property_info:${uuid}`;
+    let cachedPropertyData = await redisClient?.get(REDIS_KEY);
+    if(cachedPropertyData) {
+        console.log(`Property found in redis cache -> ${REDIS_KEY}. Not calling MongoDB`);
+        return JSON.parse(cachedPropertyData);
+    }
 
-    // Set username
-    if (doc) {
+    let doc = await collections?.reProperties?.find({ _id: uuid }).tryNext();
+    if (doc) { // saves to cache for 60 seconds * minutes.
+        await redisClient?.setEx(REDIS_KEY, 60*5, JSON.stringify(doc));
         return doc;
     } 
     
@@ -41,48 +47,88 @@ export const getPropertiesState = async (state: string) => {
 /**
  * Get a users CRAFT owned NFTs (for now this is the omniflix for onft testing)
  * (Acts more so like middle ware)
- * http://127.0.0.1:4000/v1/realestate/owned/omniflix13na285c3llhnfenq6hl3fh255scljcue4td9nh
+ * 
+ * http://127.0.0.1:4000/v1/realestate/owned/craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
  * 
  * @param wallet The CRAFT address of the user
  */
-export const getNFTs = async (wallet: string) => {
-    let usersNFTs = {} // uuid as key, description, name, type as values (useful for webapp & in game minecraft syncing)
+export const getUsersOwnedNFTs = async (wallet: string) => {
+    let usersNFTIDs = await getUsersNFTsIDsList(wallet); // { tokens: [ '1', '101', '102', '2', '8', '9' ] }
+    // console.log(usersNFTIDs) 
 
-    let api = `https://rest.flixnet-4.omniflix.network/omniflix/onft/v1beta1/onfts/onftdenome307136eed384681ab981e6aedbcad5c/${wallet}`
-    // console.log(api)
+    if(usersNFTIDs) {
+        return Promise.all(usersNFTIDs?.tokens.map(token => queryToken(`${process.env.ADDR721}`, token)))
+    }
 
-    // make a get request to that API with Axios
+    return []; 
+};
+
+
+/**
+ * 
+ * Queries a smart contract defined in .env (ADDR721) by token name. 
+ * If found, decompiles the base64 data & saves to redis cache.
+ * 
+ * http://127.0.0.1:4000/v1/realestate/get_token/1
+ * 
+ * @param tokenId 
+ * @returns JSON information about the property from the token_uri
+ */
+// IMPORTANT: We allow different addr721's so we can query from the marketplace as well as we expand to other contracts
+export const queryToken = async (addr721Address: string, tokenId: string) => {
+    // hget cache:query_token 10
+
+    // Get cached
+    const REDIS_KEY = `cache:query_token`;
+    const REDIS_HSET_KEY = `${addr721Address}-${tokenId}` // for marketplace expansion
+    let cachedToken = await redisClient?.hGet(REDIS_KEY , REDIS_HSET_KEY);
+    if(cachedToken) {
+        // console.log(`Token ${tokenId} found in redis cache -> ${REDIS_KEY}`);
+        return JSON.parse(cachedToken);
+    }
+
+    const query = Buffer.from(`{"nft_info":{"token_id":"${tokenId}"}}`).toString('base64');
+    let api = `${process.env.CRAFTD_NODE}/cosmwasm/wasm/v1/contract/${addr721Address}/smart/${query}`
+    // console.log(`Querying token ${tokenId} from ${api}`);
+
     let response = await axios.get(api).catch(err => {
-        console.log(err);
+        // console.log("queryToken Error (does not exist)");
         return undefined;
     })
-    // console.log(response)
 
-    // get collections section from the JSON response of the blockchain rest API
-    // https://rest.flixnet-4.omniflix.network/omniflix/onft/v1beta1/onfts/onftdenome307136eed384681ab981e6aedbcad5c/omniflix13na285c3llhnfenq6hl3fh255scljcue4td9nh
-    let onfts = response?.data?.collections?.[0]?.onfts;
-    // console.log(onfts)
-
-    if(!onfts) { 
-        console.log(`onfts is undefined or there are none for request: ${api}`)
-        return {};
+    // base64 encoded
+    let token_uri_base64 = response?.data?.data?.token_uri; // base64 encoded string of the values
+    if(!token_uri_base64) {
+        // console.log(`Error querying token ${tokenId}. Token likely does not exist`);
+        return undefined;
     }
 
-    // loop through onfts objects
-    for (let onft of onfts) {
-        let name = onft?.metadata?.name
-        let dataObj = JSON.parse(onft?.data) // convert that json string into an object
+    let values = Buffer.from(token_uri_base64, 'base64').toString('ascii');
+    let valuesJSON = JSON.parse(values);
+    
+    // save to redis hSet cache
+    await redisClient?.hSet(REDIS_KEY, REDIS_HSET_KEY, JSON.stringify(valuesJSON));
 
-        // console.log(name, dataObj?.description, dataObj?.uuid, dataObj?.type)
+    return valuesJSON;
+};
 
-        usersNFTs[dataObj?.uuid] = {
-            "name": name,
-            "description": dataObj?.description,
-            "type": dataObj?.type
-        }
-    }
 
-    // return the response data as JSON
-    return usersNFTs;
-       
+// this function gets all owned NFTs for a user, then queries all token_uris as well & returns that as a map.
+
+export const getUsersNFTsIDsList = async (wallet: string) => {            
+    let query = Buffer.from(`{"tokens":{"owner":"${wallet}","start_after":"0","limit":500}}`).toString('base64');
+    
+    let api = `${process.env.CRAFTD_NODE}/cosmwasm/wasm/v1/contract/${process.env.ADDR721}/smart/${query}`
+    // console.log(api)
+
+    let response = await axios.get(api).catch(err => {
+        // console.log("getUsersNFTsIDsList Error (wallet does not exist)");
+        // return { "tokens": [] };
+        return undefined;
+    })
+
+    let tokens = response?.data?.data;
+    // console.log(tokens) // { tokens: [ '1', '101', '102', '2', '8', '9' ] }
+
+    return tokens;
 };
