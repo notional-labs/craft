@@ -28,6 +28,7 @@ public class SignedTxCheckListner implements Listener {
     RedisManager redis = CraftBlockchainPlugin.getInstance().getRedis();
 
     private static String TX_ENDPOINT = CraftBlockchainPlugin.getTxQueryEndpoint();
+    private static Boolean IS_DEV_MODE = CraftBlockchainPlugin.getIfInDevMode();
 
     @EventHandler
     public void onSignedTxCheck(SignedTransactionEvent event) {
@@ -39,23 +40,22 @@ public class SignedTxCheckListner implements Listener {
         // If it does, we can complete the method and remove the TxID from the pending
         // list&cache
         Tx tx = PendingTransactions.getInstance().getTxFromID(TxID);
-
         if (tx == null) { return; }
 
         // Gets the Memos/Descriptions of each transaction (on chain query & our local object)
-        String desc = tx.getDescription();
-        String tendermintHash = getMemoFromHash(event.getTednermintHash());
+        String expectedDesc = tx.getDescription();
+        long expected_ucraft = tx.getAmount() * 1_000_000; 
+        String expectedToWallet = tx.getToWallet();
 
-        // Checks that the desc of our Tx object matches that of the signed Memo on chain.
-        boolean doesMatch = doTxMemoAndDescriptionMatch(desc, tendermintHash);
-        boolean isDebugging = tendermintHash.equalsIgnoreCase("DEBUGGING");
+        boolean doesMatch = doesDataMatchTransaction(event.getTednermintHash(), expectedToWallet, expected_ucraft, expectedDesc);
 
         System.out.println("[SignedTransactionEvent] Comparing our tx description -> the memo in the body of the transaction");
         if(!doesMatch) {
-            if(isDebugging) {
+            if(IS_DEV_MODE) {
                 System.out.println("In debugging mode (tendermintHash = DEBUGGING), fake a testing generated faketx");
             } else {
-                System.out.println("[DEBUG] Memo & Actual Description do not match for:" + TxID + "\n- desc: " + desc + "\n- memo:" + tendermintHash);
+                System.out.println("[DEBUG] TxData did not match for:" + TxID + " - " + event.getTednermintHash());
+                System.out.println("[DEBUG] ACTUAL: desc: " + expectedDesc + "  amount (ucraft): " + expected_ucraft + "  toWallet: " + expectedToWallet);
                 return;
             }            
         }
@@ -87,63 +87,64 @@ public class SignedTxCheckListner implements Listener {
         }
     }
 
-    // TODO: Finish this to ping the hash endpoint for craft
-    private boolean doTxMemoAndDescriptionMatch(String tendermintDesc, String desc) {
-        // https://www.mintscan.io/cosmos/txs/3EFA66F9613EF5E215942257C08904392195FCA1C8A9367704AEF97FCAD6FEAA
-        // My test tx hash ^
-
-        if(tendermintDesc == null) {
-            System.out.println("[DEBUG] TxID: " + tendermintDesc + " tendermintDesc is null (not found)");
-            return false;
-        }
-
-        if (tendermintDesc.equalsIgnoreCase("DEBUGGING")) {
-            return true; // wallet fakesign command
-        }
-
-        // if the memo matches the tx description, the tx is valid & secure
-        return tendermintDesc.equalsIgnoreCase(desc);
-    }
-
-    private String getMemoFromHash(String tendermintHash) {
-        URL url = null;
-        String myMemo = null;
+    private static boolean doesDataMatchTransaction(String tendermintHash, String expectedToAddress, long expectedAmount, String expectedMemo) {
+        boolean transactionDataMatches = false;        
         try {
             // TODO: Change this to get value from config
             // curl -X GET "https://api.cosmos.network/cosmos/tx/v1beta1/txs/3EFA66F9613EF5E215942257C08904392195FCA1C8A9367704AEF97FCAD6FEAA" -H "accept: application/json"
-            // url = new URL("https://api.cosmos.network/cosmos/tx/v1beta1/txs/" + tendermintHash);
-            String myUrl = TX_ENDPOINT.replace("{TENDERMINT_HASH}", tendermintHash);
+            // URL url = new URL("https://api.cosmos.network/cosmos/tx/v1beta1/txs/" + tendermintHash);
+            URL url = new URL(TX_ENDPOINT.replace("{TENDERMINT_HASH}", tendermintHash));
             
             if(tendermintHash.equalsIgnoreCase("debugging")) {
-                System.out.println("TendermintHash = DEBUGGING, so we will sign the tx given this.");
-                return tendermintHash;
-            }
-
-            System.out.println("MYURL: " + myUrl);
-            url = new URL(myUrl);
+                System.out.println("TendermintHash = 'debugging', so we will sign the tx given this.");
+                return true;
+            }            
 
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
             httpConn.setRequestMethod("GET");
-
             httpConn.setRequestProperty("accept", "application/json");
 
-            InputStream responseStream = httpConn.getResponseCode() / 100 == 2
-                    ? httpConn.getInputStream()
-                    : httpConn.getErrorStream();
+            InputStream responseStream = httpConn.getResponseCode() / 100 == 2 ? httpConn.getInputStream() : httpConn.getErrorStream();
             Scanner s = new Scanner(responseStream).useDelimiter("\\A");
             String response = s.hasNext() ? s.next() : "";
 
+            // Get the memo string from the transcaction
             JSONObject myObject = new JSONObject(response).getJSONObject("tx");
             myObject = myObject.getJSONObject("body");
+            String txMemo = myObject.getString("memo");
 
-            myMemo = myObject.getString("memo");
-            System.out.println(myMemo);        
+            // Loops through the Tx's messages trying to find one which matches to_address & amount 
+            // [!] (amount is in ucraft)
+            for(Object msg :  myObject.getJSONArray("messages")) {
+                JSONObject msgObject = (JSONObject) msg;
+                String msgToAddress = msgObject.getString("to_address");
+                boolean doesAmountMatchExpected = false;
+                // System.out.println(msgObject.toString());
+                
+                // get amounts array & check until the expected amount = the amount they sent            
+                for(Object amounts : msgObject.getJSONArray("amount")) {
+                    JSONObject tempAmount = (JSONObject) amounts;
+                    long msgAmount = tempAmount.getLong("amount");                    
+                    if(msgAmount == expectedAmount) {
+                        // Util.log("TXHASH - Found a matching amount of " + msgAmount);
+                        doesAmountMatchExpected = true;
+                        break;
+                    }
+                }
+
+                // if (amount=Expected) & (to_address=expected) & (memo=expected), then this was the actual transaction& is valid
+                if(doesAmountMatchExpected && msgToAddress.equalsIgnoreCase(expectedToAddress) && txMemo.equalsIgnoreCase(expectedMemo)) {
+                    // Util.log("Data DOES match transaction!!!");
+                    transactionDataMatches = true;
+                } else {
+                    // Util.logSevere("Data does NOT match this transaction's expected outcome!");
+                }
+            }
             s.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            // Maybe the tx hash was not there? recall this with a runnable in X seconds?
             e.printStackTrace();
         }
-        return myMemo;
+        return transactionDataMatches;
     }
-
 }
