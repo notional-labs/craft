@@ -46,28 +46,20 @@ public class SignedTxCheckListner implements Listener {
         String expectedDesc = tx.getDescription();
         long expected_ucraft = tx.getAmount() * 1_000_000; 
         String expectedToWallet = tx.getToWallet();
-
         boolean doesMatch = doesDataMatchTransaction(event.getTednermintHash(), expectedToWallet, expected_ucraft, expectedDesc);
 
-        System.out.println("[SignedTransactionEvent] Comparing our tx description -> the memo in the body of the transaction");
-        if(!doesMatch) {
-            if(IS_DEV_MODE) {
-                System.out.println("In debugging mode (tendermintHash = DEBUGGING), fake a testing generated faketx");
-            } else {
-                System.out.println("[DEBUG] TxData did not match for:" + TxID + " - " + event.getTednermintHash());
-                System.out.println("[DEBUG] ACTUAL: desc: " + expectedDesc + "  amount (ucraft): " + expected_ucraft + "  toWallet: " + expectedToWallet);
-                return;
-            }            
-        }
-        System.out.println("[DEBUG] TxID: " + TxID + " desc matches the tendermint hash memo!");
-        
-
-        Util.logFine("SignedTransactionEvent found for " + TxID.toString().substring(0, 15) + "... Completing.\n");
+        System.out.println("[SignedTransactionEvent] Comparing our tx description -> the memo in the body of the transaction");        
+        if(doesMatch == false) {
+            Util.logWarn("[DEBUG] TxData did not match for:" + TxID + " - " + event.getTednermintHash());
+            Util.logWarn("[DEBUG] ACTUAL: desc: " + expectedDesc + "  amount (ucraft): " + expected_ucraft + "  toWallet: " + expectedToWallet);
+            return;
+        }                
+        Util.logFine("SignedTransactionEvent [DATA MATCH] found for " + TxID.toString().substring(0, 15) + "... Completing\n");
         tx.complete();
 
         // remove that TxID from the pending list
         PendingTransactions.getInstance().removePending(TxID);
-        System.out.println("[DEBUG] TxID: " + TxID + " removed from pending list");
+        // System.out.println("[DEBUG] TxID: " + TxID + " removed from pending list");
 
         try (Jedis jedis = redis.getRedisConnection()) {
             // gets 1 key which matches the wallets address due to unique TxID
@@ -95,8 +87,8 @@ public class SignedTxCheckListner implements Listener {
             // URL url = new URL("https://api.cosmos.network/cosmos/tx/v1beta1/txs/" + tendermintHash);
             URL url = new URL(TX_ENDPOINT.replace("{TENDERMINT_HASH}", tendermintHash));
             
-            if(tendermintHash.equalsIgnoreCase("debugging")) {
-                System.out.println("TendermintHash = 'debugging', so we will sign the tx given this.");
+            if(IS_DEV_MODE && tendermintHash.equalsIgnoreCase("debugging")) {
+                Util.logFine("TendermintHash = 'debugging', so we will sign the tx given this.");
                 return true;
             }            
 

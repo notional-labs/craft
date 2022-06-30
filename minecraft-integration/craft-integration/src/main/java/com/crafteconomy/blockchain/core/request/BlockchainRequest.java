@@ -14,6 +14,7 @@ import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -169,7 +170,8 @@ public class BlockchainRequest {
                 return ErrorTypes.NO_WALLET;
             }
         } else {
-            Util.coloredBroadcast("&cDEV MODE IS ENABLED FOR THIS TRANSACTION (config.yml, no blockchain request)");
+            String name = Bukkit.getPlayer(transaction.getFromUUID()).getName().toUpperCase();
+            Util.coloredBroadcast("&cDEV MODE IS ENABLED FOR THIS TRANSACTION "+name+" (config.yml, no blockchain request)");
         }
 
         
