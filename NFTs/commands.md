@@ -65,18 +65,26 @@ export ADDR20=craft1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3shge3vd
 
 ```bash
 craftd tx wasm instantiate $C721 '{
-  "name": "craftd-realestate-nfts2",
+  "name": "craftd-realestate-3",
   "symbol": "CRE",
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
-}' --label "cw721-base-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
-export ADDR721=craft1xt4ahzz2x8hpkc0tk6ekte9x6crw4w6u0r67cyt3kz9syh24pd7srxmrrn
+}' --label "cw721-realestate-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
+
+craftd tx wasm instantiate $C721 '{
+  "name": "craftd-skins-1",
+  "symbol": "CSKINS",
+  "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
+}' --label "cw721-realestate-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
+
+export ADDR721=craft1z7asfxkwv0t863rllul570eh5pf2zk07k3d86ag4vtghaue37l5sz0nt7k
+export ADDR721_SKINS=craft182nff4ttmvshn6yjlqj5czapfcav9434l2qzz8aahf5pxnyd33ts98amul
 ```
 
 ```bash
 craftd tx wasm instantiate $CM '{
-  "name": "craft-marketplace-nfts3"
+  "name": "craft-marketplace-nfts5"
 }' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
-export ADDRM=craft1436kxs0w2es6xlqpp9rd35e3d0cjnw4sv8j3a7483sgks29jqwgsmy2ztv
+export ADDRM=craft149ltwdnpxrhx9al42s359glcjnsuc6x3dalz28f04dsxhlu7jhmqgzt8jl
 ```
 
 ---

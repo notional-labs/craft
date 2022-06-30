@@ -31,17 +31,23 @@ from base64 import b64decode, b64encode
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
+from Util import Contract_Tx
+
 # --- User Defined Variables -------------------------------------------------------------------------------------------
-CRAFTD_NODE = "http://65.108.125.182:1317"
+CRAFTD_REST = "http://65.108.125.182:1317"
 CODE_20=3 # code ids on chain after upload
 CODE_721=4
 CODE_M=5
 
 # Hardcoded once you Contract_Initialize
-ADDR20="craft1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3shge3vd"
-ADDR721="craft1xt4ahzz2x8hpkc0tk6ekte9x6crw4w6u0r67cyt3kz9syh24pd7srxmrrn"
-ADDRM="craft1436kxs0w2es6xlqpp9rd35e3d0cjnw4sv8j3a7483sgks29jqwgsmy2ztv"
+load_dotenv()
+ADDR20=os.getenv("ADDR20")
+ADDR721=os.getenv("ADDR721_REALESTATE")
+ADDRM=os.getenv("ADDRM")
 
+if ADDR721 == None:
+    print("Please set the ADDR721 variable in the script.")
+    exit()
 
 
 # --- Initialization ---------------------------------------------------------------------------------------------------
@@ -65,13 +71,15 @@ class Utils:
         doc = reCities.find_one(filter={'_id': region_id})
         if doc == None:
             return ""    
-        return doc.get('name', "")
+        return doc.get('name', "") 
+
     @staticmethod
     def getBuildingFromID(region_id):
         doc = reBuildings.find_one(filter={'_id': region_id})
         if doc == None:
             return ""    
         return doc.get('name', "")
+
     @staticmethod
     def _calcListingPrice(data: dict) -> int:
         # print(f"{type(data)}, {data}")
@@ -144,13 +152,12 @@ class Contract_Instantiate:
         # print(contractID) # craft1xr3rq8yvd7qplsw5yx90ftsr2zdhg4e9z60h5duusgxpv72hud3sc3plyl
         return {"tx_hash": TX_HASH, "contract_address": contractID}
 
-
 class Contract_Query:
-    # All moved to official rest API + redis caching. Remove this soon
+    # All moved to official rest API + redis caching.
     @staticmethod
     def getNFTContractInfo(): # CACHE THIS
         # craftd query wasm contract-state smart $ADDR721 '{"contract_info":{}}'
-        url = f'{CRAFTD_NODE}/cosmwasm/wasm/v1/contract/{ADDR721}'
+        url = f'{CRAFTD_REST}/cosmwasm/wasm/v1/contract/{ADDR721}'
         response = requests.get(url).json()
         print(response)
         return response
@@ -161,7 +168,7 @@ class Contract_Query:
         query = '{"nft_info":{"token_id":"{TOKEN_ID}"}}'.replace("{TOKEN_ID}", str(token_id))
         b64query = b64encode(query.encode('utf-8')).decode('utf-8')
 
-        url = f'{CRAFTD_NODE}/cosmwasm/wasm/v1/contract/{ADDR721}/smart/{b64query}'#; print(url)
+        url = f'{CRAFTD_REST}/cosmwasm/wasm/v1/contract/{ADDR721}/smart/{b64query}'#; print(url)
         response = requests.get(url, params=params_base64)  
         if response.status_code != 200:
             print(f"Status code {response.status_code}. This NFT '{token_id}' likely does not exist...")
@@ -179,13 +186,14 @@ class Contract_Query:
         query = '{"tokens":{"owner":"{address}","start_after":"{INIT_START}","limit":100}}'.replace("{address}", str(address)).replace("{INIT_START}", str(INIT_START_IDX))
         b64query = b64encode(query.encode('utf-8')).decode('utf-8')
 
-        url = f'{CRAFTD_NODE}/cosmwasm/wasm/v1/contract/{ADDR721}/smart/{b64query}'#; print(url)
+        url = f'{CRAFTD_REST}/cosmwasm/wasm/v1/contract/{ADDR721}/smart/{b64query}'#; print(url)
         response = requests.get(url, params=params_base64)        
         if response.status_code != 200:
             print("Status code " + str(response.status_code) + ". Returning {}")
             return []
         return response.json()['data']['tokens']
 
+    @staticmethod
     def getUserOwnedNFTsALL(address, decodeBase64=True):
         # Gets all users tokenIDS AND their base64 values
         '''{"tokenID": "base64Value",}'''
@@ -203,7 +211,7 @@ class Contract_Query:
         query = '{"get_offerings":{}}'
         b64query = b64encode(query.encode('utf-8')).decode('utf-8')
 
-        url = f'{CRAFTD_NODE}/cosmwasm/wasm/v1/contract/{ADDRM}/smart/{b64query}'#; print(url)
+        url = f'{CRAFTD_REST}/cosmwasm/wasm/v1/contract/{ADDRM}/smart/{b64query}'#; print(url)
         response = requests.get(url, params=params_base64)        
         if response.status_code != 200:
             print("Status code " + str(response.status_code) + ". Returning {}")
@@ -225,36 +233,7 @@ class Contract_Query:
             newOutput[tokenID] = base64Value
         return newOutput
 
-class Contract_Tx:
-    def transferNFTToMarketplace(id):        
-        '''
-        export NFT_LISTING_BASE64=`printf  $ADDR20 | base64 -w 0` && echo $NFT_LISTING_BASE64
-        # send_nft from 721 -> marketplace contract =  $ADDRM
-        export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"2","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
-        craftd tx wasm execute $ADDR721 $SEND_NFT_JSON --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY
-        '''
-        metadata = json.loads(Contract_Query.queryToken(id, decodeBase64=True))
-        # print(metadata)
-        # listingCraftPrice = Utils._calcListingPrice(mintCommands[id])
-        listingCraftPrice = Utils._calcListingPrice(metadata)
-        if listingCraftPrice <= 0:
-            print(f"Error: Property {id} is a government property & will not be listed (listingCraftPrice <= 0).")
-            return
 
-        # print(f"{listingCraftPrice=}")
-        listPrice = '{"list_price":{"address":"{ADMIN_WALLET}","amount":"{AMT}","denom":"{TOKEN}"}}'\
-            .replace("{ADMIN_WALLET}", admin_wallet).replace("{AMT}", str(listingCraftPrice)).replace("{TOKEN}", DENOM)
-
-        SEND_NFT_JSON = '''{"send_nft":{"contract":"{ADDRM}","token_id":"{ID}","msg":"{LIST_PRICE}"}}''' \
-            .replace("{ADDRM}", ADDRM) \
-            .replace("{ID}", str(id)) \
-            .replace("{LIST_PRICE}", b64encode(listPrice.encode('utf-8')).decode('utf-8'))
-        # print(SEND_NFT_JSON)
-
-
-        cmd = f"""craftd tx wasm execute {ADDR721} '{SEND_NFT_JSON}' --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY"""
-        with open(os.path.join(current_dir, "tx_to_marketplace_commands.txt"), 'a') as mintF:
-            mintF.write(cmd + "\n")
 
 # cw20_contract_address = Contract_Instantiate.C20()
 # print(f"{cw20_contract_address}")
@@ -263,6 +242,7 @@ class Contract_Tx:
 # cm_contract_address = Contract_Instantiate.CM()
 # print(f"{cm_contract_address}")
 
+# moved to rest API
 # q = Contract_Query.getNFTContractInfo()
 # q = Contract_Query.getNFTInfo(1)
 
@@ -284,7 +264,8 @@ def step1_prepareRealEstateDocuments():
 
 # in the future we need to craftd tx sign as a big array of messages, but for now this works
 def step2_encodeRealEstateDocumentAndSaveMintToFile():
-    print("Step 2: Encoding Real Estate Documents from Step1 -> mintCommands.txt")
+    fileName = "tx_mint_realestate_commands.txt"
+    print(f"Step 2: Encoding Real Estate Documents from Step1 -> {fileName}")
     for idx, data in mintCommands.items():
         b64Data = b64encode(json.dumps(data).encode('utf-8')).decode('utf-8')
         # print(b64Data)
@@ -295,29 +276,36 @@ def step2_encodeRealEstateDocumentAndSaveMintToFile():
             .replace("{B64DATA}", b64Data)
 
         mintCmd = f"""craftd tx wasm execute {ADDR721} '{mintJSON}' --from $KEY --output json -y"""
-        with open(os.path.join(current_dir, "mintCommands.txt"), 'a') as mintF:
+        with open(os.path.join(current_dir, f"{fileName}"), 'a') as mintF:
             mintF.write(mintCmd + "\n")
-    print("Commands to mint saved to file mintCommands.txt. Please run these before continuing to Step3.")
+    print(f"Commands to mint saved to file {fileName}. Please run these before continuing to Step3.")
 
 
 def step3_moveAllREToMarketplaceContractWithCorrectPricing():
     nft_token_list = list(Contract_Query.getUserOwnedNFTsALL(f"{admin_wallet}", decodeBase64=False).keys())
     print(nft_token_list)
+
+    cTx = Contract_Tx(admin_wallet)
     for tokenId in nft_token_list:
-        Contract_Tx.transferNFTToMarketplace(int(tokenId))
+
+        metadata = json.loads(Contract_Query.queryToken(tokenId, decodeBase64=True))
+        listingCraftPrice = Utils._calcListingPrice(metadata)
+        if listingCraftPrice <= 0:
+            print(f"[!] Property {tokenId} is a government property & will not be listed (listingCraftPrice <= 0).")
+            continue
+        # ADDR721, id, forSalePrice, fileName
+        cTx.transferNFTToMarketplace(ADDR721, int(tokenId), listingCraftPrice, "RE_txSendToMarketplace.txt")
 
 if __name__ == '__main__':
     # step1_prepareRealEstateDocuments()
     # step2_encodeRealEstateDocumentAndSaveMintToFile()
-    # step3_moveAllREToMarketplaceContractWithCorrectPricing()
+    input("Did you already run the commands / submit?"); step3_moveAllREToMarketplaceContractWithCorrectPricing()
 
 
     # query_data = Contract_Query.queryToken(3, decodeBase64=True)
     # print(query_data)
 
     # Contract_Query.queryOfferings()
-    newOutput = Contract_Query.queryOfferingsWithData()
-    print(newOutput)
 
     # owned_nfts = Contract_Query.getUsersOwnedNFTs("craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl")
     # print(owned_nfts)
