@@ -81,76 +81,14 @@ class Utils:
         return doc.get('name', "")
 
     @staticmethod
-    def _calcListingPrice(data: dict) -> int:
-        # print(f"{type(data)}, {data}")
-        return MINT_PRICES.get(data['type'], -1) * int(data['floorArea'])
+    def _calcListingPrice(property_type: str, floor_area: int) -> int:
+        mintMultiplier = int(MINT_PRICES[property_type])
+        floorArea = int(floor_area)
+        product = floorArea * mintMultiplier
+        print(f"{mintMultiplier=}, {floorArea=}, {product=}")
+        return product
 
-class Contract_Instantiate:   
-    # After uploading to the chain, we call this class to actually get get an instance of them 
-    @staticmethod
-    def C20():
-        '''
-        Uploads CW20 contract & returns the address
-        '''
-        init_cw20_balances = [
-            {"address":f"{admin_wallet}","amount": "100"}, # test account (admin)
-            {"address":"craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0","amount": "100"}, # reece
-        ]
-        cmd = """craftd tx wasm instantiate $C20 '{"name": "{CW_CONTRACT_NAME}","symbol": "{SYMBOL}","decimals": 6,"initial_balances": {INIT_BALS},"mint": {"minter": "{ADMIN_WALLET}"}}' --label "{LABEL}" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR --output json | jq -r '.txhash'""" \
-            .replace("{INIT_BALS}", json.dumps(init_cw20_balances, separators=(',',":"))) \
-            .replace("{CW_CONTRACT_NAME}", "craft-cw-20-placeholder") \
-            .replace("{SYMBOL}", "CRAFTR") \
-            .replace("{LABEL}", "cw20-base") \
-            .replace("{ADMIN_WALLET}", admin_wallet)
-        TX_HASH = os.popen(cmd).read().strip()
-        # print(TX_HASH)
-        cmd2 = f"""craftd q tx {TX_HASH} --output json | jq -r '.logs[].events[].attributes[] | select(.key=="_contract_address").value'"""
-        # print(cmd2)
-        contractID = os.popen(cmd2).read().strip()
-        # print(contractID) # craft1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3shge3vd
-        return {"tx_hash": TX_HASH, "contract_address": contractID}
 
-    @staticmethod
-    def C721():
-        '''
-        Uploads CW721 contract & returns the address
-        '''
-        cmd = """craftd tx wasm instantiate {C721_ID} '{"name": "{CW_CONTRACT_NAME}","symbol": "{SYMBOL}","minter": "{ADMIN_WALLET}"}' --label "{LABEL}" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR --output json | jq -r '.txhash'""" \
-            .replace("{CW_CONTRACT_NAME}", "craftd-realestate4") \
-            .replace("{SYMBOL}", "CRE") \
-            .replace("{C721_ID}", f"{CODE_721}") \
-            .replace("{LABEL}", "cw721-base-craft2") \
-            .replace("{ADMIN_WALLET}", admin_wallet)
-        print(cmd)
-        TX_HASH = os.popen(cmd).read().strip()
-        # print(TX_HASH)
-        time.sleep(0.5)
-        cmd2 = f"""craftd q tx {TX_HASH} --output json | jq -r '.logs[].events[].attributes[] | select(.key=="_contract_address").value'"""
-        # print(cmd2)
-        contractID = os.popen(cmd2).read().strip()
-        values = {"tx_hash": TX_HASH, "contract_address": contractID}
-        print(values)
-        return values
-
-    @staticmethod
-    def CM():
-        '''
-        Uploads CW721 contract & returns the address
-        '''
-        # init_cw20_balances = [
-        #     {"address":f"{admin_wallet}","amount": "100"}, # test account (admin)
-        #     {"address":"craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0","amount": "100"}, # reece
-        # ]
-        cmd = """craftd tx wasm instantiate $CM '{"name": "{CW_CONTRACT_NAME}"}' --label "{LABEL}" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR --output json | jq -r '.txhash'""" \
-            .replace("{CW_CONTRACT_NAME}", "craft-marketplace-nfts") \
-            .replace("{LABEL}", "marketplace")
-        TX_HASH = os.popen(cmd).read().strip()
-        print(TX_HASH)
-        cmd2 = f"""craftd q tx {TX_HASH} --output json | jq -r '.logs[].events[].attributes[] | select(.key=="_contract_address").value'"""
-        # print(cmd2)
-        contractID = os.popen(cmd2).read().strip()
-        # print(contractID) # craft1xr3rq8yvd7qplsw5yx90ftsr2zdhg4e9z60h5duusgxpv72hud3sc3plyl
-        return {"tx_hash": TX_HASH, "contract_address": contractID}
 
 class Contract_Query:
     # All moved to official rest API + redis caching.
@@ -233,20 +171,6 @@ class Contract_Query:
             newOutput[tokenID] = base64Value
         return newOutput
 
-
-
-# cw20_contract_address = Contract_Instantiate.C20()
-# print(f"{cw20_contract_address}")
-# cw721_contract_address = Contract_Instantiate.C721()
-# print(f"{cw721_contract_address}")
-# cm_contract_address = Contract_Instantiate.CM()
-# print(f"{cm_contract_address}")
-
-# moved to rest API
-# q = Contract_Query.getNFTContractInfo()
-# q = Contract_Query.getNFTInfo(1)
-
-# exit()
 # --- Other ------------------------------------------------------------------------------------------------------------
 
 
@@ -259,8 +183,10 @@ def step1_prepareRealEstateDocuments():
             del doc[k]
         doc['cityName'] = Utils.getCityFromID(doc['cityId'])
         doc['buildingName'] = Utils.getBuildingFromID(doc['buildingId'])
+        doc['_nft_type'] = "real_estate"
         # print(f"Getting data for {idx}, {doc}")
         mintCommands[idx] = doc
+        # input(f"{doc=}")
 
 # in the future we need to craftd tx sign as a big array of messages, but for now this works
 def step2_encodeRealEstateDocumentAndSaveMintToFile():
@@ -281,25 +207,35 @@ def step2_encodeRealEstateDocumentAndSaveMintToFile():
     print(f"Commands to mint saved to file {fileName}. Please run these before continuing to Step3.")
 
 
-def step3_moveAllREToMarketplaceContractWithCorrectPricing():
+def step3_generateRESendCommandsToMarketplaceContract():
     nft_token_list = list(Contract_Query.getUserOwnedNFTsALL(f"{admin_wallet}", decodeBase64=False).keys())
     print(nft_token_list)
 
     cTx = Contract_Tx(admin_wallet)
     for tokenId in nft_token_list:
-
-        metadata = json.loads(Contract_Query.queryToken(tokenId, decodeBase64=True))
-        listingCraftPrice = Utils._calcListingPrice(metadata)
+        metadata = dict(json.loads(Contract_Query.queryToken(tokenId, decodeBase64=True)))
+        floorArea = metadata['floorArea']
+        
+        listingCraftPrice = Utils._calcListingPrice(metadata.get("type"), floorArea)
+        print(f"{listingCraftPrice}")
         if listingCraftPrice <= 0:
             print(f"[!] Property {tokenId} is a government property & will not be listed (listingCraftPrice <= 0).")
             continue
+
+        # v = input("\n>>>")
         # ADDR721, id, forSalePrice, fileName
         cTx.transferNFTToMarketplace(ADDR721, int(tokenId), listingCraftPrice, "RE_txSendToMarketplace.txt")
 
 if __name__ == '__main__':
-    # step1_prepareRealEstateDocuments()
-    # step2_encodeRealEstateDocumentAndSaveMintToFile()
-    input("Did you already run the commands / submit?"); step3_moveAllREToMarketplaceContractWithCorrectPricing()
+    step1_prepareRealEstateDocuments()
+    step2_encodeRealEstateDocumentAndSaveMintToFile()
+    # input("Did you already run commands from step2?"); step3_generateRESendCommandsToMarketplaceContract()
+
+    # moved to rest API
+    # q = Contract_Query.getNFTContractInfo()
+    # q = Contract_Query.getNFTInfo(1)
+
+    # exit()
 
 
     # query_data = Contract_Query.queryToken(3, decodeBase64=True)

@@ -25,7 +25,7 @@ craftd tx wasm instantiate $C721 '{
 '''
 
 
-START_INDEX = 50 # 1 by default
+START_INDEX = 1 # 1 by default
 SKIN_MINT_PRICE = 5 # craft
 
 load_dotenv()
@@ -58,24 +58,27 @@ class Skins:
         return []
 
     def getSkinValues(self, id: int):
-        REDIS_CACHE_KEY = "cache:skins_textures" # speeds up query time for past events
-        value = r.hget(REDIS_CACHE_KEY, str(id))
-        if value:
-            value = json.loads(value)
-            if len(value) > 0:
-                print(f"[Redis Cache] {id} found")
-                return value # if not, we need to requery the API
+        # we dont save to cache here, we do that in the TS query
+        # REDIS_CACHE_KEY = "cache:skins_textures" # speeds up query time for past events
+        # value = r.hget(REDIS_CACHE_KEY, str(id))
+        # if value:
+        #     value = json.loads(value)
+        #     if len(value) > 0:
+        #         print(f"[Redis Cache] {id} found")
+        #         return value # if not, we need to requery the API
 
         response = requests.get(f'https://api.mineskin.org/get/id/{id}', headers=headers).json()
         if 'data' in response:
             texture = response['data']['texture']
             textureData =  {
+                "_nft_type": "skin", # helps with sorting
                 "value": texture['value'], 
                 "signature": texture['signature'],
                 "url": texture['url']
             }
-            print(f'Downloaded {id}. Saved to cache')
-            r.hset(REDIS_CACHE_KEY, str(id), json.dumps(textureData))
+            print(f'Downloaded {id}')
+            # r.hset(REDIS_CACHE_KEY, str(id), json.dumps(textureData))
+            return textureData
         return {}
 
 

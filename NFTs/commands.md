@@ -45,46 +45,47 @@ echo $CM
 
 ```bash
 craftd tx wasm instantiate $C20 '{
-  "name": "craft-cw-20-placeholder",
+  "name": "craft-cw-20-placeholder2",
   "symbol": "CRAFTR",
   "decimals": 6,
   "initial_balances": [
     {
       "address": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl",
-      "amount": "100"
+      "amount": "10000"
     }
   ],
   "mint": {
     "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
   }
-}' --label "cw20-base" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
+}' --label "cw20-base2" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
 # gets latest instantiated contract address
 # export ADDR20=$(craftd q wasm list-contract-by-code $C20 --output json | jq -r '.contracts[-1]')
-export ADDR20=craft1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3shge3vd
+# export ADDR20=craft1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3shge3vd
+export ADDR20=craft1q23d30x94cm8ve243pxdc52m398r4l5ecgcfp8tud3vggcsq8s2qz0py27
 ```
 
 ```bash
 craftd tx wasm instantiate $C721 '{
-  "name": "craftd-realestate-3",
+  "name": "craftd-realestate-6",
   "symbol": "CRE",
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 }' --label "cw721-realestate-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
 
 craftd tx wasm instantiate $C721 '{
-  "name": "craftd-skins-1",
+  "name": "craftd-skins-2",
   "symbol": "CSKINS",
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 }' --label "cw721-realestate-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
 
-export ADDR721=craft1z7asfxkwv0t863rllul570eh5pf2zk07k3d86ag4vtghaue37l5sz0nt7k
-export ADDR721_SKINS=craft182nff4ttmvshn6yjlqj5czapfcav9434l2qzz8aahf5pxnyd33ts98amul
+export ADDR721=craft187zds75uenfxht2zqz7e0wxn3ushcawvf2ndrns6q63hgfn6ptqqsuflma
+export ADDR721_SKINS=craft15jzyzklz8rq9gy38p4kcall0nqr8exglqg5870gglaq4c976vlxsa5uznc
 ```
 
 ```bash
 craftd tx wasm instantiate $CM '{
-  "name": "craft-marketplace-nfts5"
+  "name": "craft-marketplace-nfts6"
 }' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR
-export ADDRM=craft149ltwdnpxrhx9al42s359glcjnsuc6x3dalz28f04dsxhlu7jhmqgzt8jl
+export ADDRM=craft13h9k5rsrgveg6sdtzg34qg499ns0e5kku74kapnskegtwyfspf6qhxcdfh
 ```
 
 ---
