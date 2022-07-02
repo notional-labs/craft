@@ -77,8 +77,15 @@ craftd tx wasm instantiate $C721 '{
   "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 }' --label "cw721-realestate-craft" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
 
+craftd tx wasm instantiate $C721 '{
+  "name": "craftd-test721",
+  "symbol": "ctest2",
+  "minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
+}' --label "cw721-base-test" $CRAFTD_COMMAND_ARGS -y --admin $KEY_ADDR
+
 export ADDR721=craft187zds75uenfxht2zqz7e0wxn3ushcawvf2ndrns6q63hgfn6ptqqsuflma
 export ADDR721_SKINS=craft15jzyzklz8rq9gy38p4kcall0nqr8exglqg5870gglaq4c976vlxsa5uznc
+export ADDR721_TEST_NORMAL=craft1zjd5lwhch4ndnmayqxurja4x5y5mavy9ktrk6fzsyzan4wcgawnq7d4srp
 ```
 
 ```bash
