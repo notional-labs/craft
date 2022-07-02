@@ -12,6 +12,8 @@ import connectionsRouter from './routes/connections.route';
 import transactionsRouter from './routes/transactions.route';
 import realestateRouter from './routes/realestate.route';
 import nftmarketplaceRouter from './routes/nftmarketplace.route';
+import nftsRouter from './routes/nfts.route';
+import skinsRouter from './routes/skins.route';
 
 // Initialises env variables
 config();
@@ -35,8 +37,10 @@ connectToRedis(REDIS_CONN_STRING);
 app.use('/v1/statistics', statisticsRouter);
 app.use('/v1/connections', connectionsRouter);
 app.use('/v1/tx', transactionsRouter);
+app.use('/v1/marketplace', nftmarketplaceRouter)
 app.use('/v1/realestate', realestateRouter)
-app.use('/v1/nftmarketplace', nftmarketplaceRouter)
+app.use('/v1/nfts', nftsRouter)
+app.use('/v1/skins', skinsRouter)
 
 
 var ROUTER_CACHE = {};
@@ -50,14 +54,19 @@ app.get('/', (req, res) => {
         const statisticsRoutes = statisticsRouter.stack.map(({ route }) => `${urlStart}/v1/statistics` + route.path)
         const connectionsRoutes = connectionsRouter.stack.map(({ route }) => `${urlStart}/v1/connections` + route.path)
         const transactionsRoutes = transactionsRouter.stack.map(({ route }) => `${urlStart}/v1/tx` + route.path)
+        const nftmarketplaceRouters = nftmarketplaceRouter.stack.map(({ route }) => `${urlStart}/v1/marketplace` + route.path)
+        const nftsRoutes = nftsRouter.stack.map(({ route }) => `${urlStart}/v1/nfts` + route.path)
         const realestateRoutes = realestateRouter.stack.map(({ route }) => `${urlStart}/v1/realestate` + route.path)
-        const nftmarketplaceRouters = nftmarketplaceRouter.stack.map(({ route }) => `${urlStart}/v1/nftmarketplace` + route.path)
+        const skinsRoutes = skinsRouter.stack.map(({ route }) => `${urlStart}/v1/skins` + route.path)
+        
         ROUTER_CACHE = {
             statistics: statisticsRoutes,
             connections: connectionsRoutes,
-            transactions: transactionsRoutes,
-            realestate: realestateRoutes,
+            transactions: transactionsRoutes,            
             nftmarketplace: nftmarketplaceRouters,
+            nfts: nftsRoutes,
+            realestate: realestateRoutes,
+            skins: skinsRoutes
         }
     }
 
