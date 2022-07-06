@@ -15,13 +15,13 @@ const request = require('request');
 
 // npm install webpack-dev-server -g
 
-const name = "Craft Testnet v4"
+const name = "Craft Reecenet"
 const CHAIN_ID = "test-1"; // test_node.sh
 const RPC_ENDPOINT = "http://65.108.125.182:26657/";
 const REST_ENDPOINT = "http://65.108.125.182:1317/";
 
-const bondDenom = "stake"; // uexp in production
-const tokenDenom = "token"; // ucraft in production
+const bondDenom = "uexp"; // uexp in production
+const tokenDenom = "ucraft"; // ucraft in production
 
 window.onload = async () => {
     // Keplr extension injects the offline signer that is compatible with cosmJS.
