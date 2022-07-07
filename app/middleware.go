@@ -11,8 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	channelkeeper "github.com/cosmos/ibc-go/v3/modules/core/04-channel/keeper"
-	ibcmiddleware "github.com/cosmos/ibc-go/v3/modules/core/middleware"
+	channelkeeper "github.com/cosmos/ibc-go/v4/modules/core/04-channel/keeper"
+	ibcmiddleware "github.com/cosmos/ibc-go/v4/modules/core/middleware"
 )
 
 // ComposeMiddlewares compose multiple middlewares on top of a tx.Handler. The
