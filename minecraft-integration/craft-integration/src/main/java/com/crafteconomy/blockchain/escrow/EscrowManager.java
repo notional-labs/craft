@@ -85,7 +85,8 @@ public class EscrowManager {
         tx.setDescription("ESCROWING " +ucraft_amount/1_000_000 + "craft (" + ucraft_amount + "ucraft) FOR " + uuid.toString());
         tx.setFunction(depositEscrowLogic(uuid, ucraft_amount));
 
-        tx = tx.sendDescription().sendTxIDClickable().sendWebappLink();
+        // tx = tx.sendDescription().sendTxIDClickable().sendWebappLink();
+        tx = tx.sendTxIDClickable().sendWebappLink();
         tx.submit();
 
         return EscrowErrors.SUCCESS;
@@ -146,7 +147,7 @@ public class EscrowManager {
         return spendUCraft(uuid, (long) (craft_cost * 1_000_000));
     }
 
-    public EscrowErrors payPlayerUCraft(UUID from_uuid, UUID to_uuid, long ucraft_cost) {
+    public EscrowErrors escrowPayPlayerUCraft(UUID from_uuid, UUID to_uuid, long ucraft_cost) {
         // player not enough escrow.
         if(getUCraftBalance(from_uuid) < ucraft_cost) {
             return EscrowErrors.INSUFFICIENT_FUNDS;
@@ -157,8 +158,8 @@ public class EscrowManager {
         return EscrowErrors.SUCCESS;
     }
 
-    public EscrowErrors payPlayerCraft(UUID from_uuid, UUID to_uuid, float craft_cost) {
-        return payPlayerUCraft(from_uuid, to_uuid, (long) (craft_cost * 1_000_000));
+    public EscrowErrors escrowPayPlayerCraft(UUID from_uuid, UUID to_uuid, float craft_cost) {
+        return escrowPayPlayerUCraft(from_uuid, to_uuid, (long) (craft_cost * 1_000_000));
     }
 
     

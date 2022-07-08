@@ -5,6 +5,7 @@ import com.crafteconomy.blockchain.commands.escrow.EscrowCMD;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowBalance;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowDeposit;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowHelp;
+import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowPay;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowRedeem;
 import com.crafteconomy.blockchain.commands.wallet.WalletCMD;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletBalance;
@@ -143,8 +144,9 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         escrowCMD.registerCommand(new String[] {"b", "bal", "balance"}, new EscrowBalance());
         escrowCMD.registerCommand(new String[] {"d", "dep", "deposit"}, new EscrowDeposit());
         escrowCMD.registerCommand(new String[] {"r", "red", "redeem"}, new EscrowRedeem());
+        escrowCMD.registerCommand(new String[] {"p", "pay", "payment"}, new EscrowPay());
         // arg[0] commands which will tab complete
-        escrowCMD.addTabComplete(new String[] {"balance","deposit","redeem"});
+        escrowCMD.addTabComplete(new String[] {"balance","deposit","redeem","pay"});
 
 
         getServer().getPluginManager().registerEvents(new JoinLeave(), this);  

@@ -336,6 +336,13 @@ public class IntegrationAPI {
         return escrowUCraftSpend(playerUUID, (long) (craft_cost * 1_000_000));
     }
 
+    public EscrowErrors escrowPayPlayerUCraft(UUID from_uuid, UUID to_uuid, long ucraft_cost) {
+        return EscrowManager.getInstance().escrowPayPlayerUCraft(from_uuid, to_uuid, ucraft_cost);
+    }
+    public EscrowErrors escrowPayPlayerCraft(UUID from_uuid, UUID to_uuid, float craft_cost) {
+        return EscrowManager.getInstance().escrowPayPlayerCraft(from_uuid, to_uuid, craft_cost);
+    }
+
     public long escrowGetUCraftBalance(UUID uuid) {
         return EscrowManager.getInstance().getUCraftBalance(uuid);
     }
