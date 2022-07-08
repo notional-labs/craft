@@ -55,7 +55,7 @@ public class WalletGenerateFakeTx implements SubCommand {
             TxInfo.setFunction(Examples.purchaseBusinessLicense());
             TxInfo.setTxType(TransactionType.COMPANY);
             desc = "Purchase Business License for 2";
-            TxInfo.setAmount(2);
+            TxInfo.setCraftAmount(2);
         } else {
             if(args.length >= 3) { 
                 itemToPurchase = Util.argsToSingleString(2, args); 
@@ -64,7 +64,7 @@ public class WalletGenerateFakeTx implements SubCommand {
             TxInfo.setFunction(Examples.purchaseSomeItem(itemToPurchase));
             TxInfo.setTxType(TransactionType.TRADE);
             desc = "Purchasing item " + itemToPurchase + " for 1";
-            TxInfo.setAmount(1);
+            TxInfo.setCraftAmount(1);
         }
 
         TxInfo.setDescription(desc);
@@ -75,7 +75,7 @@ public class WalletGenerateFakeTx implements SubCommand {
         
         try (Jedis jedis = redis.getRedisConnection()) {
             ErrorTypes error = BlockchainRequest.transaction(TxInfo, RedisMinuteTTL);
-            // if(error != ErrorTypes.NO_ERROR) {
+            // if(error != ErrorTypes.SUCCESS) {
             //     // code
             // }
                         

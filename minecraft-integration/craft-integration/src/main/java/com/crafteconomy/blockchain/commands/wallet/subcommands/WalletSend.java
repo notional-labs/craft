@@ -42,10 +42,10 @@ public class WalletSend implements SubCommand {
         final String FROM = walletManager.getAddress(((Player)sender).getUniqueId());
         final String TO = walletManager.getAddressFromName(args[1]);
 
-        final long AMOUNT;
+        final long CRAFT_AMOUNT;
         try {
-            AMOUNT = Long.parseLong(args[2]);
-            if(AMOUNT <= 0) { return; }
+            CRAFT_AMOUNT = Long.parseLong(args[2]);
+            if(CRAFT_AMOUNT <= 0) { return; }
 
         } catch (Exception e) {
             Util.colorMsg(sender, "&c&lInvalid amount " + args[2]);
@@ -77,18 +77,18 @@ public class WalletSend implements SubCommand {
         Tx txInfo = new Tx();
         txInfo.setFromUUID(player.getUniqueId());
         txInfo.setToWallet(TO);
-        txInfo.setAmount(AMOUNT);
-        txInfo.setDescription(player.getName() + " sent " + AMOUNT + " to " + args[1]);
-        txInfo.setFunction(getConsumerMessage("&a&lSUCCESS: &fYou have sent " + AMOUNT + "CRAFT to " + args[1]));
+        txInfo.setCraftAmount(CRAFT_AMOUNT);
+        txInfo.setDescription(player.getName() + " sent " + CRAFT_AMOUNT + " to " + args[1]);
+        txInfo.setFunction(getConsumerMessage("&a&lSUCCESS: &fYou have sent " + CRAFT_AMOUNT + "CRAFT to " + args[1]));
 
         ErrorTypes error = BlockchainRequest.transaction(txInfo, RedisMinuteTTL);
 
-        if(error != ErrorTypes.NO_ERROR) {
+        if(error != ErrorTypes.SUCCESS) {
             Util.colorMsg(sender, "&c&lERROR: &f" + error.toString());
             return;
         }
 
-        Util.colorMsg(sender, "\nTx for " + AMOUNT + "craft->" + TO.subSequence(0, 16) + "...");
+        Util.colorMsg(sender, "\nTx for " + CRAFT_AMOUNT + "craft->" + TO.subSequence(0, 16) + "...");
         IntegrationAPI.getInstance().sendTxIDClickable(sender, txInfo.getTxID().toString());
         IntegrationAPI.getInstance().sendWebappForSigning(sender, FROM);
     }

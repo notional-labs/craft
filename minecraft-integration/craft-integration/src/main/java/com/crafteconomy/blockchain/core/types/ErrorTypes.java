@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ErrorTypes {
-    NO_ERROR(0),
+    SUCCESS(0),
     NO_WALLET(-1),
     NOT_ENOUGH_TO_SEND(-2),
     NODE_DOWN(-5), // no BlockchainAPI (1317)

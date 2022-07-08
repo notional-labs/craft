@@ -15,7 +15,8 @@ public class EscrowBalance implements SubCommand {
     @Override // "Usage: /escrow balance"
     public void onCommand(CommandSender sender, String[] args) {
         Player player = (Player) sender;
-        Util.colorMsg(sender, "Your escrow balance is: " + api.escrowGetBalance(player.getUniqueId()));
+        Util.colorMsg(sender, "Your escrow balance is: " + api.escrowGetCraftBalance(player.getUniqueId()) + "craft");
+        Util.colorMsg(sender, "( ucraft = "+ api.escrowGetUCraftBalance(player.getUniqueId()) + " )");
         return;
     }
 }

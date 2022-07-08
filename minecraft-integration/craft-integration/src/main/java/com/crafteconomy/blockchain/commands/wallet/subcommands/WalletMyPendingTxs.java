@@ -77,7 +77,8 @@ public class WalletMyPendingTxs implements SubCommand {
                         // Util.clicableTxID(sender, key.replace(walletFormat, ""), "&7- &f%uuid%");
 
                         IntegrationAPI.getInstance().sendTxIDClickable(sender, key.replace(walletFormat, ""), "&7- &f%value%");
-                        Util.colorMsg(sender, "&7&o   " + txinfo.getDescription() + "\n");
+                        Util.colorMsg(sender, "&7&o   " + txinfo.getDescription());
+                        Util.colorMsg(sender, "&7&o   Cost: " + txinfo.getCraftAmount() + "craft (" + txinfo.getUCraftAmount() + "ucraft)\n");
                     }
                 }
 

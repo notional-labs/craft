@@ -118,12 +118,21 @@ public class IntegrationAPI {
      * @param player_uuid
      * @return
      */
-    public long getBalance(UUID player_uuid) {
+    public long getUCraftBalance(UUID player_uuid) {
         String walletAddr = getWallet(player_uuid);
         if(walletAddr == null) {
             return 0;
         }
-        return BlockchainRequest.getBalance(walletAddr);
+        return BlockchainRequest.getUCraftBalance(walletAddr);
+    }
+
+    /**
+     * Gets the ucraft balance of a player based on their wallet address
+     * @param player_uuid
+     * @return
+     */
+    public float getCraftBalance(UUID player_uuid) {
+        return getUCraftBalance(player_uuid) / 1_000_000;
     }
 
     /**
@@ -154,11 +163,11 @@ public class IntegrationAPI {
      * @param callback      Function to run for the sender once completed
      * @return Tx
      */
-    public Tx createNewTx(UUID playerUUID, @NotNull String to_wallet, long amount, String description, Consumer<UUID> callback) {
+    public Tx createNewTx(UUID playerUUID, @NotNull String to_wallet, float craftAmount, String description, Consumer<UUID> callback) {
         Tx tx = new Tx();
         tx.setFromUUID(playerUUID);
         tx.setToWallet(to_wallet);
-        tx.setAmount(amount);
+        tx.setCraftAmount(craftAmount);
         tx.setDescription(description);
         tx.setFunction(callback);
         return tx;
@@ -174,12 +183,12 @@ public class IntegrationAPI {
      * @param callback
      * @return Tx
      */
-    public Tx createNewTx(UUID playerUUID, UUID recipientUUID, @NotNull String to_wallet, long amount, String description, BiConsumer<UUID, UUID> biCallback) {
+    public Tx createNewTx(UUID playerUUID, UUID recipientUUID, @NotNull String to_wallet, float craftAmount, String description, BiConsumer<UUID, UUID> biCallback) {
         Tx tx = new Tx();
         tx.setFromUUID(playerUUID);
         tx.setToUUID(recipientUUID);
         tx.setToWallet(to_wallet);
-        tx.setAmount(amount);
+        tx.setCraftAmount(craftAmount);
         tx.setDescription(description);
         tx.setBiFunction(biCallback);
         return tx;
@@ -305,23 +314,33 @@ public class IntegrationAPI {
      * Deposits CRAFT into an in game account (Escrow). 
      * Each escrow is redeemable for 1x craft, its deposit rate
      */
-    public EscrowErrors escrowDeposit(UUID playerUUID, long amount) {
+    public EscrowErrors escrowUCraftDeposit(UUID playerUUID, long ucraft_amount) {
         // creates a Tx to send CRAFT to DAO. On sign, player gets escrow balance
-        return EscrowManager.getInstance().deposit(playerUUID, amount);
+        return EscrowManager.getInstance().depositUCraft(playerUUID, ucraft_amount);
+    }
+    public EscrowErrors escrowCraftDeposit(UUID playerUUID, float craft_amount) {
+        // creates a Tx to send CRAFT to DAO. On sign, player gets escrow balance
+        return escrowUCraftDeposit(playerUUID, (long) (craft_amount * 1_000_000));
     }
 
     public long escrowRedeem(UUID playerUUID, long amount) {
-        // If player has enough escrow, their wallet is paid in CRAFT & escrow is subtracted
+        // If player has enough escrow, their wallet is paid in ucraft & escrow is subtracted
         return EscrowManager.getInstance().redeem(playerUUID, amount);
     }
 
-    public EscrowErrors escrowSpend(UUID playerUUID, long cost) {
+    public EscrowErrors escrowUCraftSpend(UUID playerUUID, long ucraft_cost) {
         // Will remove balance & return Success if they can spend
-        return EscrowManager.getInstance().spend(playerUUID, cost);
+        return EscrowManager.getInstance().spendUCraft(playerUUID, ucraft_cost);
+    }
+    public EscrowErrors escrowCraftSpend(UUID playerUUID, float craft_cost) {
+        return escrowUCraftSpend(playerUUID, (long) (craft_cost * 1_000_000));
     }
 
-    public long escrowGetBalance(UUID uuid) {
-        return EscrowManager.getInstance().getBalance(uuid);
+    public long escrowGetUCraftBalance(UUID uuid) {
+        return EscrowManager.getInstance().getUCraftBalance(uuid);
+    }
+    public float escrowGetCraftBalance(UUID uuid) {
+        return EscrowManager.getInstance().getCraftBalance(uuid);
     }
 
 

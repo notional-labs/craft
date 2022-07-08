@@ -1,6 +1,7 @@
 package com.crafteconomy.blockchain.core.request;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -54,8 +55,12 @@ public class BlockchainRequest {
         return amount;
     }
 
-    public static long getBalance(String craft_address) {
-        return getBalance(craft_address, "ucraft") / 1_000_000;
+    public static long getUCraftBalance(String craft_address) { // 1_000_000ucraft = 1craft
+        return getBalance(craft_address, "ucraft");
+    }
+
+    public static float getCraftBalance(String craft_address) { // 1 craft
+        return (float) (getUCraftBalance(craft_address) / 1_000_000);
     }
 
 
@@ -88,13 +93,11 @@ public class BlockchainRequest {
     public static int acc_seq_override = 0;
 
     // -= GIVING TOKENS =-
-    public static String depositToAddress(String craft_address, long amount) {        
+    public static String depositToAddress(String craft_address, long ucraft_amount) {        
         if(craft_address == null) {
             return "NO_WALLET";
         }
-
-        // TODO: new, run a command through shell. THIS IS CURRENTLY ONLY FOR TESTING, DO NOT USE THIS IN PRODUCTION
-        // This code & commands are also so yuck. Improve readability
+        // TODO: Hook into our API for payment of ucraft -> player
         
         /*
         TO NOT USE THESE MONIKERS, THEY ARE ONLY FOR PRIVATE TESTING
@@ -127,7 +130,7 @@ public class BlockchainRequest {
        
 
         // pay the user & set sequence as 1 higher than the wallets current sequence.
-        String[] args = ("craftd tx bank send daowallet " + craft_address + " " + amount + "ucraft --keyring-backend test --yes --chain-id craft-v4 --node http://65.108.125.182:26657 --sequence " + (acc_seq)).split(" ");
+        String[] args = ("craftd tx bank send daowallet " + craft_address + " " + ucraft_amount + "ucraft --keyring-backend test --yes --chain-id craft-v4 --node http://65.108.125.182:26657 --sequence " + (acc_seq)).split(" ");
         try {
             // get the Tx hash here to prove it worked?
             Process process = new ProcessBuilder(args).start();
@@ -138,7 +141,7 @@ public class BlockchainRequest {
             if(result.startsWith("code: 32")) {
                 // raw_log: 'account sequence mismatch, expected 13, got 12: incorrect account sequence'
                 acc_seq_override = Integer.valueOf(StringUtils.substringBetween(result, ", expected ", ", got "));
-                depositToAddress(craft_address, amount);
+                depositToAddress(craft_address, ucraft_amount);
             }
             // code: 19 - already in mem pool
 
@@ -160,15 +163,17 @@ public class BlockchainRequest {
 
         // IF we are in dev mode, don't try to send request to the blockchain, just do the transactions
         if(CraftBlockchainPlugin.getIfInDevMode() == false) {
-            if(BlockchainRequest.getBalance(transaction.getFromWallet()) < transaction.getAmount()){
-                System.out.println("Not enough tokens to send");
-                return ErrorTypes.NOT_ENOUGH_TO_SEND;
-            }
-    
-            if(BlockchainRequest.getBalance(transaction.getToWallet()) < 0) {
+            // we check how much ucraft is in the transaction data since its on chain, so get the ucraft from the Tx
+
+            if(BlockchainRequest.getUCraftBalance(transaction.getToWallet()) < 0) {
                 System.out.println("No wallet balance for address");  
                 return ErrorTypes.NO_WALLET;
             }
+
+            if(BlockchainRequest.getUCraftBalance(transaction.getFromWallet()) < transaction.getUCraftAmount()){
+                System.out.println("Not enough tokens to send");
+                return ErrorTypes.NOT_ENOUGH_TO_SEND;
+            }            
         } else {
             String name = Bukkit.getPlayer(transaction.getFromUUID()).getName().toUpperCase();
             Util.coloredBroadcast("&cDEV MODE IS ENABLED FOR THIS TRANSACTION "+name+" (config.yml, no blockchain request)");
@@ -178,7 +183,7 @@ public class BlockchainRequest {
 
         String from = transaction.getFromWallet();
         String to = transaction.getToWallet();
-        long amount = transaction.getAmount();
+        long ucraftAmount = transaction.getUCraftAmount();
         UUID TxID = transaction.getTxID();
         String desc = transaction.getDescription();
         TransactionType txType = transaction.getTxType(); // used for webapp
@@ -186,7 +191,8 @@ public class BlockchainRequest {
 
         JSONObject jsonObject;
         try {
-            String transactionJson = generateTxJSON(from, to, amount, desc, txType);
+            // we submit the uCraft amount -> the redis for the webapp to sign it directly
+            String transactionJson = generateTxJSON(from, to, ucraftAmount, desc, txType);
             jsonObject = new JSONObject(transactionJson);
        }catch (JSONException err) {
             Util.logSevere("EBlockchainRequest.java Error " + err.toString());
@@ -197,7 +203,7 @@ public class BlockchainRequest {
         pTxs.addPending(transaction.getTxID(), transaction);     
         redisDB.submitTxForSigning(from, TxID, jsonObject.toString(), RedisMinuteTTL);
         
-        return ErrorTypes.NO_ERROR;
+        return ErrorTypes.SUCCESS;
     }
 
     // private static String tokenDenom = blockchainPlugin.getTokenDenom(true);
@@ -210,9 +216,8 @@ public class BlockchainRequest {
      * @param DESCRIPTION
      * @return String JSON Amino (Readable by webapp)
      */
-    private static String generateTxJSON(String FROM, String TO, long AMOUNT, String DESCRIPTION, TransactionType txType) {    
-        long updatedAmount = AMOUNT * 1_000_000;  // converts craft -> ucraft value
-        double taxAmount = updatedAmount * blockchainPlugin.getTaxRate();
+    private static String generateTxJSON(String FROM, String TO, long UCRAFT_AMOUNT, String DESCRIPTION, TransactionType txType) {    
+        double taxAmount = UCRAFT_AMOUNT * blockchainPlugin.getTaxRate();
         long now = Instant.now().getEpochSecond();
 
         // EX: {"amount":"2","description":"Purchase Business License for 2","to_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p","tax":{"amount":0.1,"address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"},"denom":"uosmo","from_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"}
@@ -220,7 +225,7 @@ public class BlockchainRequest {
         // ",\"timestamp\": "+variable.toString()+
 
         // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
-        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+updatedAmount+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
+        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
         // System.out.println(v);
         return json;
     }

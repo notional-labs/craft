@@ -44,7 +44,7 @@ public class SignedTxCheckListner implements Listener {
 
         // Gets the Memos/Descriptions of each transaction (on chain query & our local object)
         String expectedDesc = tx.getDescription();
-        long expected_ucraft = tx.getAmount() * 1_000_000; 
+        long expected_ucraft = tx.getUCraftAmount(); 
         String expectedToWallet = tx.getToWallet();
         boolean doesMatch = doesDataMatchTransaction(event.getTednermintHash(), expectedToWallet, expected_ucraft, expectedDesc);
 
@@ -87,8 +87,8 @@ public class SignedTxCheckListner implements Listener {
             // URL url = new URL("https://api.cosmos.network/cosmos/tx/v1beta1/txs/" + tendermintHash);
             URL url = new URL(TX_ENDPOINT.replace("{TENDERMINT_HASH}", tendermintHash));
             
-            if(IS_DEV_MODE && tendermintHash.equalsIgnoreCase("debugging")) {
-                Util.logFine("TendermintHash = 'debugging', so we will sign the tx given this.");
+            if(IS_DEV_MODE) {
+                Util.logFine("Dev mode is enabled, so we will sign the tx given this & broadacast to ensure devs know.");
                 return true;
             }            
 

@@ -145,7 +145,7 @@ tx.setSendWebappLink(true);
 ```java
 // Subit the Tx to be signed by the user
 ErrorTypes err = tx.submit()
-if(err != ErrorTypes.NO_ERROR) { // I should really change this to SUCCESS
+if(err != ErrorTypes.SUCCESS) { // I should really change this to SUCCESS
   p.sendMessage("Error submitting auth transaction to chain: " + err.toString());
   return;
 }

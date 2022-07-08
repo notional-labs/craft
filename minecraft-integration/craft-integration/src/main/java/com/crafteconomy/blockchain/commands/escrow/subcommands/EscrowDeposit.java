@@ -22,17 +22,17 @@ public class EscrowDeposit implements SubCommand {
             return;
         }
 
-        int depositAmount = 0;
+        float depositAmount = 0;
         // ensure argument 1 is a number
         try {
-            depositAmount = Integer.valueOf(args[1]);
+            depositAmount = Float.valueOf(args[1]);
         } catch(NumberFormatException e) {
             Util.colorMsg(player, "Usage: /escrow deposit <amount>");
             return;
         }
 
         if(depositAmount > 0) { // depositing into players escrow account
-            api.escrowDeposit(player.getUniqueId(), depositAmount);
+            api.escrowCraftDeposit(player.getUniqueId(), depositAmount);
         } else {
             Util.colorMsg(player, "You must deposit > 0craft tokens");
         }

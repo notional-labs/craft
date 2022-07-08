@@ -36,20 +36,20 @@ public class MyExampleTransaction implements CommandExecutor {
             return true;
         }
 
-        long balance = api.getBalance(player.getUniqueId());
-        if(balance < 0) {
-            Util.colorMsg(player, "Error:" + ErrorTypes.of((int) balance));
+        float craft_balance = api.getCraftBalance(player.getUniqueId());
+        if(craft_balance < 0) {
+            Util.colorMsg(player, "Error:" + ErrorTypes.of((int) craft_balance));
             return true;
         }
          
-        if(balance > 20) {
+        if(craft_balance > 10) {
 
             // Creates inline transaction
             // Tx tx1 = api.createNewTx(player.getUniqueId(), to_wallet, 10, "Describe what it does here", Logic.purchaseBusinessLicense());
             Tx txinfo = new Tx(); // getTxID() -> auto generated. just a UUID [/wallet pending shows all]
             txinfo.setFromUUID(player.getUniqueId());
             txinfo.setToWallet(to_wallet);
-            txinfo.setAmount(10);
+            txinfo.setCraftAmount(10);
             txinfo.setDescription("Describe what it does here");
             txinfo.setFunction(Logic.purchaseBusinessLicense());
 
@@ -59,14 +59,14 @@ public class MyExampleTransaction implements CommandExecutor {
 
             ErrorTypes error = txinfo.submit();
 
-            if(error == ErrorTypes.NO_ERROR) {
+            if(error == ErrorTypes.SUCCESS) {
                 // Util.colorMsg(sender,  + txinfo.getTxID());
                 api.sendTxIDClickable(sender, txinfo.getTxID().toString(), "\n&eMisc Transaction created successfully\n%value%");
             } else {
                 Util.colorMsg(player, "Error: " + error.toString());
             }
         } else {
-            Util.colorMsg(player, "You do not have enough money to purchase a business license");
+            Util.colorMsg(player, "You do not have 10 craft to purchase a business license");
         }
 
         return true;
