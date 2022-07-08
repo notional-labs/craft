@@ -19,7 +19,7 @@ You can read a rough overview [HERE](https://github.com/notional-labs/craft/blob
 <dependency>
     <groupId>com.crafteconomy</groupId>
     <artifactId>craft-integration</artifactId>
-    <version>4.1.1</version>
+    <version>4.2.0</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -47,7 +47,8 @@ String wallet   = api.getWallet(uuid);
 boolean result  = api.setWallet(uuid, craftwallet)
 
 // Gets balance from chain query
-long balance    = api.getBalance(uuid);
+long ubalance    = api.getUCraftBalance(uuid);
+float balance    = api.getCraftBalance(uuid);
 
 // The DAO's wallet
 String swallet  = api.getServerWallet();
@@ -67,15 +68,27 @@ Double getTaxRate()
 
 ```java
 // converts CRAFT on chain -> escrow account in game 1 for 1 rate
-EscrowErrors escrowDeposit(UUID playerUUID, long amount)
+EscrowErrors escrowUCraftDeposit(UUID playerUUID, long ucraft_amount)
+EscrowErrors escrowCraftDeposit(UUID playerUUID, float craft_amount)
 
 // converts escrow -> on chain money upon request IF they have enough
-long escrowRedeem(UUID playerUUID, long amount)
+long escrowRedeem(UUID playerUUID, long ucraft_amount)
 
 // remove balance & return Success if they can spend
-EscrowErrors escrowSpend(UUID playerUUID, long cost)
+EscrowErrors escrowUCraftSpend(UUID playerUUID, long ucraft_cost)
+EscrowErrors escrowCraftSpend(UUID playerUUID, float craft_cost)
 
-long escrowGetBalance(UUID uuid)
+// pay between accounts
+EscrowErrors escrowPayPlayerUCraft(from_uuid, to_uuid, long ucraft_amount)
+EscrowErrors escrowPayPlayerCraft(from_uuid, to_uuid, float craft_amount)
+
+long escrowGetUCraftBalance(UUID uuid)
+float escrowGetCraftBalance(UUID uuid)
+
+// /escrow pay <OnlinePlayerName> <FloatCraftAmount>
+// /escrow balance
+// /escrow deposit <CraftAmount>
+// /escrow withdraw <CraftAmountFromEscrow>
 ```
 
 # Transactions
@@ -100,7 +113,10 @@ Tx tx2 = api.createNewTx(uuid, to_wallet, amt, desc, BiConsumer<UUID, UUID> func
 UUID fromUUID    = tx.getFromUUID();
 UUID toUUID      = tx.getToUUID();
 UUID txID        = tx.getTxID();
-long amt         = tx.getAmount();
+
+long amt         = tx.getUCraftAmount();
+//float amt       = tx.getCraftAmount();
+
 String desc      = tx.getDescription();
 String toWallet  = tx.getToWallet();
 Consumer c       = tx.getFunction();
@@ -120,7 +136,7 @@ tx.setToWalletAsServer();
 
 tx.setTxType(TransactionType.DEFAULT);
 
-tx.setAmount(10);
+tx.setCraftAmount(10);
 tx.setDescription(fromUUID + " paid " + toUUID + " 10 for their trade of items");
 
 tx.setFunction((Consumer<UUID>) Logic.purchaseBusinessLicense());
