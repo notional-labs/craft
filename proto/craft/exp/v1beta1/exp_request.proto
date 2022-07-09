@@ -1,0 +1,57 @@
+syntax = "proto3";
+package craft.exp.v1beta1;
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "x/exp/types";
+
+enum RequestStatus {
+    option (gogoproto.goproto_enum_prefix) = false;
+
+	// REQUEST_STATUS_COMPLETE defines a request status completed.
+	StatusCompleteRequest  = 0;
+	// REQUEST_STATUS_PERIOD defines a request status current in process
+	StatusOnGoingRequest  = 1;
+	// REQUEST_STATUS_EXPIRED defines the expired request status.
+	StatusExpiredRequest  = 2;
+	// REQUEST_STATUS_EXPIRED defines the request status that member don't fund to exp module.
+	StatusNoFundRequest  = 3;
+}
+
+message BurnRequest {
+  option (gogoproto.goproto_getters)         = true;
+  option (gogoproto.goproto_stringer)        = true;
+
+  string account                      = 1;
+  cosmos.base.v1beta1.Coin burn_token_left  = 2 ;
+  google.protobuf.Timestamp request_time = 3   [ 
+    (gogoproto.nullable) = false ,
+    (gogoproto.stdtime)  = true
+  ];
+  RequestStatus status = 4;
+}
+
+message MintRequest{
+    option (gogoproto.goproto_getters)         = true;
+    option (gogoproto.goproto_stringer)        = true;
+  
+    string account                      = 1;
+    string dao_token_minted  = 2 [    
+        (gogoproto.nullable)   = false,
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.moretags)     = "yaml:\"dao_token_mint\""
+    ];
+    string dao_token_left  = 3 [    
+        (gogoproto.nullable)   = false,
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.moretags)     = "yaml:\"dao_token_left\""
+    ];
+    google.protobuf.Timestamp RequestTime = 4 [
+        (gogoproto.nullable)    = false,
+        (gogoproto.stdtime)     = true
+    ];
+    RequestStatus status = 5;
+}

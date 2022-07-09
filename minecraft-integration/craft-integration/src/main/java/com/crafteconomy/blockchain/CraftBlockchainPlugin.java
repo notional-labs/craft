@@ -5,6 +5,7 @@ import com.crafteconomy.blockchain.commands.escrow.EscrowCMD;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowBalance;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowDeposit;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowHelp;
+import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowPay;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowRedeem;
 import com.crafteconomy.blockchain.commands.wallet.WalletCMD;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletBalance;
@@ -48,6 +49,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     private static MongoDB mongoDB;
 
+    public static String ADMIN_PERM = "crafteconomy.admin";
+
     private Double TAX_RATE;
 
     private String SERVER_WALLET = null;
@@ -56,10 +59,13 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     private Jedis jedisPubSubClient = null;
     private RedisKeyListener keyListener = null;
 
-    private String webappLink = null;
+    private static String webappLink = null;
+    private static String TX_QUERY_ENDPOINT = null;
 
     public static boolean ENABLED_FAUCET = false;
 
+    private static Integer REDIS_MINUTE_TTL = 30;   
+    private static Boolean DEV_MODE = false;
 
     @Override
     public void onEnable() {
@@ -67,26 +73,40 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
         getConfig().options().copyDefaults(true);
         saveConfig();
-        redisDB = new RedisManager(
-            getConfig().getString("Redis.host"), 
-            getConfig().getInt("Redis.port"),
-            getConfig().getString("Redis.password")
-        );
 
-        mongoDB = new MongoDB(
-            getConfig().getString("MongoDB.host"), 
-            getConfig().getInt("MongoDB.port"), 
-            getConfig().getString("MongoDB.database"), 
-            getConfig().getString("MongoDB.username"),
-            getConfig().getString("MongoDB.password")
-        );
+        redisDB = new RedisManager(getConfig().getString("Redis.uri"));
+        mongoDB = new MongoDB(getConfig().getString("MongoDB.uri"), getConfig().getString("MongoDB.database"));
+        // redisDB = new RedisManager("redis://:PASSWORD@IP:6379");
+        // mongoDB = new MongoDB("mongodb://USER:PASS@IP:PORT/?authSource=AUTHDB", "crafteconomy");
+
+        System.out.println(redisDB.getRedisConnection().ping());
+        System.out.println("" + mongoDB.getDatabase().getCollection("connections").countDocuments());
+
 
         SERVER_WALLET = getConfig().getString("SERVER_WALLET_ADDRESS");
 
         webappLink = getConfig().getString("SIGNING_WEBAPP_LINK");
+        TX_QUERY_ENDPOINT = getConfig().getString("TX_QUERY_ENDPOINT");
 
         TAX_RATE = getConfig().getDouble("TAX_RATE");
         if(TAX_RATE == null) TAX_RATE = 0.0;
+
+        REDIS_MINUTE_TTL = getConfig().getInt("TAX_RATE");
+        if(REDIS_MINUTE_TTL == null) REDIS_MINUTE_TTL = 30;
+
+        DEV_MODE = getConfig().getBoolean("DEV_MODE");
+        if(DEV_MODE == null) DEV_MODE = false;
+
+        if(DEV_MODE) {
+            // async runnable every 4 minutes
+            Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
+                @Override
+                public void run() {
+                    Util.coloredBroadcast("&c&l[!] REMINDER, INTEGRATION DEV MODE ENABLED");
+                }
+            }, 0, 20*60*4);
+        }
+
 
         if(getApiEndpoint() == null) {
             getLogger().severe("API REST (lcd) endpoint not set in config.yml, disabling plugin");
@@ -124,8 +144,9 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         escrowCMD.registerCommand(new String[] {"b", "bal", "balance"}, new EscrowBalance());
         escrowCMD.registerCommand(new String[] {"d", "dep", "deposit"}, new EscrowDeposit());
         escrowCMD.registerCommand(new String[] {"r", "red", "redeem"}, new EscrowRedeem());
+        escrowCMD.registerCommand(new String[] {"p", "pay", "payment"}, new EscrowPay());
         // arg[0] commands which will tab complete
-        escrowCMD.addTabComplete(new String[] {"balance","deposit","redeem"});
+        escrowCMD.addTabComplete(new String[] {"balance","deposit","redeem","pay"});
 
 
         getServer().getPluginManager().registerEvents(new JoinLeave(), this);  
@@ -158,8 +179,23 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         // Bukkit.getScheduler().cancelTasks(this);
 
         PendingTransactions.clearUncompletedTransactionsFromRedis();
-        redisDB.closePool();  
-        // jedisPubSubClient.close();             
+        redisDB.closePool();
+        mongoDB.disconnect(); 
+        // jedisPubSubClient.close();          
+        
+        Bukkit.getScheduler().cancelTasks(this);
+    }
+
+    public static int getRedisMinuteTTL() {
+        return REDIS_MINUTE_TTL;
+    }
+    public static boolean getIfInDevMode() {
+        return DEV_MODE;
+    }
+
+    public static String getTxQueryEndpoint() {
+        // https://api.cosmos.network/cosmos/tx/v1beta1/txs/{TENDERMINT_HASH}
+        return TX_QUERY_ENDPOINT;
     }
 
     public RedisManager getRedis() {

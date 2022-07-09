@@ -1,0 +1,81 @@
+{
+  "name": "cw721",
+  "developer": {
+    "archwayd": {
+      "docker": false
+    },
+    "scripts": {
+      "test": "cargo unit-test",
+      "build": "cargo build",
+      "optimize": "cargo run-script optimize",
+      "wasm": "cargo wasm",
+      "query": "archwayd query wasm",
+      "tx": "archwayd tx wasm execute"
+    },
+    "deployments": [
+      {
+        "type": "set-metadata",
+        "chainId": "torii-1",
+        "contract": "archway1q0hurmerww8emklmtp2qfvrxcsdsc7e33w8ttu8vehfggvgd63tqa0m3c6",
+        "contractMetadata": {
+          "developerAddress": "archway1a8dq0wced6q29rppdug7yvk8ek0dsrqwe3hxcz",
+          "rewardAddress": "archway1a8dq0wced6q29rppdug7yvk8ek0dsrqwe3hxcz",
+          "collectPremium": false,
+          "gasRebate": false
+        }
+      },
+      {
+        "type": "instantiate",
+        "chainId": "torii-1",
+        "codeId": 49036,
+        "address": "archway1q0hurmerww8emklmtp2qfvrxcsdsc7e33w8ttu8vehfggvgd63tqa0m3c6",
+        "admin": "archway1q35c9uzfvwv052m3k4ffv4vmld6n57uqjm0r2t"
+      },
+      {
+        "type": "create",
+        "chainId": "torii-1",
+        "codeId": 49036
+      },
+      {
+        "type": "instantiate",
+        "chainId": "torii-1",
+        "codeId": 49009,
+        "address": "archway1xmavqpev6fhu44gywcsyh9680dfqesvz7cpe25j2nsu4n9xwh6hsj2dvdh",
+        "admin": "archway1q35c9uzfvwv052m3k4ffv4vmld6n57uqjm0r2t"
+      },
+      {
+        "type": "create",
+        "chainId": "torii-1",
+        "codeId": 49009
+      }
+    ]
+  },
+  "network": {
+    "name": "torii",
+    "chainId": "torii-1",
+    "type": "testnet",
+    "fees": {
+      "feeDenom": "utorii"
+    },
+    "gas": {
+      "prices": "0.002utorii",
+      "mode": "auto",
+      "adjustment": "1.3"
+    },
+    "wasm": {
+      "bech32Hrp": "archway",
+      "archwayd": "0.0.4",
+      "configDir": ".archway",
+      "binary": "archwayd"
+    },
+    "urls": {
+      "rpc": {
+        "url": "https://rpc.torii-1.archway.tech",
+        "port": 443
+      },
+      "faucets": [
+        "https://faucet.torii-1.archway.tech"
+      ]
+    }
+  }
+}

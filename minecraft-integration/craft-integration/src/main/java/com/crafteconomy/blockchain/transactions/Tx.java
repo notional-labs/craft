@@ -1,12 +1,14 @@
 package com.crafteconomy.blockchain.transactions;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
 import org.bukkit.Bukkit;
@@ -30,11 +32,16 @@ public class Tx implements Serializable {
     private UUID TxID;
     private String description;
 
+    private TransactionType txType = TransactionType.DEFAULT; // used for webapp
+
     private Consumer<UUID> function = null;
     private BiConsumer<UUID, UUID> biFunction = null;
 
     private String toWallet;
-    private long amount;
+    
+    // since the chain works in ints/longs, we save the Tx data as the ucraft variant
+    // there are helper functions to getCraftAmount() and setCraftAmount() which auto convert to this value
+    private long uCraftAmount = 0; 
 
     // used when submitting a tx. Done like a builder
     // Tx tx = api.createServerTx(uuid, amount, "ESCROWING " + amount + "FOR " + uuid.toString(), depositEscrowLogic(uuid, amount));        
@@ -44,11 +51,11 @@ public class Tx implements Serializable {
     private boolean sendDescMessage = false;
     private boolean sendWebappLink = false;
 
-    public Tx(UUID playerUUID, String TO_WALLET, int amount, String description, Consumer<UUID> function){
+    public Tx(UUID playerUUID, String TO_WALLET, float craftAmount, String description, Consumer<UUID> function){
         this.setFromUUID(playerUUID);        
         this.setDescription(description);
         this.setToWallet(toWallet);
-        this.setAmount(amount);     
+        this.setCraftAmount(craftAmount);
         this.setFunction(function);
 
         this.TxID = UUID.randomUUID(); // random for each Tx for signing time
@@ -64,6 +71,13 @@ public class Tx implements Serializable {
         this.TxID = UUID.randomUUID();    
     }
 
+    public Tx setDescription(String description) {
+        // By doing this, we can ensure a compromised webapp attacker can't reuse the same TxHash to match a similar Tx description
+        // Read about it in docs/README.md -> Security Considerations
+        this.description = description + " time_" + System.currentTimeMillis();
+        return this;
+    }
+
     public String getFromWallet() {
         return walletManager.getAddress(this.fromUUID);
     }
@@ -73,7 +87,15 @@ public class Tx implements Serializable {
     }
 
     public Double getTotalTaxAmount() {
-        return api.getTaxRate() * this.amount;
+        return api.getTaxRate() * this.uCraftAmount;
+    }
+
+    public void setCraftAmount(float amount) {
+        this.uCraftAmount = (long)(amount *1_000_000);
+    }
+
+    public BigDecimal getCraftAmount() {        
+        return BigDecimal.valueOf((this.uCraftAmount / 1_000_000));
     }
 
     public void complete() {
@@ -83,6 +105,17 @@ public class Tx implements Serializable {
         } else if(function != null) {
             this.getFunction().accept(this.fromUUID);
         }
+    }
+
+    // TODO Does this mess with the @getter and setter stuff? or override
+    public Tx setTxType(TransactionType txType) {
+        // sets the type of transaction for the webapp to better sort each ID.
+        // (optional)
+        this.txType = txType;
+        return this;
+    }
+    public TransactionType getTxType() {
+        return this.txType;
     }
 
     public Tx sendTxIDClickable() {
@@ -103,7 +136,7 @@ public class Tx implements Serializable {
      */
     public ErrorTypes submit() {
         ErrorTypes returnType = api.submit(this);
-        if(returnType == ErrorTypes.NO_ERROR) {
+        if(returnType == ErrorTypes.SUCCESS) {
             Player player = Bukkit.getPlayer(this.fromUUID);
             if(player != null) {
                 if(includeTxClickable) {

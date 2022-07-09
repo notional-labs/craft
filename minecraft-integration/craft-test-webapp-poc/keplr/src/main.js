@@ -15,10 +15,13 @@ const request = require('request');
 
 // npm install webpack-dev-server -g
 
-const name = "Craft Testnet v4"
-const CHAIN_ID = "craft-v4";
+const name = "Craft Reecenet"
+const CHAIN_ID = "test-1"; // test_node.sh
 const RPC_ENDPOINT = "http://65.108.125.182:26657/";
 const REST_ENDPOINT = "http://65.108.125.182:1317/";
+
+const bondDenom = "uexp"; // uexp in production
+const tokenDenom = "ucraft"; // ucraft in production
 
 window.onload = async () => {
     // Keplr extension injects the offline signer that is compatible with cosmJS.
@@ -44,7 +47,7 @@ window.onload = async () => {
                         // Coin denomination to be displayed to the user.
                         coinDenom: "EXP",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "uexp",
+                        coinMinimalDenom: bondDenom,
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -71,7 +74,7 @@ window.onload = async () => {
                         // Coin denomination to be displayed to the user.
                         coinDenom: "EXP",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "uexp",
+                        coinMinimalDenom: bondDenom,
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -81,7 +84,7 @@ window.onload = async () => {
                         // Coin denomination to be displayed to the user.
                         coinDenom: "CRAFT",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "ucraft",
+                        coinMinimalDenom: tokenDenom,
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -93,7 +96,7 @@ window.onload = async () => {
                         // Coin denomination to be displayed to the user.
                         coinDenom: "CRAFT",
                         // Actual denom (i.e. uosmo, uscrt) used by the blockchain.
-                        coinMinimalDenom: "ucraft",
+                        coinMinimalDenom: tokenDenom,
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -187,7 +190,8 @@ window.onload = async () => {
                 sendTx(
                     body[txID]["to_address"],                     
                     parseInt(body[txID]["amount"]), 
-                    body[txID]["denom"],
+                    // body[txID]["denom"], // since using test_node.sh, chanigng to be hardcoded for ucraft
+                    tokenDenom, // ucraft OR token depending on where it is testing
                     txID,
                     body[txID]["description"]
                 );
@@ -218,18 +222,20 @@ document.sendForm.onsubmit = () => {
     // // No TX ID since this is just sending to some address.
     // sendTx(recipient, amount, "uosmo", "", "blank memo");
 
-    fireSuccessfulBroadcast(document.sendForm.recipient.value);
+    // tendermint hash == "debugging" when pressing on submit. This is required
+    // since cosmjs doesn't work yet
+    fireSuccessfulBroadcast(document.sendForm.recipient.value, "debugging");
 
     return false;
 };
 
-function fireSuccessfulBroadcast(txID) {
+function fireSuccessfulBroadcast(txID, tendermintHash) {
     // request('https://api.crafteconomy.io/v1/tx/sign/'+txID, { json: true }, (err, res, body) => {
     //     if (err) { return console.log(err); }
     // });
 
     request.post(
-        "https://api.crafteconomy.io/v1/tx/sign/" + txID,
+        "https://api.crafteconomy.io/v1/tx/sign/" + txID + "/" + tendermintHash,
         { json: { key: 'value' } },
         function (error, response, body) {
             if (!error && response.statusCode == 200) {

@@ -47,11 +47,18 @@ public class MongoDB {
         this.connect();
     }
 
+    public MongoDB(String uri, String database) {
+        this.URI = uri;
+        this.database = database;
+        this.connect();
+    }
+
+
     /**
      * Connects to the database
      */
     public void connect() {
-        client = new MongoClient(new MongoClientURI(URI));
+        client = new MongoClient(new MongoClientURI(URI));        
     }
 
     /**

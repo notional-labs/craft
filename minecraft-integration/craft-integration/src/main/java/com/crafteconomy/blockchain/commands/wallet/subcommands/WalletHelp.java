@@ -1,5 +1,6 @@
 package com.crafteconomy.blockchain.commands.wallet.subcommands;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.commands.SubCommand;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
@@ -8,21 +9,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class WalletHelp implements SubCommand {
-    
-    String ADMIN_PERM = "blockchain.admin";
 
     WalletManager walletManager = WalletManager.getInstance();
 
     private final String[] HELP_MESSAGES = {
         "help",
-        "balance <player / craft_address>",
-        "set <craft-wallet>",
+        "balance <player / craft_address>",        
         "pay <player|UUID|wallet> <amount>", 
         "supply",
         "pending",
     };
     
-    private final String[] ADMIN_HELP_MESSAGES = {        
+    private final String[] ADMIN_HELP_MESSAGES = {  
+        "set <craft-wallet> &4[Players do this via website only].",      
         "faucet <name|wallet> <amount> &7- &fDeposit craft to wallet.",
         "faketx <license/purchase> [item] &7- &4[TEMP].",
         "fakesign <Generated_TxID> &7- &4[TEMP].",
@@ -53,7 +52,7 @@ public class WalletHelp implements SubCommand {
             Util.colorMsg(sender, "&a/wallet &f" + msg);
         }   
 
-        if(sender.hasPermission(ADMIN_PERM)){
+        if(sender.hasPermission(CraftBlockchainPlugin.ADMIN_PERM)){
             Util.colorMsg(sender, "\n&c&lADMIN COMMANDS");
             for(String msg : ADMIN_HELP_MESSAGES){
                 Util.colorMsg(sender, "&a/wallet &f" + msg);

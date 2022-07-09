@@ -1,0 +1,49 @@
+syntax = "proto3";
+package craft.exp.v1beta1;
+
+import "craft/exp/v1beta1/exp_request.proto";
+import "craft/exp/v1beta1/daoinfo.proto";
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+
+option go_package = "x/exp/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // returns coins that is going to be distributed
+  rpc WhiteList(QueryWhiteListRequest) returns (QueryWhiteListResponse) {
+    option (google.api.http).get = "/craft.exp.v1beta1/whitelistdao";
+  }
+
+  rpc DaoAsset(QueryDaoAssetRequest) returns (QueryDaoAssetResponse){
+    option (google.api.http).get = "/craft.exp.v1beta1/daoasset";
+  }
+
+  rpc MintRequestList(QueryMintRequestListRequest) returns (QueryMintRequestListRequestResponse){
+    option (google.api.http).get = "/craft.exp.v1beta1/mintrequests";
+  }
+  rpc BurnRequestList(QueryBurnRequestListRequest) returns (QueryBurnRequestListRequestResponse){
+    option (google.api.http).get = "/craft.exp.v1beta1/burnrequests";
+  }
+}
+
+message QueryWhiteListRequest {}
+message QueryWhiteListResponse {
+  repeated AccountRecord accountRecord = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryDaoAssetRequest {}
+message QueryDaoAssetResponse {
+  DaoAssetInfo dao_asset = 1;
+}
+
+message QueryMintRequestListRequest {}
+message QueryMintRequestListRequestResponse {
+  repeated MintRequest mint_requests = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryBurnRequestListRequest {}
+message QueryBurnRequestListRequestResponse {
+  repeated BurnRequest burn_requests = 1 [(gogoproto.nullable) = false];
+}

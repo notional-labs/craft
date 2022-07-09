@@ -1,0 +1,82 @@
+{
+  "name": "cw721",
+  "developer": {
+    "archwayd": {
+      "docker": false
+    },
+    "scripts": {
+      "test": "cargo unit-test",
+      "build": "cargo build",
+      "optimize": "cargo run-script optimize",
+      "wasm": "cargo wasm",
+      "query": "archwayd query wasm",
+      "tx": "archwayd tx wasm execute"
+    },
+    "deployments": [
+      {
+        "type": "instantiate",
+        "chainId": "constantine-1",
+        "codeId": 198,
+        "address": "archway1js506l9w5p2nkwpx4tf5078vwcmeycnp00vcs58m2myusd226lsqd4q2hc",
+        "admin": "archway1q35c9uzfvwv052m3k4ffv4vmld6n57uqjm0r2t"
+      },
+      {
+        "type": "create",
+        "chainId": "constantine-1",
+        "codeId": 198
+      },
+      {
+        "type": "instantiate",
+        "chainId": "constantine-1",
+        "codeId": 190,
+        "address": "archway1u9rzdmqpeez424lw8dlpgfqkpe9kjn0hgts44nu0q97rv4qnyj8qhy9w3s",
+        "admin": "archway1q35c9uzfvwv052m3k4ffv4vmld6n57uqjm0r2t"
+      },
+      {
+        "type": "create",
+        "chainId": "constantine-1",
+        "codeId": 190
+      },
+      {
+        "type": "instantiate",
+        "chainId": "constantine-1",
+        "codeId": 187,
+        "address": "archway17q9a682r6ltfzur3aa9r8fakhrk82fdkw7fs8rwetqq06558s38shj4uqr",
+        "admin": "archway1q35c9uzfvwv052m3k4ffv4vmld6n57uqjm0r2t"
+      },
+      {
+        "type": "create",
+        "chainId": "constantine-1",
+        "codeId": 187
+      }
+    ]
+  },
+  "network": {
+    "name": "constantine",
+    "chainId": "constantine-1",
+    "type": "testnet",
+    "fees": {
+      "feeDenom": "uconst"
+    },
+    "gas": {
+      "prices": "0.002uconst",
+      "mode": "auto",
+      "adjustment": "1.3"
+    },
+    "wasm": {
+      "bech32Hrp": "archway",
+      "archwayd": "0.0.4",
+      "configDir": ".archway",
+      "binary": "archwayd"
+    },
+    "urls": {
+      "rpc": {
+        "url": "https://rpc.constantine-1.archway.tech",
+        "port": 443
+      },
+      "faucets": [
+        "https://faucet.constantine-1.archway.tech"
+      ]
+    }
+  }
+}

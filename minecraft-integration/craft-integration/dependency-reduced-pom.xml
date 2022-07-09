@@ -4,7 +4,7 @@
   <groupId>com.crafteconomy</groupId>
   <artifactId>craft-integration</artifactId>
   <name>craft-integration</name>
-  <version>4.0.0</version>
+  <version>4.2.0</version>
   <build>
     <resources>
       <resource>
@@ -84,9 +84,9 @@
     </repository>
   </distributionManagement>
   <properties>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>16</maven.compiler.source>
     <maven.compiler.target>16</maven.compiler.target>
+    <maven.compiler.source>16</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 </project>

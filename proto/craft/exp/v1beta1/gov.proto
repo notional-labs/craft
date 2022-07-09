@@ -1,0 +1,15 @@
+syntax = "proto3";
+package craft.exp.v1beta1;
+import "gogoproto/gogo.proto";
+
+option go_package = "x/exp/types";
+
+// MintExpProposal is a gov Content type to create mint exp proposal
+// not be necessary by we use sdk 0.46
+// message MintExpProposal {
+//     option (gogoproto.equal) = true;
+//     option (gogoproto.goproto_getters) = false;
+//     option (gogoproto.goproto_stringer) = false;
+// }
+
+

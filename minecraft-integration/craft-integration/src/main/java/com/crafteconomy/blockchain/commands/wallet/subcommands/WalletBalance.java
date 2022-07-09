@@ -85,7 +85,7 @@ public class WalletBalance implements SubCommand {
             return "&c"+otherUser+" does not have a wallet set!";
         }
 
-        long amount = BlockchainRequest.getBalance(wallet);
+        float amount = BlockchainRequest.getCraftBalance(wallet);
 
         if(otherUser != null) {
             return otherUser + " has " + amount + walletPrefix;
@@ -99,16 +99,18 @@ public class WalletBalance implements SubCommand {
             return "";
         }
 
-        long amount = BlockchainRequest.getBalance(wallet);
+        // long amount = BlockchainRequest.getUCraftBalance(wallet);
+        float craft_amount = BlockchainRequest.getCraftBalance(wallet);
 
-        if(amount == ErrorTypes.NO_TOKENS_FOR_WALLET.code || amount == ErrorTypes.NO_WALLET.code) {
+        // negative number checks
+        if(craft_amount == ErrorTypes.NO_TOKENS_FOR_WALLET.code || craft_amount == ErrorTypes.NO_WALLET.code) {
             return "&c[!] That wallet is not apart of the BlockchainChain!";
 
-        } else if(amount == ErrorTypes.NODE_DOWN.code) {            
+        } else if(craft_amount == ErrorTypes.NODE_DOWN.code) {            
             return "&c[!] Blockchain is currently down, please try again later.";
         }
 
-        return wallet + " has " + amount + walletPrefix;
+        return wallet + " has " + craft_amount + "craft";
     }
     
 }

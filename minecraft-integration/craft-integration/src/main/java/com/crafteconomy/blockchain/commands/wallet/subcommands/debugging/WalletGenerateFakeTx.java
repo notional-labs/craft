@@ -4,6 +4,7 @@ import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.commands.SubCommand;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.transactions.function_testing.Examples;
@@ -22,6 +23,8 @@ public class WalletGenerateFakeTx implements SubCommand {
     RedisManager redis = CraftBlockchainPlugin.getInstance().getRedis();
 
     String webapp = CraftBlockchainPlugin.getInstance().getWebappLink();
+
+    int RedisMinuteTTL = CraftBlockchainPlugin.getRedisMinuteTTL();
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
@@ -50,16 +53,18 @@ public class WalletGenerateFakeTx implements SubCommand {
 
         if(args[1].equalsIgnoreCase("license")) {
             TxInfo.setFunction(Examples.purchaseBusinessLicense());
+            TxInfo.setTxType(TransactionType.COMPANY);
             desc = "Purchase Business License for 2";
-            TxInfo.setAmount(2);
+            TxInfo.setCraftAmount(2);
         } else {
             if(args.length >= 3) { 
                 itemToPurchase = Util.argsToSingleString(2, args); 
             }
 
             TxInfo.setFunction(Examples.purchaseSomeItem(itemToPurchase));
+            TxInfo.setTxType(TransactionType.TRADE);
             desc = "Purchasing item " + itemToPurchase + " for 1";
-            TxInfo.setAmount(1);
+            TxInfo.setCraftAmount(1);
         }
 
         TxInfo.setDescription(desc);
@@ -69,8 +74,8 @@ public class WalletGenerateFakeTx implements SubCommand {
        
         
         try (Jedis jedis = redis.getRedisConnection()) {
-            ErrorTypes error = BlockchainRequest.transaction(TxInfo);
-            // if(error != ErrorTypes.NO_ERROR) {
+            ErrorTypes error = BlockchainRequest.transaction(TxInfo, RedisMinuteTTL);
+            // if(error != ErrorTypes.SUCCESS) {
             //     // code
             // }
                         

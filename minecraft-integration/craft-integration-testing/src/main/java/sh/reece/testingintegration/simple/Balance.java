@@ -25,9 +25,9 @@ public class Balance implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        long balance = api.getBalance(player.getUniqueId());
+        float balance = api.getCraftBalance(player.getUniqueId());
         if(balance >= 0) {
-            Util.colorMsg(player, "Your balance is: " + balance);
+            Util.colorMsg(player, "Your balance is: " + balance + "craft");
         } else {
             Util.colorMsg(player, "An error occured while fetching your balance");
             // ErrorTypes.values() && ErrorTypes.NETWORK_ERROR.code

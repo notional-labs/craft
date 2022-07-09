@@ -16,6 +16,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 public class WalletManager {
+
+    // [NOTE] Only admins should use this command. Players will do it via the connection page.
+    // This is soley to ensure that admins can easily test accounts via public bech32 addresses.
     
     private MongoDatabase db = null;
 
@@ -32,7 +35,6 @@ public class WalletManager {
 
     public void cacheWalletOnJoin(UUID uuid) {
         String wallet = getAddress(uuid);
-
         if(wallet != null){
             addToCache(uuid, wallet);
         }        
@@ -86,24 +88,24 @@ public class WalletManager {
 
     // -= Database Functions =-
     public void setAddressToDatabase(UUID uuid, String wallet) {
-        Bson filter = Filters.eq("_id", uuid.toString());
+        Bson filter = Filters.eq("minecraftId", uuid.toString());
         Document doc = getCollection().find(filter).first();
 
         if(doc != null) {
-            getCollection().updateOne(filter, Updates.set("address", wallet));
+            getCollection().updateOne(filter, Updates.set("keplrId", wallet));
         } else {
-            doc = new Document("_id", uuid.toString());
-            doc.append("address", wallet);
+            doc = new Document("minecraftId", uuid.toString());
+            doc.append("keplrId", wallet);
             getCollection().insertOne(doc);
         }
     }
 
     public String getAddressFromDatabase(UUID uuid) {
-        Bson filter = Filters.eq("_id", uuid.toString());
+        Bson filter = Filters.eq("minecraftId", uuid.toString());
         Document doc = getCollection().find(filter).first();
 
         if(doc != null) { 
-            Object wallet = doc.get("address");
+            Object wallet = doc.get("keplrId");
             if(wallet != null){
                 return (String) wallet;
             } 
@@ -112,7 +114,8 @@ public class WalletManager {
     }
 
     private MongoCollection<Document> getCollection() {
-        return db.getCollection("wallets");
+        // This is where all the connections are stored w/ the webapp
+        return db.getCollection("connections");
     }
 
     public static WalletManager getInstance() {

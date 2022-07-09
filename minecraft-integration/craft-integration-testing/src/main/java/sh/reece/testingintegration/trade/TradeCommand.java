@@ -76,8 +76,8 @@ public class TradeCommand implements CommandExecutor {
         }
 
         // Check to ensure user has enough CRAFT to actually send that much
-        Long amount = Long.parseLong(args[1]);
-        if(api.getBalance(from.getUniqueId()) < amount) {
+        float craft_amount = Float.parseFloat(args[1]);
+        if(api.getCraftBalance(from.getUniqueId()) < craft_amount) {
             Util.colorMsg(sender, "&c&oYou do not have enough CRAFT");
             return true;
         }
@@ -85,7 +85,7 @@ public class TradeCommand implements CommandExecutor {
         // [!] save backup of those items incase they log off / server goes down, etc
         
         // Create unfinished template for Transaction (Since we will not know items trading OR description until user accepts)
-        Tx txInfo = api.createNewTx(fromUUID, receiverUUID, toWallet, amount, null, null);
+        Tx txInfo = api.createNewTx(fromUUID, receiverUUID, toWallet, craft_amount, null, null);
 
         // Saves to others UUID for when they /trade accept, real projects would do /trade accept <user>
         pendingTradeRequest.put(receiverUUID, txInfo);
@@ -119,7 +119,7 @@ public class TradeCommand implements CommandExecutor {
         receiver.updateInventory();
         
         // set values for transaction now that we know the user accepted the trade
-        tx.setDescription("Traded " + p1Item.getType() + " +" + tx.getAmount() + "craft FOR " + receiver.getName() + "'s " + p2Item.getType());
+        tx.setDescription("Traded " + p1Item.getType() + " +" + tx.getCraftAmount() + "craft FOR " + receiver.getName() + "'s " + p2Item.getType());
         tx.setBiFunction(Logic.trade(tx.getFromUUID(), playerWhoAcceptedTrade, p1Item, p2Item, tx.getDescription()));
         tx.setToWallet(toWallet);
 
