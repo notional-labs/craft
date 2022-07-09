@@ -2,7 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/libs/time"
+	"github.com/tendermint/tendermint/types/time"
 )
 
 // NewGenesisState creates a new GenesisState object .
