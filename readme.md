@@ -21,9 +21,9 @@ craftd testnet start --enable-logging
 ## Basic Dev Roadmap
 
 * ~~Testnet one makes sure that we got the vesting right and we didn't make a horrible mistake choosing SDK 0.46.0 and tm 0.35.1~~
-  * ~~ibc-go v3.0.0~~
-  * ~~cosmos-sdk v0.46.0~~
-  * ~~x/wasm with support for ibc v3.0.0 and interchain accounts~~
+  * ~~ibc-go v4.0.0~~
+  * ~~cosmos-sdk v0.46.0-rc2~~
+  * ~~x/wasm with support for ibc v4.0.0 and interchain accounts~~
 
 
 Craft economy is functionally complete, and features:
