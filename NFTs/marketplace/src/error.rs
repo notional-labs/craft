@@ -13,5 +13,5 @@ pub enum ContractError {
     Unauthorized {},
     
     #[error("Insufficient funds")]
-    InsufficientFunds {},
+    InsufficientFundsSend {},
 }

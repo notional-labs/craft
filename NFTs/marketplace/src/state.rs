@@ -2,18 +2,18 @@ use crate::package::ContractInfoResponse;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{Addr, StdResult, Storage};
-use cw20::Cw20Coin;
+use cosmwasm_std::{Addr, StdResult, Storage, Uint128};
+// use cosmwasm_std::Coin;
 use cw_storage_plus::{Index, IndexList, IndexedMap, Item, Map, MultiIndex};
 
-pub static CONFIG_KEY: &[u8] = b"config";
+pub static _CONFIGKEY: &[u8] = b"config";
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct Offering {
     pub token_id: String,
     pub contract_addr: Addr,
     pub seller: Addr,
-    pub list_price: Cw20Coin,
+    pub list_price: Uint128,
 }
 
 /// OFFERINGS is a map which maps the offering_id to an offering. Offering_id is derived from OFFERINGS_COUNT.

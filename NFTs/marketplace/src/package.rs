@@ -1,18 +1,18 @@
-use cosmwasm_std::Addr;
-use cw20::Cw20Coin;
+use cosmwasm_std::{Addr, Uint128};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct ContractInfoResponse {
     pub name: String,
+    pub denom: String
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct QueryOfferingsResult {
     pub id: String,
     pub token_id: String,
-    pub list_price: Cw20Coin,
+    pub list_price: Uint128,
     pub contract_addr: Addr,
     pub seller: Addr,
 }
