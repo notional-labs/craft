@@ -21,6 +21,10 @@ type ExpKeeper struct {
 	paramSpace    paramtypes.Subspace
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
+
+	channelKeeper types.ChannelKeeper
+	portKeeper    types.PortKeeper
+	scopedKeeper  types.ScopedKeeper
 }
 
 func NewKeeper(

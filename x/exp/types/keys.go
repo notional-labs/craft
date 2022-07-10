@@ -60,3 +60,13 @@ func GetEndedBurnRequestKey(addressRequest sdk.AccAddress) []byte {
 func GetAccountRecordKey(addressRequest sdk.AccAddress) []byte {
 	return append(KeyWhiteList, address.MustLengthPrefix(addressRequest.Bytes())...)
 }
+
+const (
+	// IBCPortID is the default port id that profiles module binds to.
+	IBCPortID = "ibc-exp"
+)
+
+var (
+	// IBCPortKey defines the key to store the port ID in store
+	IBCPortKey = []byte{0x01}
+)
