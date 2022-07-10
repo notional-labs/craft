@@ -51,6 +51,9 @@ update_test_genesis '.app_state["crisis"]["constant_fee"]={"denom": "ucraft","am
 craftd add-genesis-account $KEY 1000000000000000000000000uexp,10000000000ucraft --keyring-backend $KEYRING
 # Adds token to reece
 craftd add-genesis-account craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0 8000000uexp,10000000000ucraft --keyring-backend $KEYRING
+# add tokens to webappt team
+craftd add-genesis-account craft1sv434uclts5u7ufrzqsmqvlxhkw04q84yuh0hj 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
+craftd add-genesis-account craft14mt78hz73d9tdwpdvkd59ne9509kxw8y53sjt9 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
 
 # Sign genesis transaction
 craftd gentx $KEY 1000000000000000000000uexp --keyring-backend $KEYRING --chain-id $CHAINID
