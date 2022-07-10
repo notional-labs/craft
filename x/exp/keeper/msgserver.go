@@ -179,6 +179,8 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 		return nil, types.ErrDenomNotMatch
 	}
 
+	// oracle for exp price
+
 	err = k.ExpKeeper.executeMintExpByIbcToken(ctx, fromAddress, msg.Amount[0])
 	if err != nil {
 		return nil, err
