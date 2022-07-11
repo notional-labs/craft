@@ -181,7 +181,7 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 
 	// oracle for exp price
 
-	err = k.ExpKeeper.executeMintExpByIbcToken(ctx, fromAddress, msg.Amount[0])
+	err = k.ExpKeeper.SendIbcOracle(ctx, fromAddress, msg.Amount[0])
 	if err != nil {
 		return nil, err
 	}
@@ -189,6 +189,7 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 	return &types.MsgSpendIbcAssetToExpResponse{}, nil
 }
 
+// NEED REMOVE WHEN ORACLE DONE
 func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDaoTokenPrice) (*types.MsgAdjustDaoTokenPriceResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
