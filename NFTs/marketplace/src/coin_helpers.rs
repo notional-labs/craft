@@ -1,6 +1,7 @@
 use crate::error::ContractError;
 use cosmwasm_std::Coin;
 
+// https://github.com/InterWasm/cw-contracts/blob/main/contracts/nameservice/src/contract.rs
 pub fn assert_sent_sufficient_coin(
     sent: &[Coin],
     required: Option<Coin>,

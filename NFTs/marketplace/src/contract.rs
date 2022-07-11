@@ -5,14 +5,13 @@ use cosmwasm_std::{
     StdResult, SubMsg, WasmMsg, Coin
 };
 
-// https://github.com/InterWasm/cw-contracts/blob/main/contracts/nameservice/src/contract.rs
 
 use cosmwasm_std::BankMsg;
 use crate::coin_helpers::assert_sent_sufficient_coin;
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg};
 use cosmwasm_std::entry_point;
 use crate::error::ContractError;
-use crate::msg::{HandleMsg, InitMsg, QueryMsg, SellNft}; // BuyNft
+use crate::msg::{HandleMsg, InitMsg, QueryMsg, SellNft};
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
@@ -40,7 +39,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         HandleMsg::WithdrawNft { offering_id } => try_withdraw(deps, info, offering_id),
-        HandleMsg::Receive { offering_id } => try_buy_nft(deps, info, offering_id),
+        HandleMsg::BuyNft { offering_id } => try_buy_nft(deps, info, offering_id),
         HandleMsg::ReceiveNft(msg) => try_receive_nft(deps, info, msg),
     }
 }
@@ -126,6 +125,7 @@ pub fn try_buy_nft(
         .add_submessages(cosmos_msgs))
 }
 
+// gets NFT from a 721 contract
 pub fn try_receive_nft(
     deps: DepsMut,
     info: MessageInfo,
@@ -138,8 +138,10 @@ pub fn try_receive_nft(
     let id = increment_offerings(deps.storage)?.to_string();
 
     // save Offering
+    let denom = CONTRACT_INFO.load(deps.storage)?.denom;
     let off = Offering {
         contract_addr: info.sender.clone(),
+        list_denom: denom,
         token_id: rcv_msg.token_id,
         seller: deps.api.addr_validate(&rcv_msg.sender)?,
         list_price: msg.list_price,
@@ -212,19 +214,11 @@ fn query_offerings(deps: Deps) -> StdResult<OfferingsResponse> {
 }
 
 fn parse_offering(item: StdResult<(String, Offering)>) -> StdResult<QueryOfferingsResult> {
-    // item.and_then(|(k, offering)| {
-    //     Ok(QueryOfferingsResult {
-    //         id: k,
-    //         token_id: offering.token_id,
-    //         list_price: offering.list_price,
-    //         contract_addr: offering.contract_addr,
-    //         seller: offering.seller,
-    //     })
-    // })
     item.map(|(k, offering)| {
         QueryOfferingsResult {
             id: k,
             token_id: offering.token_id,
+            list_denom: offering.list_denom,
             list_price: offering.list_price,
             contract_addr: offering.contract_addr,
             seller: offering.seller,
@@ -273,7 +267,7 @@ mod tests {
         assert_eq!(1, value.offerings.len());
 
         // Purchase the NFT from the store
-        let msg2 = HandleMsg::Receive { offering_id: value.offerings[0].id.to_string() };
+        let msg2 = HandleMsg::BuyNft { offering_id: value.offerings[0].id.to_string() };
         let info_buy = mock_info("addr1", &coins(2, &denom));
         let _res = execute(deps.as_mut(), mock_env(), info_buy, msg2);
 

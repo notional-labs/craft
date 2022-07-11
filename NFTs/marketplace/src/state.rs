@@ -11,6 +11,7 @@ pub static _CONFIGKEY: &[u8] = b"config";
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct Offering {
     pub token_id: String,
+    pub list_denom: String,
     pub contract_addr: Addr,
     pub seller: Addr,
     pub list_price: Uint128,
