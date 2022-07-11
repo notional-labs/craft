@@ -2,6 +2,11 @@
 
 export KEY="mykey"
 export KEY2="mykey2"
+export KEYALGO="secp256k1"
+export CRAFT_CHAIN_ID="test-1"
+export CRAFTD_KEYRING_BACKEND="test"
+export CRAFTD_NODE="http://65.108.125.182:26657"
+export CRAFTD_COMMAND_ARGS="--gas-prices="0.025ucraft" -y --from $KEY"
 
 # craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
 echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | craftd keys add $KEY --keyring-backend $CRAFTD_KEYRING_BACKEND --algo $KEYALGO --recover
@@ -10,11 +15,7 @@ echo "flag meat remind stamp unveil junior goose first hold atom deny ramp raven
 
 export KEY_ADDR=`craftd keys show $KEY -a`
 export KEY_ADDR2=`craftd keys show $KEY2 -a`
-export KEYALGO="secp256k1"
-export CRAFT_CHAIN_ID="test-1"
-export CRAFTD_KEYRING_BACKEND="test"
-export CRAFTD_NODE="http://65.108.125.182:26657"
-export CRAFTD_COMMAND_ARGS="--gas-prices="0.025ucraft" -y --from $KEY"
+
 
 
 
@@ -93,5 +94,5 @@ craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y
 
 # buy the NFT with mykey2 & with ucraft
 # offering_id should match with {"get_offerings": {}} id:
-export SEND_FUNDS_PURCHASE_NFT=`printf '{"receive":{"offering_id":"1"}}' $OFFERING_ID_MSG_BASE64`
+export SEND_FUNDS_PURCHASE_NFT=`printf '{"receive":{"offering_id":"4"}}' $OFFERING_ID_MSG_BASE64`
 craftd tx wasm execute $ADDRM $SEND_FUNDS_PURCHASE_NFT --gas-prices="0.025ucraft" --amount 2ucraft -y --from $KEY2

@@ -12,6 +12,13 @@ pub enum ContractError {
     #[error("Unauthorized")]
     Unauthorized {},
     
-    #[error("Insufficient funds")]
-    InsufficientFundsSend {},
+    #[error("Insufficient funds. Needed: {needed:?}, Received: {received:?}")]
+    InsufficientFundsSend {needed: String, received: String},
+
+    #[error("The ID {id} is not valid. Make sure to check getOfferings{}")]
+    NoMarketplaceOfferingWithGivenID {id: String},
+    
+    // This may be removed in favor of just withdrawing the NFT back to themselves.
+    #[error("Trying to purchase your own item")]
+    UnableToPurchaseMarketplaceItemYouSold {},
 }
