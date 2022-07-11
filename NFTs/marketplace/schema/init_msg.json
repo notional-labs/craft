@@ -3,9 +3,13 @@
   "title": "InitMsg",
   "type": "object",
   "required": [
+    "denom",
     "name"
   ],
   "properties": {
+    "denom": {
+      "type": "string"
+    },
     "name": {
       "type": "string"
     }
