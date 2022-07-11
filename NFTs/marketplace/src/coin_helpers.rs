@@ -8,16 +8,21 @@ pub fn assert_sent_sufficient_coin(
     if let Some(required_coin) = required {
         let required_amount = required_coin.amount.u128();
         if required_amount > 0 {
+            let mut received_amount = 0;
             let sent_sufficient_funds = sent.iter().any(|coin| {
                 // check if a given sent coin matches denom
                 // and has sufficient amount
+                received_amount = coin.amount.u128();
                 coin.denom == required_coin.denom && coin.amount.u128() >= required_amount
             });
 
             if sent_sufficient_funds {
                 return Ok(());
             } else {
-                return Err(ContractError::InsufficientFundsSend {});
+                return Err(ContractError::InsufficientFundsSend { 
+                    needed: required_amount.to_string(), 
+                    received: received_amount.to_string()
+                });
             }
         }
     }
@@ -36,15 +41,26 @@ mod test {
             Err(e) => panic!("Unexpected error: {:?}", e),
         };
 
+        let _sent_coins = "&[]".to_string();
+        let _required_coins = "&[coin(5, \"token\")]".to_string();
         match assert_sent_sufficient_coin(&[], Some(coin(5, "token"))) {
             Ok(()) => panic!("Should have raised insufficient funds error"),
-            Err(ContractError::InsufficientFundsSend {}) => {}
+            
+            Err(ContractError::InsufficientFundsSend {
+                needed: _sent_coins,
+                received: _required_coins,
+            }) => {}
             Err(e) => panic!("Unexpected error: {:?}", e),
         };
 
+        let _sent_coins = "&[coin(10, \"smokin\")]".to_string();
+        let _required_coins = "&[coin(5, \"token\")]".to_string();
         match assert_sent_sufficient_coin(&coins(10, "smokin"), Some(coin(5, "token"))) {
             Ok(()) => panic!("Should have raised insufficient funds error"),
-            Err(ContractError::InsufficientFundsSend {}) => {}
+            Err(ContractError::InsufficientFundsSend {
+                needed: _sent_coins,
+                received: _required_coins,
+            }) => {}
             Err(e) => panic!("Unexpected error: {:?}", e),
         };
 

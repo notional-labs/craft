@@ -7,14 +7,12 @@ use cosmwasm_std::{
 
 // https://github.com/InterWasm/cw-contracts/blob/main/contracts/nameservice/src/contract.rs
 
-// import BankMsg
-use cosmwasm_std::{BankMsg};
-// use crate::coin_helpers::assert_sent_sufficient_coin;
+use cosmwasm_std::BankMsg;
+use crate::coin_helpers::assert_sent_sufficient_coin;
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg};
 use cosmwasm_std::entry_point;
 use crate::error::ContractError;
-// use crate::msg::{BuyNft, HandleMsg, InitMsg, QueryMsg, SellNft};
-use crate::msg::{HandleMsg, InitMsg, QueryMsg, SellNft};
+use crate::msg::{HandleMsg, InitMsg, QueryMsg, SellNft}; // BuyNft
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
@@ -33,7 +31,6 @@ pub fn instantiate(
     Ok(Response::default())
 }
 
-// And declare a custom Error variant for the ones where you will want to make use of it
 #[entry_point]
 pub fn execute(
     deps: DepsMut,
@@ -43,7 +40,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         HandleMsg::WithdrawNft { offering_id } => try_withdraw(deps, info, offering_id),
-        HandleMsg::Receive { offering_id } => try_receive(deps, info, offering_id),
+        HandleMsg::Receive { offering_id } => try_buy_nft(deps, info, offering_id),
         HandleMsg::ReceiveNft(msg) => try_receive_nft(deps, info, msg),
     }
 }
@@ -51,7 +48,7 @@ pub fn execute(
 // ============================== Message Handlers ==============================
 
 // receive funds & buy NFT if funds are enough
-pub fn try_receive(
+pub fn try_buy_nft(
     deps: DepsMut,
     info: MessageInfo,
     offering_id: String,
@@ -59,57 +56,31 @@ pub fn try_receive(
     // let msg: BuyNft = from_binary(&rcv_msg.msg)?;
 
     // check if offering exists
-    let off = OFFERINGS.load(deps.storage, &offering_id)?;
+    // let off = OFFERINGS.load(deps.storage, &offering_id)?;
 
-    // check if the seller is the person trying to buy it back, if so we just transfer the NFT back to them
-    // if off.seller == info.sender {
-    //     let err = try_withdraw(deps, info, offering_id).unwrap();
-    //     return Ok(err);
-    // }
+    // load offering from storage if a given offering_id exist, if not, return NoMarketplaceOfferingWithGivenID
+    let off = OFFERINGS.may_load(deps.storage, &offering_id)?;
+    if off.is_none() {
+        return Err(ContractError::NoMarketplaceOfferingWithGivenID { id: offering_id });
+    } 
 
-    //     // transfer token back to original owner
-    //     let transfer_cw721_msg = Cw721ExecuteMsg::TransferNft {
-    //         recipient: off.seller.clone().into_string(),
-    //         token_id: off.token_id.clone(),
-    //     };
+    let off = off.unwrap();
 
-    //     let exec_cw721_transfer = WasmMsg::Execute {
-    //         contract_addr: off.contract_addr.clone().into_string(),
-    //         msg: to_binary(&transfer_cw721_msg)?,
-    //         funds: vec![],
-    //     };
+    // Check if the seller of the NFT is the sender
+    if off.seller == info.sender {
+        // let err = try_withdraw(deps, info, offering_id).unwrap();
+        // return Ok(err);
+        return Err(ContractError::UnableToPurchaseMarketplaceItemYouSold {});
+    }
 
-    //     let cw721_transfer_cosmos_msg: CosmosMsg = exec_cw721_transfer.into();
-    //     let cw721_submsg = SubMsg::new(cw721_transfer_cosmos_msg);
+    let denom = CONTRACT_INFO.load(deps.storage)?.denom;
 
-    //     // remove offering
-    //     OFFERINGS.remove(deps.storage, &offering_id);
-
-    //     return Ok(Response::new()
-    //         .add_attribute("action", "withdraw_nft")
-    //         .add_attribute("seller", info.sender)
-    //         .add_attribute("offering_id", offering_id)
-    //         .add_submessage(cw721_submsg));
-    // }
-    // Err(ContractError::Unauthorized {})
-
-    // check if the ucraft is enough to buy the NFT
-
-
-    // check for enough coins
-    // if ucraft.amount < off.list_price.amount {
-    //     return Err(ContractError::InsufficientFunds {});
-    // }
-
-    // ensure this contract got sent enough funds to purchase the NFT
-    // TODO: Make this work
-    // let err = assert_sent_sufficient_coin(&info.funds, Some(Coin::new(off.list_price.amount.clone().u128(), "ucraft"))).unwrap_err();
-    // if err == ContractError::InsufficientFundsSend {} else {
-    //     return Err(err);
-    // }
+    // check for enough coins (>= the listing price with the same denom)
+    // change this to match like coin_helper has?
+    assert_sent_sufficient_coin(&info.funds, Some(Coin::new(off.list_price.clone().u128(), &denom)))?;
 
     // convert off.list_price to a vector of coins
-    let list_price_coins = vec![Coin::new(off.list_price.clone().u128(), "ucraft")];
+    let list_price_coins = vec![Coin::new(off.list_price.clone().u128(), &denom)];
 
 
     // send the ucraft -> the off.seller using BankMsg
@@ -117,19 +88,6 @@ pub fn try_receive(
         to_address: off.seller.to_string(),
         amount: list_price_coins,
     };
-    
-    
-
-    // create transfer cw20 msg
-    // let transfer_cw20_msg = Cw20ExecuteMsg::Transfer {
-    //     recipient: off.seller.clone().into_string(),
-    //     amount: rcv_msg.amount,
-    // };
-    // let exec_cw20_transfer = WasmMsg::Execute {
-    //     contract_addr: info.sender.clone().into_string(),
-    //     msg: to_binary(&transfer_cw20_msg)?,
-    //     funds: vec![],
-    // };
 
     // create transfer cw721 msg
     let transfer_cw721_msg = Cw721ExecuteMsg::TransferNft {
@@ -143,7 +101,6 @@ pub fn try_receive(
     };
 
     // if everything is fine transfer ucraft to seller
-    // let cw20_transfer_cosmos_msg: CosmosMsg = exec_cw20_transfer.into();
     let transfer_cosmos_msg: CosmosMsg = transfer_tokens.into();
 
     // transfer nft to buyer
@@ -246,7 +203,8 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 fn query_offerings(deps: Deps) -> StdResult<OfferingsResponse> {
     let res: StdResult<Vec<QueryOfferingsResult>> = OFFERINGS
         .range(deps.storage, None, None, Order::Ascending)
-        .map(|kv_item| parse_offering(kv_item))
+        // .map(|kv_item| parse_offering(kv_item))
+        .map(parse_offering)
         .collect();
     Ok(OfferingsResponse {
         offerings: res?, // Placeholder
@@ -282,25 +240,24 @@ mod tests {
     use cosmwasm_std::{coins, from_binary, Uint128};
 
     #[test]
-    fn sell_offering_happy_path() {
+    fn test_sell_offering() {
         let mut deps = mock_dependencies();
 
         let msg = InitMsg {
             name: String::from("test market"),
             denom: String::from("ucraft"),
         };
-        let info = mock_info("creator", &coins(2, "token"));
+
+        let denom = msg.denom.clone();
+
+        let info = mock_info("creator", &coins(2, &denom));
         let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
 
         // beneficiary can release it
-        let info = mock_info("anyone", &coins(2, "token"));
+        let info = mock_info("anyone", &coins(2, &denom));
 
         let sell_msg = SellNft {
-            // list_price: Coin {
-            //     denom: String::from("token"),
-            //     amount: Uint128::new(5),
-            // },
-            list_price: Uint128::new(5),
+            list_price: Uint128::new(2),
         };
 
         let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
@@ -315,46 +272,36 @@ mod tests {
         let value: OfferingsResponse = from_binary(&res).unwrap();
         assert_eq!(1, value.offerings.len());
 
-        // let buy_msg = BuyNft {
-        //     offering_id: value.offerings[0].id.clone(),
-        // };
-
-        // let msg2 = HandleMsg::Receive(Cw20ReceiveMsg {
-        //     sender: String::from("buyer"),
-        //     amount: Uint128::new(5),
-        //     msg: to_binary(&buy_msg).unwrap(),
-        // });
+        // Purchase the NFT from the store
         let msg2 = HandleMsg::Receive { offering_id: value.offerings[0].id.to_string() };
+        let info_buy = mock_info("addr1", &coins(2, &denom));
+        let _res = execute(deps.as_mut(), mock_env(), info_buy, msg2);
 
-        let info_buy = mock_info("cw20ContractAddr", &coins(2, "token"));
+        // panic!("{}", _res.unwrap_err());
 
-        let _res = execute(deps.as_mut(), mock_env(), info_buy, msg2).unwrap();
-
-        // check offerings again. Should be 0
+        // check offerings again. Should be 0 since the NFT is bought
         let res2 = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
         let value2: OfferingsResponse = from_binary(&res2).unwrap();
-        assert_eq!(0, value2.offerings.len());
+        assert_eq!(0, value2.offerings.len()); 
     }
 
     #[test]
-    fn withdraw_offering_happy_path() {
+    fn test_withdraw_offering() {
         let mut deps = mock_dependencies();
 
         let msg = InitMsg {
             name: String::from("test market"),
             denom: String::from("token"),
         };
-        let info = mock_info("creator", &coins(2, "token"));
+        let denom = msg.denom.clone();
+
+        let info = mock_info("creator", &coins(2, &denom));
         let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
 
         // beneficiary can release it
-        let info = mock_info("anyone", &coins(2, "token"));
+        let info = mock_info("anyone", &coins(2, &denom));
         
         let sell_msg = SellNft {
-            // list_price: Coin {
-            //     denom: String::from("token"),
-            //     amount: Uint128::new(5),
-            // },
             list_price: Uint128::new(5),
         };
 
@@ -371,7 +318,7 @@ mod tests {
         assert_eq!(1, value.offerings.len());
 
         // withdraw offering
-        let withdraw_info = mock_info("seller", &coins(2, "token"));
+        let withdraw_info = mock_info("seller", &coins(2, &denom));
         let withdraw_msg = HandleMsg::WithdrawNft {
             offering_id: value.offerings[0].id.clone(),
         };
