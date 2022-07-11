@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	abci "github.com/tendermint/tendermint/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/notional-labs/craft/x/exp/keeper"
@@ -455,7 +454,7 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 			},
 		},
 
-		// Should not set price to 0
+		// Should set price to 0
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
@@ -465,7 +464,7 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 					DaoTokenPrice: sdk.NewDec(0),
 				}
 				_, err := msgServer.AdjustDaoPrice(sdk.WrapSDKContext(suite.Ctx), &req)
-				suite.Require().Error(err) // should return err
+				suite.Require().NoError(err) // should return err
 			},
 		},
 	}
@@ -493,7 +492,6 @@ func (suite *KeeperTestSuite) TestSpendIbcAssetToExp() {
 				suite.Require().NoError(err)
 
 				// check balance
-				suite.App.EndBlock(abci.RequestEndBlock{Height: suite.Ctx.BlockHeight()})
 				ibcBalance := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "token")
 				daoBalance := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "uexp")
 
