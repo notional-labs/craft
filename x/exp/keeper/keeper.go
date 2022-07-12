@@ -143,6 +143,18 @@ func (k ExpKeeper) verifyAccountToWhiteList(ctx sdk.Context, memberAddress sdk.A
 	return nil
 }
 
+func (k ExpKeeper) verifyAccountToMintRequestList(ctx sdk.Context, memberAddress sdk.AccAddress) error {
+	// check if dstAddress already in mint request list .
+	list := k.GetMintRequestsByStatus(ctx, int(types.StatusOnGoingRequest))
+
+	for _, accountRecord := range list {
+		if memberAddress.String() == accountRecord.Account {
+			return types.ErrAddressdNotFound
+		}
+	}
+	return nil
+}
+
 func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, ar types.AccountRecord) error {
 	balance := k.bankKeeper.GetBalance(ctx, memberAccount, k.GetDenom(ctx))
 	if !ar.MaxToken.Amount.Equal(balance.Amount) {

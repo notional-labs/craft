@@ -127,7 +127,7 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 		return nil, types.ErrGov
 	}
 
-	err = k.verifyAccountToWhiteList(ctx, joinAddress)
+	err = k.verifyAccountToMintRequestList(ctx, joinAddress)
 
 	if err != nil {
 		return &types.MsgJoinDaoByIbcAssetResponse{}, err
