@@ -1,3 +1,6 @@
+
+# Replaced by test_script.sh in ./already_compiled/
+
 ```bash
 export KEY="mykey"
 export KEY2="mykey2"

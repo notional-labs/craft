@@ -21,6 +21,10 @@ type ExpKeeper struct {
 	paramSpace    paramtypes.Subspace
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
+
+	channelKeeper types.ChannelKeeper
+	portKeeper    types.PortKeeper
+	scopedKeeper  types.ScopedKeeper
 }
 
 func NewKeeper(
@@ -221,6 +225,7 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin) error {
 	mintRequest, _ := k.GetMintRequest(ctx, fromAddress)
 	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
+	fmt.Println("before",mintRequest, expWillGet)
 
 	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
 		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
@@ -244,8 +249,13 @@ func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 
 		mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
 		mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(decCoin)
+		k.SetMintRequest(ctx, mintRequest)
 	}
-	k.SetMintRequest(ctx, mintRequest)
+	return nil
+}
+	
 
+// SendIbcOracle send a package to query exp price over ibc.
+func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin) error {
 	return nil
 }

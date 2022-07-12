@@ -25,7 +25,7 @@ message BurnRequest {
   option (gogoproto.goproto_getters)         = true;
   option (gogoproto.goproto_stringer)        = true;
 
-  string account                      = 1;
+  string account = 1;
   cosmos.base.v1beta1.Coin burn_token_left  = 2 ;
   google.protobuf.Timestamp request_time = 3   [ 
     (gogoproto.nullable) = false ,
@@ -38,7 +38,7 @@ message MintRequest{
     option (gogoproto.goproto_getters)         = true;
     option (gogoproto.goproto_stringer)        = true;
   
-    string account                      = 1;
+    string account = 1;
     string dao_token_minted  = 2 [    
         (gogoproto.nullable)   = false,
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -54,4 +54,8 @@ message MintRequest{
         (gogoproto.stdtime)     = true
     ];
     RequestStatus status = 5;
+}
+
+message MintRequestQueue{
+    
 }
