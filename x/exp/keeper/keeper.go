@@ -218,21 +218,21 @@ func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 			return err
 		}
 
-		mintRequest.DaoTokenLeft = sdk.NewDec(0)
 		mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
+		mintRequest.DaoTokenLeft = sdk.NewDec(0)
 
 		k.SetMintRequest(ctx, mintRequest)
-	}
-	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), fromAddress)
-	if err != nil {
-		return sdkerrors.Wrap(err, "fund error")
-	}
-	k.removeMintRequest(ctx, mintRequest)
-	decCoin := sdk.NewDecFromInt(coin.Amount)
+	} else {
+		err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), fromAddress)
+		if err != nil {
+			return sdkerrors.Wrap(err, "fund error")
+		}
+		k.removeMintRequest(ctx, mintRequest)
+		decCoin := sdk.NewDecFromInt(coin.Amount)
 
-	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
-	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(decCoin)
-
+		mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
+		mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(decCoin)
+	}
 	k.SetMintRequest(ctx, mintRequest)
 
 	return nil

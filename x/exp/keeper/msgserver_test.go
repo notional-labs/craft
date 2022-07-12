@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	abci "github.com/tendermint/tendermint/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/notional-labs/craft/x/exp/keeper"
@@ -490,6 +491,7 @@ func (suite *KeeperTestSuite) TestSpendIbcAssetToExp() {
 				}
 				_, err := msgServer.SpendIbcAssetToExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().NoError(err)
+				suite.App.EndBlock(abci.RequestEndBlock{Height: suite.Ctx.BlockHeight()})
 
 				// check balance
 				ibcBalance := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "token")
@@ -497,9 +499,9 @@ func (suite *KeeperTestSuite) TestSpendIbcAssetToExp() {
 
 				// init 10000000, spent 1000000
 				suite.Require().Equal(ibcBalance.Amount, sdk.NewInt(9000000))
-				
+
 				daoBalanceExpected := suite.App.ExpKeeper.GetDaoTokenPrice(suite.Ctx).Mul(sdk.NewDec(1000000))
-				suite.Require().Equal(daoBalanceExpected, daoBalance.Amount)
+				suite.Require().Equal(daoBalanceExpected, sdk.NewDec(daoBalance.Amount.Int64()))
 			},
 		},
 
