@@ -1,0 +1,72 @@
+version: "2.0"
+
+# In the future, add option for mongodb here as well once we have read only DB's available
+# not tested
+
+services:
+  redis:
+    image: redis:latest
+    expose:
+      - port: 6379        
+        to:
+          - service: craftapi
+  craftapi:
+    image: reecepbcups/craft-rest-api:1.0.0
+    env:
+      - DAO_EXP_MODULE_ONLY=true
+      - API_PORT=4000
+      - REDIS_CONN_STRING=redis://redis:6379/0
+      - CRAFTD_REST=http://65.108.125.182:1317
+      - CRAFTD_NODE=http://65.108.125.182:26657
+      - DAO_WALLETS=cosmos10r39fueph9fq7a6lgswu4zdsg8t3gxlqvvvyvn,osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p,juno10r39fueph9fq7a6lgswu4zdsg8t3gxlq670lt0,dig10r39fueph9fq7a6lgswu4zdsg8t3gxlq5c90wg
+      - CRAFT_ADMIN_WALLET=craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
+    depends_on:
+      - redis
+    expose:
+      - port: 4000
+        as: 80
+        to:
+          - global: true 
+
+profiles:
+  compute:
+    craftapi:
+      resources:
+        cpu:
+          units: 0.5
+        memory:
+          size: 1Gi
+        storage:
+          size: 2Gi
+    redis:
+      resources:
+        cpu:
+          units: 0.25
+        memory:
+          size: 1Gi
+        storage:
+          size: 2Gi
+  placement:
+    dcloud:
+      attributes:
+        host: akash
+      signedBy:
+        anyOf:
+          - "akash1365yvmc4s7awdyj3n2sav7xfx76adc6dnmlx63"
+      pricing:
+        craftapi:
+          denom: uakt
+          amount: 50
+        redis:
+          denom: uakt
+          amount: 50
+
+deployment:
+  craftapi:
+    dcloud:
+      profile: craftapi
+      count: 1
+  redis:
+    dcloud:
+      profile: redis
+      count: 1

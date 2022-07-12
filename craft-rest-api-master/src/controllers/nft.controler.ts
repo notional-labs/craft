@@ -23,8 +23,7 @@ export const getDataFromTokenID = async (req: Request, res: Response) => {
 export const getContractAddresses = async (req: Request, res: Response) => {
     const addresses = {
         "ADDR721_REALESTATE": process.env.ADDR721_REALESTATE,
-        "ADDR721_SKINS": process.env.ADDR721_SKINS,
-        "ADDR20": process.env.ADDR20,
+        "ADDR721_SKINS": process.env.ADDR721_SKINS,        
         "MARKETPLACE": process.env.ADDRM,   
     }
     return res.status(200).json(addresses) 

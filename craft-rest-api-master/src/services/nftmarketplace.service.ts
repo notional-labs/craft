@@ -50,7 +50,7 @@ export const queryOfferings = async (contract_address: string) => {
         let token_data = await queryToken(offering.contract_addr, offering.token_id);
         // console.log(token_data);
         if(token_data) {
-            offering.token_uri = token_data;
+            offering.token_data = token_data;
             offerings.push(offering);       
         }
     }
