@@ -1,6 +1,7 @@
 package com.crafteconomy.blockchain.api;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -224,9 +225,8 @@ public class IntegrationAPI {
      *          or {"transfers":[{"coin":"1token","status":"ok"}]}
      *          or "NO_WALLET" if wallet is null
      */
-    public String faucet(String wallet_address, long amount) {
-        // {"transfers":[{"coin":"1token","status":"ok"}]}
-        return BlockchainRequest.depositToAddress(wallet_address, amount);
+    public CompletableFuture<String> faucet(String wallet_address, long amount) {
+        return BlockchainRequest.depositToAddress(wallet_address, amount);   
     }
 
     /**
@@ -238,8 +238,7 @@ public class IntegrationAPI {
      *          or {"transfers":[{"coin":"1token","status":"ok"}]}
      *          or "NO_WALLET" if wallet is null
      */
-    public String faucet(UUID player_uuid, long amount) {
-        // {"transfers":[{"coin":"1token","status":"ok"}]}
+    public CompletableFuture<String> faucet(UUID player_uuid, long amount) {
         return faucet(walletManager.getAddress(player_uuid), amount);
     }
 

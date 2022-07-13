@@ -113,6 +113,20 @@ public class WalletManager {
         return null;        
     }
 
+    public UUID getUUIDFromWallet(String wallet) {
+        Bson filter = Filters.eq("keplrId", wallet);
+        Document doc = getCollection().find(filter).first();
+
+        if(doc != null) { 
+            Object uuid = doc.get("minecraftId");
+            if(uuid != null){
+                String myUUID = (String) uuid;
+                return UUID.fromString(myUUID);
+            } 
+        }
+        return UUID.fromString("00000000-0000-0000-0000-000000000000");        
+    }
+
     private MongoCollection<Document> getCollection() {
         // This is where all the connections are stored w/ the webapp
         return db.getCollection("connections");

@@ -6,7 +6,13 @@ import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 // TODO: Remove when live
 
@@ -47,12 +53,6 @@ public class WalletFaucet implements SubCommand {
         try {
             amount = Long.parseLong(args[2]);
             if(amount <= 0) { return; }
-
-            // if(amount > CraftBlockchainPlugin.MAX_FAUCET_AMOUNT) {
-            //     Util.logSevere("\n\n&cConsole just tried to faucet an amount too high: " + amount + "\n\n");
-            //     return;
-            // }
-
         } catch (Exception e) {
             Util.colorMsg(sender, "&cInvalid amount " + args[2]);
             return;
@@ -61,23 +61,42 @@ public class WalletFaucet implements SubCommand {
                  
 
         // used only for outputs
-        String reducedWallet = wallet.substring(0, 25) + "...";
+        String reducedWallet = wallet.substring(0, 20) + "...";
 
         Util.colorMsg(sender, "&f&o[!] Faucet request sent for " + reducedWallet);   
+        Util.colorMsg(sender, "&f&o[!] This may take up to ~45 seconds to process.");
         
-        String html = BlockchainRequest.depositToAddress(wallet, amount);
-        if(html == null) {
-            Util.colorMsg(sender, "&c&lERROR: &cCraftd node is not running, please contact a staff.");
-            return;
-        }
+        
+        final String actualWallet = wallet;
+        final long actualAmount = amount;
+        Bukkit.getServer().getScheduler().runTaskAsynchronously(CraftBlockchainPlugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                CompletableFuture<String> status = BlockchainRequest.depositToAddress(actualWallet, actualAmount);
 
-        String output = "&aFauceted &f" + amount + "craft to &a" + reducedWallet;
-        if(html.contains("error")) {
-            output = "&c&lERROR: &c" + html;
-        } 
+                // get the user ID attached to that wallet
+                UUID userID = walletManager.getUUIDFromWallet(actualWallet);   
+                Player receiver = null;
+                if(userID != UUID.fromString("00000000-0000-0000-0000-000000000000")) {
+                    receiver = Bukkit.getPlayer(userID);
+                }             
 
-        Util.colorMsg(sender, output);
-        // Util.clickableWallet(sender, wallet, "&7&oTheir Wallet: &n%wallet%");         
+                String strStatus = status.join();
+                if(strStatus.equalsIgnoreCase("SUCCESS")) {
+                    if(sender instanceof ConsoleCommandSender) {
+                        Util.colorMsg(sender, "&fPayment Success! &fFauceted +" + actualAmount + "ucraft to their wallet: &a" + reducedWallet);
+                        
+                    }
+                    
+                    if(receiver != null && receiver.isOnline()) {
+                        Util.colorMsg(receiver, "&aIncoming Payment! &fYou received +" + actualAmount + "ucraft to your wallet: &a" + reducedWallet);
+                    }
+                } else {
+                    Util.colorMsg(sender, "&c&o[!] ERROR: payment request failed for " + reducedWallet + ".");
+                }
+            }            
+        }); 
+
+     
     }
-    
 }
