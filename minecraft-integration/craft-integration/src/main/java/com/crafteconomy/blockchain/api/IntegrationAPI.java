@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.escrow.EscrowErrors;
 import com.crafteconomy.blockchain.escrow.EscrowManager;
 import com.crafteconomy.blockchain.transactions.Tx;
@@ -217,31 +218,25 @@ public class IntegrationAPI {
     }
 
     /**
+     * Gives a wallet some tokens (UCRAFT) 
+     * @param wallet_address
+     * @param amount
+     * @return  CompletableFuture<FaucetTypes>
+     */
+    public CompletableFuture<FaucetTypes> faucetUCraft(String wallet_address, long ucraft) {
+        return BlockchainRequest.depositCraftToAddress(wallet_address, ucraft);   
+    }
+
+    /**
      * Gives a wallet some tokens (CRAFT) 
      * @param consoleSender
      * @param player_uuid
      * @param amount
-     * @return  "" if faucet is disabled, 
-     *          or {"transfers":[{"coin":"1token","status":"ok"}]}
-     *          or "NO_WALLET" if wallet is null
+     * @return CompletableFuture<FaucetTypes>
      */
-    public CompletableFuture<String> faucet(String wallet_address, long amount) {
-        return BlockchainRequest.depositToAddress(wallet_address, amount);   
+    public CompletableFuture<FaucetTypes> faucetCraft(String wallet_address, long craft_amount) {
+        return faucetUCraft(wallet_address, craft_amount*1_000_000);   
     }
-
-    /**
-     * Gives a player's wallet some tokens (CRAFT)
-     * @param consoleSender
-     * @param player_uuid
-     * @param amount
-     * @return  "" if faucet is disabled, 
-     *          or {"transfers":[{"coin":"1token","status":"ok"}]}
-     *          or "NO_WALLET" if wallet is null
-     */
-    public CompletableFuture<String> faucet(UUID player_uuid, long amount) {
-        return faucet(walletManager.getAddress(player_uuid), amount);
-    }
-
 
     // --------------------------------------------------
     // clickable links / commands / TxId's to make user life better

@@ -9,9 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.core.types.RequestTypes;
 import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.storage.RedisManager;
@@ -97,56 +99,55 @@ public class BlockchainRequest {
 
     // -= GIVING TOKENS =-
     private static final String ENDPOINT_SECRET = CraftBlockchainPlugin.getInstance().getSecret();
-    public static CompletableFuture<String> depositToAddress(String craft_address, long ucraft_amount) {   
-        CompletableFuture<String> future = new CompletableFuture<>();
 
-        if(craft_address == null) {            
-            // throw new Exception("NO WALLET");
-            future.complete("NO WALLET");
+
+    private static FaucetTypes makePostRequest(String craft_address, long ucraft_amount) {
+        /// called by the CompletableFuture so it is made async
+        if(craft_address == null) { 
+            return FaucetTypes.NO_WALLET; 
         }
 
-        // curl --data '{"secret": "7821719493", "wallet": "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0", "amount": 50000}' -X POST -H "Content-Type: application/json"  http://api.crafteconomy.io/v1/dao/make_payment 
-        // {"success":"Wallet: craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0 Amount: 50000"}
-
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(CraftBlockchainPlugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                URL url = null;
-                HttpURLConnection http = null;
-                OutputStream stream = null;
-                String msg = "";
-
-                String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"wallet\": \""+craft_address+"\", \"amount\": "+ucraft_amount+"}";
-                System.out.println("depositToAddress data " + data);
-                
-                try {
-                    url = new URL("http://api.crafteconomy.io/v1/dao/make_payment");
-                    http = (HttpURLConnection)url.openConnection();
-                    http.setRequestMethod("POST");
-                    http.setDoOutput(true);
-                    http.setRequestProperty("Content-Type", "application/json");
+        URL url = null;
+        HttpURLConnection http = null;
+        OutputStream stream = null;
+        String msg = "";
+        String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"wallet\": \""+craft_address+"\", \"amount\": "+ucraft_amount+"}";
+        System.out.println("depositToAddress data " + data); // TODO: Remove this from production code
         
-                    byte[] out = data.getBytes(StandardCharsets.UTF_8);
-                    stream = http.getOutputStream();                    
-                    stream.write(out);
-        
-                    msg = http.getResponseMessage();
-                    System.out.println("depositToAddress code: " + http.getResponseCode() + " | msg: " + msg);
-                    http.disconnect();
+        try {
+            url = new URL("http://api.crafteconomy.io/v1/dao/make_payment");
+            http = (HttpURLConnection)url.openConnection();
+            http.setRequestMethod("POST");
+            http.setDoOutput(true);
+            http.setRequestProperty("Content-Type", "application/json");
 
-                    if(http.getResponseCode() == 200) {
-                        System.out.println("Successful payment!");
-                        future.complete("SUCCESS");
-                    } else {
-                        System.out.println("Failed payment!");
-                        future.complete("FAILED");
-                    }                    
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        return future;
+            byte[] out = data.getBytes(StandardCharsets.UTF_8);
+            stream = http.getOutputStream();                    
+            stream.write(out);
+
+            msg = http.getResponseMessage();
+            System.out.println("depositToAddress code: " + http.getResponseCode() + " | msg: " + msg);
+            http.disconnect();
+
+            if(http.getResponseCode() == 200) {
+                System.out.println("Successful payment!");                
+                return FaucetTypes.SUCCESS;
+            } else {
+                System.out.println("Failed payment!");
+                return FaucetTypes.FAILURE;
+            }                    
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return FaucetTypes.FAILURE;
+    }
+
+    public static CompletableFuture<FaucetTypes> depositUCraftToAddress(String craft_address, long ucraft_amount) {   
+        // curl --data '{"secret": "7821719493", "wallet": "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0", "amount": 50000}' -X POST -H "Content-Type: application/json"  http://api.crafteconomy.io/v1/dao/make_payment
+        return CompletableFuture.supplyAsync(() -> makePostRequest(craft_address, ucraft_amount)).completeOnTimeout(FaucetTypes.ENDPOINT_TIMEOUT, 45, TimeUnit.SECONDS);
+    }
+    public static CompletableFuture<FaucetTypes> depositCraftToAddress(String craft_address, long craft) {           
+        return depositUCraftToAddress(craft_address, craft*1_000_000);
     }
 
 
