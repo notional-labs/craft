@@ -4,6 +4,7 @@ MongoDB:
 Redis: 
   uri: "redis://:PASSWORD@IP:6379"
 TAX_RATE: 0.05
+DAO_ESCROW_ENDPOINT_SECRET: "some.secret.here"
 REDIS_KEY_EXPIRE_TIME: 0
 DEV_MODE: false
 API_ENDPOINT: http://65.108.125.182:1317/

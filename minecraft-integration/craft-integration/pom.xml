@@ -6,7 +6,7 @@
 
   <groupId>com.crafteconomy</groupId>
   <artifactId>craft-integration</artifactId>
-  <version>4.2.0</version>
+  <version>4.2.1</version>
   <name>craft-integration</name>
 
   <properties>
@@ -64,6 +64,11 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>fluent-hc</artifactId>
       <version>4.5.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpasyncclient</artifactId>
+      <version>4.0-beta4</version>
     </dependency>
 
     <dependency>

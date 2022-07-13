@@ -214,8 +214,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         return IntegrationAPI.getInstance();
     }
 
-    public String getTokenFaucet() {        
-        return getConfig().getString("TOKEN_FAUCET_ENDPOINT"); // :4500
+    public String getSecret() {        
+        return getConfig().getString("DAO_ESCROW_ENDPOINT_SECRET"); // random string of secret characters
     }
 
     public String getApiEndpoint() {
