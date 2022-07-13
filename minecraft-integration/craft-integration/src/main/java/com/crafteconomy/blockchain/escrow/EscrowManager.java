@@ -9,6 +9,7 @@ import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.request.Caches;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.core.types.RequestTypes;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.wallets.WalletManager;
@@ -115,30 +116,25 @@ public class EscrowManager {
         long mostTheyCanRedeemUCraft = Math.min(getUCraftBalance(uuid), redeemAmountCraft);
         removeUCraftBalance(uuid, mostTheyCanRedeemUCraft);
         System.out.println("Redeeming " + (mostTheyCanRedeemUCraft / 1_000_000) + " from in game -> wallet via deposit");
+        
         // deposits the tokens to their actual wallet
-        // api.faucet();
+        BlockchainRequest.depositCraftToAddress(walletManager.getAddress(uuid), mostTheyCanRedeemUCraft).thenAccept(status_type -> {
+            Player player = Bukkit.getPlayer(uuid);
 
-        // run it async
-        Player player = Bukkit.getPlayer(uuid);
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(CraftBlockchainPlugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                CompletableFuture<String> status = BlockchainRequest.depositToAddress(walletManager.getAddress(uuid), mostTheyCanRedeemUCraft);                
-                if (player == null) {
-                    return; // no msg for them
-                }
+            String messages = "";
+            if (status_type == FaucetTypes.SUCCESS) {
+                String amt = (mostTheyCanRedeemUCraft * 1_000_000) + CraftBlockchainPlugin.getInstance().getTokenDenom(false);
+                messages = "You have redeemed " + amt + " from your escrow account -> wallet.\n";
+                messages += "Your new escrow balance is: " + getCraftBalance(uuid);
+            } else {
+                messages = "An error occurred while redeeming your escrow account -> wallet.\n";
+                messages += "Error: " + status_type.toString();
+            }
 
-                if (status.join().equalsIgnoreCase("SUCCESS")) {
-                    player.sendMessage("You have redeemed " + (mostTheyCanRedeemUCraft * 1_000_000)
-                            + CraftBlockchainPlugin.getInstance().getTokenDenom(false)
-                            + " from your escrow account -> wallet.");
-                    player.sendMessage("Your new escrow balance is: " + getCraftBalance(uuid));
-                } else {
-                    player.sendMessage("An error occurred while redeeming your escrow account -> wallet.");
-                    player.sendMessage("Error: " + status);
-                }
-            }            
-        });        
+            if(player != null) {
+                player.sendMessage(messages);
+            }
+        });
             
         return mostTheyCanRedeemUCraft;
     }

@@ -43,12 +43,11 @@ public class EndpointQuery {
 
             if (httpResponse.getEntity() != null) {                
                 String html = EntityUtils.toString(httpResponse.getEntity());
-
                 
-                if (type == RequestTypes.FAUCET) {
-                    Util.log("Faucet Request " + html);
-                    return html; // {"transfers":[{"coin":"1token","status":"ok"}]}
-                }
+                // if (type == RequestTypes.FAUCET) {
+                //     Util.log("Faucet Request " + html);
+                //     return html; // {"transfers":[{"coin":"1token","status":"ok"}]}
+                // }
 
                 json = (JSONObject) parser.parse(html);            
                 
