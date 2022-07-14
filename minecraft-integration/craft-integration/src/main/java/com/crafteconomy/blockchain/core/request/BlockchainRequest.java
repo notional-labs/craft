@@ -1,7 +1,5 @@
 package com.crafteconomy.blockchain.core.request;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -22,7 +20,6 @@ import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.json.JSONException;
 import org.json.JSONObject;
 

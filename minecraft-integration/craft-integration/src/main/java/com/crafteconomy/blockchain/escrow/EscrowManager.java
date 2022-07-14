@@ -1,7 +1,6 @@
 package com.crafteconomy.blockchain.escrow;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;

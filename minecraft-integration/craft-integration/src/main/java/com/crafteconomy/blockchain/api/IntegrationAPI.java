@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
+import com.crafteconomy.blockchain.core.request.EndpointQuery;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.escrow.EscrowErrors;
@@ -244,6 +245,11 @@ public class IntegrationAPI {
     
     public CompletableFuture<FaucetTypes> faucetCraft(UUID uuid, long craft_amount) {
         return faucetUCraft(uuid, craft_amount*1_000_000);   
+    }
+
+
+    public CompletableFuture<Float> getCraftUSDPrice() {
+        return EndpointQuery.queryCraftTokenPrice();
     }
 
     // --------------------------------------------------

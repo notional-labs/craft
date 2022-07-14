@@ -75,9 +75,9 @@ public class WalletGenerateFakeTx implements SubCommand {
         
         try (Jedis jedis = redis.getRedisConnection()) {
             ErrorTypes error = BlockchainRequest.transaction(TxInfo, RedisMinuteTTL);
-            // if(error != ErrorTypes.SUCCESS) {
-            //     // code
-            // }
+            if(error != ErrorTypes.SUCCESS) {
+                // code
+            }
                         
             Util.colorMsg(sender, "\n&a&l[✓] &aAdded following Tx to redis:");
             Util.colorMsg(sender, "&f&otx_"+walletAddress.subSequence(0, 10)+"..._" +TxInfo.getTxID());

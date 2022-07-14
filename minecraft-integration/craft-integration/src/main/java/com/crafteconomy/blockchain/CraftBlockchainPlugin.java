@@ -17,6 +17,7 @@ import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletSend;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletSet;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletSupply;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletWebapp;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.CraftTokenPrice;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.WalletFakeSign;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.WalletGenerateFakeTx;
 import com.crafteconomy.blockchain.listeners.JoinLeave;
@@ -131,6 +132,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         cmd.registerCommand(new String[] {"fakesign"}, new WalletFakeSign());
         cmd.registerCommand(new String[] {"allpending", "allkeys"}, new WalletOutputPendingTxs());
         cmd.registerCommand(new String[] {"mypending", "pending", "mykeys", "keys"}, new WalletMyPendingTxs());
+
+        cmd.registerCommand(new String[] {"craft", "craftprice"}, new CraftTokenPrice());
 
         // arg[0] commands which will tab complete
         cmd.addTabComplete(new String[] {"balance","setwallet","supply","send","pending","webapp"});

@@ -2,8 +2,6 @@ package com.crafteconomy.blockchain.listeners;
 
 import java.util.UUID;
 
-import com.crafteconomy.blockchain.core.request.Caches;
-import com.crafteconomy.blockchain.core.types.RequestTypes;
 import com.crafteconomy.blockchain.escrow.EscrowManager;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
