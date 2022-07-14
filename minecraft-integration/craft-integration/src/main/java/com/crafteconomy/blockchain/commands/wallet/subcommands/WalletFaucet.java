@@ -66,12 +66,13 @@ public class WalletFaucet implements SubCommand {
                 
         final String finalWallet = wallet;
         final long finalAmount = craftAmount;
-        BlockchainRequest.depositCraftToAddress(wallet, craftAmount).thenAccept(faucet_status -> {
+        final String description = "Ex Desc: cmd: /wallet faucet " + args[1] + " " + args[2] + ". FROM: " + sender.getName();
+
+        BlockchainRequest.depositCraftToAddress(wallet, description, craftAmount).thenAccept(faucet_status -> {
             // This runs in the Forked thread, not main (non blocking)
             // System.out.println("The future from WalletFaucet returned " + status);
-
             UUID userID = walletManager.getUUIDFromWallet(finalWallet);
-            Player receiver = null;
+            Player receiver = null; // TODO: How can I improve this?
             if(userID != UUID.fromString("00000000-0000-0000-0000-000000000000")) {
                 receiver = Bukkit.getPlayer(userID);
             }       

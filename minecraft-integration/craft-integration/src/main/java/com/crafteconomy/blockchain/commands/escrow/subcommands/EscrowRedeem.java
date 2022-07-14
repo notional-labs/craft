@@ -35,9 +35,9 @@ public class EscrowRedeem implements SubCommand {
         // if redeemAmount > what they have in escrow, we make the Tx match their escrow balance
         long redeemedAmount = api.escrowRedeem(player.getUniqueId(), redeemAmount);
         
-        Util.colorMsg(player, "&cINTEGRATION -> ESCROWredeem - wallet faucet not implemented yet until craft release");
-        Util.colorMsg(player, "You redeemed " + redeemedAmount + "craft tokens to your wallet");
-        Util.colorMsg(player, "If this was less than you requested, its because that is all the escrow balance you had :)");
-        return;
+        Util.colorMsg(player, "&aYou redeemed " + redeemedAmount/1_000_000 + "craft tokens to your blockchain wallet from escrow");
+        if(redeemedAmount < redeemAmount) {
+            Util.colorMsg(player, "This was less than you requested "+redeemAmount+", since you only had " + redeemedAmount/1_000_000 + "craft tokens in escrow");
+        }
     }
 }

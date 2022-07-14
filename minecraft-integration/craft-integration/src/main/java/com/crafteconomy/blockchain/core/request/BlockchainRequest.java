@@ -96,9 +96,7 @@ public class BlockchainRequest {
 
     // -= GIVING TOKENS =-
     private static final String ENDPOINT_SECRET = CraftBlockchainPlugin.getInstance().getSecret();
-
-
-    private static FaucetTypes makePostRequest(String craft_address, long ucraft_amount) {
+    private static FaucetTypes makePostRequest(String craft_address, String description, long ucraft_amount) {
         /// called by the CompletableFuture so it is made async
         if(craft_address == null) { 
             return FaucetTypes.NO_WALLET; 
@@ -108,7 +106,7 @@ public class BlockchainRequest {
         HttpURLConnection http = null;
         OutputStream stream = null;
         String msg = "";
-        String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"wallet\": \""+craft_address+"\", \"amount\": "+ucraft_amount+"}";
+        String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"description\": \""+description+"\", \"wallet\": \""+craft_address+"\", \"amount\": "+ucraft_amount+"}";
         System.out.println("depositToAddress data " + data); // TODO: Remove this from production code
         
         try {
@@ -139,12 +137,12 @@ public class BlockchainRequest {
         return FaucetTypes.FAILURE;
     }
 
-    public static CompletableFuture<FaucetTypes> depositUCraftToAddress(String craft_address, long ucraft_amount) {   
+    public static CompletableFuture<FaucetTypes> depositUCraftToAddress(String craft_address, String description, long ucraft_amount) {   
         // curl --data '{"secret": "7821719493", "wallet": "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0", "amount": 50000}' -X POST -H "Content-Type: application/json"  http://api.crafteconomy.io/v1/dao/make_payment
-        return CompletableFuture.supplyAsync(() -> makePostRequest(craft_address, ucraft_amount)).completeOnTimeout(FaucetTypes.ENDPOINT_TIMEOUT, 45, TimeUnit.SECONDS);
+        return CompletableFuture.supplyAsync(() -> makePostRequest(craft_address, description, ucraft_amount)).completeOnTimeout(FaucetTypes.ENDPOINT_TIMEOUT, 45, TimeUnit.SECONDS);
     }
-    public static CompletableFuture<FaucetTypes> depositCraftToAddress(String craft_address, long craft) {           
-        return depositUCraftToAddress(craft_address, craft*1_000_000);
+    public static CompletableFuture<FaucetTypes> depositCraftToAddress(String craft_address, String description, float craft) {           
+        return depositUCraftToAddress(craft_address, description, (long)(craft*1_000_000));
     }
 
 

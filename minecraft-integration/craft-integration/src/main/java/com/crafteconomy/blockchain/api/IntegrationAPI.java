@@ -224,8 +224,8 @@ public class IntegrationAPI {
      * @param amount
      * @return  CompletableFuture<FaucetTypes>
      */
-    public CompletableFuture<FaucetTypes> faucetUCraft(String wallet_address, long ucraft) {
-        return BlockchainRequest.depositUCraftToAddress(wallet_address, ucraft);   
+    public CompletableFuture<FaucetTypes> faucetUCraft(String wallet_address, String description, long ucraft) {
+        return BlockchainRequest.depositUCraftToAddress(wallet_address, description, ucraft);   
     }
 
     /**
@@ -235,16 +235,16 @@ public class IntegrationAPI {
      * @param amount
      * @return CompletableFuture<FaucetTypes>
      */
-    public CompletableFuture<FaucetTypes> faucetCraft(String wallet_address, float craft_amount) {
-        return faucetUCraft(wallet_address, (long) (craft_amount*1_000_000));   
+    public CompletableFuture<FaucetTypes> faucetCraft(String wallet_address, String description, float craft_amount) {
+        return faucetUCraft(wallet_address, description, (long) (craft_amount*1_000_000));   
     }
 
-    public CompletableFuture<FaucetTypes> faucetUCraft(UUID uuid, long ucraft) {
-        return BlockchainRequest.depositUCraftToAddress(walletManager.getAddress(uuid), ucraft);   
+    public CompletableFuture<FaucetTypes> faucetUCraft(UUID uuid, String description, long ucraft) {
+        return BlockchainRequest.depositUCraftToAddress(walletManager.getAddress(uuid), description, ucraft);   
     }
     
-    public CompletableFuture<FaucetTypes> faucetCraft(UUID uuid, float craft_amount) {
-        return faucetUCraft(uuid, (long) (craft_amount*1_000_000));   
+    public CompletableFuture<FaucetTypes> faucetCraft(UUID uuid, String description, float craft_amount) {
+        return faucetUCraft(uuid, description, (long) (craft_amount*1_000_000));   
     }
 
 
@@ -331,9 +331,9 @@ public class IntegrationAPI {
         return escrowUCraftDeposit(playerUUID, (long) (craft_amount * 1_000_000));
     }
 
-    public long escrowRedeem(UUID playerUUID, long amount) {
+    public long escrowRedeem(UUID playerUUID, float craft_amount) {
         // If player has enough escrow, their wallet is paid in ucraft & escrow is subtracted
-        return EscrowManager.getInstance().redeem(playerUUID, amount);
+        return EscrowManager.getInstance().redeem(playerUUID, craft_amount);
     }
 
     public EscrowErrors escrowUCraftSpend(UUID playerUUID, long ucraft_cost) {

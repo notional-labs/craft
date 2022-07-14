@@ -218,7 +218,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     }
 
     public String getSecret() {        
-        return getConfig().getString("DAO_ESCROW_ENDPOINT_SECRET"); // random string of secret characters
+        return getConfig().getString("DAO_ESCROW_ENDPOINT_SECRET"); // random string of secret characters for rest api
     }
 
     public String getApiEndpoint() {
@@ -246,6 +246,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         return SERVER_WALLET;
     }
 
+    // TODO: Remove?
     public String getTokenDenom(boolean smallerValue) {
         if(smallerValue) {
             return "ucraft";
