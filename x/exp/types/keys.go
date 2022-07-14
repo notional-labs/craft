@@ -66,7 +66,5 @@ const (
 	IBCPortID = "ibc-exp"
 )
 
-var (
-	// IBCPortKey defines the key to store the port ID in store
-	IBCPortKey = []byte{0x01}
-)
+// IBCPortKey defines the key to store the port ID in store
+var IBCPortKey = []byte{0x01}

@@ -16,9 +16,7 @@ import (
 	oracletypes "github.com/notional-labs/craft/x/oracle"
 )
 
-var (
-	_ porttypes.IBCModule = IBCModule{}
-)
+var _ porttypes.IBCModule = IBCModule{}
 
 // IBCModule implements the ICS26 interface for transfer given the transfer keeper.
 type IBCModule struct {
@@ -93,7 +91,6 @@ func (am IBCModule) OnChanOpenTry(
 	counterparty channeltypes.Counterparty,
 	counterpartyVersion string,
 ) (string, error) {
-
 	if err := ValidateChannelParams(ctx, am.keeper, order, portID, channelID); err != nil {
 		return "", err
 	}
