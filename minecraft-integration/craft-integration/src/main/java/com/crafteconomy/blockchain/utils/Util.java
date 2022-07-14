@@ -31,6 +31,7 @@ public class Util {
 	public static void logFine(String message) { logger.fine(message); }
 
 	// ---- CraftIntegration Specific ----	 
+
 	 @SuppressWarnings("deprecation")
 	 public static void clickableCopy(CommandSender sender, String ThingToCopy, String fmt, String hoverText) {
 		// allows copy paste of wallet address to clipboard, format use %value% as placeholder
