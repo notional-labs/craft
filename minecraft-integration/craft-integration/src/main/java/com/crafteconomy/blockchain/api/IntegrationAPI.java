@@ -224,7 +224,7 @@ public class IntegrationAPI {
      * @return  CompletableFuture<FaucetTypes>
      */
     public CompletableFuture<FaucetTypes> faucetUCraft(String wallet_address, long ucraft) {
-        return BlockchainRequest.depositCraftToAddress(wallet_address, ucraft);   
+        return BlockchainRequest.depositUCraftToAddress(wallet_address, ucraft);   
     }
 
     /**
@@ -236,6 +236,14 @@ public class IntegrationAPI {
      */
     public CompletableFuture<FaucetTypes> faucetCraft(String wallet_address, long craft_amount) {
         return faucetUCraft(wallet_address, craft_amount*1_000_000);   
+    }
+
+    public CompletableFuture<FaucetTypes> faucetUCraft(UUID uuid, long ucraft) {
+        return BlockchainRequest.depositUCraftToAddress(walletManager.getAddress(uuid), ucraft);   
+    }
+    
+    public CompletableFuture<FaucetTypes> faucetCraft(UUID uuid, long craft_amount) {
+        return faucetUCraft(uuid, craft_amount*1_000_000);   
     }
 
     // --------------------------------------------------
