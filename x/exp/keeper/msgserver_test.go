@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"time"
 
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/notional-labs/craft/x/exp/keeper"
 	"github.com/notional-labs/craft/x/exp/types"
@@ -483,7 +481,7 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 // 		{
 // 			fn: func() {
 // 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 // 				req := types.MsgSpendIbcAssetToExp{
 // 					FromAddress: suite.TestAccs[0].String(),
 // 					Amount: sdk.NewCoins(sdk.NewCoin("token", sdk.NewInt(1000000))),
@@ -533,16 +531,14 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 // 		}
 
 // 		msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 // 		req := types.MsgJoinDaoByIbcAsset{
 // 			JoinAddress: suite.TestAccs[0].String(),
 // 			GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
 // 			Amount: sdk.NewDec(1000000),
 // 		}
 // 		_, err := msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
-// 		suite.Require().NoError(err)		
+// 		suite.Require().NoError(err)
 // 		test.fn()
 // 	}
 // }
-
-
