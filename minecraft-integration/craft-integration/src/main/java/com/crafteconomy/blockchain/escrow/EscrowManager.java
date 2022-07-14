@@ -102,16 +102,16 @@ public class EscrowManager {
      * @param redeemAmt
      * @return Amount they redeemed, or -1 if they do not have a wallet
      */
-    public long redeem(UUID uuid, float redeemAmountCraft) {
+    public long redeemUCraft(UUID uuid, long ucraft_amount) {
         String wallet = api.getWallet(uuid);
         if (wallet == null) {
             return ErrorTypes.NO_WALLET.code;
         }
-        redeemAmountCraft = Math.abs(redeemAmountCraft); // only positive redeems
-        long ucraftAmount = (long)(redeemAmountCraft*1_000_000);
+
+        ucraft_amount = Math.abs(ucraft_amount);
 
         // max withdraw is the redeemAmt OR total amount in their wallet, which ever is less
-        long mostTheyCanRedeemUCraft = Math.min(getUCraftBalance(uuid), ucraftAmount);
+        long mostTheyCanRedeemUCraft = Math.min(getUCraftBalance(uuid), ucraft_amount);
         removeUCraftBalance(uuid, mostTheyCanRedeemUCraft);
         System.out.println("Redeeming " + (mostTheyCanRedeemUCraft / 1_000_000) + "craft from in game -> wallet via deposit");
         
@@ -123,7 +123,7 @@ public class EscrowManager {
 
             String messages = "";
             if (status_type == FaucetTypes.SUCCESS) {
-                String amt = (mostTheyCanRedeemUCraft/1_000_000) + CraftBlockchainPlugin.getInstance().getTokenDenom(false);
+                String amt = (mostTheyCanRedeemUCraft/1_000_000) + "craft";
                 messages = "You have redeemed " + amt + " from your escrow account -> wallet.\n";
                 messages += "Your new escrow balance is: " + getCraftBalance(uuid);
             } else {
@@ -137,6 +137,10 @@ public class EscrowManager {
         });
             
         return mostTheyCanRedeemUCraft;
+    }
+
+    public long redeemCraft(UUID uuid, float craft_amount) {
+        return redeemUCraft(uuid, (long) (craft_amount * 1_000_000));
     }
 
     private void setBalance(UUID uuid, long newBalance) {

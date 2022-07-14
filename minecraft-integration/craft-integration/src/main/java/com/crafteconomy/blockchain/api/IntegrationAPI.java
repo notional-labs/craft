@@ -138,15 +138,6 @@ public class IntegrationAPI {
     }
 
     /**
-     * Gets either CRAFT (false) or UCRAFT (true)
-     * @param getSmallerValue
-     * @return craft | ucraft
-     */
-    public String getTokenDenomination(boolean getSmallerValue) {
-        return blockchainPlugin.getTokenDenom(getSmallerValue);
-    }
-
-    /**
      * Gets the tax rate of the server (ex. 0.05 = 5% rate * any transaction amount (so 105% total)).
      * Is done via the webapp for you
      * @return
@@ -330,9 +321,12 @@ public class IntegrationAPI {
         return escrowUCraftDeposit(playerUUID, (long) (craft_amount * 1_000_000));
     }
 
-    public long escrowRedeem(UUID playerUUID, float craft_amount) {
+    public long escrowUCraftRedeem(UUID playerUUID, long ucraft_amount) {
         // If player has enough escrow, their wallet is paid in ucraft & escrow is subtracted
-        return EscrowManager.getInstance().redeem(playerUUID, craft_amount);
+        return EscrowManager.getInstance().redeemUCraft(playerUUID, ucraft_amount);
+    }
+    public long escrowCraftRedeem(UUID playerUUID, float craft_amount) {
+        return escrowUCraftRedeem(playerUUID, (long)(craft_amount*1_000_000));
     }
 
     public EscrowErrors escrowUCraftSpend(UUID playerUUID, long ucraft_cost) {

@@ -34,7 +34,7 @@ public class EscrowRedeem implements SubCommand {
         // takes in game CRAFT held balance & deposits into their CRAFTA wallet address account
         // if redeemAmount > what they have in escrow, we make the Tx match their escrow balance
         // async under the hood for actual payment
-        long redeemedAmount = api.escrowRedeem(player.getUniqueId(), redeemAmount);
+        long redeemedAmount = api.escrowCraftRedeem(player.getUniqueId(), redeemAmount);
         
         Util.colorMsg(player, "&7You have requested " + redeemedAmount/1_000_000 + "craft tokens to your blockchain wallet from escrow");
         Util.colorMsg(player, "&7&o((Please wait while we process your request))");
