@@ -19,7 +19,7 @@ You can read a rough overview [HERE](https://github.com/notional-labs/craft/blob
 <dependency>
     <groupId>com.crafteconomy</groupId>
     <artifactId>craft-integration</artifactId>
-    <version>4.2.0</version>
+    <version>4.2.2</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -54,8 +54,12 @@ float balance    = api.getCraftBalance(uuid);
 String swallet  = api.getServerWallet();
 
 // Will deposit money from DAO wallet -> a Players wallet
-String value    = api.faucet(uuid, longAmount);
-String value    = api.faucet(wallet_address, longAmount);
+CompletableFuture<FaucetTypes> cf = api.faucetUCraft(wallet_address, ucraft);
+CompletableFuture<FaucetTypes> cf = api.faucetUCraft(uuid, ucraft);
+
+CompletableFuture<FaucetTypes> cf = api.faucetCraft(wallet_address, craft);
+CompletableFuture<FaucetTypes> cf = api.faucetCraft(uuid, craft);
+// thenAccept(status -> {... logic here});
 
 // Gets the link to the webapp signing location
 String webappAddr = api.getWebAppAddress()
@@ -115,7 +119,7 @@ UUID toUUID      = tx.getToUUID();
 UUID txID        = tx.getTxID();
 
 long amt         = tx.getUCraftAmount();
-//float amt       = tx.getCraftAmount();
+float craft      = tx.getCraftAmount();
 
 String desc      = tx.getDescription();
 String toWallet  = tx.getToWallet();

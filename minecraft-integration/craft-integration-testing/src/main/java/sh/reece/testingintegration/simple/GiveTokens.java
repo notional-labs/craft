@@ -2,7 +2,10 @@ package sh.reece.testingintegration.simple;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
+import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.utils.Util;
+
+import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -25,26 +28,26 @@ public class GiveTokens implements CommandExecutor {
         }
 
         if(args.length != 2) {
-            Util.colorMsg(sender, "Usage: /tokensapi <player> <amount>");
+            Util.colorMsg(sender, "Usage: /test-tokensapi <player> <amount>");
             return true;
         }
 
         // Player player = (Player) sender;
 
         // SINCE CONSOLE CAN ONLY SEND COMMANDS TO PLAYERS, YOU MUST PASS THE SENDER THROUGH TO ENSURE
-
         Player player = Bukkit.getPlayer(args[0]);
 
-        String value = api.faucet(player.getUniqueId(), Long.valueOf(args[1]));
-
-        if(value != null) {
-            Util.colorMsg(sender, "Deposited " + args[1] + " to " + player.getName() + " wallet");
-            Util.colorMsg(player, "Console just gave you " + args[1] + " tokens");
-
-        } else {
-            // Console only
-            Util.logSevere("Error: This command can only be used by console. (("+args[0]+", ))");
-        }
+        CompletableFuture<FaucetTypes> value = api.faucetCraft(player.getUniqueId(), Long.valueOf(args[1]));
+        value.thenAccept(status -> {
+            switch (status) {
+                case SUCCESS:
+                    Util.colorMsg(sender, "Deposited " + args[1] + " to " + player.getName() + " wallet");
+                    Util.colorMsg(player, "Console just gave you " + args[1] + " tokens");
+                default:
+                    Util.logSevere("Error: This command can only be used by console. (("+args[0]+", ))");
+                    break;
+            }
+        });
 
         return true;
     }

@@ -16,7 +16,7 @@ import (
 
 type KeeperTestSuite struct {
 	apptesting.KeeperTestHelper
-	
+
 	queryClient types.QueryClient
 	querier     keeper.ExpKeeper
 }
@@ -25,7 +25,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.Setup()
 	suite.queryClient = types.NewQueryClient(suite.QueryHelper)
 	suite.querier = keeper.ExpKeeper{}
-
 }
 
 func (suite *KeeperTestSuite) SetupValidators(bondStatuses []stakingtypes.BondStatus) []sdk.ValAddress {

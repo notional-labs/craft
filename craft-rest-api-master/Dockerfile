@@ -1,5 +1,5 @@
 # Get Node image
-FROM node:16
+FROM node:18.3.0
 
 # Setup env
 ENV NODE_ENV=production

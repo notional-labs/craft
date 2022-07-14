@@ -1,12 +1,14 @@
 package com.crafteconomy.blockchain.api;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.request.BlockchainRequest;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.escrow.EscrowErrors;
 import com.crafteconomy.blockchain.escrow.EscrowManager;
 import com.crafteconomy.blockchain.transactions.Tx;
@@ -216,33 +218,33 @@ public class IntegrationAPI {
     }
 
     /**
+     * Gives a wallet some tokens (UCRAFT) 
+     * @param wallet_address
+     * @param amount
+     * @return  CompletableFuture<FaucetTypes>
+     */
+    public CompletableFuture<FaucetTypes> faucetUCraft(String wallet_address, long ucraft) {
+        return BlockchainRequest.depositUCraftToAddress(wallet_address, ucraft);   
+    }
+
+    /**
      * Gives a wallet some tokens (CRAFT) 
      * @param consoleSender
      * @param player_uuid
      * @param amount
-     * @return  "" if faucet is disabled, 
-     *          or {"transfers":[{"coin":"1token","status":"ok"}]}
-     *          or "NO_WALLET" if wallet is null
+     * @return CompletableFuture<FaucetTypes>
      */
-    public String faucet(String wallet_address, long amount) {
-        // {"transfers":[{"coin":"1token","status":"ok"}]}
-        return BlockchainRequest.depositToAddress(wallet_address, amount);
+    public CompletableFuture<FaucetTypes> faucetCraft(String wallet_address, long craft_amount) {
+        return faucetUCraft(wallet_address, craft_amount*1_000_000);   
     }
 
-    /**
-     * Gives a player's wallet some tokens (CRAFT)
-     * @param consoleSender
-     * @param player_uuid
-     * @param amount
-     * @return  "" if faucet is disabled, 
-     *          or {"transfers":[{"coin":"1token","status":"ok"}]}
-     *          or "NO_WALLET" if wallet is null
-     */
-    public String faucet(UUID player_uuid, long amount) {
-        // {"transfers":[{"coin":"1token","status":"ok"}]}
-        return faucet(walletManager.getAddress(player_uuid), amount);
+    public CompletableFuture<FaucetTypes> faucetUCraft(UUID uuid, long ucraft) {
+        return BlockchainRequest.depositUCraftToAddress(walletManager.getAddress(uuid), ucraft);   
     }
-
+    
+    public CompletableFuture<FaucetTypes> faucetCraft(UUID uuid, long craft_amount) {
+        return faucetUCraft(uuid, craft_amount*1_000_000);   
+    }
 
     // --------------------------------------------------
     // clickable links / commands / TxId's to make user life better

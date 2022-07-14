@@ -10,6 +10,6 @@ func (k ExpKeeper) OnOracleRequestTimeoutPacket(
 	ctx sdk.Context,
 	data oracletypes.OracleRequestPacketData,
 ) error {
-	//TODO: need implement
+	// TODO: need implement
 	return nil
 }

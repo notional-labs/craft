@@ -14,14 +14,15 @@ import realestateRouter from './routes/realestate.route';
 import nftmarketplaceRouter from './routes/nftmarketplace.route';
 import nftsRouter from './routes/nfts.route';
 import skinsRouter from './routes/skins.route';
+import daoRouter from './routes/dao.route';
 
-// Initialises env variables
+// Initializes env variables
 config();
 
 // Variables
-const { API_PORT, DB_CONN_STRING, DB_NAME, REDIS_CONN_STRING } = process.env;
+const { API_PORT, DB_CONN_STRING, DB_NAME, REDIS_CONN_STRING, DAO_EXP_MODULE_ONLY } = process.env;
 
-// API initialisation
+// API initialization
 const app = express();
 
 // Middlewares
@@ -29,44 +30,61 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Database
-connectToMongo(DB_CONN_STRING, DB_NAME);
+// Cache
 connectToRedis(REDIS_CONN_STRING);
 
-// Setup routers
-app.use('/v1/statistics', statisticsRouter);
-app.use('/v1/connections', connectionsRouter);
-app.use('/v1/tx', transactionsRouter);
-app.use('/v1/marketplace', nftmarketplaceRouter)
-app.use('/v1/realestate', realestateRouter)
-app.use('/v1/nfts', nftsRouter)
-app.use('/v1/skins', skinsRouter)
-
-
+//  routers
 var ROUTER_CACHE = {};
+
+// Setup DAO/EXP module only for price oracle
+if(DAO_EXP_MODULE_ONLY && DAO_EXP_MODULE_ONLY.toLowerCase().startsWith('t')) {
+    console.log(`DAO_EXP_MODULE_ONLY is ${DAO_EXP_MODULE_ONLY}`);
+    app.use('/v1/dao', daoRouter)
+} else {
+    // we only need MOngoDB if we use all the routes, excluding DAO/EXP
+    connectToMongo(DB_CONN_STRING, DB_NAME);
+    // Setup all routers (including the DAO)
+    app.use('/v1/statistics', statisticsRouter);
+    app.use('/v1/connections', connectionsRouter);
+    app.use('/v1/tx', transactionsRouter);
+    app.use('/v1/marketplace', nftmarketplaceRouter)
+    app.use('/v1/realestate', realestateRouter)
+    app.use('/v1/nfts', nftsRouter)
+    app.use('/v1/skins', skinsRouter)
+    app.use('/v1/dao', daoRouter)
+}
+
+
 
 // Sends all our API endpoints
 app.get('/', (req, res) => {
     if(Object.keys(ROUTER_CACHE).length === 0) {
-        // console.log('ROUTER_CACHE was empty, setting to newest routes');
+
+        // there has to be a better way to do this..
         const urlStart = `${req.protocol}://${req.get('host')}`
-        // get all routes from statisticsRouter
-        const statisticsRoutes = statisticsRouter.stack.map(({ route }) => `${urlStart}/v1/statistics` + route.path)
-        const connectionsRoutes = connectionsRouter.stack.map(({ route }) => `${urlStart}/v1/connections` + route.path)
-        const transactionsRoutes = transactionsRouter.stack.map(({ route }) => `${urlStart}/v1/tx` + route.path)
-        const nftmarketplaceRouters = nftmarketplaceRouter.stack.map(({ route }) => `${urlStart}/v1/marketplace` + route.path)
-        const nftsRoutes = nftsRouter.stack.map(({ route }) => `${urlStart}/v1/nfts` + route.path)
-        const realestateRoutes = realestateRouter.stack.map(({ route }) => `${urlStart}/v1/realestate` + route.path)
-        const skinsRoutes = skinsRouter.stack.map(({ route }) => `${urlStart}/v1/skins` + route.path)
-        
-        ROUTER_CACHE = {
-            statistics: statisticsRoutes,
-            connections: connectionsRoutes,
-            transactions: transactionsRoutes,            
-            nftmarketplace: nftmarketplaceRouters,
-            nfts: nftsRoutes,
-            realestate: realestateRoutes,
-            skins: skinsRoutes
+        if(DAO_EXP_MODULE_ONLY && DAO_EXP_MODULE_ONLY.toLowerCase().startsWith('t')) {
+            const daoRoutes = daoRouter.stack.map(({ route }) => `${urlStart}/v1/dao` + route.path)
+            ROUTER_CACHE = { dao: daoRoutes }
+        } else {
+            // Setup all endpoints, including the DAO endpoint
+            const statisticsRoutes = statisticsRouter.stack.map(({ route }) => `${urlStart}/v1/statistics` + route.path)
+            const connectionsRoutes = connectionsRouter.stack.map(({ route }) => `${urlStart}/v1/connections` + route.path)
+            const transactionsRoutes = transactionsRouter.stack.map(({ route }) => `${urlStart}/v1/tx` + route.path)
+            const nftmarketplaceRouters = nftmarketplaceRouter.stack.map(({ route }) => `${urlStart}/v1/marketplace` + route.path)
+            const nftsRoutes = nftsRouter.stack.map(({ route }) => `${urlStart}/v1/nfts` + route.path)
+            const realestateRoutes = realestateRouter.stack.map(({ route }) => `${urlStart}/v1/realestate` + route.path)
+            const skinsRoutes = skinsRouter.stack.map(({ route }) => `${urlStart}/v1/skins` + route.path)
+            const daoRoutes = daoRouter.stack.map(({ route }) => `${urlStart}/v1/dao` + route.path)            
+            ROUTER_CACHE = {
+                statistics: statisticsRoutes,
+                connections: connectionsRoutes,
+                transactions: transactionsRoutes,            
+                nftmarketplace: nftmarketplaceRouters,
+                nfts: nftsRoutes,
+                realestate: realestateRoutes,
+                skins: skinsRoutes,
+                dao: daoRoutes
+            }
         }
     }
 

@@ -1,12 +1,19 @@
 package com.crafteconomy.blockchain.core.request;
 
-import java.io.IOException;
-import java.math.BigDecimal;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
+import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.core.types.RequestTypes;
 import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.storage.RedisManager;
@@ -14,8 +21,8 @@ import com.crafteconomy.blockchain.transactions.PendingTransactions;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -90,69 +97,57 @@ public class BlockchainRequest {
         return EndpointQuery.req(req_url, RequestTypes.ACCOUNT, "Account Sequence Request").toString();
     }
 
-    public static int acc_seq_override = 0;
-
     // -= GIVING TOKENS =-
-    public static String depositToAddress(String craft_address, long ucraft_amount) {        
-        if(craft_address == null) {
-            return "NO_WALLET";
+    private static final String ENDPOINT_SECRET = CraftBlockchainPlugin.getInstance().getSecret();
+
+
+    private static FaucetTypes makePostRequest(String craft_address, long ucraft_amount) {
+        /// called by the CompletableFuture so it is made async
+        if(craft_address == null) { 
+            return FaucetTypes.NO_WALLET; 
         }
-        // TODO: Hook into our API for payment of ucraft -> player
+
+        URL url = null;
+        HttpURLConnection http = null;
+        OutputStream stream = null;
+        String msg = "";
+        String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"wallet\": \""+craft_address+"\", \"amount\": "+ucraft_amount+"}";
+        System.out.println("depositToAddress data " + data); // TODO: Remove this from production code
         
-        /*
-        TO NOT USE THESE MONIKERS, THEY ARE ONLY FOR PRIVATE TESTING
-        # Server Wallet to give players funds
-        craftd keys add daowallet --recover --keyring-backend test 
-        multiply security charge attack minor logic staff belt want mixture sick rebuild sadness canvas twelve mango embark emotion bulb popular remind rebel circle blouse
-        # craft1s4yczg3zgr4qdxussx3wpgezangh2388xgkkz9 -- 
-
-        # Testing that the send actually worked
-        craftd keys add playerwallet --recover --keyring-backend test
-        treat draft tip empty disorder gain symptom harbor pride motion twin right pony car bubble fantasy tube supply amused nut strong service useless expose
-        # craft12gr56gv009h8hq30k5xfv7agl2d8xa8u2ag7e4
-
-        
-        craftd tx bank send daowallet craft12gr56gv009h8hq30k5xfv7agl2d8xa8u2ag7e4 4ucraft --keyring-backend test --yes --chain-id craft-v4 --node http://65.108.125.182:26657 --sequence $(craftd q account craft1s4yczg3zgr4qdxussx3wpgezangh2388xgkkz9 --node http://65.108.125.182:26657 --output json | jq '.sequence' | sed 's/\"//g')
-        craftd q bank balances craft12gr56gv009h8hq30k5xfv7agl2d8xa8u2ag7e4 --node http://65.108.125.182:26657
-        */
-
-        // when overridden, its because the sequence is off due to pending txs
-        int acc_seq;
-        if(acc_seq_override == 0) {
-            acc_seq = Integer.valueOf(getAccountSequence("craft1s4yczg3zgr4qdxussx3wpgezangh2388xgkkz9")); // DAO wallet. make sure to set in config
-        } else {
-            // override blockchain query to the correct value (if a code 32 happens)
-            acc_seq = acc_seq_override;
-            acc_seq_override = 0;
-        }
-        System.out.println("Account Sequence for DAO Wallet craft1s4yczg3zgr4qdxussx3wpgezangh2388xgkkz9: " + acc_seq);
-         
-       
-
-        // pay the user & set sequence as 1 higher than the wallets current sequence.
-        String[] args = ("craftd tx bank send daowallet " + craft_address + " " + ucraft_amount + "ucraft --keyring-backend test --yes --chain-id craft-v4 --node http://65.108.125.182:26657 --sequence " + (acc_seq)).split(" ");
         try {
-            // get the Tx hash here to prove it worked?
-            Process process = new ProcessBuilder(args).start();
-            String result = new String(process.getInputStream().readAllBytes());
-            System.out.println(result);
+            url = new URL("http://api.crafteconomy.io/v1/dao/make_payment");
+            http = (HttpURLConnection)url.openConnection();
+            http.setRequestMethod("POST");
+            http.setDoOutput(true);
+            http.setRequestProperty("Content-Type", "application/json");
 
-            // if the account seq is off (32) then set it to the raw logs correct value of what it expected
-            if(result.startsWith("code: 32")) {
-                // raw_log: 'account sequence mismatch, expected 13, got 12: incorrect account sequence'
-                acc_seq_override = Integer.valueOf(StringUtils.substringBetween(result, ", expected ", ", got "));
-                depositToAddress(craft_address, ucraft_amount);
-            }
-            // code: 19 - already in mem pool
+            byte[] out = data.getBytes(StandardCharsets.UTF_8);
+            stream = http.getOutputStream();                    
+            stream.write(out);
 
-            String r2 = new String(process.getErrorStream().readAllBytes());
-            System.out.println(r2);
+            msg = http.getResponseMessage();
+            System.out.println("depositToAddress code: " + http.getResponseCode() + " | msg: " + msg);
+            http.disconnect();
 
-            return "SUCCESS"; // return txhash in future            
-        } catch (IOException e) {
-            e.printStackTrace();            
+            if(http.getResponseCode() == 200) {
+                System.out.println("Successful payment!");                
+                return FaucetTypes.SUCCESS;
+            } else {
+                System.out.println("Failed payment!");
+                return FaucetTypes.FAILURE;
+            }                    
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return "FAILED";
+        return FaucetTypes.FAILURE;
+    }
+
+    public static CompletableFuture<FaucetTypes> depositUCraftToAddress(String craft_address, long ucraft_amount) {   
+        // curl --data '{"secret": "7821719493", "wallet": "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0", "amount": 50000}' -X POST -H "Content-Type: application/json"  http://api.crafteconomy.io/v1/dao/make_payment
+        return CompletableFuture.supplyAsync(() -> makePostRequest(craft_address, ucraft_amount)).completeOnTimeout(FaucetTypes.ENDPOINT_TIMEOUT, 45, TimeUnit.SECONDS);
+    }
+    public static CompletableFuture<FaucetTypes> depositCraftToAddress(String craft_address, long craft) {           
+        return depositUCraftToAddress(craft_address, craft*1_000_000);
     }
 
 
