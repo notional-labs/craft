@@ -24,8 +24,9 @@ import com.crafteconomy.blockchain.listeners.JoinLeave;
 import com.crafteconomy.blockchain.storage.MongoDB;
 import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.transactions.PendingTransactions;
-import com.crafteconomy.blockchain.transactions.events.RedisKeyListener;
-import com.crafteconomy.blockchain.transactions.events.SignedTxCheckListner;
+import com.crafteconomy.blockchain.transactions.listeners.ExpiredTransactionListener;
+import com.crafteconomy.blockchain.transactions.listeners.RedisKeyListener;
+import com.crafteconomy.blockchain.transactions.listeners.SignedTxCheckListner;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
@@ -154,6 +155,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new JoinLeave(), this);  
         getServer().getPluginManager().registerEvents(new SignedTxCheckListner(), this);
+        getServer().getPluginManager().registerEvents(new ExpiredTransactionListener(), this);
 
 
         // We dont want to crash main server thread. Running sync crashes main server thread
@@ -164,7 +166,9 @@ public class CraftBlockchainPlugin extends JavaPlugin {
             public void run() {      
                 Util.logSevere("Starting Redis PubSub Client");                          
                 // Webapp sends this request after the Tx has been signed
-                jedisPubSubClient.psubscribe(keyListener, "__key*__:signed_*");                
+                // jedisPubSubClient.psubscribe(keyListener, "__key*__:signed_*"); 
+                // jedisPubSubClient.psubscribe(keyListener, "__keyevent@*__:expire*"); // gets expired keys from redis (after Tx is removed), so we can remove from pending
+                jedisPubSubClient.psubscribe(keyListener, "*");  // __keyevent@*__:expire* 
             }
         });
         

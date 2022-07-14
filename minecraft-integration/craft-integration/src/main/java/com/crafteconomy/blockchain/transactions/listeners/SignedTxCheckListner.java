@@ -1,4 +1,4 @@
-package com.crafteconomy.blockchain.transactions.events;
+package com.crafteconomy.blockchain.transactions.listeners;
 
 import java.util.Set;
 import java.util.UUID;
@@ -7,6 +7,7 @@ import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.transactions.PendingTransactions;
 import com.crafteconomy.blockchain.transactions.Tx;
+import com.crafteconomy.blockchain.transactions.events.SignedTransactionEvent;
 import com.crafteconomy.blockchain.utils.Util;
 
 import org.bukkit.event.EventHandler;
@@ -79,6 +80,7 @@ public class SignedTxCheckListner implements Listener {
         }
     }
 
+    // TODO: CompleteableFuture
     private static boolean doesDataMatchTransaction(String tendermintHash, String expectedToAddress, long expectedAmount, String expectedMemo) {
         boolean transactionDataMatches = false;        
         try {

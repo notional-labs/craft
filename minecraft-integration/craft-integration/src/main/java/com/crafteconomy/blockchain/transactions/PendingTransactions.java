@@ -48,8 +48,7 @@ public class PendingTransactions {
                 // String value = jedis.get(key);
 
                 jedis.keys(key).forEach(k -> {
-                    // jedis.del(key);
-                    jedis.unlink(k); // better for larger values, which the JSON Object may be
+                    jedis.unlink(k); // deletes the key
                     Util.logSevere("[PendingTxs.java] Removed " + key + " from redis");
                 });  
             }

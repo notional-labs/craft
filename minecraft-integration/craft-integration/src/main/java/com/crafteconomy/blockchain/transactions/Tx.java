@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.core.types.TransactionType;
@@ -26,6 +27,7 @@ public class Tx implements Serializable {
     private static IntegrationAPI api = IntegrationAPI.getInstance();
     private static WalletManager walletManager = WalletManager.getInstance();
     
+    
     private UUID fromUUID;
     private UUID toUUID; // for BiConsumer only
 
@@ -38,6 +40,14 @@ public class Tx implements Serializable {
     private BiConsumer<UUID, UUID> biFunction = null;
 
     private String toWallet;
+
+    // redis TTL minutes for expiring the transaction
+    private int redisMinuteTTL = CraftBlockchainPlugin.getRedisMinuteTTL(); // setTimeout()
+
+    // set a consumer to run after the timeout (redisMinuteTTL) is reached (useful for reverting a Tx which was not signed, like for trading)
+    // It passes through the users to the consumers as it would normally (Consumer(getFromUUID()) & biConsumer(getFromUUID(), getToUUID()))
+    private Consumer<UUID> consumerOnExpire = null; 
+    private BiConsumer<UUID, UUID> biConsumerOnExpire = null;
     
     // since the chain works in ints/longs, we save the Tx data as the ucraft variant
     // there are helper functions to getCraftAmount() and setCraftAmount() which auto convert to this value
@@ -134,7 +144,7 @@ public class Tx implements Serializable {
     /**
      * Submit the transaction to redis for the webapp to sign & send link to sign it
      */
-    public ErrorTypes submit() {
+    public ErrorTypes submit() {        
         ErrorTypes returnType = api.submit(this);
         if(returnType == ErrorTypes.SUCCESS) {
             Player player = Bukkit.getPlayer(this.fromUUID);

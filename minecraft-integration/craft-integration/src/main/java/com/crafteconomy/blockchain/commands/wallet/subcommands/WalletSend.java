@@ -80,8 +80,9 @@ public class WalletSend implements SubCommand {
         txInfo.setCraftAmount(CRAFT_AMOUNT);
         txInfo.setDescription(player.getName() + " sent " + CRAFT_AMOUNT + " to " + args[1]);
         txInfo.setFunction(getConsumerMessage("&a&lSUCCESS: &fYou have sent " + CRAFT_AMOUNT + "CRAFT to " + args[1]));
+        txInfo.setRedisMinuteTTL(RedisMinuteTTL);
 
-        ErrorTypes error = BlockchainRequest.transaction(txInfo, RedisMinuteTTL);
+        ErrorTypes error = BlockchainRequest.transaction(txInfo);
 
         if(error != ErrorTypes.SUCCESS) {
             Util.colorMsg(sender, "&c&lERROR: &f" + error.toString());

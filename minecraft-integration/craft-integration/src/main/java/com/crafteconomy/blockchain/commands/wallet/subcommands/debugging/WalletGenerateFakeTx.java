@@ -35,6 +35,7 @@ public class WalletGenerateFakeTx implements SubCommand {
             player.sendMessage("Usage: /wallet genfaketx <license/purchase>");
             player.sendMessage("license = business license example");
             player.sendMessage("purchase = purchase item example");
+            player.sendMessage("expire = create Tx but then it will expire & that code run");
             return;
         }
 
@@ -47,6 +48,7 @@ public class WalletGenerateFakeTx implements SubCommand {
         // , "test TX Method", Examples.purchaseBusinessLicense()
         Tx TxInfo = new Tx();
         TxInfo.setFromUUID(player.getUniqueId());
+        TxInfo.setRedisMinuteTTL(RedisMinuteTTL);
 
         String desc = null;
         String itemToPurchase = "<PlaceholderItemText>";
@@ -56,6 +58,16 @@ public class WalletGenerateFakeTx implements SubCommand {
             TxInfo.setTxType(TransactionType.COMPANY);
             desc = "Purchase Business License for 2";
             TxInfo.setCraftAmount(2);
+
+        } else if(args[1].equalsIgnoreCase("expire")) {
+
+            TxInfo.setFunction(Examples.purchaseBusinessLicense());
+            TxInfo.setTxType(TransactionType.DEFAULT);
+            desc = "Example Tx which exires with code run in 1 min";
+            TxInfo.setCraftAmount(3);
+            TxInfo.setRedisMinuteTTL(1);
+            TxInfo.setConsumerOnExpire(Examples.revertSomeActionOnExpire());
+
         } else {
             if(args.length >= 3) { 
                 itemToPurchase = Util.argsToSingleString(2, args); 
@@ -68,13 +80,13 @@ public class WalletGenerateFakeTx implements SubCommand {
         }
 
         TxInfo.setDescription(desc);
+        
 
         TxInfo.setToWallet(walletAddress);
         
        
-        
         try (Jedis jedis = redis.getRedisConnection()) {
-            ErrorTypes error = BlockchainRequest.transaction(TxInfo, RedisMinuteTTL);
+            ErrorTypes error = BlockchainRequest.transaction(TxInfo);
             if(error != ErrorTypes.SUCCESS) {
                 // code
             }

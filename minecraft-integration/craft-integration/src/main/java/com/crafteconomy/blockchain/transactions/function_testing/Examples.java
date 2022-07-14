@@ -33,6 +33,16 @@ public class Examples implements Serializable {
     }
 
 
+    @SuppressWarnings("deprecation")
+    public static Consumer<UUID> revertSomeActionOnExpire() {
+        Consumer<UUID> purchase = (uuid) -> {                   
+            String name = getNameIfOnline(uuid);            
+            Bukkit.broadcastMessage("[EXPIRED] Tx expired in redis, so this code ran as ex: " + name + " (" + uuid.toString() + ")\n");                
+        };
+        return purchase;
+    }
+
+
 
     private static String getNameIfOnline(UUID uuid) {
         String playername = "";

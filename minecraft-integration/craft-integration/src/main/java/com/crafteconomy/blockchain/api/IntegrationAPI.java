@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 public class IntegrationAPI {
 
     WalletManager walletManager = WalletManager.getInstance();
-    private int RedisMinuteTTL = CraftBlockchainPlugin.getRedisMinuteTTL();
 
     private CraftBlockchainPlugin blockchainPlugin;
 
@@ -214,8 +213,8 @@ public class IntegrationAPI {
      * @param tx    Transaction to submit
      * @return      The ErrorTypes of the transaction status
      */
-    public ErrorTypes submit(Tx tx) {
-        return BlockchainRequest.transaction(tx, RedisMinuteTTL);
+    public ErrorTypes submit(Tx tx) { // TTL is done within the Tx itself
+        return BlockchainRequest.transaction(tx);
     }
 
     /**

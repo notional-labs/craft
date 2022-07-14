@@ -8,6 +8,8 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
@@ -198,7 +200,7 @@ public class BlockchainRequest {
 
     private static PendingTransactions pTxs = PendingTransactions.getInstance();
 
-    public static ErrorTypes transaction(Tx transaction, int RedisMinuteTTL) {
+    public static ErrorTypes transaction(Tx transaction) {
         // int minuteTTL = 30;
 
         // IF we are in dev mode, don't try to send request to the blockchain, just do the transactions
@@ -228,6 +230,10 @@ public class BlockchainRequest {
         String desc = transaction.getDescription();
         TransactionType txType = transaction.getTxType(); // used for webapp
 
+        int redisMinuteTTL = transaction.getRedisMinuteTTL(); // minutes till this transaction should be: rm from redis, rm from pending, run the following:
+        Consumer<UUID> runOnExpire = transaction.getConsumerOnExpire(); // check these are not null,
+        BiConsumer<UUID, UUID> runOnBiExpire = transaction.getBiConsumerOnExpire();
+
         
         org.json.JSONObject jsonObject;
         try {
@@ -241,7 +247,7 @@ public class BlockchainRequest {
        }
        
         pTxs.addPending(transaction.getTxID(), transaction);     
-        redisDB.submitTxForSigning(from, TxID, jsonObject.toString(), RedisMinuteTTL);
+        redisDB.submitTxForSigning(from, TxID, jsonObject.toString(), redisMinuteTTL);
         
         return ErrorTypes.SUCCESS;
     }
