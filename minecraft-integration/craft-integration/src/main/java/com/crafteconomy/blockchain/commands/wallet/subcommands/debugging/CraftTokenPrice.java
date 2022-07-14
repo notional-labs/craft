@@ -16,7 +16,7 @@ public class CraftTokenPrice implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
 
-        api.getCraftTokenPrice().thenAccept(price -> {
+        api.getCraftUSDPrice().thenAccept(price -> {
             if(price > 0) {
                 Util.colorMsg(sender, "\n&a&lCRAFT TOKEN PRICE: &f$" + price);
             } else {
