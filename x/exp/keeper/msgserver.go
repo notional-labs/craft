@@ -189,7 +189,7 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 	return &types.MsgSpendIbcAssetToExpResponse{}, nil
 }
 
-// NEED REMOVE WHEN ORACLE DONE
+// NEED REMOVE WHEN ORACLE DONE.
 func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDaoTokenPrice) (*types.MsgAdjustDaoTokenPriceResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

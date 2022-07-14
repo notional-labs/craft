@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewOracleRequestPacketData constructs a new OracleRequestPacketData instance
+// NewOracleRequestPacketData constructs a new OracleRequestPacketData instance.
 func NewOracleRequestPacketData(
 	clientID string, oracleScriptID OracleScriptID, calldata []byte, askCount uint64, minCount uint64, feeLimit sdk.Coins, prepareGas uint64, executeGas uint64,
 ) OracleRequestPacketData {
@@ -20,7 +20,7 @@ func NewOracleRequestPacketData(
 	}
 }
 
-// GetBytes is a helper for serialising
+// GetBytes is a helper for serialising.
 func (p OracleRequestPacketData) GetBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&p))
 }
