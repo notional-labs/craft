@@ -104,7 +104,7 @@ public class IntegrationAPI {
      * @param craft_amount
      * @return
      */
-    public long convertCraftToUCRAFT(long craft_amount) {
+    public long convertCraftToUCRAFT(float craft_amount) {
         return (long)craft_amount * 1_000_000;
     }
 
@@ -235,16 +235,16 @@ public class IntegrationAPI {
      * @param amount
      * @return CompletableFuture<FaucetTypes>
      */
-    public CompletableFuture<FaucetTypes> faucetCraft(String wallet_address, long craft_amount) {
-        return faucetUCraft(wallet_address, craft_amount*1_000_000);   
+    public CompletableFuture<FaucetTypes> faucetCraft(String wallet_address, float craft_amount) {
+        return faucetUCraft(wallet_address, (long) (craft_amount*1_000_000));   
     }
 
     public CompletableFuture<FaucetTypes> faucetUCraft(UUID uuid, long ucraft) {
         return BlockchainRequest.depositUCraftToAddress(walletManager.getAddress(uuid), ucraft);   
     }
     
-    public CompletableFuture<FaucetTypes> faucetCraft(UUID uuid, long craft_amount) {
-        return faucetUCraft(uuid, craft_amount*1_000_000);   
+    public CompletableFuture<FaucetTypes> faucetCraft(UUID uuid, float craft_amount) {
+        return faucetUCraft(uuid, (long) (craft_amount*1_000_000));   
     }
 
 
