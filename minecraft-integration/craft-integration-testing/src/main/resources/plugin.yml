@@ -37,3 +37,11 @@ commands:
   test-escrowspend:
     description: send keplr link to setup
     usage: /<command>  
+
+  test-craftusd:
+    description: get usd price of craft
+    usage: /<command>  
+
+  test-expire:
+    description: expires a tx & then runs the logic for it after 1 min
+    usage: /<command>  

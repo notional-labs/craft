@@ -6,7 +6,7 @@
 
   <groupId>sh.reece</groupId>
   <artifactId>craft-integration-testing</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2.1</version>
   <name>craft-integration-test-plugin</name>
 
   <properties>
@@ -32,7 +32,7 @@
     <dependency>
 	    <groupId>com.crafteconomy</groupId>
 	    <artifactId>craft-integration</artifactId>
-	    <version>4.2.2</version>
+	    <version>4.3.0</version>
         <scope>provided</scope>
 	</dependency>
 

@@ -6,13 +6,13 @@ import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 
+import sh.reece.testingintegration.Logic;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-
-import sh.reece.testingintegration.callbacks.Logic;
 
 
 public class MyExampleTransaction implements CommandExecutor {
@@ -52,6 +52,8 @@ public class MyExampleTransaction implements CommandExecutor {
             txinfo.setCraftAmount(10);
             txinfo.setDescription("Describe what it does here");
             txinfo.setFunction(Logic.purchaseBusinessLicense());
+            
+            txinfo.setRedisMinuteTTL(15);            
 
             txinfo.setIncludeTxClickable(false);
             txinfo.setSendDescMessage(false);

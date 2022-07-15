@@ -37,8 +37,7 @@ public class GiveTokens implements CommandExecutor {
         // SINCE CONSOLE CAN ONLY SEND COMMANDS TO PLAYERS, YOU MUST PASS THE SENDER THROUGH TO ENSURE
         Player player = Bukkit.getPlayer(args[0]);
 
-        CompletableFuture<FaucetTypes> value = api.faucetCraft(player.getUniqueId(), Long.valueOf(args[1]));
-        value.thenAccept(status -> {
+        api.faucetCraft(player.getUniqueId(), "Giving Tokens Example test-plugin", Long.valueOf(args[1])).thenAccept(status -> {
             switch (status) {
                 case SUCCESS:
                     Util.colorMsg(sender, "Deposited " + args[1] + " to " + player.getName() + " wallet");

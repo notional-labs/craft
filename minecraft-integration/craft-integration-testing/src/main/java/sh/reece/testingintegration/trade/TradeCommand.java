@@ -9,6 +9,8 @@ import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 
+import sh.reece.testingintegration.Logic;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,9 +18,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import sh.reece.testingintegration.callbacks.Logic;
-
 // Shows how P2P should work [when blockchain is required in transaction]
+
+// !If the server holds items for the pending transaction, make sure to set a reasonable time limit & logic for if the user doesn't sign
+// !IMPORTANT: View example in ExpiredTransaction.java
+
+// Only 1 user should sign (the 'net' sender of craft coins)
+// Ex: Reece trades 1 craft + 1 diamond to Chalabi
+// Chalabi trades 2 craft & 1 dirt to Reece.
+// This means net, Chalabi sends 1 craft to reece, so he is the signer of the Tx.
+// If net = 0, no signing is needed the transaction can just happen.
 
 public class TradeCommand implements CommandExecutor {
 

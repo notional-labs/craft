@@ -5,7 +5,6 @@ import java.util.UUID;
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.escrow.EscrowErrors;
-import com.crafteconomy.blockchain.utils.Util;
 
 import org.bukkit.Material;
 import org.bukkit.command.Command;

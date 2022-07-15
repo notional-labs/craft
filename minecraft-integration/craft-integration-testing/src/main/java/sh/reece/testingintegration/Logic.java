@@ -1,4 +1,4 @@
-package sh.reece.testingintegration.callbacks;
+package sh.reece.testingintegration;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -46,6 +46,14 @@ public class Logic {
             p2.updateInventory();
         };
         return trading;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Consumer<UUID> expireLogic() {
+        Consumer<UUID> purchase = (uuid) -> {  
+            Bukkit.broadcastMessage("[!] EXPIRE: The Transaction Expired before you could sign it, looks like this worked!\n"); 
+        };
+        return purchase;
     }
 
 
