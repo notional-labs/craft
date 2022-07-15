@@ -146,7 +146,7 @@ func (suite *KeeperTestSuite) TestJoinDaoByIbcAsset() {
 
 				suite.Ctx = suite.Ctx.WithBlockTime(suite.Ctx.BlockTime().Add(time.Second))
 				_, err = msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
-				suite.Require().NoError(err)
+				suite.Require().Error(err)
 			},
 		},
 
