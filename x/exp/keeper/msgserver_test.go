@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	abci "github.com/tendermint/tendermint/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/notional-labs/craft/x/exp/keeper"
 	"github.com/notional-labs/craft/x/exp/types"
@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	defaultAcctFunds  sdk.Coins = sdk.NewCoins(
+	defaultAcctFunds sdk.Coins = sdk.NewCoins(
 		sdk.NewCoin("token", sdk.NewInt(10000000)),
 	)
 	daoAddress = "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
@@ -28,11 +28,11 @@ func (suite *KeeperTestSuite) TestJoinDaoByNonIbcAsset() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgJoinDaoByNonIbcAsset{
 					JoinAddress: suite.TestAccs[0].String(),
-					GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-					MaxToken: 1000000,
+					GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+					MaxToken:    1000000,
 				}
 				_, err := msgServer.JoinDaoByNonIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().NoError(err)
@@ -48,11 +48,11 @@ func (suite *KeeperTestSuite) TestJoinDaoByNonIbcAsset() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgJoinDaoByNonIbcAsset{
 					JoinAddress: suite.TestAccs[0].String(),
-					GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-					MaxToken: 1000000,
+					GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+					MaxToken:    1000000,
 				}
 				_, err := msgServer.JoinDaoByNonIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().NoError(err)
@@ -66,11 +66,11 @@ func (suite *KeeperTestSuite) TestJoinDaoByNonIbcAsset() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgJoinDaoByNonIbcAsset{
 					JoinAddress: "",
-					GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-					MaxToken: 1000000,
+					GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+					MaxToken:    1000000,
 				}
 				_, err := msgServer.JoinDaoByNonIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -81,11 +81,11 @@ func (suite *KeeperTestSuite) TestJoinDaoByNonIbcAsset() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgJoinDaoByNonIbcAsset{
 					JoinAddress: suite.TestAccs[0].String(),
-					GovAddress: suite.TestAccs[1].String(),
-					MaxToken: 1000000,
+					GovAddress:  suite.TestAccs[1].String(),
+					MaxToken:    1000000,
 				}
 				_, err := msgServer.JoinDaoByNonIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -99,7 +99,6 @@ func (suite *KeeperTestSuite) TestJoinDaoByNonIbcAsset() {
 		for _, acc := range suite.TestAccs {
 			suite.FundAcc(acc, defaultAcctFunds)
 		}
-		
 
 		test.fn()
 	}
@@ -113,11 +112,11 @@ func (suite *KeeperTestSuite) TestJoinDaoByIbcAsset() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgJoinDaoByIbcAsset{
 					JoinAddress: suite.TestAccs[0].String(),
-					GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-					Amount: sdk.NewDec(1000000),
+					GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+					Amount:      sdk.NewDec(1000000),
 				}
 				_, err := msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().NoError(err)
@@ -136,17 +135,18 @@ func (suite *KeeperTestSuite) TestJoinDaoByIbcAsset() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgJoinDaoByIbcAsset{
 					JoinAddress: suite.TestAccs[0].String(),
-					GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-					Amount: sdk.NewDec(1000000),
+					GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+					Amount:      sdk.NewDec(1000000),
 				}
 				_, err := msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().NoError(err)
+
 				suite.Ctx = suite.Ctx.WithBlockTime(suite.Ctx.BlockTime().Add(time.Second))
 				_, err = msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
-				suite.Require().Error(err) // should be err here
+				suite.Require().NoError(err)
 			},
 		},
 
@@ -154,11 +154,11 @@ func (suite *KeeperTestSuite) TestJoinDaoByIbcAsset() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgJoinDaoByIbcAsset{
 					JoinAddress: "",
-					GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-					Amount: sdk.NewDec(1000000),
+					GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+					Amount:      sdk.NewDec(1000000),
 				}
 				_, err := msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -169,11 +169,11 @@ func (suite *KeeperTestSuite) TestJoinDaoByIbcAsset() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgJoinDaoByIbcAsset{
 					JoinAddress: suite.TestAccs[0].String(),
-					GovAddress: suite.TestAccs[1].String(),
-					Amount: sdk.NewDec(1000000),
+					GovAddress:  suite.TestAccs[1].String(),
+					Amount:      sdk.NewDec(1000000),
 				}
 				_, err := msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -187,7 +187,6 @@ func (suite *KeeperTestSuite) TestJoinDaoByIbcAsset() {
 		for _, acc := range suite.TestAccs {
 			suite.FundAcc(acc, defaultAcctFunds)
 		}
-		
 
 		test.fn()
 	}
@@ -204,13 +203,13 @@ func (suite *KeeperTestSuite) TestMintAndAllocateExp() {
 				suite.Require().Equal(balance.Amount, sdk.NewInt(0))
 
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				balances := suite.App.BankKeeper.GetAccountsBalances(suite.Ctx)
 				fmt.Println(balances)
 				req := types.MsgMintAndAllocateExp{
-					Amount: sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
 					FromAddress: daoAddress,
-					Member: suite.TestAccs[0].String(),
+					Member:      suite.TestAccs[0].String(),
 				}
 				_, err := msgServer.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().NoError(err)
@@ -225,11 +224,11 @@ func (suite *KeeperTestSuite) TestMintAndAllocateExp() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgMintAndAllocateExp{
-					Amount: sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
 					FromAddress: daoAddress,
-					Member: suite.TestAccs[1].String(),
+					Member:      suite.TestAccs[1].String(),
 				}
 				_, err := msgServer.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -240,11 +239,11 @@ func (suite *KeeperTestSuite) TestMintAndAllocateExp() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgMintAndAllocateExp{
-					Amount: sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
 					FromAddress: suite.TestAccs[1].String(),
-					Member: suite.TestAccs[0].String(),
+					Member:      suite.TestAccs[0].String(),
 				}
 				_, err := msgServer.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -255,11 +254,11 @@ func (suite *KeeperTestSuite) TestMintAndAllocateExp() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgMintAndAllocateExp{
-					Amount: sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(10000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(10000000))),
 					FromAddress: daoAddress,
-					Member: suite.TestAccs[0].String(),
+					Member:      suite.TestAccs[0].String(),
 				}
 				_, err := msgServer.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -270,22 +269,21 @@ func (suite *KeeperTestSuite) TestMintAndAllocateExp() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
 
 				// try to mint one token but not exp
 				req := types.MsgMintAndAllocateExp{
-					Amount: sdk.NewCoins(sdk.NewCoin("uosmo", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("uosmo", sdk.NewInt(1000000))),
 					FromAddress: daoAddress,
-					Member: suite.TestAccs[0].String(),
+					Member:      suite.TestAccs[0].String(),
 				}
 				_, err := msgServer.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
 
 				// try to mint more than one token but contain exp
 				req = types.MsgMintAndAllocateExp{
-					Amount: sdk.NewCoins(sdk.NewCoin("uosmo", sdk.NewInt(1000000)), sdk.NewCoin("uexp", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("uosmo", sdk.NewInt(1000000)), sdk.NewCoin("uexp", sdk.NewInt(1000000))),
 					FromAddress: daoAddress,
-					Member: suite.TestAccs[0].String(),
+					Member:      suite.TestAccs[0].String(),
 				}
 				_, err = msgServer.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -300,15 +298,15 @@ func (suite *KeeperTestSuite) TestMintAndAllocateExp() {
 			suite.FundAcc(acc, defaultAcctFunds)
 		}
 		msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-		
+
 		req := types.MsgJoinDaoByNonIbcAsset{
 			JoinAddress: suite.TestAccs[0].String(),
-			GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-			MaxToken: 1000000,
+			GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+			MaxToken:    1000000,
 		}
 		_, err := msgServer.JoinDaoByNonIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 		suite.Require().NoError(err)
-		
+
 		test.fn()
 	}
 }
@@ -321,12 +319,12 @@ func (suite *KeeperTestSuite) TestRequestBurnCoinAndExitDao() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				// Mint before burn
 				mintReq := types.MsgMintAndAllocateExp{
-					Amount: sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
 					FromAddress: daoAddress,
-					Member: suite.TestAccs[0].String(),
+					Member:      suite.TestAccs[0].String(),
 				}
 				_, err := msgServer.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &mintReq)
 				suite.Require().NoError(err)
@@ -339,7 +337,7 @@ func (suite *KeeperTestSuite) TestRequestBurnCoinAndExitDao() {
 
 				req := types.MsgBurnAndRemoveMember{
 					FromAddress: suite.TestAccs[0].String(),
-					Metadata: "",
+					Metadata:    "",
 				}
 				_, err = msgServer.RequestBurnCoinAndExitDao(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().NoError(err)
@@ -350,10 +348,10 @@ func (suite *KeeperTestSuite) TestRequestBurnCoinAndExitDao() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgBurnAndRemoveMember{
 					FromAddress: suite.TestAccs[1].String(),
-					Metadata: "",
+					Metadata:    "",
 				}
 				_, err := msgServer.RequestBurnCoinAndExitDao(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -364,10 +362,10 @@ func (suite *KeeperTestSuite) TestRequestBurnCoinAndExitDao() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgBurnAndRemoveMember{
 					FromAddress: suite.TestAccs[0].String(),
-					Metadata: "",
+					Metadata:    "",
 				}
 				_, err := msgServer.RequestBurnCoinAndExitDao(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -378,12 +376,12 @@ func (suite *KeeperTestSuite) TestRequestBurnCoinAndExitDao() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				// Mint before burn
 				mintReq := types.MsgMintAndAllocateExp{
-					Amount: sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
 					FromAddress: daoAddress,
-					Member: suite.TestAccs[0].String(),
+					Member:      suite.TestAccs[0].String(),
 				}
 				_, err := msgServer.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &mintReq)
 				suite.Require().NoError(err)
@@ -396,7 +394,7 @@ func (suite *KeeperTestSuite) TestRequestBurnCoinAndExitDao() {
 
 				req := types.MsgBurnAndRemoveMember{
 					FromAddress: suite.TestAccs[0].String(),
-					Metadata: "",
+					Metadata:    "",
 				}
 				_, err = msgServer.RequestBurnCoinAndExitDao(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -407,15 +405,15 @@ func (suite *KeeperTestSuite) TestRequestBurnCoinAndExitDao() {
 	for _, test := range tests {
 		suite.SetupTest()
 		msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-		
+
 		req := types.MsgJoinDaoByNonIbcAsset{
 			JoinAddress: suite.TestAccs[0].String(),
-			GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-			MaxToken: 1000000,
+			GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+			MaxToken:    1000000,
 		}
 		_, err := msgServer.JoinDaoByNonIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 		suite.Require().NoError(err)
-		
+
 		test.fn()
 	}
 }
@@ -428,9 +426,9 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgAdjustDaoTokenPrice{
-					FromAddress: daoAddress,
+					FromAddress:   daoAddress,
 					DaoTokenPrice: sdk.NewDec(2),
 				}
 				_, err := msgServer.AdjustDaoPrice(sdk.WrapSDKContext(suite.Ctx), &req)
@@ -445,9 +443,9 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgAdjustDaoTokenPrice{
-					FromAddress: suite.TestAccs[1].String(),
+					FromAddress:   suite.TestAccs[1].String(),
 					DaoTokenPrice: sdk.NewDec(10),
 				}
 				_, err := msgServer.AdjustDaoPrice(sdk.WrapSDKContext(suite.Ctx), &req)
@@ -459,9 +457,9 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgAdjustDaoTokenPrice{
-					FromAddress: daoAddress,
+					FromAddress:   daoAddress,
 					DaoTokenPrice: sdk.NewDec(0),
 				}
 				_, err := msgServer.AdjustDaoPrice(sdk.WrapSDKContext(suite.Ctx), &req)
@@ -471,7 +469,7 @@ func (suite *KeeperTestSuite) TestAdjustDaoPrice() {
 	}
 
 	for _, test := range tests {
-		suite.SetupTest()		
+		suite.SetupTest()
 		test.fn()
 	}
 }
@@ -484,10 +482,10 @@ func (suite *KeeperTestSuite) TestSpendIbcAssetToExp() {
 		{
 			fn: func() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 				req := types.MsgSpendIbcAssetToExp{
 					FromAddress: suite.TestAccs[0].String(),
-					Amount: sdk.NewCoins(sdk.NewCoin("token", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("token", sdk.NewInt(1000000))),
 				}
 				_, err := msgServer.SpendIbcAssetToExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().NoError(err)
@@ -498,8 +496,8 @@ func (suite *KeeperTestSuite) TestSpendIbcAssetToExp() {
 				daoBalance := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "uexp")
 
 				// init 10000000, spent 1000000
-				suite.Require().Equal(ibcBalance.Amount, sdk.NewInt(9000000))
-				
+				suite.Require().True(ibcBalance.Amount.Equal(sdk.NewInt(9000000)))
+
 				daoBalanceExpected := suite.App.ExpKeeper.GetDaoTokenPrice(suite.Ctx).Mul(sdk.NewDec(1000000))
 				suite.Require().Equal(daoBalanceExpected, daoBalance.Amount)
 			},
@@ -511,14 +509,14 @@ func (suite *KeeperTestSuite) TestSpendIbcAssetToExp() {
 				msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
 				req := types.MsgSpendIbcAssetToExp{
 					FromAddress: suite.TestAccs[0].String(),
-					Amount: sdk.NewCoins(sdk.NewCoin("ibc", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("ibc", sdk.NewInt(1000000))),
 				}
 				_, err := msgServer.SpendIbcAssetToExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
 
 				req = types.MsgSpendIbcAssetToExp{
 					FromAddress: suite.TestAccs[0].String(),
-					Amount: sdk.NewCoins(sdk.NewCoin("ibc", sdk.NewInt(1000000)), sdk.NewCoin("token", sdk.NewInt(1000000))),
+					Amount:      sdk.NewCoins(sdk.NewCoin("ibc", sdk.NewInt(1000000)), sdk.NewCoin("token", sdk.NewInt(1000000))),
 				}
 				_, err = msgServer.SpendIbcAssetToExp(sdk.WrapSDKContext(suite.Ctx), &req)
 				suite.Require().Error(err)
@@ -534,15 +532,14 @@ func (suite *KeeperTestSuite) TestSpendIbcAssetToExp() {
 		}
 
 		msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
-				
+
 		req := types.MsgJoinDaoByIbcAsset{
 			JoinAddress: suite.TestAccs[0].String(),
-			GovAddress: suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
-			Amount: sdk.NewDec(1000000),
+			GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+			Amount:      sdk.NewDec(1000000),
 		}
 		_, err := msgServer.JoinDaoByIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
-		suite.Require().NoError(err)		
+		suite.Require().NoError(err)
 		test.fn()
 	}
 }
-

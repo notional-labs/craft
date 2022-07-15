@@ -128,12 +128,17 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 	}
 
 	err = k.verifyAccountToWhiteList(ctx, joinAddress)
-
 	if err != nil {
 		return &types.MsgJoinDaoByIbcAssetResponse{}, err
 	}
 
 	k.addAddressToMintRequestList(ctx, joinAddress, msg.Amount)
+
+	MintCoin := sdk.Coin{
+		Amount: sdk.NewInt(msg.Amount.TruncateInt64()),
+		Denom:  k.GetDenom(ctx),
+	}
+	k.addAddressToWhiteList(ctx, joinAddress, MintCoin)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -197,6 +202,10 @@ func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDao
 
 	if params.DaoAccount != msg.FromAddress {
 		return nil, sdkerrors.Wrapf(types.ErrDaoAccount, "DAO address must be %s not %s", params.DaoAccount, msg.FromAddress)
+	}
+
+	if msg.DaoTokenPrice.Equal(sdk.NewDec(0)) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDaoTokenPrice, "DAO token price must > 0")
 	}
 
 	daoAssetInfo, err := k.GetDaoAssetInfo(ctx)
