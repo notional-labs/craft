@@ -7,6 +7,7 @@ option go_package = "x/exp/types";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
+import "ibc/core/client/v1/client.proto";
 
 
 // Msg is the cosmos.group.v1 Msg service.
@@ -85,7 +86,18 @@ message MsgSpendIbcAssetToExp{
   string from_address = 1 ;
   repeated cosmos.base.v1beta1.Coin amount = 2 
   [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  
+    // Timeout height relative to the current block height.
+  // The timeout is disabled when set to 0.
+  ibc.core.client.v1.Height timeout_height = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"timeout_height\""
+  ];
+
+  // Timeout timestamp (in nanoseconds) relative to the current block timestamp.
+  // The timeout is disabled when set to 0.
+  uint64 timeout_timestamp = 4
+      [ (gogoproto.moretags) = "yaml:\"timeout_timestamp\"" ];
+
 }
 
 message MsgSpendIbcAssetToExpResponse{}

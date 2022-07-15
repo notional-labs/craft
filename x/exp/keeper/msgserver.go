@@ -129,6 +129,16 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 
 	err = k.verifyAccountToWhiteList(ctx, joinAddress)
 
+	MaxCoinMint := sdk.Coin{
+		Amount: msg.Amount.TruncateInt(),
+		Denom:  k.GetDenom(ctx),
+	}
+
+	err = k.addAddressToWhiteList(ctx, joinAddress, MaxCoinMint)
+	if err != nil {
+		return nil, err
+	}
+
 	if err != nil {
 		return &types.MsgJoinDaoByIbcAssetResponse{}, err
 	}
@@ -181,7 +191,7 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 
 	// oracle for exp price
 
-	err = k.ExpKeeper.SendIbcOracle(ctx, fromAddress, msg.Amount[0])
+	err = k.ExpKeeper.SendIbcOracle(ctx, fromAddress, msg.Amount[0], "mint", msg.TimeoutHeight, msg.TimeoutTimestamp)
 	if err != nil {
 		return nil, err
 	}

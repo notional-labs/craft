@@ -3,13 +3,20 @@ package keeper
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	clienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+
+	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
+	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
+	"github.com/notional-labs/craft/utils/obi"
 	"github.com/notional-labs/craft/x/exp/types"
+	oracletypes "github.com/notional-labs/craft/x/oracle"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -25,6 +32,13 @@ type ExpKeeper struct {
 	channelKeeper types.ChannelKeeper
 	portKeeper    types.PortKeeper
 	scopedKeeper  types.ScopedKeeper
+}
+
+// oracleScriptCallData represents the data that should be OBI-encoded and sent to perform an oracle request
+type oracleScriptCallData struct {
+	AddressRequest string `obi:"address_request"`
+	RequestType    string `obi:"request_type"`
+	Status         string `obi:"status"`
 }
 
 func NewKeeper(
@@ -211,6 +225,78 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 }
 
 // SendIbcOracle send a package to query exp price over ibc.
-func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin) error {
+func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin, status string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64,
+) error {
+	requestType := "exp_price"
+	// get IBC params
+	sourcePort := "oracle"
+	sourceChannel := "channel-1"
+
+	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)
+	if !found {
+		return sdkerrors.Wrapf(channeltypes.ErrChannelNotFound, "port ID (%s) channel ID (%s)", sourcePort, sourceChannel)
+	}
+
+	destinationPort := sourceChannelEnd.GetCounterparty().GetPortID()
+	destinationChannel := sourceChannelEnd.GetCounterparty().GetChannelID()
+
+	// Get the next sequence
+	sequence, found := k.channelKeeper.GetNextSequenceSend(ctx, sourcePort, sourceChannel)
+	if !found {
+		return sdkerrors.Wrapf(
+			channeltypes.ErrSequenceSendNotFound,
+			"source port: %s, source channel: %s", sourcePort, sourceChannel,
+		)
+	}
+
+	// Begin createOutgoingPacket logic
+	channelCap, ok := k.scopedKeeper.GetCapability(ctx, host.ChannelCapabilityPath(sourcePort, sourceChannel))
+	if !ok {
+		return sdkerrors.Wrap(channeltypes.ErrChannelCapabilityNotFound, "module does not own channel capability")
+	}
+	// Create the call data to be used
+	data := oracleScriptCallData{
+		AddressRequest: strings.ToLower(fromAddress.String()),
+		RequestType:    requestType,
+		Status:         status,
+	}
+
+	// Serialize the call data using the OBI encoding
+	callDataBz, err := obi.Encode(data)
+	if err != nil {
+		return err
+	}
+
+	clientID := fromAddress.String() + "-" + requestType + "-"
+
+	feeAmount := sdk.NewCoin("uband", sdk.NewInt(100000)) //0.1band to fee, need change by gov
+	packetData := oracletypes.NewOracleRequestPacketData(
+		clientID,
+		209, // oracletypes.OracleScriptID(oraclePrams.ScriptID),
+		callDataBz,
+		1,                       // oraclePrams.AskCount, need change to use gov param
+		1,                       // oraclePrams.MinCount,need change to use gov param
+		sdk.NewCoins(feeAmount), // oraclePrams.FeeAmount,need change to use gov param
+		300000,                  // oraclePrams.PrepareGas,need change to use gov param
+		300000,                  // oraclePrams.ExecuteGas,need change to use gov param
+	)
+
+	// Create the IBC packet
+	packet := channeltypes.NewPacket(
+		packetData.GetBytes(),
+		sequence,
+		sourcePort,
+		sourceChannel,
+		destinationPort,
+		destinationChannel,
+		timeoutHeight,
+		timeoutTimestamp,
+	)
+	// Send the IBC packet
+	err = k.channelKeeper.SendPacket(ctx, channelCap, packet)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
