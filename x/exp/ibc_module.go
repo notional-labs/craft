@@ -24,7 +24,7 @@ var _ porttypes.IBCModule = IBCModule{}
 type resultData struct {
 	ExpPrice       string `obi:"exp_price"`
 	AddressRequest string `obi:"address_request"`
-	RequestType    string `obi:request_type`
+	RequestType    string `obi:"request_type"`
 	Status         string `obi:"status"`
 }
 

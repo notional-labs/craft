@@ -50,6 +50,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 
 	// Exp module.
+	"github.com/notional-labs/craft/x/exp"
 	expkeeper "github.com/notional-labs/craft/x/exp/keeper"
 	exptypes "github.com/notional-labs/craft/x/exp/types"
 
@@ -93,6 +94,7 @@ type AppKeepers struct {
 
 	// transfer module
 	TransferModule transfer.AppModule
+	ExpIBCModule   exp.IBCModule
 
 	// keys to access the substores
 	keys    map[string]*storetypes.KVStoreKey
@@ -193,6 +195,8 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 	)
+	expIBCModule := exp.NewIBCModule(appCodec, appKeepers.ExpKeeper)
+	appKeepers.ExpIBCModule = expIBCModule
 
 	appKeepers.FeeGrantKeeper = feegrantkeeper.NewKeeper(
 		appCodec,
@@ -225,6 +229,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(exptypes.ModuleName, expIBCModule)
 	// Note: the sealing is done after creating wasmd and wiring that up
 
 	// create evidence keeper with router
