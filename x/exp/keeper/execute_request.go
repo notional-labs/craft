@@ -104,6 +104,6 @@ func (k ExpKeeper) ValidateBurnRequestByTime(ctx sdk.Context, burnRequest types.
 }
 
 func (k ExpKeeper) ValidateMintRequestByTime(ctx sdk.Context, mintRequest types.MintRequest) bool {
-	mintPeriod := k.GetBurnExpPeriod(ctx)
-	return mintRequest.RequestTime.Add(mintPeriod).After(ctx.BlockTime())
+	mintPeriod := k.GetClosePoolPeriod(ctx)
+	return mintRequest.RequestTime.Add(mintPeriod).Before(ctx.BlockTime())
 }

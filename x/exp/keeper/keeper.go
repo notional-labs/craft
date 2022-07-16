@@ -161,6 +161,18 @@ func (k ExpKeeper) verifyAccountToWhiteList(ctx sdk.Context, memberAddress sdk.A
 	return nil
 }
 
+func (k ExpKeeper) verifyAccountToMintRequestList(ctx sdk.Context, memberAddress sdk.AccAddress) error {
+	// check if dstAddress already in mint request list .
+	list := k.GetMintRequestsByStatus(ctx, int(types.StatusOnGoingRequest))
+
+	for _, accountRecord := range list {
+		if memberAddress.String() == accountRecord.Account {
+			return types.ErrAddressdNotFound
+		}
+	}
+	return nil
+}
+
 func (k ExpKeeper) stakingCheck(ctx sdk.Context, memberAccount sdk.AccAddress, ar types.AccountRecord) error {
 	balance := k.bankKeeper.GetBalance(ctx, memberAccount, k.GetDenom(ctx))
 	if !ar.MaxToken.Amount.Equal(balance.Amount) {
@@ -220,6 +232,39 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 	err = k.addAddressToBurnRequestList(ctx, ar.GetAccount(), ar.MaxToken)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+//nolint:unused
+func (k ExpKeeper) executeMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin) error {
+	mintRequest, _ := k.GetMintRequest(ctx, fromAddress)
+	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
+	fmt.Println("before", mintRequest, expWillGet)
+
+	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
+		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
+
+		err := k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), fromAddress)
+		if err != nil {
+			return err
+		}
+
+		mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
+		mintRequest.DaoTokenLeft = sdk.NewDec(0)
+
+		k.SetMintRequest(ctx, mintRequest)
+	} else {
+		err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), fromAddress)
+		if err != nil {
+			return sdkerrors.Wrap(err, "fund error")
+		}
+		k.removeMintRequest(ctx, mintRequest)
+		decCoin := sdk.NewDecFromInt(coin.Amount)
+
+		mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
+		mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(decCoin)
+		k.SetMintRequest(ctx, mintRequest)
 	}
 	return nil
 }

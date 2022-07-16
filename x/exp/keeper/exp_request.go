@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/notional-labs/craft/x/exp/types"
@@ -56,7 +57,7 @@ func (k ExpKeeper) GetDaoTokenPrice(ctx sdk.Context) sdk.Dec {
 }
 
 // calculate exp value by ibc asset .
-func (k ExpKeeper) calculateDaoTokenValue(ctx sdk.Context, amount sdk.Int) sdk.Dec {
+func (k ExpKeeper) calculateDaoTokenValue(ctx sdk.Context, amount math.Int) sdk.Dec {
 	daoTokenPrice := k.GetDaoTokenPrice(ctx)
 
 	return daoTokenPrice.MulInt(amount)

@@ -24,7 +24,7 @@ type IBCModule struct {
 	keeper keeper.ExpKeeper
 }
 
-// NewIBCModule creates a new IBCModule given the keeper
+// NewIBCModule creates a new IBCModule given the keeper.
 func NewIBCModule(cdc codec.Codec, k keeper.ExpKeeper) IBCModule {
 	return IBCModule{
 		cdc:    cdc,
@@ -57,7 +57,7 @@ func ValidateChannelParams(
 
 // -------------------------------------------------------------------------------------------------------------------
 
-// OnChanOpenInit implements the IBCModule interface
+// OnChanOpenInit implements the IBCModule interface.
 func (am IBCModule) OnChanOpenInit(
 	ctx sdk.Context,
 	order channeltypes.Order,
@@ -80,7 +80,7 @@ func (am IBCModule) OnChanOpenInit(
 	return version, nil
 }
 
-// OnChanOpenTry implements the IBCModule interface
+// OnChanOpenTry implements the IBCModule interface.
 func (am IBCModule) OnChanOpenTry(
 	ctx sdk.Context,
 	order channeltypes.Order,
@@ -110,7 +110,7 @@ func (am IBCModule) OnChanOpenTry(
 	return counterpartyVersion, nil
 }
 
-// OnChanOpenAck implements the IBCModule interface
+// OnChanOpenAck implements the IBCModule interface.
 func (am IBCModule) OnChanOpenAck(
 	ctx sdk.Context,
 	portID,
@@ -121,7 +121,7 @@ func (am IBCModule) OnChanOpenAck(
 	return nil
 }
 
-// OnChanOpenConfirm implements the IBCModule interface
+// OnChanOpenConfirm implements the IBCModule interface.
 func (am IBCModule) OnChanOpenConfirm(
 	ctx sdk.Context,
 	portID,
@@ -130,7 +130,7 @@ func (am IBCModule) OnChanOpenConfirm(
 	return nil
 }
 
-// OnChanCloseInit implements the IBCModule interface
+// OnChanCloseInit implements the IBCModule interface.
 func (am IBCModule) OnChanCloseInit(
 	ctx sdk.Context,
 	portID,
@@ -140,7 +140,7 @@ func (am IBCModule) OnChanCloseInit(
 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "user cannot close channel")
 }
 
-// OnChanCloseConfirm implements the IBCModule interface
+// OnChanCloseConfirm implements the IBCModule interface.
 func (am IBCModule) OnChanCloseConfirm(
 	ctx sdk.Context,
 	portID,
@@ -149,7 +149,7 @@ func (am IBCModule) OnChanCloseConfirm(
 	return nil
 }
 
-// OnRecvPacket implements the IBCModule interface
+// OnRecvPacket implements the IBCModule interface.
 func (am IBCModule) OnRecvPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
@@ -159,7 +159,7 @@ func (am IBCModule) OnRecvPacket(
 	return nil
 }
 
-// OnAcknowledgementPacket implements the IBCModule interface
+// OnAcknowledgementPacket implements the IBCModule interface.
 func (am IBCModule) OnAcknowledgementPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
@@ -211,7 +211,7 @@ func (am IBCModule) OnAcknowledgementPacket(
 
 // -------------------------------------------------------------------------------------------------------------------
 
-// OnTimeoutPacket implements the IBCModule interface
+// OnTimeoutPacket implements the IBCModule interface.
 func (am IBCModule) OnTimeoutPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
