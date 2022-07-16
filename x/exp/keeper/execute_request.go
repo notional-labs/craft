@@ -24,9 +24,10 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 	tokenReturn, _ := k.calculateStableTokenReturn(ctx, *burnRequest.BurnTokenLeft)
 
 	coinWilReceive := sdk.NewCoin(k.GetIbcDenom(ctx), tokenReturn.TruncateInt())
+
 	coinModule := k.bankKeeper.GetBalance(ctx, k.accountKeeper.GetModuleAccount(ctx, types.ModuleName).GetAddress(), k.GetIbcDenom(ctx))
-	// if coin module don't have money return err .
-	if coinModule.Amount == sdk.NewInt(0) {
+	// if coin module don't have money return nil .
+	if coinModule.Amount.Equal(sdk.NewInt(0)) {
 		return nil
 	}
 
@@ -38,7 +39,7 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 		}
 
 		burnRequest.BurnTokenLeft.Amount = coinWilReceive.Amount.Sub(coinModule.Amount)
-		return k.BurnExpFromAccount(ctx, sdk.NewCoins(coinModule), burnAccount)
+		return k.BurnExpFromAccount(ctx, sdk.NewCoins(*burnRequest.BurnTokenLeft), burnAccount)
 	}
 
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, burnAccount, sdk.NewCoins(coinWilReceive))
