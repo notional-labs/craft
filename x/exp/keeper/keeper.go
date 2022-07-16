@@ -249,6 +249,17 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress sdk.AccAddress, co
 		)
 	}
 
+	// set OracleID
+	clientID := k.GetNextOracleID(ctx)
+
+	oracleRequest := types.OracleRequest{
+		OracleId:        clientID,
+		Type:            status,
+		AddressRequest:  fromAddress.String(),
+		AmountInRequest: coin,
+	}
+	k.SetNextOracleRequest(ctx, oracleRequest)
+
 	// Begin createOutgoingPacket logic
 	channelCap, ok := k.scopedKeeper.GetCapability(ctx, host.ChannelCapabilityPath(sourcePort, sourceChannel))
 	if !ok {
@@ -267,11 +278,9 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress sdk.AccAddress, co
 		return err
 	}
 
-	clientID := fromAddress.String() + "-" + requestType + "-"
-
 	feeAmount := sdk.NewCoin("uband", sdk.NewInt(100000)) //0.1band to fee, need change by gov
 	packetData := oracletypes.NewOracleRequestPacketData(
-		clientID,
+		fmt.Sprint(clientID),
 		209, // oracletypes.OracleScriptID(oraclePrams.ScriptID),
 		callDataBz,
 		1,                       // oraclePrams.AskCount, need change to use gov param
