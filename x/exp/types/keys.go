@@ -33,14 +33,16 @@ var (
 	KeyMintRequestList = []byte{0x03}
 	// KeyBurnRequestList defines key to store the BurnRequestList .
 	KeyBurnRequestList = []byte{0x04}
-	// KeyMintRequestList defines key to store the CompletedMintRequest .
+	// KeyCompletedMintRequest defines key to store the CompletedMintRequest .
 	KeyCompletedMintRequest = []byte{0x05}
-	// KeyBurnRequestList defines key to store the CompletedBurnRequest .
+	// KeyCompletedBurnRequest defines key to store the CompletedBurnRequest .
 	KeyCompletedBurnRequest = []byte{0x06}
 	// KeyWhiteList defines key to store the WhiteList .
 	KeyWhiteList = []byte{0x07}
-	// KeyOracleID
+	// KeyOracleID key to store the OracleID .
 	KeyOracleID = []byte{0x08}
+	// KeyOracleRequest to store the Oracle Request .
+	KeyOracleRequest = []byte{0x09}
 )
 
 func GetMintRequestAddressBytes(addressRequest sdk.AccAddress) (mintRequestsBytes []byte) {

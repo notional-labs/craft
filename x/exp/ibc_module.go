@@ -2,6 +2,7 @@ package exp
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -176,7 +177,11 @@ func (am IBCModule) OnRecvPacket(
 	// if err != nil {
 	// 	acknowledgement = channeltypes.NewErrorAcknowledgement(err.Error())
 	// }
+	oracleID, err := strconv.ParseUint(data.ClientID, 10, 64)
+	if err != nil {
+		return channeltypes.Acknowledgement{}
 
+	}
 	switch data.ResolveStatus {
 	case oracletypes.RESOLVE_STATUS_SUCCESS:
 		var result resultData
@@ -186,9 +191,15 @@ func (am IBCModule) OnRecvPacket(
 		}
 		switch result.Status {
 		case "mint":
-			am.keeper.ProccessRecvPacketMintRequest(ctx, result.AddressRequest, result.ExpPrice)
+			err = am.keeper.ProccessRecvPacketMintRequest(ctx, result.AddressRequest, result.ExpPrice, oracleID)
+			if err != nil {
+				return channeltypes.Acknowledgement{}
+			}
 		case "burn":
-			am.keeper.ProccessRecvPacketBurntRequest(ctx, result.AddressRequest, result.ExpPrice)
+			err = am.keeper.ProccessRecvPacketBurnRequest(ctx, result.AddressRequest, result.ExpPrice, oracleID)
+			if err != nil {
+				return channeltypes.Acknowledgement{}
+			}
 		}
 	case oracletypes.RESOLVE_STATUS_EXPIRED:
 		//TODO: need implement later

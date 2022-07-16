@@ -14,20 +14,23 @@ func (k ExpKeeper) OnOracleRequestTimeoutPacket(
 	return nil
 }
 
-func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest string, expPrice string) error {
+func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest string, expPrice string, oracleID uint64) error {
 	accAddress, err := sdk.AccAddressFromBech32(addressRequest)
 	if err != nil {
 		return err
 	}
 	mintRequest, err := k.GetMintRequest(ctx, accAddress)
-
+	oracleRequest := k.GetOracleRequest(ctx, oracleID)
 	if err != nil {
 		return err
 	}
-
+	err = k.ExecuteMintExpByIbcToken(ctx, mintRequest, oracleRequest.AmountInRequest)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest string, expPrice string) error {
+func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest string, expPrice string, oracleID uint64) error {
 	return nil
 }
