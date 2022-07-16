@@ -81,16 +81,24 @@ public class SignedTxCheckListner implements Listener {
     }
 
     // TODO: CompleteableFuture
-    private static boolean doesDataMatchTransaction(String tendermintHash, String expectedToAddress, long expectedAmount, String expectedMemo) {
-        boolean transactionDataMatches = false;        
+    // Testing_Cosmos_Query.java
+    private static boolean doesDataMatchTransaction(String tendermintHash, String expectedToAddress, long expectedUCraftAmount, String expectedMemo) {
+        boolean transactionDataMatches = false;
+        ;        
         try {
-            // TODO: Change this to get value from config
-            // curl -X GET "https://api.cosmos.network/cosmos/tx/v1beta1/txs/3EFA66F9613EF5E215942257C08904392195FCA1C8A9367704AEF97FCAD6FEAA" -H "accept: application/json"
-            // URL url = new URL("https://api.cosmos.network/cosmos/tx/v1beta1/txs/" + tendermintHash);
-            URL url = new URL(TX_ENDPOINT.replace("{TENDERMINT_HASH}", tendermintHash));
-            
+            String fmt_url = "http://api.crafteconomy.io/v1/tx/confirm/{TO_ADDR}/{EXPECTED_UCRAFT_AMT}ucraft/{EXPECTED_MEMO}/{TM_HASH}"
+                .replace("{TO_ADDR}", expectedToAddress)
+                .replace("{EXPECTED_UCRAFT_AMT}", String.valueOf(expectedUCraftAmount))
+                .replace("{EXPECTED_MEMO}", expectedMemo.replace(" ", "%20"))
+                .replace("{TM_HASH}", tendermintHash);
+
+            // prefix with 0x bc that's how it likes it
+            URL url = new URL(fmt_url);
+            // URL url = new URL(TX_ENDPOINT.replace("{TENDERMINT_HASH}", tendermintHash);
+            System.out.println("URL: " + url.toString());
+                        
             if(IS_DEV_MODE) {
-                Util.logFine("Dev mode is enabled, so we will sign the tx given this & broadacast to ensure devs know.");
+                System.out.println("Dev mode is enabled, so we will sign the tx given this & broadacast to ensure devs know.");
                 return true;
             }            
 
@@ -101,40 +109,12 @@ public class SignedTxCheckListner implements Listener {
             InputStream responseStream = httpConn.getResponseCode() / 100 == 2 ? httpConn.getInputStream() : httpConn.getErrorStream();
             Scanner s = new Scanner(responseStream).useDelimiter("\\A");
             String response = s.hasNext() ? s.next() : "";
-
+            s.close(); 
             // Get the memo string from the transcaction
-            JSONObject myObject = new JSONObject(response).getJSONObject("tx");
-            myObject = myObject.getJSONObject("body");
-            String txMemo = myObject.getString("memo");
-
-            // Loops through the Tx's messages trying to find one which matches to_address & amount 
-            // [!] (amount is in ucraft)
-            for(Object msg :  myObject.getJSONArray("messages")) {
-                JSONObject msgObject = (JSONObject) msg;
-                String msgToAddress = msgObject.getString("to_address");
-                boolean doesAmountMatchExpected = false;
-                // System.out.println(msgObject.toString());
-                
-                // get amounts array & check until the expected amount = the amount they sent            
-                for(Object amounts : msgObject.getJSONArray("amount")) {
-                    JSONObject tempAmount = (JSONObject) amounts;
-                    long msgAmount = tempAmount.getLong("amount");                    
-                    if(msgAmount == expectedAmount) {
-                        // Util.log("TXHASH - Found a matching amount of " + msgAmount);
-                        doesAmountMatchExpected = true;
-                        break;
-                    }
-                }
-
-                // if (amount=Expected) & (to_address=expected) & (memo=expected), then this was the actual transaction& is valid
-                if(doesAmountMatchExpected && msgToAddress.equalsIgnoreCase(expectedToAddress) && txMemo.equalsIgnoreCase(expectedMemo)) {
-                    // Util.log("Data DOES match transaction!!!");
-                    transactionDataMatches = true;
-                } else {
-                    // Util.logSevere("Data does NOT match this transaction's expected outcome!");
-                }
-            }
-            s.close();
+            transactionDataMatches = new JSONObject(response).getBoolean("doesDataMatch");
+                       
+            System.out.println("Does data match: " + transactionDataMatches);
+            return transactionDataMatches;
         } catch (IOException e) {
             // Maybe the tx hash was not there? recall this with a runnable in X seconds?
             e.printStackTrace();

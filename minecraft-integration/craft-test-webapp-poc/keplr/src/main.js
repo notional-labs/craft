@@ -17,8 +17,8 @@ const request = require('request');
 
 const name = "Craft Reecenet"
 const CHAIN_ID = "test-1"; // test_node.sh
-const RPC_ENDPOINT = "http://65.108.125.182:26657/";
-const REST_ENDPOINT = "http://65.108.125.182:1317/";
+const RPC_ENDPOINT = "http://65.108.125.182:26657";
+const REST_ENDPOINT = "http://65.108.125.182:1317";
 
 const bondDenom = "uexp"; // uexp in production
 const tokenDenom = "ucraft"; // ucraft in production
@@ -72,6 +72,16 @@ window.onload = async () => {
                     // List of all coin/tokens used in this chain.
                     currencies: [{
                         // Coin denomination to be displayed to the user.
+                        coinDenom: "CRAFT",
+                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
+                        coinMinimalDenom: tokenDenom,
+                        // # of decimal points to convert minimal denomination to user-facing denomination.
+                        coinDecimals: 6,
+                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
+                        // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
+                        coinGeckoId: "terra-luna-2"
+                    },{
+                        // Coin denomination to be displayed to the user.
                         coinDenom: "EXP",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
                         coinMinimalDenom: bondDenom,
@@ -80,16 +90,6 @@ window.onload = async () => {
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
                         // coinGeckoId: ""
-                    },{
-                        // Coin denomination to be displayed to the user.
-                        coinDenom: "CRAFT",
-                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: tokenDenom,
-                        // # of decimal points to convert minimal denomination to user-facing denomination.
-                        coinDecimals: 6,
-                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-                        // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-                        coinGeckoId: "dig-chain"
                     }],
                     // List of coin/tokens used as a fee token in this chain.
                     feeCurrencies: [{
@@ -101,7 +101,7 @@ window.onload = async () => {
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-                        coinGeckoId: "dig-chain"
+                        coinGeckoId: "terra-luna-2"
                     }],
                     coinType: 118,
                     // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
@@ -287,18 +287,17 @@ function sendTx(recipient, amount, denom, txID, memo) {
 
         console.log(result);
 
-
         // does this ever run??
         if (result.code !== undefined && result.code !== 0) {
             alert("Failed to send tx: " + result.log || result.rawLog);
         } else {
             //alert("Succeed to send tx");
-            if(txID !== "") {
-                alert("SENT TO CHAIN! Once broadcasted, ping api.crafteconomy.io/v1/tx/sign/" + txID);
-            }
+            // if(txID !== "") {
+            //     alert("SENT TO CHAIN! Once broadcasted, ping api.crafteconomy.io/v1/tx/sign/" + txID);
+            // }
 
-            alert("Firing signed_" + txID + " to redis server!");     
-            fireSuccessfulBroadcast(txID);                   
+            alert("Firing signed_" + txID + " to redis server! (" + result.transactionHash + ")");     
+            fireSuccessfulBroadcast(txID, result.transactionHash);                   
         }
     })();
 
