@@ -13,3 +13,21 @@ func (k ExpKeeper) OnOracleRequestTimeoutPacket(
 	// TODO: need implement
 	return nil
 }
+
+func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest string, expPrice string) error {
+	accAddress, err := sdk.AccAddressFromBech32(addressRequest)
+	if err != nil {
+		return err
+	}
+	mintRequest, err := k.GetMintRequest(ctx, accAddress)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest string, expPrice string) error {
+	return nil
+}

@@ -39,6 +39,8 @@ var (
 	KeyCompletedBurnRequest = []byte{0x06}
 	// KeyWhiteList defines key to store the WhiteList .
 	KeyWhiteList = []byte{0x07}
+	// KeyOracleID
+	KeyOracleID = []byte{0x08}
 )
 
 func GetMintRequestAddressBytes(addressRequest sdk.AccAddress) (mintRequestsBytes []byte) {

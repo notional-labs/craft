@@ -11,12 +11,21 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
 	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibcexported "github.com/cosmos/ibc-go/v4/modules/core/exported"
+	"github.com/notional-labs/craft/utils/obi"
 	"github.com/notional-labs/craft/x/exp/keeper"
 	"github.com/notional-labs/craft/x/exp/types"
 	oracletypes "github.com/notional-labs/craft/x/oracle"
 )
 
 var _ porttypes.IBCModule = IBCModule{}
+
+// resultData represents the data that is returned by the oracle script
+type resultData struct {
+	ExpPrice       string `obi:"exp_price"`
+	AddressRequest string `obi:"address_request"`
+	RequestType    string `obi:request_type`
+	Status         string `obi:"status"`
+}
 
 // IBCModule implements the ICS26 interface for transfer given the transfer keeper.
 type IBCModule struct {
@@ -155,8 +164,50 @@ func (am IBCModule) OnRecvPacket(
 	packet channeltypes.Packet,
 	relayer sdk.AccAddress,
 ) ibcexported.Acknowledgement {
-	// TODO: implement logic
-	return nil
+	var data oracletypes.OracleResponsePacketData
+	if err := types.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
+		return channeltypes.Acknowledgement{}
+	}
+
+	acknowledgement := channeltypes.NewResultAcknowledgement([]byte{byte(1)})
+
+	// handler IBC packet
+	// err = am.keeper.OnRecvApplicationLinkPacketData(ctx, data)
+	// if err != nil {
+	// 	acknowledgement = channeltypes.NewErrorAcknowledgement(err.Error())
+	// }
+
+	switch data.ResolveStatus {
+	case oracletypes.RESOLVE_STATUS_SUCCESS:
+		var result resultData
+		err := obi.Decode(data.Result, &result)
+		if err != nil {
+			return channeltypes.Acknowledgement{}
+		}
+		switch result.Status {
+		case "mint":
+			am.keeper.ProccessRecvPacketMintRequest(ctx, result.AddressRequest, result.ExpPrice)
+		case "burn":
+			am.keeper.ProccessRecvPacketBurntRequest(ctx, result.AddressRequest, result.ExpPrice)
+		}
+	case oracletypes.RESOLVE_STATUS_EXPIRED:
+		//TODO: need implement later
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypePacket,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+			sdk.NewAttribute(types.AttributeKeyClientID, data.ClientID),
+			sdk.NewAttribute(types.AttributeKeyRequestID, fmt.Sprintf("%d", data.RequestID)),
+			sdk.NewAttribute(types.AttributeKeyResolveStatus, data.ResolveStatus.String()),
+			sdk.NewAttribute(types.AttributeKeyAckSuccess, fmt.Sprintf("%t", true)),
+		),
+	)
+
+	// NOTE: acknowledgement will be written synchronously during IBC handler execution.
+	return acknowledgement
+
 }
 
 // OnAcknowledgementPacket implements the IBCModule interface

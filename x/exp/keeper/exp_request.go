@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"encoding/binary"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/notional-labs/craft/x/exp/types"
@@ -269,4 +271,21 @@ func (k ExpKeeper) IterateStatusMintRequests(ctx sdk.Context, status int, cb fun
 			break
 		}
 	}
+}
+
+func (k ExpKeeper) IncreaseOracleID(ctx sdk.Context) {
+
+}
+
+func (k ExpKeeper) setOracleID(ctx sdk.Context, id int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	store.Set(types.KeyOracleID, GetOracleIDBytes(uint64(id)))
+}
+
+// GetOracleID returns the byte representation of the OracleID
+func GetOracleIDBytes(id uint64) (IDBz []byte) {
+	IDBz = make([]byte, 8)
+	binary.BigEndian.PutUint64(IDBz, id)
+	return
 }

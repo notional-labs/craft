@@ -59,14 +59,13 @@ func (k ExpKeeper) ClaimCapability(ctx sdk.Context, cap *capabilitytypes.Capabil
 }
 
 // ExecuteMintExpByIbcToken only run in OnPacketRecv
-func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin) error {
-	mintRequest, _ := k.GetMintRequest(ctx, fromAddress)
+func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.MintRequest, coin sdk.Coin) error {
 	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
 
 	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
 		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
 
-		err := k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), fromAddress)
+		err := k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), sdk.AccAddress(mintRequest.Account))
 		if err != nil {
 			return err
 		}
@@ -76,7 +75,7 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, fromAddress sdk.Acc
 
 		k.SetMintRequest(ctx, mintRequest)
 	}
-	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), fromAddress)
+	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), sdk.AccAddress(mintRequest.Account))
 	if err != nil {
 		return sdkerrors.Wrap(err, "fund error")
 	}
