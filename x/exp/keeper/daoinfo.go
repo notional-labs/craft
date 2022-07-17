@@ -81,3 +81,10 @@ func (k ExpKeeper) RemoveRecord(ctx sdk.Context, address sdk.AccAddress) {
 
 	store.Delete(keys)
 }
+
+func (k ExpKeeper) setDaoTokenPrice(ctx sdk.Context, price sdk.Dec) {
+	// set price to state
+	daoAssetInfo, _ := k.GetDaoAssetInfo(ctx)
+	daoAssetInfo.DaoTokenPrice = price
+	k.SetDaoAssetInfo(ctx, daoAssetInfo)
+}

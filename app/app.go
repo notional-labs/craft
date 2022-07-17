@@ -476,9 +476,9 @@ func (app *CraftApp) RegisterTxService(clientCtx client.Context) {
 	authtx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry)
 }
 
-// RegisterTendermintService implements the Application.RegisterTendermintService method.
+// RegisterTendermintService implements the Appl	ication.RegisterTendermintService method.
 func (app *CraftApp) RegisterTendermintService(clientCtx client.Context) {
-	tmservice.RegisterTendermintService(clientCtx, app.BaseApp.GRPCQueryRouter(), app.interfaceRegistry, abci.NewBaseApplication().Query)
+	tmservice.RegisterTendermintService(clientCtx, app.BaseApp.GRPCQueryRouter(), app.interfaceRegistry, app.Query)
 }
 
 // GetMaccPerms returns a copy of the module account permissions.

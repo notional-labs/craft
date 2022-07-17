@@ -56,6 +56,15 @@ message MintRequest{
     RequestStatus status = 5;
 }
 
-message MintRequestQueue{
-    
+message OracleRequest{
+    option (gogoproto.goproto_getters)         = true;
+    option (gogoproto.goproto_stringer)        = true;
+    uint64 oracle_id = 1;
+    string type = 2;
+    string address_request= 3;
+    string amount_in_request  = 4 [    
+        (gogoproto.nullable)   = false,
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+        (gogoproto.moretags)   = "yaml:\"amount_in_request\""
+    ];
 }

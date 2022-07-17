@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/CosmWasm/wasmd v0.27.0
-	github.com/cosmos/cosmos-sdk v0.46.0-rc2.0.20220705201857-c7c65880dfbe
+	github.com/cosmos/cosmos-sdk v0.46.0-rc2.0.20220717044044-e2afb411d70e
 	github.com/cosmos/ibc-go/v4 v4.0.0-rc0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
@@ -16,7 +16,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.12.0
 	github.com/stretchr/testify v1.8.0
-	github.com/tendermint/tendermint v0.34.20-rc0
+	github.com/tendermint/tendermint v0.34.20-rc1
 	github.com/tendermint/tm-db v0.6.7
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
 	google.golang.org/grpc v1.47.0
@@ -100,7 +100,7 @@ require (
 	github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d // indirect
 	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/lib/pq v1.10.6 // indirect
-	github.com/libp2p/go-buffer-pool v0.0.2 // indirect
+	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -153,7 +153,7 @@ require (
 
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
-	github.com/CosmWasm/wasmd => github.com/notional-labs/wasmd v0.25.1-0.20220708024647-b60c0517d289
+	github.com/CosmWasm/wasmd => github.com/notional-labs/wasmd v0.25.1-0.20220717200618-f0d3a8e39d19
 	github.com/cosmos/ibc-go/v4 => github.com/notional-labs/ibc-go/v4 v4.0.0-20220707091415-8e4f87eaef2d
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 )
