@@ -273,7 +273,7 @@ func (k ExpKeeper) IterateStatusMintRequests(ctx sdk.Context, status int, cb fun
 	}
 }
 
-// IncreaseOracleID increase oracle ID by 1
+// IncreaseOracleID increase oracle ID by 1.
 func (k ExpKeeper) IncreaseOracleID(ctx sdk.Context) {
 	k.setOracleID(ctx, k.GetNextOracleID(ctx))
 }
@@ -284,7 +284,7 @@ func (k ExpKeeper) setOracleID(ctx sdk.Context, id uint64) {
 	store.Set(types.KeyOracleID, GetOracleIDBytes(id))
 }
 
-// GetOracleIDBytes returns the byte representation of the OracleID
+// GetOracleIDBytes returns the byte representation of the OracleID.
 func GetOracleIDBytes(id uint64) (IDBz []byte) {
 	IDBz = make([]byte, 8)
 	binary.BigEndian.PutUint64(IDBz, id)
@@ -316,7 +316,7 @@ func (k ExpKeeper) SetNextOracleRequest(ctx sdk.Context, oracleRequest types.Ora
 	store.Set(key, bz)
 }
 
-// GetOracleRequest get oracle request by oracleID
+// GetOracleRequest get oracle request by oracleID.
 func (k ExpKeeper) GetOracleRequest(ctx sdk.Context, oracleID uint64) (oracleRequest types.OracleRequest) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(GetOracleIDBytes(oracleID))

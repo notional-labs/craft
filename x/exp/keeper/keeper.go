@@ -34,7 +34,7 @@ type ExpKeeper struct {
 	scopedKeeper  types.ScopedKeeper
 }
 
-// oracleScriptCallData represents the data that should be OBI-encoded and sent to perform an oracle request
+// oracleScriptCallData represents the data that should be OBI-encoded and sent to perform an oracle request.
 type oracleScriptCallData struct {
 	AddressRequest string `obi:"address_request"`
 	RequestType    string `obi:"request_type"`
