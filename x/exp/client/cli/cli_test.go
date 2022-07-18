@@ -22,7 +22,7 @@ import (
 var testMbm = module.NewBasicManager(genutil.AppModuleBasic{})
 var (
 	defaultAcctFunds sdk.Coins = sdk.NewCoins(
-		sdk.NewCoin("token", sdk.NewInt(10000000)),
+		sdk.NewCoin("uexp", sdk.NewInt(10000000)),
 	)
 	daoAddress = "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"
 )
@@ -196,7 +196,7 @@ func TestGetBurnRequestList(t *testing.T) {
 			ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 			ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 
-			cli.GetBurnRequestList()
+			cli := cli.GetBurnRequestList()
 
 			if tc.expectErr {
 				require.Error(t, cli.ExecuteContext(ctx))
@@ -247,7 +247,7 @@ func TestNewMintExpCmd(t *testing.T) {
 			ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 			ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 
-			cli.NewMintExpCmd()
+			cli := cli.NewMintExpCmd()
 
 			if tc.expectErr {
 				require.Error(t, cli.ExecuteContext(ctx))
@@ -301,7 +301,7 @@ func TestNewSpendIbcAssetForExpCmd(t *testing.T) {
 			ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 			ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 
-			cli.NewSpendIbcAssetForExpCmd()
+			cli := cli.NewSpendIbcAssetForExpCmd()
 
 			if tc.expectErr {
 				require.Error(t, cli.ExecuteContext(ctx))
@@ -349,7 +349,7 @@ func TestNewBurnExpCmd(t *testing.T) {
 			ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 			ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 
-			cli.NewBurnExpCmd()
+			cli := cli.NewBurnExpCmd()
 
 			if tc.expectErr {
 				require.Error(t, cli.ExecuteContext(ctx))
@@ -397,7 +397,7 @@ func TestNewFundToExpModule(t *testing.T) {
 			ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 			ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 
-			cli.NewFundToExpModule()
+			cli := cli.NewFundToExpModule()
 
 			if tc.expectErr {
 				require.Error(t, cli.ExecuteContext(ctx))
@@ -445,7 +445,7 @@ func TestNewSendCoinsToDAO(t *testing.T) {
 			ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 			ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 
-			cli.NewSendCoinsToDAO()
+			cli := cli.NewSendCoinsToDAO()
 
 			if tc.expectErr {
 				require.Error(t, cli.ExecuteContext(ctx))
@@ -493,7 +493,7 @@ func TestNewAdjustDaoTokenPrice(t *testing.T) {
 			ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 			ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 
-			cli.NewAdjustDaoTokenPrice()
+			cli := cli.NewAdjustDaoTokenPrice()
 
 			if tc.expectErr {
 				require.Error(t, cli.ExecuteContext(ctx))
