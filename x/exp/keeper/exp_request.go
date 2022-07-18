@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/binary"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/notional-labs/craft/x/exp/types"
@@ -58,7 +59,7 @@ func (k ExpKeeper) GetDaoTokenPrice(ctx sdk.Context) sdk.Dec {
 }
 
 // calculate exp value by ibc asset .
-func (k ExpKeeper) calculateDaoTokenValue(ctx sdk.Context, amount sdk.Int) sdk.Dec {
+func (k ExpKeeper) calculateDaoTokenValue(ctx sdk.Context, amount math.Int) sdk.Dec {
 	daoTokenPrice := k.GetDaoTokenPrice(ctx)
 
 	return daoTokenPrice.MulInt(amount)
@@ -285,9 +286,9 @@ func (k ExpKeeper) setOracleID(ctx sdk.Context, id uint64) {
 }
 
 // GetOracleIDBytes returns the byte representation of the OracleID.
-func GetOracleIDBytes(id uint64) (IDBz []byte) {
-	IDBz = make([]byte, 8)
-	binary.BigEndian.PutUint64(IDBz, id)
+func GetOracleIDBytes(id uint64) (idbz []byte) {
+	idbz = make([]byte, 8)
+	binary.BigEndian.PutUint64(idbz, id)
 	return
 }
 
@@ -320,7 +321,11 @@ func (k ExpKeeper) SetNextOracleRequest(ctx sdk.Context, oracleRequest types.Ora
 func (k ExpKeeper) GetOracleRequest(ctx sdk.Context, oracleID uint64) (oracleRequest types.OracleRequest) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(GetOracleIDBytes(oracleID))
+	if bz == nil {
+		return types.OracleRequest{}
+	}
 
 	k.cdc.Unmarshal(bz, &oracleRequest)
+
 	return oracleRequest
 }

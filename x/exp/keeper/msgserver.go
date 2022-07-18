@@ -128,6 +128,9 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 	}
 
 	err = k.verifyAccountToWhiteList(ctx, joinAddress)
+	if err != nil {
+		return &types.MsgJoinDaoByIbcAssetResponse{}, err
+	}
 
 	MaxCoinMint := sdk.Coin{
 		Amount: msg.Amount.TruncateInt(),
