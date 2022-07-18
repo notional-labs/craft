@@ -57,35 +57,3 @@ func (k ExpKeeper) AuthenticateCapability(ctx sdk.Context, cap *capabilitytypes.
 func (k ExpKeeper) ClaimCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) error {
 	return k.scopedKeeper.ClaimCapability(ctx, cap, name)
 }
-
-// ExecuteMintExpByIbcToken only run in OnPacketRecv
-func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.MintRequest, coin sdk.Coin) error {
-	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
-
-	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
-		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
-
-		err := k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), sdk.AccAddress(mintRequest.Account))
-		if err != nil {
-			return err
-		}
-
-		mintRequest.DaoTokenLeft = sdk.NewDec(0)
-		mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
-
-		k.SetMintRequest(ctx, mintRequest)
-	}
-	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), sdk.AccAddress(mintRequest.Account))
-	if err != nil {
-		return sdkerrors.Wrap(err, "fund error")
-	}
-	k.removeMintRequest(ctx, mintRequest)
-	decCoin := sdk.NewDecFromInt(coin.Amount)
-
-	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
-	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(decCoin)
-
-	k.SetMintRequest(ctx, mintRequest)
-
-	return nil
-}
