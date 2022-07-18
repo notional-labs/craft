@@ -43,6 +43,8 @@ var (
 	KeyOracleID = []byte{0x08}
 	// KeyOracleRequest to store the Oracle Request .
 	KeyOracleRequest = []byte{0x09}
+	// KeyBurnOracleRequest to store the BurnOracleRequest  .
+	KeyBurnOracleRequest = []byte{0x10}
 )
 
 func GetMintRequestAddressBytes(addressRequest sdk.AccAddress) (mintRequestsBytes []byte) {

@@ -336,3 +336,60 @@ func (k ExpKeeper) GetOracleRequest(ctx sdk.Context, oracleID uint64) (oracleReq
 
 	return oracleRequest
 }
+
+// // IterateOracleRequest iterates over the all the Oracle Request .
+// func (k ExpKeeper) IterateOracleRequest(ctx sdk.Context, cb func(oracleRequest types.OracleRequest) (stop bool)) {
+// 	store := ctx.KVStore(k.storeKey)
+
+// 	iterator := sdk.KVStorePrefixIterator(store, types.KeyOracleRequest)
+// 	defer iterator.Close()
+// 	for ; iterator.Valid(); iterator.Next() {
+// 		var oracleRequest types.OracleRequest
+// 		err := k.cdc.Unmarshal(iterator.Value(), &oracleRequest)
+// 		if err != nil {
+// 			panic(err)
+// 		}
+
+// 		if cb(oracleRequest) {
+// 			break
+// 		}
+// 	}
+// }
+
+// func (k ExpKeeper) GetAllOracleRequest(ctx sdk.Context) (oracleRequests []types.OracleRequest) {
+// 	k.IterateOracleRequest(ctx, func(oracleRequest types.OracleRequest) bool {
+// 		oracleRequests = append(oracleRequests, oracleRequest)
+// 		return false
+// 	})
+// 	return
+// }
+
+func (k ExpKeeper) SetBurnRequestOracle(ctx sdk.Context, oracle types.OracleRequest) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshal(&oracle)
+	key := append(types.KeyOracleRequest, []byte(oracle.AddressRequest)...)
+
+	store.Set(key, bz)
+}
+
+func (k ExpKeeper) GetBurnRequestOracle(ctx sdk.Context, addressBurn string) (oracle types.OracleRequest, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	key := append(types.KeyOracleRequest, []byte(addressBurn)...)
+
+	bz := store.Get(key)
+	if bz == nil {
+		return types.OracleRequest{}, false
+	}
+
+	k.cdc.Unmarshal(bz, &oracle)
+	return oracle, true
+}
+
+func (k ExpKeeper) RemoveBurnRequestOracle(ctx sdk.Context, addressBurn string) {
+	store := ctx.KVStore(k.storeKey)
+	key := append(types.KeyOracleRequest, []byte(addressBurn)...)
+
+	if store.Has(key) {
+		store.Delete(key)
+	}
+}

@@ -32,6 +32,7 @@ func DefaultGenesisState() *GenesisState {
 			AssetDao:      nil,
 		},
 		Params: DefaultParams(),
+		PortId: IBCPortID,
 	}
 }
 

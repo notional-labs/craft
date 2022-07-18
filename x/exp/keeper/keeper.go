@@ -225,7 +225,7 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 }
 
 // SendIbcOracle send a package to query exp price over ibc.
-func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress sdk.AccAddress, coin sdk.Coin, status string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64,
+func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.Coin, status string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64,
 ) error {
 	requestType := "exp_price"
 	// get IBC params
@@ -255,7 +255,7 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress sdk.AccAddress, co
 	oracleRequest := types.OracleRequest{
 		OracleId:        clientID,
 		Type:            status,
-		AddressRequest:  fromAddress.String(),
+		AddressRequest:  fromAddress,
 		AmountInRequest: coin,
 	}
 	k.SetNextOracleRequest(ctx, oracleRequest)
@@ -267,7 +267,7 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress sdk.AccAddress, co
 	}
 	// Create the call data to be used
 	data := oracleScriptCallData{
-		AddressRequest: strings.ToLower(fromAddress.String()),
+		AddressRequest: strings.ToLower(fromAddress),
 		RequestType:    requestType,
 		Status:         status,
 	}

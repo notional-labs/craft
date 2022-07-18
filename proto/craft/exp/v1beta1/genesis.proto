@@ -16,4 +16,5 @@ message GenesisState {
     Params params = 1 [(gogoproto.nullable) = false];
     repeated AccountRecord white_list = 2 [(gogoproto.nullable) = false];
     DaoAssetInfo dao_asset = 3;
+    string port_id = 4;
 }
