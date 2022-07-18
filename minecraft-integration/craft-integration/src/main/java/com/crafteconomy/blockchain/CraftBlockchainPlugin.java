@@ -26,7 +26,7 @@ import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.transactions.PendingTransactions;
 import com.crafteconomy.blockchain.transactions.listeners.ExpiredTransactionListener;
 import com.crafteconomy.blockchain.transactions.listeners.RedisKeyListener;
-import com.crafteconomy.blockchain.transactions.listeners.SignedTxCheckListner;
+import com.crafteconomy.blockchain.transactions.listeners.SignedTxCheckListener;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
@@ -154,7 +154,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
 
         getServer().getPluginManager().registerEvents(new JoinLeave(), this);  
-        getServer().getPluginManager().registerEvents(new SignedTxCheckListner(), this);
+        getServer().getPluginManager().registerEvents(new SignedTxCheckListener(), this);
         getServer().getPluginManager().registerEvents(new ExpiredTransactionListener(), this);
 
 
@@ -203,6 +203,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     public static String getTxQueryEndpoint() {
         // https://api.cosmos.network/cosmos/tx/v1beta1/txs/{TENDERMINT_HASH}
+        // http://65.108.125.182:1317/cosmos/tx/v1beta1/txs/{TENDERMINT_HASH}
         return TX_QUERY_ENDPOINT;
     }
 

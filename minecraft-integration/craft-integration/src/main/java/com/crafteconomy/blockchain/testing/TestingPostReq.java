@@ -1,4 +1,4 @@
-package com.crafteconomy.blockchain;
+package com.crafteconomy.blockchain.testing;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
