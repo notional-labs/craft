@@ -182,8 +182,7 @@ func (am IBCModule) OnRecvPacket(
 		return channeltypes.Acknowledgement{}
 
 	}
-	switch data.ResolveStatus {
-	case oracletypes.RESOLVE_STATUS_SUCCESS:
+	if data.ResolveStatus == oracletypes.RESOLVE_STATUS_SUCCESS {
 		var result resultData
 		err := obi.Decode(data.Result, &result)
 		if err != nil {
@@ -201,10 +200,15 @@ func (am IBCModule) OnRecvPacket(
 				return channeltypes.Acknowledgement{}
 			}
 		}
-	case oracletypes.RESOLVE_STATUS_EXPIRED:
-		//TODO: need implement later
+	} else {
+		oracleRequest := am.keeper.GetOracleRequest(ctx, oracleID)
+		if oracleRequest.Type == "burn" {
+			// remove burnRequest to resend burn oracle request in next block.
+			am.keeper.RemoveBurnRequestOracle(ctx, oracleRequest.AddressRequest)
+		} else {
+			// Change state for user know failed mint request .
+		}
 	}
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypePacket,

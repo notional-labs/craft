@@ -372,3 +372,12 @@ func (k ExpKeeper) GetBurnRequestOracle(ctx sdk.Context, addressBurn string) (or
 	k.cdc.Unmarshal(bz, &oracle)
 	return oracle, true
 }
+
+func (k ExpKeeper) RemoveBurnRequestOracle(ctx sdk.Context, addressBurn string) {
+	store := ctx.KVStore(k.storeKey)
+	key := append(types.KeyOracleRequest, []byte(addressBurn)...)
+
+	if store.Has(key) {
+		store.Delete(key)
+	}
+}

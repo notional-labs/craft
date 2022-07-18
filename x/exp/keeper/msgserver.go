@@ -191,7 +191,7 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 
 	// oracle for exp price
 
-	err = k.ExpKeeper.SendIbcOracle(ctx, fromAddress, msg.Amount[0], "mint", msg.TimeoutHeight, msg.TimeoutTimestamp)
+	err = k.ExpKeeper.SendIbcOracle(ctx, fromAddress.String(), msg.Amount[0], "mint", msg.TimeoutHeight, msg.TimeoutTimestamp)
 	if err != nil {
 		return nil, err
 	}
