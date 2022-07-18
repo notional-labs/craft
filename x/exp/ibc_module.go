@@ -180,7 +180,6 @@ func (am IBCModule) OnRecvPacket(
 	oracleID, err := strconv.ParseUint(data.ClientID, 10, 64)
 	if err != nil {
 		return channeltypes.Acknowledgement{}
-
 	}
 	switch data.ResolveStatus {
 	case oracletypes.RESOLVE_STATUS_SUCCESS:
@@ -202,7 +201,11 @@ func (am IBCModule) OnRecvPacket(
 			}
 		}
 	case oracletypes.RESOLVE_STATUS_EXPIRED:
-		//TODO: need implement later
+		// TODO: need implement later
+	case oracletypes.RESOLVE_STATUS_FAILURE:
+		// TODO: need implement later
+	case oracletypes.RESOLVE_STATUS_OPEN:
+		// TODO: need implement later
 	}
 
 	ctx.EventManager().EmitEvent(
@@ -218,7 +221,6 @@ func (am IBCModule) OnRecvPacket(
 
 	// NOTE: acknowledgement will be written synchronously during IBC handler execution.
 	return acknowledgement
-
 }
 
 // OnAcknowledgementPacket implements the IBCModule interface.
