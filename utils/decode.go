@@ -80,6 +80,12 @@ func decodeImpl(data []byte, v interface{}) ([]byte, error) {
 			}
 		}
 		return rem, nil
+
+	// required to make golint happy.
+	case reflect.Array, reflect.Bool, reflect.Chan, reflect.Complex128, reflect.Complex64, reflect.Float64, reflect.Float32, reflect.Func,
+		reflect.Int, reflect.Interface, reflect.Invalid, reflect.Map, reflect.Pointer, reflect.Uint, reflect.Uintptr, reflect.UnsafePointer:
+		return nil, fmt.Errorf("obi: unsupported value type: %s", ev.Kind())
+
 	default:
 		return nil, fmt.Errorf("obi: unsupported value type: %s", ev.Kind())
 	}

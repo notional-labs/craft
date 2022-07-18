@@ -311,7 +311,11 @@ func (k ExpKeeper) SetNextOracleRequest(ctx sdk.Context, oracleRequest types.Ora
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&oracleRequest)
 	nextID := k.GetNextOracleID(ctx)
-	key := append(types.KeyOracleRequest, GetOracleIDBytes(nextID)...)
+	// NOTE: append only to an already created slice.
+	// You could use types.KeyOracleRequest = append(types.KeyOracleRequest, GetOracleIDBytes(nextID)...).
+	// But wanted to keep readability simple.
+	key := types.KeyOracleRequest
+	key = append(key, GetOracleIDBytes(nextID)...)
 	k.IncreaseOracleID(ctx)
 
 	store.Set(key, bz)
@@ -325,7 +329,10 @@ func (k ExpKeeper) GetOracleRequest(ctx sdk.Context, oracleID uint64) (oracleReq
 		return types.OracleRequest{}
 	}
 
-	k.cdc.Unmarshal(bz, &oracleRequest)
+	_ = k.cdc.Unmarshal(bz, &oracleRequest)
+	// if err != nil { // if we did this, it breaks all of app.go.
+	// 	panic(err)
+	// }
 
 	return oracleRequest
 }
