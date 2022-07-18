@@ -15,6 +15,8 @@ func InitGenesis(ctx sdk.Context, keeper keeper.ExpKeeper, ak types.AccountKeepe
 		keeper.SetAccountRecord(ctx, accAddress, record)
 	}
 
+	// for IBC
+	keeper.SetPort(ctx, data.PortId)
 	keeper.SetDaoAssetInfo(ctx, *data.DaoAsset)
 	ak.GetModuleAccount(ctx, types.ModuleName)
 }
