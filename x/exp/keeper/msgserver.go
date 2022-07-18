@@ -128,6 +128,9 @@ func (k msgServer) JoinDaoByIbcAsset(goCtx context.Context, msg *types.MsgJoinDa
 	}
 
 	err = k.verifyAccountToWhiteList(ctx, joinAddress)
+	if err != nil {
+		return &types.MsgJoinDaoByIbcAssetResponse{}, err
+	}
 
 	MaxCoinMint := sdk.Coin{
 		Amount: msg.Amount.TruncateInt(),
@@ -199,7 +202,7 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 	return &types.MsgSpendIbcAssetToExpResponse{}, nil
 }
 
-// NEED REMOVE WHEN ORACLE DONE
+// NEED REMOVE WHEN ORACLE DONE.
 func (k msgServer) AdjustDaoPrice(goCtx context.Context, msg *types.MsgAdjustDaoTokenPrice) (*types.MsgAdjustDaoTokenPriceResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

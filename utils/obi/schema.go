@@ -71,6 +71,10 @@ func getSchemaImpl(s *strings.Builder, t reflect.Type) error {
 		}
 		s.WriteString("}")
 		return nil
+	// required to make golint happy.
+	case reflect.Array, reflect.Bool, reflect.Chan, reflect.Complex128, reflect.Complex64, reflect.Float64, reflect.Float32, reflect.Func,
+		reflect.Int, reflect.Interface, reflect.Invalid, reflect.Map, reflect.Pointer, reflect.Uint, reflect.Uintptr, reflect.UnsafePointer:
+		return fmt.Errorf("obi: unsupported value type: %s", t.Kind())
 	default:
 		return fmt.Errorf("obi: unsupported value type: %s", t.Kind())
 	}

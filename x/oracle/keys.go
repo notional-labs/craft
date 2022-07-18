@@ -8,16 +8,16 @@ const (
 	// ModuleName is the name of the module.
 	ModuleName = "oracle"
 
-	// Version defines the current version the IBC oracle module supports
+	// Version defines the current version the IBC oracle module supports.
 	Version = "bandchain-1"
 
 	// StoreKey to be used when creating the KVStore.
 	StoreKey = ModuleName
 
-	// QuerierRoute is the querier route for the oracle module
+	// QuerierRoute is the querier route for the oracle module.
 	QuerierRoute = ModuleName
 
-	// RouterKey is the msg router key for the oracle module
+	// RouterKey is the msg router key for the oracle module.
 	RouterKey = ModuleName
 
 	// PortID is the default port id that oracle module binds to.
@@ -55,7 +55,7 @@ var (
 	// ResultStoreKeyPrefix is the prefix for request result store.
 	ResultStoreKeyPrefix = []byte{0xff}
 
-	// PortKey defines the key to store the port ID in store
+	// PortKey defines the key to store the port ID in store.
 	PortKey = []byte{0xf0}
 )
 

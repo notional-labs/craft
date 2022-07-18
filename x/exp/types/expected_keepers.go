@@ -26,7 +26,7 @@ type AccountKeeper interface {
 	GetModuleAddress(name string) sdk.AccAddress
 }
 
-// ChannelKeeper defines the expected IBC channel keeper
+// ChannelKeeper defines the expected IBC channel keeper.
 type ChannelKeeper interface {
 	GetChannel(ctx sdk.Context, srcPort, srcChan string) (channel channeltypes.Channel, found bool)
 	GetNextSequenceSend(ctx sdk.Context, portID, channelID string) (uint64, bool)
@@ -34,24 +34,24 @@ type ChannelKeeper interface {
 	ChanCloseInit(ctx sdk.Context, portID, channelID string, chanCap *capabilitytypes.Capability) error
 }
 
-// ClientKeeper defines the expected IBC client keeper
+// ClientKeeper defines the expected IBC client keeper.
 type ClientKeeper interface {
 	GetClientConsensusState(ctx sdk.Context, clientID string) (connection ibcexported.ConsensusState, found bool)
 }
 
-// ConnectionKeeper defines the expected IBC connection keeper
+// ConnectionKeeper defines the expected IBC connection keeper.
 type ConnectionKeeper interface {
 	GetConnection(ctx sdk.Context, connectionID string) (connection connectiontypes.ConnectionEnd, found bool)
 }
 
-// PortKeeper defines the expected IBC port keeper
+// PortKeeper defines the expected IBC port keeper.
 type PortKeeper interface {
 	BindPort(ctx sdk.Context, portID string) *capabilitytypes.Capability
 }
 
-// ScopedKeeper defines the expected scoped keeper
+// ScopedKeeper defines the expected scoped keeper.
 type ScopedKeeper interface {
-	AuthenticateCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) bool
-	ClaimCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) error
+	AuthenticateCapability(ctx sdk.Context, capability *capabilitytypes.Capability, name string) bool
+	ClaimCapability(ctx sdk.Context, capability *capabilitytypes.Capability, name string) error
 	GetCapability(ctx sdk.Context, name string) (*capabilitytypes.Capability, bool)
 }

@@ -1,4 +1,4 @@
-package com.crafteconomy.blockchain;
+package com.crafteconomy.blockchain.testing;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

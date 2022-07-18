@@ -101,7 +101,15 @@ public class Tx implements Serializable {
     }
 
     public void setCraftAmount(float amount) {
-        this.uCraftAmount = (long)(amount *1_000_000);
+        this.uCraftAmount = (long)(amount*1_000_000);
+        if(this.uCraftAmount <= 0) {
+            this.uCraftAmount = 1; // we can't sign 0ucraft, breaks chain
+        }
+    }
+
+    public void setUCraftAmount(long ucraft_amount) {
+        if(ucraft_amount <= 0) { ucraft_amount = 1; } // we can't sign 0ucraft, breaks chain
+        this.uCraftAmount = ucraft_amount;
     }
 
     public BigDecimal getCraftAmount() {        

@@ -34,7 +34,7 @@ type ExpKeeper struct {
 	scopedKeeper  types.ScopedKeeper
 }
 
-// oracleScriptCallData represents the data that should be OBI-encoded and sent to perform an oracle request
+// oracleScriptCallData represents the data that should be OBI-encoded and sent to perform an oracle request.
 type oracleScriptCallData struct {
 	AddressRequest string `obi:"address_request"`
 	RequestType    string `obi:"request_type"`
@@ -278,7 +278,7 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 		return err
 	}
 
-	feeAmount := sdk.NewCoin("uband", sdk.NewInt(100000)) //0.1band to fee, need change by gov
+	feeAmount := sdk.NewCoin("uband", sdk.NewInt(100000)) // 0.1band to fee, need change by gov
 	packetData := oracletypes.NewOracleRequestPacketData(
 		fmt.Sprint(clientID),
 		209, // oracletypes.OracleScriptID(oraclePrams.ScriptID),
