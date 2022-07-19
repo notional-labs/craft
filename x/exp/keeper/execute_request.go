@@ -69,9 +69,9 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 	memberAccount, _ := sdk.AccAddressFromBech32(mintRequest.Account)
 	maxToken := sdk.NewCoin(k.GetDenom(ctx), mintRequest.DaoTokenMinted.TruncateInt())
 
-	err := k.addAddressToWhiteList(ctx, memberAccount, maxToken)
-	if err != nil {
-		return err
+	err := k.verifyAccountToWhiteList(ctx, memberAccount)
+	if err == nil {
+		k.addAddressToWhiteList(ctx, memberAccount, maxToken)
 	}
 
 	err = k.MintExpForAccount(ctx, sdk.NewCoins(maxToken), memberAccount)
