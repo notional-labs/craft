@@ -48,6 +48,7 @@ func NewKeeper(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	pk types.PortKeeper,
+	ck types.ChannelKeeper,
 	sk capabilitykeeper.ScopedKeeper,
 ) ExpKeeper {
 	// ensure module account is set
@@ -66,6 +67,7 @@ func NewKeeper(
 		paramSpace:    paramSpace,
 		accountKeeper: ak,
 		bankKeeper:    bk,
+		channelKeeper: ck,
 		portKeeper:    pk,
 		scopedKeeper:  sk,
 	}
