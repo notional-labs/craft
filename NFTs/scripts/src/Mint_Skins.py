@@ -1,4 +1,5 @@
-
+import sys
+sys.dont_write_bytecode = True
 from dotenv import load_dotenv
 import requests
 from base64 import b64encode, b64decode
@@ -26,12 +27,16 @@ craftd tx wasm instantiate $C721 '{
 
 
 START_INDEX = 1 # 1 by default
-SKIN_MINT_PRICE = 5 # craft
+SKIN_MINT_PRICE = 5_000_000 # ucraft
 
 load_dotenv()
 MINESKINS_API_KEY = os.getenv("MINESKINS_API_KEY")
 MINESKINS_API_SECRET = os.getenv("MINESKINS_API_SECRET")
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
+os.makedirs(f"{current_dir}/skins", exist_ok=True)
+current_dir = f"{current_dir}/skins"
+
 ADDRM = os.getenv('ADDRM') 
 CRAFTD_REST = os.getenv('CRAFTD_REST')
 
@@ -129,7 +134,7 @@ def step3_sendToMarketplace():
     for tokenId in nft_token_list:
         
         # ADDR721, id, forSalePrice, fileName
-        cTx.transferNFTToMarketplace(ADDR721_SKINS, int(tokenId), SKIN_MINT_PRICE, "SKINS_txSendToMarketplace.txt")
+        cTx.transferNFTToMarketplace(ADDR721_SKINS, int(tokenId), SKIN_MINT_PRICE, "skins/SKINS_txSendToMarketplace.txt")
 
 
 

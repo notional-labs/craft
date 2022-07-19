@@ -1,5 +1,6 @@
 
-
+import sys
+sys.dont_write_bytecode = True
 import os
 import json
 from dotenv import load_dotenv
@@ -40,8 +41,7 @@ def part1_mintToAdminAccount():
 def part2_sendToMarketplace():
     # move to marketplace contract
     from base64 import b64encode
-    listPrice = '{"list_price":{"address":"{ADMIN_WALLET}","amount":"{AMT}","denom":"{TOKEN}"}}'\
-                .replace("{ADMIN_WALLET}", CRAFT_ADMIN_WALLET).replace("{AMT}", str(500)).replace("{TOKEN}", "ucraft")
+    listPrice = '{"list_price":"{AMT}"}'.replace("{AMT}", str(69))
 
     SEND_NFT_JSON = '''{"send_nft":{"contract":"{ADDRM}","token_id":"{ID}","msg":"{LIST_PRICE}"}}''' \
         .replace("{ADDRM}", ADDRM) \

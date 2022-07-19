@@ -23,6 +23,8 @@ removeKeys = ["state", "restrictions", "restrictionTemplate", "rentingPlayer", "
 DENOM = "ucraft"
 
 # ---- Imports ---------------------------------------------------------------------------------------------------------
+import sys
+sys.dont_write_bytecode = True
 import os
 import json
 import time
@@ -33,15 +35,13 @@ from pymongo import MongoClient
 
 from Util import Contract_Tx
 
+
+
 # --- User Defined Variables -------------------------------------------------------------------------------------------
 CRAFTD_REST = "http://65.108.125.182:1317"
-CODE_20=3 # code ids on chain after upload
-CODE_721=4
-CODE_M=5
 
 # Hardcoded once you Contract_Initialize
 load_dotenv()
-ADDR20=os.getenv("ADDR20")
 ADDR721=os.getenv("ADDR721_REALESTATE")
 ADDRM=os.getenv("ADDRM")
 
@@ -54,7 +54,11 @@ if ADDR721 == None:
 load_dotenv()
 uri = os.getenv("CRAFT_MONGO_DB")
 admin_wallet = os.getenv("CRAFT_ADMIN_WALLET")
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
+os.makedirs(f"{current_dir}/real_estate", exist_ok=True)
+current_dir = f"{current_dir}/real_estate"
+
 params_base64 = {'encoding': 'base64'}
 
 # --- Database ---------------------------------------------------------------------------------------------------------
@@ -227,9 +231,10 @@ def step3_generateRESendCommandsToMarketplaceContract():
         cTx.transferNFTToMarketplace(ADDR721, int(tokenId), listingCraftPrice, "RE_txSendToMarketplace.txt")
 
 if __name__ == '__main__':
-    step1_prepareRealEstateDocuments()
-    step2_encodeRealEstateDocumentAndSaveMintToFile()
-    # input("Did you already run commands from step2?"); step3_generateRESendCommandsToMarketplaceContract()
+    # step1_prepareRealEstateDocuments()
+    # step2_encodeRealEstateDocumentAndSaveMintToFile()
+    # input("Did you already run commands from step2?"); 
+    step3_generateRESendCommandsToMarketplaceContract()
 
     # moved to rest API
     # q = Contract_Query.getNFTContractInfo()
