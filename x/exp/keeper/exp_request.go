@@ -219,21 +219,19 @@ func (k ExpKeeper) setEndedMintRequest(ctx sdk.Context, mintRequest types.MintRe
 	store.Set(types.GetEndedMintRequestKey(accAddress), bz)
 }
 
-func (k ExpKeeper) GetMintRequestByKey(ctx sdk.Context, key []byte) (types.MintRequest, error) {
-	var mintRequest types.MintRequest
-
+func (k ExpKeeper) GetMintRequestByKey(ctx sdk.Context, key []byte) (mintRequest types.MintRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(key) {
-		return types.MintRequest{}, sdkerrors.Wrapf(types.ErrInvalidKey, "mintRequest")
+		return types.MintRequest{}, false
 	}
 
 	bz := store.Get(key)
 	err := k.cdc.Unmarshal(bz, &mintRequest)
 	if err != nil {
-		return types.MintRequest{}, err
+		return types.MintRequest{}, false
 	}
 
-	return mintRequest, nil
+	return mintRequest, true
 }
 
 // IterateMintRequest iterates over the all the MintRequest and performs a callback function .

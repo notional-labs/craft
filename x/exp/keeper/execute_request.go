@@ -5,7 +5,7 @@ import (
 	"github.com/notional-labs/craft/x/exp/types"
 )
 
-func (k ExpKeeper) GetMintRequest(ctx sdk.Context, accAddress sdk.AccAddress) (types.MintRequest, error) {
+func (k ExpKeeper) GetMintRequest(ctx sdk.Context, accAddress sdk.AccAddress) (mintRequset types.MintRequest, found bool) {
 	return k.GetMintRequestByKey(ctx, types.GetMintRequestAddressBytes(accAddress))
 }
 

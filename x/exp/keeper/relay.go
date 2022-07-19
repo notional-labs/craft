@@ -20,6 +20,7 @@ func (k ExpKeeper) OnOracleRequestTimeoutPacket(
 }
 
 func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest string, strExpPrice string, oracleID uint64) error {
+
 	accAddress, err := sdk.AccAddressFromBech32(addressRequest)
 	if err != nil {
 		return err
@@ -33,11 +34,17 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 
 	k.setDaoTokenPrice(ctx, sdk.NewDec(price))
 
-	mintRequest, err := k.GetMintRequest(ctx, accAddress)
-	oracleRequest := k.GetOracleRequest(ctx, oracleID)
-	if err != nil {
-		return err
+	mintRequest, found := k.GetMintRequest(ctx, accAddress)
+
+	if !found {
+		return types.ErrAddressdNotFound
 	}
+	// verify time
+	if !k.ValidateMintRequestByTime(ctx, mintRequest) {
+		return types.ErrTimeOut
+	}
+
+	oracleRequest := k.GetOracleRequest(ctx, oracleID)
 	err = k.ExecuteMintExpByIbcToken(ctx, mintRequest, oracleRequest.AmountInRequest)
 	if err != nil {
 		return err

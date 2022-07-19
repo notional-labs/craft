@@ -233,7 +233,7 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 ) error {
 	requestType := "exp_price"
 	// get IBC params
-	sourcePort := "oracle"
+	sourcePort := "ibc-exp"
 	sourceChannel := "channel-1"
 
 	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)
