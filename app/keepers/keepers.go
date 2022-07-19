@@ -72,6 +72,7 @@ type AppKeepers struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
+	ScopedOracleKeeper   capabilitykeeper.ScopedKeeper
 
 	// "Normal" keepers
 	// keepers
@@ -194,6 +195,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.GetSubspace(exptypes.ModuleName),
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
+		appKeepers.ScopedOracleKeeper,
 	)
 	expIBCModule := exp.NewIBCModule(appCodec, appKeepers.ExpKeeper)
 	appKeepers.ExpIBCModule = expIBCModule
@@ -313,6 +315,7 @@ func (appKeepers *AppKeepers) InitSpecialKeepers(
 	appKeepers.ScopedIBCKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	appKeepers.ScopedTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	appKeepers.ScopedWasmKeeper = appKeepers.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
+	appKeepers.ScopedOracleKeeper = appKeepers.CapabilityKeeper.ScopeToModule(exptypes.ModuleName)
 	appKeepers.CapabilityKeeper.Seal()
 
 	// TODO: Make a SetInvCheckPeriod fn on CrisisKeeper.

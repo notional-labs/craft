@@ -9,9 +9,9 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	clienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
-
 	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
 	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	"github.com/notional-labs/craft/utils/obi"
@@ -47,6 +47,7 @@ func NewKeeper(
 	paramSpace paramtypes.Subspace,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
+	sk capabilitykeeper.ScopedKeeper,
 ) ExpKeeper {
 	// ensure module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -64,6 +65,7 @@ func NewKeeper(
 		paramSpace:    paramSpace,
 		accountKeeper: ak,
 		bankKeeper:    bk,
+		scopedKeeper:  sk,
 	}
 }
 
