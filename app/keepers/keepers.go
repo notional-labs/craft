@@ -195,6 +195,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.GetSubspace(exptypes.ModuleName),
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
+		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedOracleKeeper,
 	)
 	expIBCModule := exp.NewIBCModule(appCodec, appKeepers.ExpKeeper)

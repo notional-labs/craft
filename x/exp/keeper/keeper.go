@@ -47,6 +47,7 @@ func NewKeeper(
 	paramSpace paramtypes.Subspace,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
+	pk types.PortKeeper,
 	sk capabilitykeeper.ScopedKeeper,
 ) ExpKeeper {
 	// ensure module account is set
