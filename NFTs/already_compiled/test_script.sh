@@ -5,7 +5,7 @@
 # then filter that out with getOffering {} struct if desired by the user
 
 export KEY="mykey"
-export KEY2="mykey2"
+export KEY2="mykey2" # craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r
 export KEYALGO="secp256k1"
 export CRAFT_CHAIN_ID="test-1"
 export CRAFTD_KEYRING_BACKEND="test"

@@ -88,9 +88,9 @@ class Skins:
 
 
 def main():
-    # step1_save_skins_to_file()
+    step1_save_skins_to_file()
     # step2_saveMintTxsToFile()
-    input("Step 3..."); step3_sendToMarketplace()
+    # input("Step 3..."); step3_sendToMarketplace()
 
     # v = s.getSkinValues(1623065198); print(v)
     pass
@@ -102,7 +102,7 @@ def step1_save_skins_to_file():
             _id = int(mySkin['id'])
             skin_values[_id] = s.getSkinValues(_id) 
 
-    with open('mint_skin_values.json', 'w') as f:
+    with open(current_dir + "/mint_skin_values.json", 'w') as f:
         json.dump(skin_values, f, indent=4)
 
 # not going to use BASE64 & see if it works out easier
