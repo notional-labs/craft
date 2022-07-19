@@ -66,6 +66,7 @@ func NewKeeper(
 		paramSpace:    paramSpace,
 		accountKeeper: ak,
 		bankKeeper:    bk,
+		portKeeper:    pk,
 		scopedKeeper:  sk,
 	}
 }
