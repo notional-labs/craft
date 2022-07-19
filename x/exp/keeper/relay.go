@@ -20,7 +20,6 @@ func (k ExpKeeper) OnOracleRequestTimeoutPacket(
 }
 
 func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest string, strExpPrice string, oracleID uint64) error {
-
 	accAddress, err := sdk.AccAddressFromBech32(addressRequest)
 	if err != nil {
 		return err
