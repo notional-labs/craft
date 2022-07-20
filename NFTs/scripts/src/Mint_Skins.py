@@ -1,15 +1,23 @@
 import sys
 sys.dont_write_bytecode = True
+
 from dotenv import load_dotenv
-import requests
 from base64 import b64encode, b64decode
-import os
+
+import requests, os, json, time
 import redis # python3 -m pip install redis==4.1.4
-import json
+
+# IPFS / Rendering
+import ipfsApi # pip install ipfs-api
+import shutil
+from PIL import Image
+from MinePI import render_3d_skin # pip install MinePI
+import asyncio
+api = ipfsApi.Client('https://ipfs.infura.io', 5001)
 
 from Util import Contract_Tx
 
-# AI Generated skins? - https://github.com/saltysnacc/SkinGAN
+# FUTURE: AI Generated skins? - https://github.com/saltysnacc/SkinGAN
 
 # https://github.com/MineSkin/api.mineskin.org
 # https://rest.wiki/?https://api.mineskin.org/openapi
@@ -26,32 +34,40 @@ craftd tx wasm instantiate $C721 '{
 '''
 
 
-START_INDEX = 1 # 1 by default
+START_INDEX = 50 # 1 by default
 SKIN_MINT_PRICE = 5_000_000 # ucraft
+MINT_SKIN_SLEEP_TIME = 1 # in seconds. So ipfs doesn't bitch
+MAX_NFTS_TO_MINT_TEST = 5
 
 load_dotenv()
 MINESKINS_API_KEY = os.getenv("MINESKINS_API_KEY")
 MINESKINS_API_SECRET = os.getenv("MINESKINS_API_SECRET")
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-os.makedirs(f"{current_dir}/skins", exist_ok=True)
-current_dir = f"{current_dir}/skins"
+skins_dir = f"{current_dir}/skins"
+renderings = f"{current_dir}/skin_renderings" # saved ipfs renderings of walking pose
+
+os.makedirs(skins_dir, exist_ok=True)
+os.makedirs(renderings, exist_ok=True)
+
 
 ADDRM = os.getenv('ADDRM') 
 CRAFTD_REST = os.getenv('CRAFTD_REST')
-
 ADDR721_SKINS = os.getenv("ADDR721_SKINS")
 CRAFT_ADMIN_WALLET = os.getenv("CRAFT_ADMIN_WALLET")
 
+# Cache System (Removed for now)
+# r = redis.Redis.from_url(os.getenv("REDIS_CACHE"))  # print(r.keys()); exit()
 
-r = redis.Redis.from_url(os.getenv("REDIS_CACHE"))
-# print(r.keys()); exit()
-
-headers = {
-    'accept': 'application/json',
-    'User-Agent': 'MyFancyUserAgent/1.0',
-}
+headers = { 'accept': 'application/json', 'User-Agent': 'MyFancyUserAgent/1.0',}
 params_base64 = {'encoding': 'base64'}
+
+def main():
+    # asyncio.run(step1_save_skins_to_file())  # runs 1 and 2
+    input("Run tx_mint_skins_commands.txt..."); step3_sendToMarketplace()
+
+    # v = s.getSkinValues(1623065198); print(v)
+    pass
 
 class Skins:
     def getPage(self, page) -> list: # list of dicts
@@ -62,7 +78,42 @@ class Skins:
             return response['skins']
         return []
 
-    def getSkinValues(self, id: int):
+    async def render_skin(self, texture_url):
+        filename = texture_url.split("/")[-1] + ".png"
+        file_path = renderings + "/" + filename
+
+        r = requests.get(texture_url, stream = True)
+        if r.status_code == 200:
+            # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
+            r.raw.decode_content = True
+            # Open a local file with wb ( write binary ) permission.
+            with open(file_path,'wb') as f:
+                shutil.copyfileobj(r.raw, f)            
+            print('Image successfully Downloaded: ',filename)
+        else:
+            print('Image Couldn\'t be retrieved')
+
+        skin_image = Image.open(file_path)
+        image = await render_3d_skin(skin_image=skin_image, hr=30, vr=-20, aa=True,
+            vrll=20, vrrl=-20, vrla=-25, vrra=25) # walking motion
+        
+        # show an Image.Image
+        # image.show()
+        # delete old file (texture skin)
+        os.remove(file_path)
+        # save image to the filename
+        image.save(file_path)
+
+        
+        # res = api.add("skin_renderings/" + filename)
+        os.chdir(renderings)
+        res = api.add(filename)
+        # print(f"{filename} https://ipfs.infura.io/ipfs/{res['Hash']}")
+        # exit()
+        os.chdir("..")
+        return f"https://ipfs.infura.io/ipfs/{res['Hash']}"
+
+    async def getSkinValues(self, id: int):
         # we dont save to cache here, we do that in the TS query
         # REDIS_CACHE_KEY = "cache:skins_textures" # speeds up query time for past events
         # value = r.hget(REDIS_CACHE_KEY, str(id))
@@ -70,7 +121,7 @@ class Skins:
         #     value = json.loads(value)
         #     if len(value) > 0:
         #         print(f"[Redis Cache] {id} found")
-        #         return value # if not, we need to requery the API
+        #         return value # if not, we need to re-query the API
 
         response = requests.get(f'https://api.mineskin.org/get/id/{id}', headers=headers).json()
         if 'data' in response:
@@ -79,38 +130,37 @@ class Skins:
                 "_nft_type": "skin", # helps with sorting
                 "value": texture['value'], 
                 "signature": texture['signature'],
-                "url": texture['url']
+                "url": texture['url'],
+                "rendering": await self.render_skin(texture['url']),
             }
+
+            # TODO: Render here, update textureData to that rendering
             print(f'Downloaded {id}')
             # r.hset(REDIS_CACHE_KEY, str(id), json.dumps(textureData))
             return textureData
         return {}
 
-
-def main():
-    step1_save_skins_to_file()
-    # step2_saveMintTxsToFile()
-    # input("Step 3..."); step3_sendToMarketplace()
-
-    # v = s.getSkinValues(1623065198); print(v)
-    pass
-
-def step1_save_skins_to_file():
+async def step1_save_skins_to_file():    
     s = Skins()
     for i in range(0, 1):
-        for mySkin in s.getPage(i):
+        for idx, mySkin in enumerate(s.getPage(i)):
             _id = int(mySkin['id'])
-            skin_values[_id] = s.getSkinValues(_id) 
+            skin_values[_id] = await s.getSkinValues(_id) 
+            time.sleep(MINT_SKIN_SLEEP_TIME)
+            print(f"Only making {MAX_NFTS_TO_MINT_TEST} nfts")
+            if idx == MAX_NFTS_TO_MINT_TEST-1: break;
 
-    with open(current_dir + "/mint_skin_values.json", 'w') as f:
+    with open(skins_dir + "/mint_skin_values.json", 'w') as f:
         json.dump(skin_values, f, indent=4)
+
+    step2_saveMintTxsToFile();
 
 # not going to use BASE64 & see if it works out easier
 def step2_saveMintTxsToFile(): 
-    fileName = "tx_mint_skins_commands.txt"
+    fileName = skins_dir + "/tx_mint_skins_commands.txt"
     print(f"Step 2: Skins from Step1 -> {fileName}")
 
-    skin_values = json.load(open('mint_skin_values.json', 'r'))
+    skin_values = json.load(open(skins_dir + '/mint_skin_values.json', 'r'))
 
     for idx, (id, data) in enumerate(skin_values.items(), START_INDEX):
         b64Data = b64encode(json.dumps(data).encode('utf-8')).decode('utf-8')
