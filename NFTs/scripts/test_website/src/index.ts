@@ -29,32 +29,126 @@ async function main() {
 
 	// returns a list of {} objects which are currently for sale. To purchase, buyNFT with the offering_id & amount in ucraft sent
 	// getAvailableOfferings(client);
+
 	// buys an NFT buy sending a msg -> the contract to buy the offering ID, also passes through the ucraft amount to buy it
 	// buyNFT("2", 5_000_000);
 
+	// Gets CRAFT tokens the user owns (real estate, skins, [images in the future])
+	// queryTokensUserOwns("craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r")	
 
-	// queryTokensUserOwns("craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r")
 
-	rendering();
+	// puts up an NFT for sale. Takes in the 
+	// listNFT("craft1qjxu65ucccpg8c5kac8ng6yxfqq85fluwd0p9nt74g2304qw8eyqz8azvt", "10", 127);
+
+	// const values = await getUsersMarketplaceListings("craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r");
+	const values = await getUsersMarketplaceListings("craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl");
+	console.log(values);
+
+	// withdrawNFTBack("24") // even tho the token is 10, 24 is the marketplace id listing.
 
 }
 
 main();
 
 // export function getAllNFTs(who: string = offering_api) {
-export async function getAvailableOfferings(client) {
+export async function getAvailableOfferings() {
 	// While you could get it this way, you don't get all the data that the API provides extra.
 	// const offerings = await client.queryContractSmart(marketplace_721, { get_offerings: {} });
 	// console.log(offerings);
 
-
 	// make an axios requests
 	const response = await axios.get(offering_api);
 	const offerings = response.data;
-	console.log(offerings);
-
+	// console.log(offerings);
+	return offerings;
 }
 
+
+export async function listNFT(contract_address: string, token_id: string, ucraft_amt: number) {
+	// sell an NFT to the marketplace with CosmWasm
+	const gasPrice = GasPrice.fromString("0.025ucraft");
+	const fee = calculateFee(200_000, gasPrice);
+	const mnemonic = "flag meat remind stamp unveil junior goose first hold atom deny ramp raven party lens jazz tape dad produce wrap citizen common vital hungry";
+	const hd_options: Secp256k1HdWalletOptions = {
+		bip39Password: "",
+		hdPaths: [stringToPath("m/44'/118'/0'/0/0")],
+		prefix: "craft",
+	}
+	const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, hd_options);
+	const client_options: SigningCosmWasmClientOptions = {
+		broadcastPollIntervalMs: 300,
+		broadcastTimeoutMs: 8_000,
+		gasPrice: gasPrice,
+		prefix: "craft"
+	};
+	const client = await SigningCosmWasmClient.connectWithSigner(
+		rpcEndpoint,
+		wallet,
+		client_options,
+	);
+	const account = await wallet.getAccounts();
+	console.log(account);
+
+	const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
+	
+	const resp = await client.execute(
+		"craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r",
+		contract_address,
+		{ send_nft: { contract: MARKETPLACE, token_id: token_id, msg: encode(JSON.stringify({"list_price":ucraft_amt.toString()}))		} },
+		fee,
+		`Listing ${token_id} ${contract_address} for sale`,		
+	);
+	console.log(resp);
+}
+export async function withdrawNFTBack(marketplace_offering_id: string) {
+	// sell an NFT to the marketplace with CosmWasm
+	const gasPrice = GasPrice.fromString("0.025ucraft");
+	const fee = calculateFee(200_000, gasPrice);
+	const mnemonic = "flag meat remind stamp unveil junior goose first hold atom deny ramp raven party lens jazz tape dad produce wrap citizen common vital hungry";
+	const hd_options: Secp256k1HdWalletOptions = {
+		bip39Password: "",
+		hdPaths: [stringToPath("m/44'/118'/0'/0/0")],
+		prefix: "craft",
+	}
+	const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, hd_options);
+	const client_options: SigningCosmWasmClientOptions = {
+		broadcastPollIntervalMs: 300,
+		broadcastTimeoutMs: 8_000,
+		gasPrice: gasPrice,
+		prefix: "craft"
+	};
+	const client = await SigningCosmWasmClient.connectWithSigner(
+		rpcEndpoint,
+		wallet,
+		client_options,
+	);
+	const account = await wallet.getAccounts();
+	console.log(account);
+	
+	const resp = await client.execute(
+		"craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r",
+		MARKETPLACE,
+		{ withdraw_nft: { offering_id: marketplace_offering_id } },
+		fee,
+		`Withdrawing ${marketplace_offering_id} from marketplace.`,		
+	);
+	console.log(resp);
+}
+
+export async function getUsersMarketplaceListings(craft_address: string) {
+	// gets all offerings & then sorts them if they are the wanted addresse's listing.
+	let ourOfferings: any = [];
+
+	// let ourOfferings: any = await getAvailableOfferings();
+	const offerings = await getAvailableOfferings();
+	for(let offering of offerings) {
+		if(offering.seller === craft_address) {			
+			ourOfferings.push(offering);
+		}
+	}
+	return ourOfferings;
+	
+}
 
 export async function buyNFT(MarketplaceID: string, ucraft_amt: number) {
 	// buy an NFT from the marketplace with CosmWasmJS. This would be via keplr wallet in the future.
@@ -111,34 +205,4 @@ export async function queryTokensUserOwns(craft_address: string) {
 
 	const skins = await axios.get(`http://api.crafteconomy.io/v1/nfts/owned/${ADDR721_SKINS}/${craft_address}`);
 	console.log(skins.data);
-}
-
-export async function rendering() {
-
-	// Option 1:
-	// So idk how to do JS/TS things, but here is a skin rendering package
-	// https://www.npmjs.com/package/minerender
-
-	// Example: https://minerender.org/embed/skin/?skin=reecepbcups&shadow=true
-	// Marketplace IdeaL https://cdn.discordapp.com/attachments/999037174165028874/999037365773422682/unknown.png
-
-	// here is a skin object in the marketplace / 721 token:
-	// value: 'ewogICJ0aW1lc3RhbXAiIDogMTY1ODI0OTYzODE5NSwKICAicHJvZmlsZUlkIiA6ICJiMDBmZWRjOTM0YmU0NWIxOGI3M2MyOTgzNjFjZTg3MSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGRlcmJyYXVlIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzgxNGMzYzM5ODI0ZmJkMmE3YjRlYzllOWQ5MjdiZjNlNWJjNWU2MmQ4MDg2YTZhN2QxZmZiYTY4MzEzODBmOTgiCiAgICB9CiAgfQp9',
-    // signature: 'r7ZJUSxRzEPeroG4mM8MT1gmelvT7skzTUq+1oRUjAH0tLngy8YVRFtztFm46VxoVa6nXjXfaihSqLjg4E+3uC4dIDabtxKXhUL6WUFMJU6QFZYLJPBw9k776dodtb3y4/rQwqzppvtvkWA6247nso1+UcKwwCOn/Ha7H9Fmr3dQVL3dNcpusXLHIerBCAbRZ3NG2QUHb7+9/nHbG9d8z/9lE7zbevH+QkYklUcLNBJWhOXIqXGXpW0iQny73bmsJAD9XhQH6JutiTjoardLC8d1cWSKdKPtjZ/qn8J9zOk9ckf3aG/vtA8uy6VwE+ExAepNUtAhf4VHSVbKJk7NFRbgjpmMjLbeAg79+lWYmLA9NZj2CAM5DaMyE+w2ypqwBf1UTR4jJ4pfDIfWh+ZtT4PBnK5DUSvgfvSMpBEBrqQBzbZUURcDbdaFT6kjq5bqUVCBPwlU2G+JDSDN4f0Qj9TkJsVedy02X6csRQsqyOemvn660mAAuTZ1YoAJX6gwh5r+IhXNwL8YPQWa1Xa2qQWAIMhKULprjlEJRmdWj6I9/8uMzwWvA+zNTX8od+KOSIjNmIBdwxmaPH38j2PzrXyJVIEMVhaZb8WoNYI1sZZQKi0mEQUhR+5GI7H2xhDmrvEA8ZagbbkKDTswUORvlDMpfvQDc/qB1lwnamvtHvc=',
-    // url: 'http://textures.minecraft.net/texture/814c3c39824fbd2a7b4ec9e9d927bf3e5bc5e62d8086a6a7d1ffba6831380f98',
-    // tokenId: '10'
-
-	// url is the link to the texture itself. This can be put on a skin model & rendered.
-	// https://github.com/bs-community/skinview3d
-	// This library does it.
-
-	// HOWTO:
-	// 1) Visit https://bs-community.github.io/skinview3d/
-	// 2) Download http://textures.minecraft.net/texture/814c3c39824fbd2a7b4ec9e9d927bf3e5bc5e62d8086a6a7d1ffba6831380f98
-	// 3) In the "Skin:" section, browse & select that downloaded image
-	// It now renders in browser (remove Panorama)
-
-
-	
-
 }

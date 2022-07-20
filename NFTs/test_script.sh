@@ -27,7 +27,7 @@ export KEY_ADDR2=`craftd keys show $KEY2 -a`
 # get this diredctory with basedir command
 cd $(basedir "$0")
 
-# NFT Contract
+# NFT Contract (Code id 3 rn)
 TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && \
 CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && \
 NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re2","symbol": "ctest","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-realestate2" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && \
@@ -123,6 +123,10 @@ craftd tx wasm execute "$ADDR721SKIN" "$SEND_NFT_JSON" --gas-prices="0.025ucraft
 # withdraw NFT so it is no longer for sale
 craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"1"}}' $CRAFTD_COMMAND_ARGS -y
 
+
+# gets all contracts which are CW721
+# craftd q wasm list-contract-by-code 3 --output json | jq '.contracts'
+# So our API could query this list, check which a user owns, so we get ALL iamges they own.
 
 
 # buy the NFT with mykey2 & with ucraft
