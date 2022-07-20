@@ -17,7 +17,6 @@ const rpcEndpoint = "http://65.108.125.182:26657/";
 const offering_api = 'http://api.crafteconomy.io/v1/marketplace/offerings';
 // http://api.crafteconomy.io/v1/nfts/get_contract_addresses
 const MARKETPLACE = "craft1nwp0ynjv84wxysf2f5ctvysl6dpm8ngm70hss6jeqt8q7e7u345sgynrhu"
-const ADDR721_SKINS = "craft1qjxu65ucccpg8c5kac8ng6yxfqq85fluwd0p9nt74g2304qw8eyqz8azvt"
 const ADDR721_REALESTATE = "craft1udfs22xpxle475m2nz7u47jfa3vngncdegmczwwdx00cmetypa3s5mr4eq"
 
 
@@ -202,7 +201,5 @@ export async function queryTokensUserOwns(craft_address: string) {
 	const response = await axios.get(`http://api.crafteconomy.io/v1/nfts/owned/${ADDR721_REALESTATE}/${craft_address}`);
 	console.log(response.data);
 
-
-	const skins = await axios.get(`http://api.crafteconomy.io/v1/nfts/owned/${ADDR721_SKINS}/${craft_address}`);
-	console.log(skins.data);
+	// TODO: Future owned will return all real estate AND normal images, just have to add mroe queries on the backend
 }

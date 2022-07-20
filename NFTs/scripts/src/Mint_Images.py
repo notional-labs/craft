@@ -13,7 +13,8 @@ ADDRM = os.getenv('ADDRM')
 
 links = [
     # random link(s)
-    "https://www.instagram.com/static/images/homepage/screenshots/screenshot1.png/fdfe239b7c9f.png",
+    "https://ipfs.stargaze.zone/ipfs/bafybeih43v4ninep6ugcow7nh46kgvd7ejg6impfoz6br4fri4gvidu4bu/images/140.png",
+    "https://ipfs.stargaze.zone/ipfs/bafybeih43v4ninep6ugcow7nh46kgvd7ejg6impfoz6br4fri4gvidu4bu/images/145.png",
 ]
 
 # A normal contract for images
