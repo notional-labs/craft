@@ -28,58 +28,66 @@ export KEY_ADDR2=`craftd keys show $KEY2 -a`
 cd $(basedir "$0")
 
 # NFT Contract (Code id 3 rn)
-TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && \
-CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && \
-NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re2","symbol": "ctest","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-realestate2" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && \
-sleep 1
+TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
+CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
+NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re3","symbol": "ctest","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-realestate3" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
+sleep 3
 ADDR721=$(craftd query tx $NFT721_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "ADDR 721: $ADDR721"
-export ADDR721=craft1udfs22xpxle475m2nz7u47jfa3vngncdegmczwwdx00cmetypa3s5mr4eq
+export ADDR721=craft16y344e8ryydmeu2g8yyfznq79j7jfnar4p59ngpvaazcj83jzsmsaaq6gm
 
 # ADDR_test721 (testing images)
-TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && \
-CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && \
-IMAGE_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craft-images","symbol": "cimg","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-images" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && \
-sleep 1
+TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
+CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
+IMAGE_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craft-images2","symbol": "cimg","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-images" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
+sleep 3
 ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "ADDR 721 IMAGES (LINKS): $ADDR721IMAGES"
-export ADDR721IMAGES=craft10fqy0npt7djm8lg847v9rqlng88kqfdvl8tyt4ge204wf52sy68qfdqfv6
+export ADDR721IMAGES=craft1q23d30x94cm8ve243pxdc52m398r4l5ecgcfp8tud3vggcsq8s2qz0py27
 
 # marketplace
-TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json | jq -r '.txhash') && \
-MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value') && \
-MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name": "m14","denom": "ucraft"}' --label "m11" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash') && \
-sleep 1 && \
+TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
+MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
+MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name": "m15","denom": "ucraft"}' --label "m11" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash') && sleep 1
+sleep 3
 ADDRM=$(craftd query tx $MARKET_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Marketplace Address: $ADDRM"
-export ADDRM=craft1nwp0ynjv84wxysf2f5ctvysl6dpm8ngm70hss6jeqt8q7e7u345sgynrhu
+export ADDRM=craft1ahg0erc2fs6xx3j5m8sfx3ryuzdjh6kf6qm9plsf865fltekyrfsnh63rw
 
 
+function mintToken() {
+    CONTRACT_ADDR=$1
+    TOKEN_ID=$2
+    TOKEN_URI=$3
+    export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"%s","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $TOKEN_ID $JSON_ENCODED`
+    TXMINT=$(craftd tx wasm execute "$CONTRACT_ADDR" "$EXECUTED_MINT_JSON" --from $KEY --yes --output json | jq -r '.txhash') && echo $TXMINT
+}
 
 # ==================================PROPERTIES EXAMPLE====================================================
-# This is NOT the final version, will be modifying nft mint script in python to do this w/ database values
-export JSON_ENCODED=`echo '{"_nft_type":"realestate", "_id": "dbcd78cb-326e-4842-982b-9252f9ca25a7","name": "MyNFTproperty1", "type": "HOME", "description": "This is my NFT1", "image": "https://image.com/1.png"}' | base64 -w 0` #&& echo $JSON_ENCODED
-export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $JSON_ENCODED` #&& echo $EXECUTED_MINT_JSON
-TXMINT=$(craftd tx wasm execute "$ADDR721" "$EXECUTED_MINT_JSON" --from $KEY --yes --output json | jq -r '.txhash') && echo $TXMINT
+# base64 is from the Mint_RealEstate.py script
 
-export JSON_ENCODED=`echo '{"_nft_type":"realestate", "_id": "1fa35e3a-04d7-49a0-9e84-c67cf1f55c7f","name": "MyNFTproperty2", "type": "HOME", "description": "This is my NFT2", "image": "https://image.com/2.png"}' | base64 -w 0` #&& echo $JSON_ENCODED
-export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"2","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $JSON_ENCODED` #&& echo $EXECUTED_MINT_JSON
-TXMINT=$(craftd tx wasm execute "$ADDR721" "$EXECUTED_MINT_JSON" --from $KEY --yes --output json | jq -r '.txhash') && echo $TXMINT
+mintToken $ADDR721 1 "eyJfaWQiOiAiNDY2YjJjMjEtNTY4MC00Mzg2LTk3ZDUtYzM0MDcwZjU0NjI0IiwgIm5hbWUiOiAiTWVnYS1NYW5zaW9uICMxIiwgImRlc2NyaXB0aW9uIjogIkEgbHV4dXJpb3VzIGFuZCBsYXJnZSBtYW5zaW9uIGxvY2F0ZWQgb24gdGhlIGVkZ2Ugb2YgY2l0eS4iLCAiaW1hZ2VMaW5rIjogImh0dHBzOi8vaS5pbWd1ci5jb20vTXc3OGp4dS5wbmciLCAiZmxvb3JBcmVhIjogMjA4NTYsICJ0b3RhbFZvbHVtZSI6IDYyNTY4LCAid29ybGROYW1lIjogIndvcmxkIiwgImNpdHlJZCI6ICJiZjcxM2RkOS03ZTFhLTRjYTUtYTA3Ny0yNTFjNTc0ZDQ5YjMiLCAiYnVpbGRpbmdJZCI6IG51bGwsICJ0eXBlIjogIlJFU0lERU5USUFMIiwgImNpdHlOYW1lIjogIkNyYWZ0IENpdHkiLCAiYnVpbGRpbmdOYW1lIjogIiIsICJfbmZ0X3R5cGUiOiAicmVhbF9lc3RhdGUifQ=="
+mintToken $ADDR721 2 "eyJfaWQiOiAiN2UzNzQyN2QtODZhNy00MmZjLThiZGMtMjZlNzczNjBmNDhkIiwgIm5hbWUiOiAiTWlkLU1hbnNpb24gIzEiLCAiZGVzY3JpcHRpb24iOiAiQSBtaWQtc2l6ZWQgbWFuc2lvbiBsb2NhdGVkIGFjcm9zcyBmcm9tIHRoZSBiZWFjaC4iLCAiaW1hZ2VMaW5rIjogImh0dHBzOi8vaS5pbWd1ci5jb20vWnlPWHJWay5qcGVnIiwgImZsb29yQXJlYSI6IDc2MzIsICJ0b3RhbFZvbHVtZSI6IDMxMjkxMiwgIndvcmxkTmFtZSI6ICJ3b3JsZCIsICJjaXR5SWQiOiAiYmY3MTNkZDktN2UxYS00Y2E1LWEwNzctMjUxYzU3NGQ0OWIzIiwgImJ1aWxkaW5nSWQiOiBudWxsLCAidHlwZSI6ICJSRVNJREVOVElBTCIsICJjaXR5TmFtZSI6ICJDcmFmdCBDaXR5IiwgImJ1aWxkaW5nTmFtZSI6ICIiLCAiX25mdF90eXBlIjogInJlYWxfZXN0YXRlIn0="
+mintToken $ADDR721 3 "eyJfaWQiOiAiZjZhMjA4OGUtZmRjMi00M2Q5LTlmOTQtMDVjZjE0OWIwM2ExIiwgIm5hbWUiOiAiU3VidXJiYW4gSG9tZSAxIiwgImRlc2NyaXB0aW9uIjogIkEgc21hbGwgc3VidXJiYW4gaG9tZSBsb2NhdGVkIGp1c3Qgb3V0c2lkZSB0aGUgYnVzaW5lc3MgZGlzdHJpY3QuIiwgImltYWdlTGluayI6ICJodHRwczovL2kuaW1ndXIuY29tL0N4N0hLRkQucG5nIiwgImZsb29yQXJlYSI6IDgxMCwgInRvdGFsVm9sdW1lIjogOTcyMCwgIndvcmxkTmFtZSI6ICJ3b3JsZCIsICJjaXR5SWQiOiAiYmY3MTNkZDktN2UxYS00Y2E1LWEwNzctMjUxYzU3NGQ0OWIzIiwgImJ1aWxkaW5nSWQiOiBudWxsLCAidHlwZSI6ICJSRVNJREVOVElBTCIsICJjaXR5TmFtZSI6ICJDcmFmdCBDaXR5IiwgImJ1aWxkaW5nTmFtZSI6ICIiLCAiX25mdF90eXBlIjogInJlYWxfZXN0YXRlIn0="
+mintToken $ADDR721 4 "eyJfaWQiOiAiMWIyYmZkMWItM2ZhMi00ZDhlLTgyMjUtZDM0YTU0M2ZkZGM0IiwgIm5hbWUiOiAiQmVhY2ggU2hvcCAjMSIsICJkZXNjcmlwdGlvbiI6ICJBIGNvenkgbGl0dGxlIHNob3AgbG9jYXRlZCBvbiB0aGUgYmVhY2guIiwgImltYWdlTGluayI6ICJodHRwczovL2kuaW1ndXIuY29tL1RrYWFEYVQucG5nIiwgImZsb29yQXJlYSI6IDM4NCwgInRvdGFsVm9sdW1lIjogNjE0NCwgIndvcmxkTmFtZSI6ICJ3b3JsZCIsICJjaXR5SWQiOiAiYmY3MTNkZDktN2UxYS00Y2E1LWEwNzctMjUxYzU3NGQ0OWIzIiwgImJ1aWxkaW5nSWQiOiBudWxsLCAidHlwZSI6ICJCVVNJTkVTUyIsICJjaXR5TmFtZSI6ICJDcmFmdCBDaXR5IiwgImJ1aWxkaW5nTmFtZSI6ICIiLCAiX25mdF90eXBlIjogInJlYWxfZXN0YXRlIn0="
+mintToken $ADDR721 5 "eyJfaWQiOiAiOTc3OGQ0ZjctNzA4ZS00YWYwLTllNWQtZjM2ZDc0ZTQ0YWNiIiwgIm5hbWUiOiAiR2FzIFN0YXRpb24gIzEiLCAiZGVzY3JpcHRpb24iOiAiQW4gdXBrZXB0IGdhcyBzdGF0aW9uIGxvY2F0ZWQgaW4gdGhlIGhlYXJ0IG9mIHRoZSBjaXR5LiIsICJpbWFnZUxpbmsiOiAiaHR0cHM6Ly9pLmltZ3VyLmNvbS9rMVhsM3JELnBuZyIsICJmbG9vckFyZWEiOiA1MDk3LCAidG90YWxWb2x1bWUiOiA3NjQ1NSwgIndvcmxkTmFtZSI6ICJ3b3JsZCIsICJjaXR5SWQiOiAiYmY3MTNkZDktN2UxYS00Y2E1LWEwNzctMjUxYzU3NGQ0OWIzIiwgImJ1aWxkaW5nSWQiOiBudWxsLCAidHlwZSI6ICJSRVNJREVOVElBTCIsICJjaXR5TmFtZSI6ICJDcmFmdCBDaXR5IiwgImJ1aWxkaW5nTmFtZSI6ICIiLCAiX25mdF90eXBlIjogInJlYWxfZXN0YXRlIn0="
+mintToken $ADDR721 6 "eyJfaWQiOiAiNWFjNWIyYWItZWMxNS00OGVhLTllYzEtZjU0OTJiZjBlMmRiIiwgIm5hbWUiOiAiR2lmdCBTaG9wICMxIiwgImRlc2NyaXB0aW9uIjogIkEgc21hbGwgc2hvcCBsb2NhdGVkIGFjcm9zcyBmcm9tIHRoZSBiZWFjaC4iLCAiaW1hZ2VMaW5rIjogImh0dHBzOi8vaS5pbWd1ci5jb20vcTU2ZVpaQS5wbmciLCAiZmxvb3JBcmVhIjogMzIyLCAidG90YWxWb2x1bWUiOiA1NDc0LCAid29ybGROYW1lIjogIndvcmxkIiwgImNpdHlJZCI6ICJiZjcxM2RkOS03ZTFhLTRjYTUtYTA3Ny0yNTFjNTc0ZDQ5YjMiLCAiYnVpbGRpbmdJZCI6IG51bGwsICJ0eXBlIjogIkJVU0lORVNTIiwgImNpdHlOYW1lIjogIkNyYWZ0IENpdHkiLCAiYnVpbGRpbmdOYW1lIjogIiIsICJfbmZ0X3R5cGUiOiAicmVhbF9lc3RhdGUifQ=="
+mintToken $ADDR721 7 "eyJfaWQiOiAiMTM0MjgxNmQtM2E4ZS00Yzk0LTgwYmUtMzE1ZjIwNWViODc0IiwgIm5hbWUiOiAiQ2FzaW5vIE1DIiwgImRlc2NyaXB0aW9uIjogIlRoZSBvbmUgYW5kIG9ubHkgQ2FzaW5vIE1DLiIsICJpbWFnZUxpbmsiOiAiaHR0cHM6Ly9pLmltZ3VyLmNvbS94dEEwclNDLmpwZWciLCAiZmxvb3JBcmVhIjogOTQ2MCwgInRvdGFsVm9sdW1lIjogNjE0OTAwLCAid29ybGROYW1lIjogIndvcmxkIiwgImNpdHlJZCI6ICJiZjcxM2RkOS03ZTFhLTRjYTUtYTA3Ny0yNTFjNTc0ZDQ5YjMiLCAiYnVpbGRpbmdJZCI6IG51bGwsICJ0eXBlIjogIkdPVkVSTk1FTlQiLCAiY2l0eU5hbWUiOiAiQ3JhZnQgQ2l0eSIsICJidWlsZGluZ05hbWUiOiAiIiwgIl9uZnRfdHlwZSI6ICJyZWFsX2VzdGF0ZSJ9"
+mintToken $ADDR721 8 "eyJfaWQiOiAiZDliYjE2M2YtOGViZS00NDBiLWE5NGEtZWJiYzAxN2M4MGRmIiwgIm5hbWUiOiAiREFPIENvdXJ0aG91c2UiLCAiZGVzY3JpcHRpb24iOiAiQ291cnRob3VzZSBvZiB0aGUgREFPLiIsICJpbWFnZUxpbmsiOiAiaHR0cHM6Ly9pLmltZ3VyLmNvbS9qRDV6UGIyLnBuZyIsICJmbG9vckFyZWEiOiAxMjY1NiwgInRvdGFsVm9sdW1lIjogMTA3NTc2MCwgIndvcmxkTmFtZSI6ICJ3b3JsZCIsICJjaXR5SWQiOiAiYmY3MTNkZDktN2UxYS00Y2E1LWEwNzctMjUxYzU3NGQ0OWIzIiwgImJ1aWxkaW5nSWQiOiBudWxsLCAidHlwZSI6ICJHT1ZFUk5NRU5UIiwgImNpdHlOYW1lIjogIkNyYWZ0IENpdHkiLCAiYnVpbGRpbmdOYW1lIjogIiIsICJfbmZ0X3R5cGUiOiAicmVhbF9lc3RhdGUifQ=="
 
-export JSON_ENCODED=`echo '{"_nft_type":"realestate", "_id": "2e778ae9-1641-43f6-9b6d-97b349af90dd","name": "MyNFTproperty3", "type": "HOME", "description": "This is my NFT3", "image": "https://image.com/3.png"}' | base64 -w 0` #&& echo $JSON_ENCODED
-export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"3","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $JSON_ENCODED` #&& echo $EXECUTED_MINT_JSON
-TXMINT=$(craftd tx wasm execute "$ADDR721" "$EXECUTED_MINT_JSON" --from $KEY --yes --output json | jq -r '.txhash') && echo $TXMINT
 
-export JSON_ENCODED=`echo '{"_nft_type":"realestate", "_id": "884895d7-057d-4a71-96f2-8f2174966110","name": "MyNFTproperty4", "type": "HOME", "description": "This is my NFT4", "image": "https://image.com/4.png"}' | base64 -w 0` #&& echo $JSON_ENCODED
-export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"4","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $JSON_ENCODED` #&& echo $EXECUTED_MINT_JSON
-TXMINT=$(craftd tx wasm execute "$ADDR721" "$EXECUTED_MINT_JSON" --from $KEY --yes --output json | jq -r '.txhash') && echo $TXMINT
 
+# ====================================NORMAL LINKS =======================================
+mintToken $ADDR721IMAGES 1 "https://ipfs.io/ipfs/QmNLijobERK4VhSDZdKjt5SrezdRM6k813qcSHd68f3Mqg"
+mintToken $ADDR721IMAGES 2 "https://ipfs.io/ipfs/QmNLjZSFV3GUMcusj8keEqVtToEE3ceTSguNom7e4S6pbJ"
+mintToken $ADDR721IMAGES 3 "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
 
 
 
 # Query Property check
 # CONTRACT_DATA: craftd query wasm contract-state smart $ADDR721 '{"contract_info":{}}'
-echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id":"1"}}' --output json) | jq -r '.data.info.token_uri'
-echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id":"2"}}' --output json) | jq -r '.data.info.token_uri'
-echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id":"3"}}' --output json) | jq -r '.data.info.token_uri'
-echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id":"4"}}' --output json) | jq -r '.data.info.token_uri'
+
+echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id":"1"}}' --output json) | jq -r '.data.info.token_uri' | base64 --decode
+echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id":"2"}}' --output json) | jq -r '.data.info.token_uri' | base64 --decode
+echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id":"3"}}' --output json) | jq -r '.data.info.token_uri' | base64 --decode
+echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id":"4"}}' --output json) | jq -r '.data.info.token_uri' | base64 --decode
 
 # Query 721 Owned Tokens
 craftd query wasm contract-state smart $ADDR721 '{"tokens":{"owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","start_after":"0","limit":50}}'
@@ -89,17 +97,19 @@ craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
 
 
 # list real estate NFT for sale
-export NFT_LISTING_BASE64=`printf '{"list_price":"77"}' | base64 -w 0`
-export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"3","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
+export NFT_LISTING_BASE64=`printf '{"list_price":"69600000"}' | base64 -w 0`
+export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"6","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
 craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+# craftd tx wasm execute "$ADDR721IMAGES" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
 
 
 # withdraw NFT so it is no longer for sale
-craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"1"}}' $CRAFTD_COMMAND_ARGS -y
+craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"4"}}' $CRAFTD_COMMAND_ARGS -y
 
 
 # gets all contracts which are CW721
 # craftd q wasm list-contract-by-code 3 --output json | jq '.contracts'
+# http://65.108.125.182:1317/cosmwasm/wasm/v1/code/3/contracts?pagination.limit=100
 # So our API could query this list, check which a user owns, so we get ALL iamges they own.
 
 

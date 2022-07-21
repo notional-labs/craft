@@ -8,7 +8,7 @@ Commands are from commands.md. & list prices are based on the floor volume & typ
 '''
 
 # ---- Configuration --------------------------------------------------------------------------------------------------
-START_IDX = 1 # put at 1 for mainnet mint
+# START_IDX = 1 # put at 1 for mainnet mint
 
 MINT_PRICES = { # price per sqBlock (floor volume)
     # src/main/java/com/crafteconomy/realestate/property/PropertyType.java
@@ -182,7 +182,7 @@ def step1_prepareRealEstateDocuments():
     print("Step 1: Preparing real estate documents from MongoDB. Put into 'mintCommands' variable.")
     # Get all properties from MongoDB & save to the mintCommands dict (key=id, value = dict or data)
     global mintCommands
-    for idx, doc in enumerate(reProperties.find(), START_IDX):    
+    for idx, doc in enumerate(reProperties.find()):     #, START_IDX
         for k in removeKeys:
             del doc[k]
         doc['cityName'] = Utils.getCityFromID(doc['cityId'])
