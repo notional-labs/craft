@@ -62,7 +62,8 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 }
 
 func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest) error {
-	if mintRequest.DaoTokenMinted == sdk.NewDec(0) {
+	// must mint 1 exp
+	if sdk.NewDec(1).GTE(mintRequest.DaoTokenMinted) {
 		mintRequest.Status = types.StatusNoFundRequest
 		k.completeMintRequest(ctx, mintRequest)
 		return nil

@@ -274,10 +274,10 @@ func (k ExpKeeper) IterateStatusMintRequests(ctx sdk.Context, status int, cb fun
 
 // IncreaseOracleID increase oracle ID by 1.
 func (k ExpKeeper) IncreaseOracleID(ctx sdk.Context) {
-	k.setOracleID(ctx, k.GetNextOracleID(ctx))
+	k.SetOracleID(ctx, k.GetNextOracleID(ctx))
 }
 
-func (k ExpKeeper) setOracleID(ctx sdk.Context, id uint64) {
+func (k ExpKeeper) SetOracleID(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
 
 	store.Set(types.KeyOracleID, GetOracleIDBytes(id))

@@ -28,6 +28,7 @@ func InitGenesis(ctx sdk.Context, keeper keeper.ExpKeeper, ak types.AccountKeepe
 		}
 	}
 	keeper.SetDaoAssetInfo(ctx, *data.DaoAsset)
+	keeper.SetOracleID(ctx, 0)
 	ak.GetModuleAccount(ctx, types.ModuleName)
 }
 
