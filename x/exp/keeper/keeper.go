@@ -273,8 +273,8 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 	}
 	// Create the call data to be used
 	data := oracleScriptCallData{
-		AddressRequest: strings.ToLower(fromAddress),
 		RequestType:    requestType,
+		AddressRequest: strings.ToLower(fromAddress),
 		Status:         status,
 	}
 

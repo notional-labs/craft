@@ -4,6 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	clienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
 )
 
 var _ sdk.Msg = &MsgMintAndAllocateExp{}
@@ -223,10 +224,12 @@ func (m MsgSpendIbcAssetToExp) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgSpendIbcAssetToExp(fromAddress string, amount sdk.Coins) *MsgSpendIbcAssetToExp {
+func NewMsgSpendIbcAssetToExp(fromAddress string, amount sdk.Coins, timeoutHeight clienttypes.Height, timeoutTimestamp uint64) *MsgSpendIbcAssetToExp {
 	return &MsgSpendIbcAssetToExp{
-		FromAddress: fromAddress,
-		Amount:      amount,
+		FromAddress:      fromAddress,
+		Amount:           amount,
+		TimeoutHeight:    timeoutHeight,
+		TimeoutTimestamp: timeoutTimestamp,
 	}
 }
 

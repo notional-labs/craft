@@ -164,7 +164,7 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 					}
 				}
 			}
-			msg := types.NewMsgSpendIbcAssetToExp(clientCtx.GetFromAddress().String(), coins)
+			msg := types.NewMsgSpendIbcAssetToExp(clientCtx.GetFromAddress().String(), coins, timeoutHeight, timeoutTimestamp)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
