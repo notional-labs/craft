@@ -36,8 +36,8 @@ type ExpKeeper struct {
 
 // oracleScriptCallData represents the data that should be OBI-encoded and sent to perform an oracle request.
 type oracleScriptCallData struct {
-	AddressRequest string `obi:"address_request"`
 	RequestType    string `obi:"request_type"`
+	AddressRequest string `obi:"address_request"`
 	Status         string `obi:"status"`
 }
 
