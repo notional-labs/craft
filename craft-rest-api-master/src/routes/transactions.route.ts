@@ -7,4 +7,6 @@ router.get('/all/:wallet', transactionsController.getAllTransactionsData);
 router.post('/sign/:uuid/:tenderminthash', transactionsController.signTransaction);
 router.delete('/:uuid', transactionsController.removeTransaction);
 
+// router.get('/confirm/:to_address/:ucraft_amt/:description/:tendermint_hash', transactionsController.confirmTransactionDetailsMatch); // done in game
+
 export default router;

@@ -15,7 +15,6 @@ export const getUsersOwnedNFTs = async (addr721_address: string, wallet: string)
     console.log("getUsersOwnedNFTs", usersNFTIDs) 
 
     if(usersNFTIDs) {
-        // cache this maybe for a few seconds? even worth it?
         return Promise.all(usersNFTIDs?.tokens.map(token => queryToken(addr721_address, token)))  
     }
 
@@ -102,7 +101,7 @@ export const getUsersNFTsIDsList = async (addr721_address: string, wallet: strin
     let api = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/contract/${addr721_address}/smart/${query}`
 
     let response = await axios.get(api).catch(err => {
-        // console.log("getUsersNFTsIDsList Error (wallet does not exist)");
+        console.log("getUsersNFTsIDsList Error (wallet does not exist)");
         // return { "tokens": [] };
         return undefined;
     })

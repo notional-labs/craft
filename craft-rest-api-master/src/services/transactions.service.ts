@@ -1,5 +1,11 @@
 import { redisClient } from './database.service';
 
+import {SigningStargateClient} from '@cosmjs/stargate'
+import {decodeTxRaw} from '@cosmjs/proto-signing'
+
+import { config } from 'dotenv';
+config()
+
 // Structure to use for transaction keys
 const KEY_STRUCTURE = 'tx_WALLET_UUID';
 
@@ -99,3 +105,83 @@ export const signTx = async (uuid: string, tenderminthash: string) => {
     // Else bad request
     return undefined;
 };
+
+
+
+const RPC = `${process.env.CRAFTD_NODE}`;
+// http://localhost:4000/v1/tx/confirm/craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl/100/My%20Test%20Description_Reece/0054F78B96E3E690EAC85E13088BC05EE19DCEC9330D66A6FF04D98943E09F01
+/*
+export const confirmTransactionDataMatches = async (to_address: string, ucraft_amt: string, description: string, tendermint_hash: string) => {
+    console.log(`Confirming transaction data matches with ${RPC}`);
+    console.log(`To: ${to_address}, Amount: ${ucraft_amt}, Description: ${description}, Tendermint Hash: ${tendermint_hash}`);
+    
+    
+    // query the RPC for a given transaction hash
+    const client = await SigningStargateClient.connect(`${RPC}`).catch(err => {
+        console.log(err);
+        return undefined;
+    });
+    if(!client) { return undefined; }
+
+    // use client to query a transaction on chain
+    let tx = await client.getTx(tendermint_hash).catch(err => {
+        console.log(err);
+    });
+    if(!tx) { return undefined; }
+
+    // create an Object which converts the CosmJS in a better readable format
+    let modifiedTx = {doesDataMatch: false, height: 0, code: 0, rawLog: "", memo: "", txs: {}};
+    modifiedTx.height = tx.height;
+    modifiedTx.code = tx.code;
+    modifiedTx.rawLog = tx.rawLog;
+    modifiedTx.memo = decodeTxRaw(tx?.tx).body.memo
+
+    // convert modifiedTx.rawLog to JSON
+    const JSONTxs = JSON.parse(modifiedTx.rawLog);
+    modifiedTx.txs = JSONTxs;
+
+    let doesMemoMatch = modifiedTx.memo === description;
+    modifiedTx.doesDataMatch = doesMemoMatch;
+    if(modifiedTx.doesDataMatch === false) {
+        console.log("The transaction memo does not match, no reason to do any further computation");        
+        return modifiedTx;
+    } else {
+        console.log("The transaction memo matches, checking the amount's in messages to find one which does match");
+    }
+
+    let doesAmountMatch = false;
+    let doesToAddressMatch = false;
+    for(const txEvent of JSONTxs) { // is an array of objects, if it doesn't match, check for next index in array
+        doesAmountMatch = false;
+        doesToAddressMatch = false;
+
+        for(const events of txEvent.events) {
+            if(events.type === "coin_received") {
+                console.log(`Found coin_received event, checking if it matches`);                
+                for(const attrs of events.attributes) {
+                    // console.log("attrs", attrs)
+                    if(attrs.key === "amount") {
+                        doesAmountMatch = attrs.value === ucraft_amt;
+                        console.log(`- Amount ${attrs.value} matches ${ucraft_amt}: ${doesAmountMatch}`);
+
+                    } 
+                    if(attrs.key === "receiver") {
+                        doesToAddressMatch = attrs.value === to_address;
+                        console.log(`- To Address ${attrs.value} matches ${to_address}: ${doesToAddressMatch}`);
+                    }
+
+                    // if amount matches & the address it was sent to match, we can stop checking & set it = true.
+                    // This way in game we know this transaction matches exactly & we can push through the code in game to run
+                    modifiedTx.doesDataMatch = (doesAmountMatch && doesToAddressMatch);
+                    if(modifiedTx.doesDataMatch === true) {
+                        console.log("The transaction data matches! Returning True");
+                        return modifiedTx;
+                    }
+                }
+            }
+        }
+    }
+
+    return modifiedTx;
+};
+*/

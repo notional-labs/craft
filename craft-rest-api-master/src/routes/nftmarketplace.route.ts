@@ -6,7 +6,6 @@ import nftmarketplaceController from '../controllers/nftmarketplace.controler';
 
 router.get('/offerings', nftmarketplaceController.getMarketplaceOfferings);
 // gets real estate only offerings
-router.get('/offerings/skins', nftmarketplaceController.getMarketplaceSkinsOfferings);
 router.get('/offerings/realestate', nftmarketplaceController.getMarketplaceRealEstateOfferings);
 router.get('/offerings/contract/:parent_contract_address', nftmarketplaceController.getMarketplaceSpecificContractOffering);
 
