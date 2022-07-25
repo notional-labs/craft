@@ -30,33 +30,33 @@ cd $(basedir "$0")
 # NFT Contract (Code id 3 rn)
 TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
 CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
-NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re3","symbol": "ctest","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-realestate3" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
+NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re7","symbol": "ctest","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-realestate7" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
 sleep 3
 ADDR721=$(craftd query tx $NFT721_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "ADDR 721: $ADDR721"
-export ADDR721=craft16y344e8ryydmeu2g8yyfznq79j7jfnar4p59ngpvaazcj83jzsmsaaq6gm
+# export ADDR721=craft1qrwaatac4xvf4qnnagvsc93gcnv2x2t7mm575v3drzh2wcap9hasjlt6rr
 
 # ADDR_test721 (testing images)
 TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
 CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
-IMAGE_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craft-images2","symbol": "cimg","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-images" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
+IMAGE_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craft-images4","symbol": "cimg","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-images4" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
 sleep 3
 ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "ADDR 721 IMAGES (LINKS): $ADDR721IMAGES"
-export ADDR721IMAGES=craft1q23d30x94cm8ve243pxdc52m398r4l5ecgcfp8tud3vggcsq8s2qz0py27
+# export ADDR721IMAGES=craft1d7m8y95ttmrdryt8s8y7v2ceqsvcjddq40l9zypjn7snk04avmhqr89azh
 
 # marketplace
 TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
 MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
-MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name": "m15","denom": "ucraft"}' --label "m11" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash') && sleep 1
+MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name": "m17","denom": "ucraft"}' --label "m17" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash') && sleep 1
 sleep 3
 ADDRM=$(craftd query tx $MARKET_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Marketplace Address: $ADDRM"
-export ADDRM=craft1ahg0erc2fs6xx3j5m8sfx3ryuzdjh6kf6qm9plsf865fltekyrfsnh63rw
+# export ADDRM=craft146ypndztcmmrmyxef7e20cul82gh43vjnw4uacwdvg5sp9kva7sqs9g5gt
 
 
 function mintToken() {
     CONTRACT_ADDR=$1
     TOKEN_ID=$2
     TOKEN_URI=$3
-    export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"%s","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $TOKEN_ID $JSON_ENCODED`
+    export EXECUTED_MINT_JSON=`printf '{"mint":{"token_id":"%s","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"%s"}}' $TOKEN_ID $TOKEN_URI`
     TXMINT=$(craftd tx wasm execute "$CONTRACT_ADDR" "$EXECUTED_MINT_JSON" --from $KEY --yes --output json | jq -r '.txhash') && echo $TXMINT
 }
 

@@ -10,11 +10,11 @@ Commands are from commands.md. & list prices are based on the floor volume & typ
 # ---- Configuration --------------------------------------------------------------------------------------------------
 # START_IDX = 1 # put at 1 for mainnet mint
 
-MINT_PRICES = { # price per sqBlock (floor volume)
+MINT_PRICES = { # price per sqBlock (floor volume) IN UCRAFT (1mill ucraft = 1 craft.)
     # src/main/java/com/crafteconomy/realestate/property/PropertyType.java
     "GOVERNMENT": -1, # not for sale
-    "RESIDENTIAL": 1,
-    "BUSINESS": 3, # (500 floorArea * 3 = 1500craft list price on marketplace)
+    "RESIDENTIAL": 1_000_000,
+    "BUSINESS": 3_000_000, # (500 floorArea * 3 = 1500craft list price on marketplace)
 }
 
 mintCommands = {}
@@ -68,6 +68,24 @@ reProperties = db['reProperties']
 reCities = db['reCities']
 reBuildings = db['reBuildings']
 
+
+def main():
+    step1_prepareRealEstateDocuments()
+    step2_encodeRealEstateDocumentAndSaveMintToFile()
+    input("Did you already run commands from step2?"); 
+    step3_generateRESendCommandsToMarketplaceContract()
+    # moved to rest API
+    # q = Contract_Query.getNFTContractInfo()
+    # q = Contract_Query.getNFTInfo(1)
+    # exit()
+    # query_data = Contract_Query.queryToken(3, decodeBase64=True)
+    # print(query_data)
+    # Contract_Query.queryOfferings()
+    # owned_nfts = Contract_Query.getUsersOwnedNFTs("craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl")
+    # print(owned_nfts)
+    # all_tokens = Contract_Query.getUserOwnedNFTsALL("craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl", decodeBase64=True)
+    # print(all_tokens)
+
 # Classes --------------------------------------------------------------------------------------------------------------
 class Utils:
     @staticmethod
@@ -85,7 +103,7 @@ class Utils:
         return doc.get('name', "")
 
     @staticmethod
-    def _calcListingPrice(property_type: str, floor_area: int) -> int:
+    def _calcListingPrice(property_type: str, floor_area: int) -> int:    
         mintMultiplier = int(MINT_PRICES[property_type])
         floorArea = int(floor_area)
         product = floorArea * mintMultiplier
@@ -231,30 +249,4 @@ def step3_generateRESendCommandsToMarketplaceContract():
         cTx.transferNFTToMarketplace(ADDR721, int(tokenId), listingCraftPrice, "RE_txSendToMarketplace.txt")
 
 if __name__ == '__main__':
-    # step1_prepareRealEstateDocuments()
-    # step2_encodeRealEstateDocumentAndSaveMintToFile()
-    # input("Did you already run commands from step2?"); 
-    step3_generateRESendCommandsToMarketplaceContract()
-
-    # moved to rest API
-    # q = Contract_Query.getNFTContractInfo()
-    # q = Contract_Query.getNFTInfo(1)
-
-    # exit()
-
-
-    # query_data = Contract_Query.queryToken(3, decodeBase64=True)
-    # print(query_data)
-
-    # Contract_Query.queryOfferings()
-
-    # owned_nfts = Contract_Query.getUsersOwnedNFTs("craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl")
-    # print(owned_nfts)
-    # all_tokens = Contract_Query.getUserOwnedNFTsALL("craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl", decodeBase64=True)
-    # print(all_tokens)
-
-    
-
-    
-
-    pass
+    main()
