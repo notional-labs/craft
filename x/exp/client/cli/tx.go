@@ -147,15 +147,19 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 					timeoutHeight = absoluteHeight
 				}
 
-				if timeoutTimestamp != 0 {
-					// use local clock time as reference time if it is later than the
-					// consensus state timestamp of the counter party chain, otherwise
-					// still use consensus state timestamp as reference
-					now := time.Now().UnixNano()
-					// consensusStateTimestamp := consensusState.GetTimestamp()
-					if now <= 0 {
-						return errors.New("local clock time is not greater than Jan 1st, 1970 12:00 AM")
-					}
+				// Original: https://github.com/notional-labs/craft/commit/d631b248d044cbe64f637a41519e0500c884110b
+				// can't be <0 bc unsigned int
+				if timeoutTimestamp == 0 {
+					return errors.New("local clock time is not greater than Jan 1st, 1970 12:00 AM")
+				}
+
+				now := uint64(time.Now().UnixNano())
+				// consensusStateTimestamp := consensusState.GetTimestamp()
+
+				// if the timeout is less than current time, then error.
+				// though, is timeoutTimestamp in nano or normal seconds? if so we need to multiply
+				if timeoutTimestamp < now {
+					return errors.New("timeoutTimestamp is not greater than current local clock time")
 				}
 			}
 			msg := types.NewMsgSpendIbcAssetToExp(clientCtx.GetFromAddress().String(), coins)
