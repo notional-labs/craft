@@ -381,7 +381,10 @@ func (k ExpKeeper) GetBurnRequestOracle(ctx sdk.Context, addressBurn string) (or
 		return types.OracleRequest{}, false
 	}
 
-	k.cdc.Unmarshal(bz, &oracle)
+	err := k.cdc.Unmarshal(bz, &oracle)
+	if err != nil {
+		panic(err)
+	}
 	return oracle, true
 }
 

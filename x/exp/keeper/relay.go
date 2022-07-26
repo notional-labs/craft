@@ -72,7 +72,7 @@ func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest
 	return nil
 }
 
-// ExecuteMintExpByIbcToken only run in OnPacketRecv
+// ExecuteMintExpByIbcToken only run in OnPacketRecv.
 func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.MintRequest, coin sdk.Coin) error {
 	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
 
@@ -106,7 +106,7 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 
 func (k ExpKeeper) SendBurnOracleRequest(ctx sdk.Context, burnRequest types.BurnRequest) error {
 	_, found := k.GetBurnRequestOracle(ctx, burnRequest.Account)
-	if found == true {
+	if found {
 		return nil
 	}
 
@@ -123,6 +123,6 @@ func (k ExpKeeper) SendBurnOracleRequest(ctx sdk.Context, burnRequest types.Burn
 		RevisionNumber: 1,
 		RevisionHeight: uint64(ctx.BlockHeight() + 100),
 	}
-	k.SendIbcOracle(ctx, burnRequest.Account, *burnRequest.BurnTokenLeft, "burn", timeoutHeight, 0)
-	return nil
+	err := k.SendIbcOracle(ctx, burnRequest.Account, *burnRequest.BurnTokenLeft, "burn", timeoutHeight, 0)
+	return err
 }

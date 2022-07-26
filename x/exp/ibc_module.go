@@ -204,9 +204,10 @@ func (am IBCModule) OnRecvPacket(
 		if oracleRequest.Type == "burn" {
 			// remove burnRequest to resend burn oracle request in next block.
 			am.keeper.RemoveBurnRequestOracle(ctx, oracleRequest.AddressRequest)
-		} else {
-			// Change state for user know failed mint request .
 		}
+		// else {
+		// Change state for user know failed mint request .
+		// }
 	}
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
