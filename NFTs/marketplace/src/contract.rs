@@ -22,9 +22,17 @@ pub fn instantiate(
     _info: MessageInfo,
     msg: InitMsg,
 ) -> StdResult<Response> {
+
+    // just ensures this is a valid DAO address
+    deps.api.addr_validate(&msg.dao_address)?;
+
+    // TODO: Add contract admin?
+
     let info = ContractInfoResponse { 
         name: msg.name,
-        denom: msg.denom
+        denom: msg.denom,
+        dao_address: msg.dao_address,
+        tax_rate: msg.tax_rate,
     };
     CONTRACT_INFO.save(deps.storage, &info)?;
     Ok(Response::default())
@@ -52,10 +60,6 @@ pub fn try_buy_nft(
     info: MessageInfo,
     offering_id: String,
 ) -> Result<Response, ContractError> {
-    // let msg: BuyNft = from_binary(&rcv_msg.msg)?;
-
-    // check if offering exists
-    // let off = OFFERINGS.load(deps.storage, &offering_id)?;
 
     // load offering from storage if a given offering_id exist, if not, return NoMarketplaceOfferingWithGivenID
     let off = OFFERINGS.may_load(deps.storage, &offering_id)?;
@@ -64,10 +68,8 @@ pub fn try_buy_nft(
     } 
 
     let off = off.unwrap();
-
-    // Check if the seller of the NFT is the sender
     if off.seller == info.sender {
-        // let err = try_withdraw(deps, info, offering_id).unwrap();
+        // let err = try_withdraw(deps, info, offering_id).unwrap(); ? or no since this should ONLY do list logic
         // return Ok(err);
         return Err(ContractError::UnableToPurchaseMarketplaceItemYouSold {});
     }
@@ -75,17 +77,32 @@ pub fn try_buy_nft(
     let denom = CONTRACT_INFO.load(deps.storage)?.denom;
 
     // check for enough coins (>= the listing price with the same denom)
-    // change this to match like coin_helper has?
     assert_sent_sufficient_coin(&info.funds, Some(Coin::new(off.list_price.clone().u128(), &denom)))?;
+    
+    // DAO TAX AND PAYMENTS
+    let tax_rate = CONTRACT_INFO.load(deps.storage)?.tax_rate; // 5 = 5%
+    let dao_addr = CONTRACT_INFO.load(deps.storage)?.dao_address;
 
+    // 1_000_000ucraft * 0.05 = 50000ucraft -> DAO [5 = 5/100 = 5%]
+    let dao_tax_payment = off.list_price.clone().u128() / 100 * tax_rate;
+    // // println!("dao_tax_payment: {}", &dao_tax_payment);
+    // 1_000_000ucraft - 50000 = 950_000ucraft -> seller
+    let seller_payment: u128 = off.list_price.clone().u128() - &dao_tax_payment;
+
+    // PAYMENT COINS
     // convert off.list_price to a vector of coins
-    let list_price_coins = vec![Coin::new(off.list_price.clone().u128(), &denom)];
+    let sellers_token_payment = vec![Coin::new(seller_payment.clone(), &denom)];
+    let daos_token_tax = vec![Coin::new(dao_tax_payment as u128, &denom)];
 
-
-    // send the ucraft -> the off.seller using BankMsg
-    let transfer_tokens = BankMsg::Send {
+    // == TRANSFERS ==
+    // send the ucraft -> the off.seller using BankMsg & the DAOs contract address
+    let transfer_seller_tokens = BankMsg::Send {
         to_address: off.seller.to_string(),
-        amount: list_price_coins,
+        amount: sellers_token_payment,
+    };
+    let transfer_daos_tokens = BankMsg::Send {
+        to_address: dao_addr.to_string(),
+        amount: daos_token_tax,
     };
 
     // create transfer cw721 msg
@@ -99,27 +116,31 @@ pub fn try_buy_nft(
         funds: vec![],
     };
 
+    // == SUBMIT TRANSFERS == 
     // if everything is fine transfer ucraft to seller
-    let transfer_cosmos_msg: CosmosMsg = transfer_tokens.into();
-
+    let transfer_cosmos_msg_seller: CosmosMsg = transfer_seller_tokens.into();
+    let transfer_cosmos_msg_dao: CosmosMsg = transfer_daos_tokens.into();
     // transfer nft to buyer
     let cw721_transfer_cosmos_msg: CosmosMsg = exec_cw721_transfer.into();
 
-    let ucraft_submsg = SubMsg::new(transfer_cosmos_msg);
-    let cw721_submsg = SubMsg::new(cw721_transfer_cosmos_msg);
-
-    let cosmos_msgs = vec![ucraft_submsg, cw721_submsg];
+    let cosmos_msgs = vec![
+        SubMsg::new(transfer_cosmos_msg_seller), 
+        SubMsg::new(transfer_cosmos_msg_dao), 
+        SubMsg::new(cw721_transfer_cosmos_msg)
+    ];
 
     //delete offering
     OFFERINGS.remove(deps.storage, &offering_id);
 
     let price_string = format!("{} {}", off.list_price.clone().u128(), info.sender);
 
-    Ok(Response::new()
+    return Ok(Response::new()
         .add_attribute("action", "buy_nft")
         .add_attribute("buyer", info.sender.to_string())
         .add_attribute("seller", off.seller)
-        .add_attribute("paid_price", price_string)
+        .add_attribute("total_paid_price", price_string)
+        .add_attribute("tax_paid", dao_tax_payment.to_string())
+        .add_attribute("seller_receive", seller_payment.to_string())
         .add_attribute("token_id", off.token_id)
         .add_attribute("contract_addr", off.contract_addr)
         .add_submessages(cosmos_msgs))
@@ -196,8 +217,9 @@ pub fn try_withdraw(
 
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
-    match msg {
+    match msg {        
         QueryMsg::GetOfferings {} => to_binary(&query_offerings(deps)?),
+        QueryMsg::GetConfig {} => todo!(),              
     }
 }
 
@@ -237,21 +259,23 @@ mod tests {
     fn test_sell_offering() {
         let mut deps = mock_dependencies();
 
+        let denom = String::from("ucraft");
         let msg = InitMsg {
             name: String::from("test market"),
-            denom: String::from("ucraft"),
+            denom: denom.clone(),
+            dao_address: String::from("craftdaoaddr"),
+            tax_rate: 5,
         };
-
-        let denom = msg.denom.clone();
-
-        let info = mock_info("creator", &coins(2, &denom));
+        
+        // confirm instantiate works correctly.
+        let info = mock_info("creator", &coins(1000000, &denom));
         let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
 
         // beneficiary can release it
-        let info = mock_info("anyone", &coins(2, &denom));
+        let info = mock_info("anyone", &coins(1000000, &denom));
 
         let sell_msg = SellNft {
-            list_price: Uint128::new(2),
+            list_price: Uint128::new(1000000), // so DAO should get 50k @ 5%
         };
 
         let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
@@ -266,17 +290,18 @@ mod tests {
         let value: OfferingsResponse = from_binary(&res).unwrap();
         assert_eq!(1, value.offerings.len());
 
-        // Purchase the NFT from the store
+        // Purchase the NFT from the store for 1mil ucraft, then check that the receiver got 950k ucraft
         let msg2 = HandleMsg::BuyNft { offering_id: value.offerings[0].id.to_string() };
-        let info_buy = mock_info("addr1", &coins(2, &denom));
-        let _res = execute(deps.as_mut(), mock_env(), info_buy, msg2);
+        let info_buy = mock_info("addr1", &coins(1_000_000, &denom));
+        let _res = execute(deps.as_mut(), mock_env(), info_buy, msg2);        
+        
+        // TODO: check the balance of seller == 950_000 after the Tx, and the DAO has 50k ucraft
+        // panic!("{}", _res.unwrap_err()); // useful for debugging
 
-        // panic!("{}", _res.unwrap_err());
-
-        // check offerings again. Should be 0 since the NFT is bought
+        // // check offerings again. Should be 0 since the NFT is bought
         let res2 = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
         let value2: OfferingsResponse = from_binary(&res2).unwrap();
-        assert_eq!(0, value2.offerings.len()); 
+        assert_eq!(0, value2.offerings.len());  
     }
 
     #[test]
@@ -286,6 +311,8 @@ mod tests {
         let msg = InitMsg {
             name: String::from("test market"),
             denom: String::from("token"),
+            dao_address: String::from("craftdaoaddr"),
+            tax_rate: 5
         };
         let denom = msg.denom.clone();
 

@@ -5,7 +5,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct ContractInfoResponse {
     pub name: String,
-    pub denom: String
+    pub denom: String,
+    pub dao_address: String, 
+    pub tax_rate: u128 // 0.05
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]

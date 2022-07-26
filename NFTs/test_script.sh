@@ -46,11 +46,13 @@ ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0]
 # marketplace
 TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
 MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
-MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name": "m17","denom": "ucraft"}' --label "m17" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash') && sleep 1
+MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"m-w-fees3","denom":"ucraft","dao_address":"craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0","tax_rate":"5"}' --label "m-w-fees" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash') && sleep 1
 sleep 3
 ADDRM=$(craftd query tx $MARKET_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Marketplace Address: $ADDRM"
 # export ADDRM=craft146ypndztcmmrmyxef7e20cul82gh43vjnw4uacwdvg5sp9kva7sqs9g5gt
 
+# marketplace w/ fees (5% tos start, fee payment -> reece main wallet)
+export ADDRM=craft1e0cwfmla7exa578xddl87paxexw9ymwrzysfjms8c2mstxjkldlqg4hxjj
 
 function mintToken() {
     CONTRACT_ADDR=$1
@@ -78,6 +80,9 @@ mintToken $ADDR721 8 "eyJfaWQiOiAiZDliYjE2M2YtOGViZS00NDBiLWE5NGEtZWJiYzAxN2M4MG
 mintToken $ADDR721IMAGES 1 "https://ipfs.io/ipfs/QmNLijobERK4VhSDZdKjt5SrezdRM6k813qcSHd68f3Mqg"
 mintToken $ADDR721IMAGES 2 "https://ipfs.io/ipfs/QmNLjZSFV3GUMcusj8keEqVtToEE3ceTSguNom7e4S6pbJ"
 mintToken $ADDR721IMAGES 3 "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
+mintToken $ADDR721IMAGES 4 "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ" # testing marketplace w/ fees
+mintToken $ADDR721IMAGES 5 "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
+mintToken $ADDR721IMAGES 6 "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
 
 
 
@@ -93,11 +98,11 @@ echo $(craftd q wasm contract-state smart "$ADDR721" '{"all_nft_info":{"token_id
 craftd query wasm contract-state smart $ADDR721 '{"tokens":{"owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","start_after":"0","limit":50}}'
 
 # Query Marketplace Holdings
-craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}' 
+craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
 
 
 # list real estate NFT for sale
-export NFT_LISTING_BASE64=`printf '{"list_price":"69600000"}' | base64 -w 0`
+export NFT_LISTING_BASE64=`printf '{"list_price":"100000000"}' | base64 -w 0`
 export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"6","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
 craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
 # craftd tx wasm execute "$ADDR721IMAGES" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
@@ -115,5 +120,5 @@ craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"4"}}' $CRAFTD_COM
 
 # buy the NFT with mykey2 & with ucraft
 # offering_id should match with {"get_offerings": {}} id:
-export SEND_FUNDS_PURCHASE_NFT=`printf '{"buy_nft":{"offering_id":"2"}}' $OFFERING_ID_MSG_BASE64`
-craftd tx wasm execute $ADDRM $SEND_FUNDS_PURCHASE_NFT --gas-prices="0.025ucraft" --amount 11ucraft -y --from $KEY2
+export SEND_FUNDS_PURCHASE_NFT=`printf '{"buy_nft":{"offering_id":"1"}}' $OFFERING_ID_MSG_BASE64`
+craftd tx wasm execute $ADDRM $SEND_FUNDS_PURCHASE_NFT --gas-prices="0.025ucraft" --amount 69600000ucraft -y --from $KEY2
