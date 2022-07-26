@@ -135,7 +135,7 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 			// if the timeouts are not absolute, retrieve latest block height and block timestamp
 			// for the consensus state connected to the destination port/channel
 			if !absoluteTimeouts {
-				consensusState, height, _, err := channelutils.QueryLatestConsensusState(clientCtx, srcPort, srcChannel)
+				_, height, _, err := channelutils.QueryLatestConsensusState(clientCtx, srcPort, srcChannel)
 				if err != nil {
 					return err
 				}
@@ -152,15 +152,8 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 					// consensus state timestamp of the counter party chain, otherwise
 					// still use consensus state timestamp as reference
 					now := time.Now().UnixNano()
-					consensusStateTimestamp := consensusState.GetTimestamp()
-					if now > 0 {
-						now := uint64(now)
-						if now > consensusStateTimestamp {
-							timeoutTimestamp = now + timeoutTimestamp
-						} else {
-							timeoutTimestamp = consensusStateTimestamp + timeoutTimestamp
-						}
-					} else {
+					// consensusStateTimestamp := consensusState.GetTimestamp()
+					if now <= 0 {
 						return errors.New("local clock time is not greater than Jan 1st, 1970 12:00 AM")
 					}
 				}
