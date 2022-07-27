@@ -1,6 +1,6 @@
 // Express
 import { Request, Response } from 'express';
-import { getUsersOwnedNFTs, queryToken } from '../services/nfts.service';
+import { getUsersOwnedNFTs, queryToken, queryContractInfo } from '../services/nfts.service';
 import { getUsersNFTsFromOtherPlatforms, getAllNFTs } from '../services/nftsync.service';
 
 export const getPlayersOwnedNFTs = async (req: Request, res: Response) => {
@@ -19,6 +19,15 @@ export const getDataFromTokenID = async (req: Request, res: Response) => {
     const response = await queryToken(addr721_address, token_id); 
     if (response) return res.status(200).json(response);
     else return res.status(404).json({ message: `No NFTs with the token id ${token_id} found!` });
+};
+
+export const getContractInformation = async (req: Request, res: Response) => {
+    const { addr721_address } = req.params;
+
+    // {"_id": "dbcd78cb-326e-4842-982b-9252f9ca25a7","name": "Mid-sized Mansion", "description": "A beautiful mansion.", ...}
+    const response = await queryContractInfo(addr721_address); 
+    if (response) return res.status(200).json(response);
+    else return res.status(404).json({ message: `No contract with this address found ${addr721_address}!` });
 };
 
 export const syncOtherPlatformNFTs = async (req: Request, res: Response) => {
@@ -52,4 +61,5 @@ export default {
     getContractAddresses,
     syncOtherPlatformNFTs,
     getAllUserNFTs,
+    getContractInformation,
 };

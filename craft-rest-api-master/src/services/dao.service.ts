@@ -125,9 +125,9 @@ export const getServersEscrowAccountInfo = async () => {
  * @param coin String
  * @returns 
  */
-export const getTotalSupply = async (coin: string) => {    
+export const getTotalSupply = async (coin: string) => {
     const REDIS_KEY = `cache:token_total_supply`;
-    const TTL = 30*5; // 5 min
+    const TTL = 30 * 5; // 5 min
     const REDIS_HSET_KEY = `${coin}` // ucraft, uexp
     let cached_total_supply = await redisClient?.hGet(REDIS_KEY, REDIS_HSET_KEY);
     if (cached_total_supply) {
@@ -210,7 +210,7 @@ export const getAssetHoldingAmount = async (address, prefix, rpc_url, denom) => 
         return JSON.parse(get_wallet_value);
     }
 
-    let ASSETS = { ubalance: 0, amount: 0 };
+    let ASSETS = { ubalance: "", amount: "" };
 
     // non cache, get balances & staked amount * price stuff
     const client = await StargateClient.connect(`${rpc_url}`).catch(err => {
@@ -220,21 +220,25 @@ export const getAssetHoldingAmount = async (address, prefix, rpc_url, denom) => 
     });
 
     if (!client) { // RPC is bad or it just did not connect properly
-        ASSETS.ubalance = -1;
-        ASSETS.amount = -1;
+        ASSETS.ubalance = "-1";
+        ASSETS.amount = "-1";
         return ASSETS;
     }
 
     const bal: Coin = await client.getBalance(address, denom).then(res => {
         console.log("balance:", res);
-        return coin(res.amount, res.denom);
+        return coin(`${res.amount}`, res.denom);
     }).catch(err => {
         console.log(err);
-        return coin(-1, denom);;
+        return coin(0, denom);
     });
 
     let staked_amount = await client.getBalanceStaked(address).then((res) => {
-        return Number(res?.amount) / 1_000_000;
+        let amt = res?.amount;
+        if(amt){
+            return BigInt(amt) / BigInt(1_000_000);
+        }
+        return -1;        
     }).catch((err) => {
         console.log(err);
         return -1;
@@ -242,8 +246,8 @@ export const getAssetHoldingAmount = async (address, prefix, rpc_url, denom) => 
     // console.log("staked_amount:", staked_amount);
     if (!staked_amount) { staked_amount = 0; }
 
-    ASSETS.ubalance = Number(bal.amount);
-    ASSETS.amount = (ASSETS.ubalance / 1_000_000) + staked_amount; // amount in normal human readable format
+    ASSETS.ubalance = BigInt(bal.amount).toString();
+    ASSETS.amount = ((BigInt(bal.amount)/BigInt(1_000_000)) + BigInt(staked_amount)).toString(); // amount in normal human readable format
     // console.log("ASSETS.amount (should include stake): ", ASSETS.amount);
 
     // save to redis
@@ -273,13 +277,22 @@ export const getAssets = async (addresses?) => {
         const t = await getAssetHoldingAmount(addr, prefix, rpc_url, denom);
 
         if (ubalances[denom] === undefined) {
-            ubalances[denom] = 0;
-            TOTAL_ASSETS[prefix] = 0;
+            ubalances[denom] = BigInt(0);
+            TOTAL_ASSETS[prefix] = BigInt(0);
         }
 
         ubalances[denom] += t.ubalance;
         TOTAL_ASSETS[prefix] += t.amount; // since we save to prefix for coingecko, we need the whole denom not micro udenom
     }
+
+    // convert every ubalances & TOTAL_ASSETS TO A STRING
+    for (const denom in ubalances) {
+        ubalances[denom] = ubalances[denom].toString();
+    }
+    for (const denom in TOTAL_ASSETS) {
+        TOTAL_ASSETS[denom] = TOTAL_ASSETS[denom].toString();
+    }    
+
     // total includes staked amount
     return { balance_only: ubalances, total: TOTAL_ASSETS }
 }
@@ -321,7 +334,7 @@ export const makePayment = async (secret: string, recipient_wallet: string, ucra
     // TODO: Future: Bulk pay transactions?
 
     // This should really never happen
-    if(ucraft_amount > Number.MAX_SAFE_INTEGER) {
+    if (ucraft_amount > Number.MAX_SAFE_INTEGER) {
         console.log("ucraftamount was > Number.MAX_SAFE_INTEGER, so set to", Number.MAX_SAFE_INTEGER);
         ucraft_amount = Number.MAX_SAFE_INTEGER;
     }
@@ -337,12 +350,12 @@ export const makePayment = async (secret: string, recipient_wallet: string, ucra
     try {
         const server_wallet = await DirectSecp256k1HdWallet.fromMnemonic(`${process.env.CRAFT_DAO_ESCROW_WALLET_MNUMONIC}`, { prefix: "craft" });
         client = await SigningStargateClient.connectWithSigner(`${process.env.CRAFTD_NODE}`, server_wallet);
-        account = await server_wallet.getAccounts();   
+        account = await server_wallet.getAccounts();
     } catch (error) {
         console.log(error);
         return;
     }
-             
+
     const time = new Date().toISOString();
     const coins_amt = coins(ucraft_amount, "ucraft");
     const gasPrice = GasPrice.fromString("0.025ucraft");
@@ -358,40 +371,40 @@ export const makePayment = async (secret: string, recipient_wallet: string, ucra
         );
         assertIsDeliverTxSuccess(result);
         console.log("Successfully broadcasted:", result.code, result.height, result.transactionHash, result.rawLog);
-    } catch (err) {        
+    } catch (err) {
         console.log("Error:", err.message);
         // {"error":"{\"code\":-32603,\"message\":\"Internal error\",\"data\":\"tx already exists in cache\"}"}
         // TODO: save to DB to retry later
 
         let code: string = "unknown"
         let reason: string = err.message;
-        if(err.message.includes("Code: ")) {
+        if (err.message.includes("Code: ")) {
             code = err.message.split("Code: ");
             code = code[1].split(";")[0];
             reason = err.message.split("message index: ")[1]//.split("\"")[0];
         } else {
             console.log("Error:", err.message);
         }
-                
-        const hasEnoughFunds = !err.message.includes("insufficient funds");        
-        return { "error": { "code": code, "reason": reason, "hasEnoughFunds": hasEnoughFunds } }; 
+
+        const hasEnoughFunds = !err.message.includes("insufficient funds");
+        return { "error": { "code": code, "reason": reason, "hasEnoughFunds": hasEnoughFunds } };
     }
 
     let serverBalanceLeft = await getServersEscrowAccountInfo();
     let balanceLeftString = "";
-    if(serverBalanceLeft) {
-        balanceLeftString = (Number(serverBalanceLeft.balance)/1_000_000).toString() + "craft"
+    if (serverBalanceLeft) {
+        balanceLeftString = (Number(serverBalanceLeft.balance) / 1_000_000).toString() + "craft"
     }
-  
-    await sendDiscordWebhook('SERVER PAYMENT | ' + time, 
-        ucraft_amount.toString() + "ucraft | ("+ (ucraft_amount/1_000_000).toString() + "craft)",
+
+    await sendDiscordWebhook('SERVER PAYMENT | ' + time,
+        ucraft_amount.toString() + "ucraft | (" + (ucraft_amount / 1_000_000).toString() + "craft)",
         {
             "Wallet": recipient_wallet,
             "Description": description,
-            "Server bal Left: ": serverBalanceLeft        
+            "Server bal Left: ": serverBalanceLeft
         },
         '#0099ff'
     );
 
-    return { "success": {"wallet": recipient_wallet, "ucraft_amount": ucraft_amount, "craft_amount": (ucraft_amount/1_000_000), "serverCraftBalLeft": balanceLeftString, "transactionHash": result.transactionHash, "height": result.height} };
+    return { "success": { "wallet": recipient_wallet, "ucraft_amount": ucraft_amount, "craft_amount": (ucraft_amount / 1_000_000), "serverCraftBalLeft": balanceLeftString, "transactionHash": result.transactionHash, "height": result.height } };
 };
