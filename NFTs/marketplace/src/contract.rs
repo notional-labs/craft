@@ -36,6 +36,8 @@ pub fn execute(deps: DepsMut, _env: Env, info: MessageInfo, msg: HandleMsg) -> R
         HandleMsg::WithdrawNft { offering_id } => execute::withdraw_offering(deps, info, offering_id),
         HandleMsg::BuyNft { offering_id } => execute::buy_nft(deps, info, offering_id),
         HandleMsg::ReceiveNft(msg) => execute::receive_nft(deps, info, msg),
+
+        HandleMsg::UpdateFeeReceiverAddress { new_address } => execute::update_fee_receiver_address(deps, info, new_address),
     }
 }
 

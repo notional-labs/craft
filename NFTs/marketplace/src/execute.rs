@@ -12,11 +12,7 @@ use crate::error::ContractError;
 use crate::msg::{SellNft};
 
 // receive funds & buy NFT if funds are enough
-pub fn buy_nft(
-    deps: DepsMut,
-    info: MessageInfo,
-    offering_id: String,
-) -> Result<Response, ContractError> {
+pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result<Response, ContractError> {
 
     // load offering from storage if a given offering_id exist, if not, return NoMarketplaceOfferingWithGivenID
     let off = OFFERINGS.may_load(deps.storage, &offering_id)?;
@@ -104,11 +100,7 @@ pub fn buy_nft(
 }
 
 // gets NFT from a 721 contract
-pub fn receive_nft(
-    deps: DepsMut,
-    info: MessageInfo,
-    rcv_msg: Cw721ReceiveMsg,
-) -> Result<Response, ContractError> {
+pub fn receive_nft( deps: DepsMut, info: MessageInfo, rcv_msg: Cw721ReceiveMsg) -> Result<Response, ContractError> {
     let msg: SellNft = from_binary(&rcv_msg.msg)?;
 
     // check if same token Id form same original contract is already on sale
@@ -137,11 +129,7 @@ pub fn receive_nft(
         .add_attribute("token_id", off.token_id))
 }
 
-pub fn withdraw_offering(
-    deps: DepsMut,
-    info: MessageInfo,
-    offering_id: String,
-) -> Result<Response, ContractError> {
+pub fn withdraw_offering( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result<Response, ContractError> {
     // check if token_id is currently sold by the requesting address
     let off = OFFERINGS.load(deps.storage, &offering_id)?;
     if off.seller == info.sender {
@@ -169,5 +157,26 @@ pub fn withdraw_offering(
             .add_attribute("offering_id", offering_id)
             .add_submessage(cw721_submsg));
     }
-    Err(ContractError::Unauthorized {})
+    Err(ContractError::Unauthorized {msg:"You are not the seller of this token, so you can not withdraw it.".to_string()})
+}
+
+
+pub fn update_fee_receiver_address( deps: DepsMut, info: MessageInfo, new_address: String) -> Result<Response, ContractError> {
+    // ensure sender is the current fee_collector in CONTRACT_INFO
+    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
+    let current_contract_collection = contract_info.fee_receive_address.clone().to_string();
+
+    if info.sender.to_string() != current_contract_collection.clone() {
+        return Err(ContractError::Unauthorized {msg:"You are not the current fee_receiver".to_string()});
+    }
+
+    contract_info.fee_receive_address = new_address.clone();
+
+    // update CONTRACT_INFO
+    CONTRACT_INFO.save(deps.storage, &contract_info.clone())?;
+
+    return Ok(Response::new()
+        .add_attribute("action", "update_fee_receiver_address")
+        .add_attribute("new_address", new_address)
+        .add_attribute("old_address", current_contract_collection));
 }

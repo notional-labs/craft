@@ -9,8 +9,8 @@ pub enum ContractError {
     #[error("No data in ReceiveMsg")]
     NoData {},
 
-    #[error("Unauthorized")]
-    Unauthorized {},
+    #[error("Unauthorized. Reason: {msg:?}")]
+    Unauthorized {msg: String},
     
     #[error("Insufficient funds. Needed: {needed:?}, Received: {received:?}")]
     InsufficientFundsSend {needed: String, received: String},

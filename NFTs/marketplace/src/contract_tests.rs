@@ -51,6 +51,41 @@ fn proper_initialization() {
 }
 
 #[test]
+fn test_update_fee_receiver_address() {
+    let mut deps = mock_dependencies();
+    let (_, fee_receiver, _) = initialize_contract(deps.as_mut());
+
+    println!("Initial fee_receiver: {:?}", fee_receiver);
+
+    // contract::update_fee_receiver_address(deps.as_mut(), mock_info("anyone", &coins(1, "token")), "new_dao_address".to_string()).unwrap();
+    let msg = HandleMsg::UpdateFeeReceiverAddress {
+        new_address: "new_dao_address".to_string()
+    };
+
+    // ensure the new address is not the initial one
+    assert_ne!(fee_receiver.clone(), "new_dao_address");
+
+    let useless_coins = coins(1, "ucraft");
+
+    // try changing the current address as a non DAO user (should fail)
+    let non_dao_user_info = mock_info("not_the_fee_receiver", &useless_coins);
+    let err = contract::execute(deps.as_mut(), mock_env(), non_dao_user_info, msg.clone()).unwrap_err();
+    match err {
+        ContractError::Unauthorized { msg: _ } => {}
+        _ => panic!("Unexpected error: {:?}", err),
+    }
+
+    // try to change it successfully as the DAO (fee receiver)
+    let info = mock_info(&fee_receiver, &useless_coins);
+    contract::execute(deps.as_mut(), mock_env(), info.clone(), msg).unwrap();
+
+    let res: ContractInfoResponse = from_binary(&contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap()).unwrap();
+    println!("New receiver: {:?}", res);
+    assert_eq!(res.fee_receive_address, "new_dao_address");
+
+}
+
+#[test]
 fn test_sell_offering() {
     let mut deps = mock_dependencies();
 
@@ -186,6 +221,7 @@ fn get_offerings(deps: Deps) -> OfferingsResponse {
 
 #[test]
 fn test_withdraw_offering() {
+    // TODO: Cleanup
     let mut deps = mock_dependencies();
 
     let msg = InitMsg {
