@@ -1,4 +1,4 @@
-use crate::package::ContractInfoResponse;
+use crate::msg::ContractInfoResponse;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
