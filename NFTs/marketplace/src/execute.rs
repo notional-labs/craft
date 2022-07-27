@@ -164,9 +164,9 @@ pub fn withdraw_offering( deps: DepsMut, info: MessageInfo, offering_id: String)
 pub fn update_fee_receiver_address( deps: DepsMut, info: MessageInfo, new_address: String) -> Result<Response, ContractError> {
     // ensure sender is the current fee_collector in CONTRACT_INFO
     let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
-    let current_contract_collection = contract_info.fee_receive_address.clone().to_string();
+    let current_contract_receiver = contract_info.fee_receive_address.clone().to_string();
 
-    if info.sender.to_string() != current_contract_collection.clone() {
+    if info.sender.to_string() != current_contract_receiver.clone() {
         return Err(ContractError::Unauthorized {msg:"You are not the current fee_receiver".to_string()});
     }
 
@@ -178,5 +178,28 @@ pub fn update_fee_receiver_address( deps: DepsMut, info: MessageInfo, new_addres
     return Ok(Response::new()
         .add_attribute("action", "update_fee_receiver_address")
         .add_attribute("new_address", new_address)
-        .add_attribute("old_address", current_contract_collection));
+        .add_attribute("old_address", current_contract_receiver));
+}
+
+pub fn update_platform_fee( deps: DepsMut, info: MessageInfo, new_fee: u128) -> Result<Response, ContractError> {
+    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
+
+    let current_platform_fee = contract_info.platform_fee.clone();
+    let current_fee_receiver = contract_info.fee_receive_address.clone();
+
+    if info.sender.to_string() != current_fee_receiver {
+        return Err(ContractError::Unauthorized {msg:"You are not the current fee_receiver".to_string()});
+    }
+
+    if new_fee > 100 {
+        return Err(ContractError::PlatformFeeToHigh {});
+    }
+
+    contract_info.platform_fee = new_fee;
+    CONTRACT_INFO.save(deps.storage, &contract_info.clone())?;
+
+    return Ok(Response::new()
+        .add_attribute("action", "update_fee_receiver_address")
+        .add_attribute("new_fee", new_fee.to_string())
+        .add_attribute("old_fee", current_platform_fee.to_string()));
 }

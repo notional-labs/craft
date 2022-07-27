@@ -21,7 +21,8 @@ pub enum HandleMsg {
     ReceiveNft(Cw721ReceiveMsg),
     // UpdateDaoAddress { new_dao_address: String } // only contract admin can execute this, or maybe only the DAO themselfs?
 
-    UpdateFeeReceiverAddress { new_address: String }
+    UpdateFeeReceiverAddress { new_address: String },
+    UpdatePlatformFee { new_fee: u128 }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

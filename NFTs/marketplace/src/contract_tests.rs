@@ -54,8 +54,7 @@ fn proper_initialization() {
 fn test_update_fee_receiver_address() {
     let mut deps = mock_dependencies();
     let (_, fee_receiver, _) = initialize_contract(deps.as_mut());
-
-    println!("Initial fee_receiver: {:?}", fee_receiver);
+    // println!("Initial fee_receiver: {:?}", fee_receiver);
 
     // contract::update_fee_receiver_address(deps.as_mut(), mock_info("anyone", &coins(1, "token")), "new_dao_address".to_string()).unwrap();
     let msg = HandleMsg::UpdateFeeReceiverAddress {
@@ -80,9 +79,46 @@ fn test_update_fee_receiver_address() {
     contract::execute(deps.as_mut(), mock_env(), info.clone(), msg).unwrap();
 
     let res: ContractInfoResponse = from_binary(&contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap()).unwrap();
-    println!("New receiver: {:?}", res);
+    // println!("New receiver: {:?}", res);
     assert_eq!(res.fee_receive_address, "new_dao_address");
 
+}
+
+#[test]
+fn test_update_platform_fee() {
+    let mut deps = mock_dependencies();
+    let (_, fee_receiver, platform_fee) = initialize_contract(deps.as_mut());
+    // println!("Initial fee_receiver: {}, platform fee: {}", fee_receiver, platform_fee);
+
+    // contract::update_fee_receiver_address(deps.as_mut(), mock_info("anyone", &coins(1, "token")), "new_dao_address".to_string()).unwrap();
+    let msg = HandleMsg::UpdatePlatformFee { new_fee: 7 };
+    let high_msg = HandleMsg::UpdatePlatformFee { new_fee: 101 };
+
+    let useless_coins = coins(1, "ucraft");
+
+    // try changing the current address as a non DAO user (should fail)
+    let non_dao_user_info = mock_info("not_the_fee_receiver", &useless_coins);
+    let err = contract::execute(deps.as_mut(), mock_env(), non_dao_user_info, msg.clone()).unwrap_err();
+    match err {
+        ContractError::Unauthorized { msg: _ } => {}
+        _ => panic!("Unexpected error: {:?}", err),
+    }
+
+    // change as DAO, but >100 (should fail)
+    let info = mock_info(&fee_receiver, &useless_coins);
+    let err = contract::execute(deps.as_mut(), mock_env(), info.clone(), high_msg.clone()).unwrap_err();
+    match err {
+        ContractError::PlatformFeeToHigh {} => {}
+        _ => panic!("Unexpected error: {:?}", err),
+    }
+    
+    // try to change it successfully as the DAO (fee receiver)
+    let info = mock_info(&fee_receiver, &useless_coins);
+    contract::execute(deps.as_mut(), mock_env(), info.clone(), msg).unwrap();
+
+    let res: ContractInfoResponse = from_binary(&contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap()).unwrap();
+    // println!("New platform fee: {:?}", res);
+    assert_eq!(res.platform_fee, 7);
 }
 
 #[test]

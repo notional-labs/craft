@@ -21,4 +21,7 @@ pub enum ContractError {
     // This may be removed in favor of just withdrawing the NFT back to themselves.
     #[error("Trying to purchase your own item")]
     UnableToPurchaseMarketplaceItemYouSold {},
+
+    #[error("You can't set the platform fee >100 (>100%)")]
+    PlatformFeeToHigh {},
 }
