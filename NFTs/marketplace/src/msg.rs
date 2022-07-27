@@ -22,7 +22,8 @@ pub enum HandleMsg {
     // UpdateDaoAddress { new_dao_address: String } // only contract admin can execute this, or maybe only the DAO themselfs?
 
     UpdateFeeReceiverAddress { new_address: String },
-    UpdatePlatformFee { new_fee: u128 }
+    UpdatePlatformFee { new_fee: u128 },
+    ForceWithdrawAll {}, // contract admin sends ALL NFTs back to original owners
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -57,7 +58,12 @@ pub struct OfferingsResponse {
     pub offerings: Vec<QueryOfferingsResult>,
 }
 
-
+impl Iterator for OfferingsResponse {
+    type Item = QueryOfferingsResult;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.offerings.pop()
+    }
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]

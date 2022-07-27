@@ -1,5 +1,6 @@
-use cosmwasm_std::BankMsg;
+use cosmwasm_std::{BankMsg, Deps};
 use crate::coin_helpers::assert_sent_exact_coin;
+use crate::queries;
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg};
 
 // use crate::package::{ContractInfoResponse};
@@ -162,34 +163,27 @@ pub fn withdraw_offering( deps: DepsMut, info: MessageInfo, offering_id: String)
 
 
 pub fn update_fee_receiver_address( deps: DepsMut, info: MessageInfo, new_address: String) -> Result<Response, ContractError> {
-    // ensure sender is the current fee_collector in CONTRACT_INFO
-    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
-    let current_contract_receiver = contract_info.fee_receive_address.clone().to_string();
+    check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
-    if info.sender.to_string() != current_contract_receiver.clone() {
-        return Err(ContractError::Unauthorized {msg:"You are not the current fee_receiver".to_string()});
-    }
-
+    // update the contract fee in memory
+    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;  
     contract_info.fee_receive_address = new_address.clone();
 
-    // update CONTRACT_INFO
+    // save to state
     CONTRACT_INFO.save(deps.storage, &contract_info.clone())?;
 
     return Ok(Response::new()
         .add_attribute("action", "update_fee_receiver_address")
         .add_attribute("new_address", new_address)
-        .add_attribute("old_address", current_contract_receiver));
+        // since you have to run this as the fee receiver, you can use your own address as the old address, this is the old address
+        .add_attribute("old_address", info.sender.clone())); 
 }
 
 pub fn update_platform_fee( deps: DepsMut, info: MessageInfo, new_fee: u128) -> Result<Response, ContractError> {
+    check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
+
     let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
-
     let current_platform_fee = contract_info.platform_fee.clone();
-    let current_fee_receiver = contract_info.fee_receive_address.clone();
-
-    if info.sender.to_string() != current_fee_receiver {
-        return Err(ContractError::Unauthorized {msg:"You are not the current fee_receiver".to_string()});
-    }
 
     if new_fee > 100 {
         return Err(ContractError::PlatformFeeToHigh {});
@@ -202,4 +196,49 @@ pub fn update_platform_fee( deps: DepsMut, info: MessageInfo, new_fee: u128) -> 
         .add_attribute("action", "update_fee_receiver_address")
         .add_attribute("new_fee", new_fee.to_string())
         .add_attribute("old_fee", current_platform_fee.to_string()));
+}
+
+pub fn force_withdraw_all( deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
+    check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
+
+    
+    // get all offerings, loop through them.
+    let offerings = queries::query_offerings(deps.as_ref())?;
+
+    let mut sub_messages_vector: Vec<SubMsg> = vec![];
+    
+    for offering in offerings {
+        // transfer token back to original owner
+        let transfer_cw721_msg = Cw721ExecuteMsg::TransferNft {
+            recipient: offering.seller.clone().into_string(),
+            token_id: offering.token_id.clone(),
+        };
+
+        let exec_cw721_transfer = WasmMsg::Execute {
+            contract_addr: offering.contract_addr.into_string(),
+            msg: to_binary(&transfer_cw721_msg)?,
+            funds: vec![],
+        };
+
+        let cw721_transfer_cosmos_msg: CosmosMsg = exec_cw721_transfer.into();
+
+        // remove offering from the OFFERINGS? is this needed or done for them
+        OFFERINGS.remove(deps.storage, &offering.id);
+        sub_messages_vector.push(SubMsg::new(cw721_transfer_cosmos_msg));
+    }
+
+
+    return Ok(Response::new()
+        .add_attribute("action", "force_withdraw_all")
+        .add_submessages(sub_messages_vector),
+    );
+}
+
+
+fn check_executer_is_authorized_fee_receiver(deps: Deps, executer_address: String) -> Result<(), ContractError> {
+    let contract_info = CONTRACT_INFO.load(deps.storage)?;
+    if executer_address.to_string() != contract_info.fee_receive_address.clone() {
+        return Err(ContractError::Unauthorized {msg:"You are not the current fee_receiver".to_string()});
+    }
+    Ok(())
 }

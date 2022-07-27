@@ -39,6 +39,7 @@ pub fn execute(deps: DepsMut, _env: Env, info: MessageInfo, msg: HandleMsg) -> R
 
         HandleMsg::UpdateFeeReceiverAddress { new_address } => execute::update_fee_receiver_address(deps, info, new_address),
         HandleMsg::UpdatePlatformFee { new_fee } => execute::update_platform_fee(deps, info, new_fee),
+        HandleMsg::ForceWithdrawAll {} => execute::force_withdraw_all(deps, info),
     }
 }
 
