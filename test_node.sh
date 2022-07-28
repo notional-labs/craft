@@ -14,23 +14,22 @@ craftd config chain-id $CHAINID
 # validate dependencies are installed
 command -v jq > /dev/null 2>&1 || { echo >&2 "jq not installed. More info: https://stedolan.github.io/jq/download/"; exit 1; }
 
-# if $KEY exists it should be deleted
-# decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry
-# craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
-echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | craftd keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO --recover
-# Set moniker and chain-id for Evmos (Moniker can be anything, chain-id must be an integer)
-craftd init $MONIKER --chain-id $CHAINID 
-
-# Function updates the config based on a jq argument as a string
-update_test_genesis () {
-  # update_test_genesis '.consensus_params["block"]["max_gas"]="100000000"'
-  cat $HOME/.craftd/config/genesis.json | jq "$1" > $HOME/.craftd/config/tmp_genesis.json && mv $HOME/.craftd/config/tmp_genesis.json $HOME/.craftd/config/genesis.json
-}
-
-
 from_scratch () {
   # remove existing daemon
   rm -rf ~/.craft* 
+
+  # if $KEY exists it should be deleted
+  # decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry
+  # craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
+  echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | craftd keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO --recover
+  # Set moniker and chain-id for Craft
+  craftd init $MONIKER --chain-id $CHAINID 
+
+  # Function updates the config based on a jq argument as a string
+  update_test_genesis () {
+    # update_test_genesis '.consensus_params["block"]["max_gas"]="100000000"'
+    cat $HOME/.craftd/config/genesis.json | jq "$1" > $HOME/.craftd/config/tmp_genesis.json && mv $HOME/.craftd/config/tmp_genesis.json $HOME/.craftd/config/genesis.json
+  }
 
   # Set gas limit in genesis
   update_test_genesis '.consensus_params["block"]["max_gas"]="100000000"'
@@ -44,18 +43,19 @@ from_scratch () {
   # update from token -> ucraft
   update_test_genesis '.app_state["mint"]["params"]["mint_denom"]="ucraft"'
   update_test_genesis '.app_state["exp"]["params"]["ibc_asset_denom"]="ucraft"'
-  update_test_genesis '.app_state["gov"]["deposit_params"]["min_deposit"]=[{"denom": "ucraft","amount": "10000000"}],'
+  update_test_genesis '.app_state["gov"]["deposit_params"]["min_deposit"]=[{"denom": "ucraft","amount": "10000000"}]'
   update_test_genesis '.app_state["crisis"]["constant_fee"]={"denom": "ucraft","amount": "1000"}'
 
 
   # Allocate genesis accounts (cosmos formatted addresses)
-  // 1 million EXP
+  # 1 million EXP
   craftd add-genesis-account $KEY 1000000000000uexp,10000000000ucraft --keyring-backend $KEYRING
   # Adds token to reece
-  craftd add-genesis-account craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0 8000000uexp,10000000000ucraft --keyring-backend $KEYRING
+  craftd add-genesis-account craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0 8000000uexp,1000000000000ucraft --keyring-backend $KEYRING
   # add tokens to webappt team
   craftd add-genesis-account craft1sv434uclts5u7ufrzqsmqvlxhkw04q84yuh0hj 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
   craftd add-genesis-account craft14mt78hz73d9tdwpdvkd59ne9509kxw8y53sjt9 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
+  craftd add-genesis-account craft1vwe2yz785u4th7hnc9glnr2ssksqcwmxjmnthv 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
 
   # Sign genesis transaction
   craftd gentx $KEY 1000000000000uexp --keyring-backend $KEYRING --chain-id $CHAINID
