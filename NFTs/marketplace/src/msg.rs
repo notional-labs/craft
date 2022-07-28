@@ -19,7 +19,8 @@ pub enum HandleMsg {
     WithdrawNft { offering_id: String },
     BuyNft { offering_id: String },
     ReceiveNft(Cw721ReceiveMsg),
-    // UpdateDaoAddress { new_dao_address: String } // only contract admin can execute this, or maybe only the DAO themselfs?
+    
+    UpdateListingPrice { offering_id: String, new_price: Uint128 },
 
     UpdateFeeReceiverAddress { new_address: String },
     UpdatePlatformFee { new_fee: u128 },
@@ -73,3 +74,8 @@ pub enum QueryMsg {
     // Returns info about the contract such as name, denom, dao_address, and the tax_rate (platform fee)
     GetContractInfo {},
 }
+
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum MigrateMsg {}

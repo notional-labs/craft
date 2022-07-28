@@ -1,4 +1,4 @@
-use cosmwasm_std::{BankMsg, Deps};
+use cosmwasm_std::{BankMsg, Deps, Uint128};
 use crate::coin_helpers::assert_sent_exact_coin;
 use crate::queries;
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg};
@@ -39,13 +39,13 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
     let dao_tax_payment = off.list_price.clone().u128() / 100 * tax_rate;
     // // println!("dao_tax_payment: {}", &dao_tax_payment);
     // 1_000_000ucraft - 50000 = 950_000ucraft -> seller
-    let seller_payment: u128 = off.list_price.clone().u128() - &dao_tax_payment;
+    let seller_payment: u128 = off.list_price.clone().u128() - dao_tax_payment;
 
     // if the user sends more funds then the list price, return those to them on success (if any)
 
     // PAYMENT COINS
     // convert off.list_price to a vector of coins
-    let sellers_token_payment = vec![Coin::new(seller_payment.clone(), &denom)];
+    let sellers_token_payment = vec![Coin::new(seller_payment, &denom)];
     let daos_token_tax = vec![Coin::new(dao_tax_payment as u128, &denom)];
 
     // == TRANSFERS ==
@@ -55,7 +55,7 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
         amount: sellers_token_payment,
     };
     let transfer_daos_tokens = BankMsg::Send {
-        to_address: dao_addr.to_string(),
+        to_address: dao_addr,
         amount: daos_token_tax,
     };
 
@@ -88,7 +88,7 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
 
     let price_string = format!("{} {}", off.list_price.clone().u128(), info.sender);
 
-    return Ok(Response::new()
+    Ok(Response::new()
         .add_attribute("action", "buy_nft")
         .add_attribute("buyer", info.sender.to_string())
         .add_attribute("seller", off.seller)
@@ -162,6 +162,35 @@ pub fn withdraw_offering( deps: DepsMut, info: MessageInfo, offering_id: String)
 }
 
 
+pub fn update_listing_price(deps: DepsMut, info: MessageInfo, offering_id: String, new_price: Uint128) -> Result<Response, ContractError> {
+
+    // check if offering_id exist & they are the seller of it
+    let off = OFFERINGS.load(deps.storage, &offering_id)?;
+    if off.seller != info.sender {
+        // println!("{}, {}", off.seller, info.sender);
+        return Err(ContractError::Unauthorized {msg: "You are not the seller of this token, so you can not update its price.".to_string()});
+    }
+
+    let old_price = off.list_price;
+
+    // update offering
+    let updated_offering = Offering {
+        contract_addr: off.contract_addr,
+        list_denom: off.list_denom,
+        token_id: off.token_id,
+        seller: off.seller,
+        list_price: new_price,
+    };
+
+    OFFERINGS.save(deps.storage, &offering_id, &updated_offering)?;
+
+    Ok(Response::new()
+        .add_attribute("action", "update_listing_price")    
+        .add_attribute("old_price", old_price.to_string())
+        .add_attribute("new_price", new_price.to_string())
+    )
+}
+
 pub fn update_fee_receiver_address( deps: DepsMut, info: MessageInfo, new_address: String) -> Result<Response, ContractError> {
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
@@ -170,32 +199,32 @@ pub fn update_fee_receiver_address( deps: DepsMut, info: MessageInfo, new_addres
     contract_info.fee_receive_address = new_address.clone();
 
     // save to state
-    CONTRACT_INFO.save(deps.storage, &contract_info.clone())?;
+    CONTRACT_INFO.save(deps.storage, &contract_info)?;
 
-    return Ok(Response::new()
+    Ok(Response::new()
         .add_attribute("action", "update_fee_receiver_address")
         .add_attribute("new_address", new_address)
         // since you have to run this as the fee receiver, you can use your own address as the old address, this is the old address
-        .add_attribute("old_address", info.sender.clone())); 
+        .add_attribute("old_address", info.sender))
 }
 
 pub fn update_platform_fee( deps: DepsMut, info: MessageInfo, new_fee: u128) -> Result<Response, ContractError> {
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
     let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
-    let current_platform_fee = contract_info.platform_fee.clone();
+    let current_platform_fee = contract_info.platform_fee;
 
     if new_fee > 100 {
         return Err(ContractError::PlatformFeeToHigh {});
     }
 
     contract_info.platform_fee = new_fee;
-    CONTRACT_INFO.save(deps.storage, &contract_info.clone())?;
+    CONTRACT_INFO.save(deps.storage, &contract_info)?;
 
-    return Ok(Response::new()
+    Ok(Response::new()
         .add_attribute("action", "update_fee_receiver_address")
         .add_attribute("new_fee", new_fee.to_string())
-        .add_attribute("old_fee", current_platform_fee.to_string()));
+        .add_attribute("old_fee", current_platform_fee.to_string()))
 }
 
 pub fn force_withdraw_all( deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
@@ -228,16 +257,16 @@ pub fn force_withdraw_all( deps: DepsMut, info: MessageInfo) -> Result<Response,
     }
 
 
-    return Ok(Response::new()
+    Ok(Response::new()
         .add_attribute("action", "force_withdraw_all")
         .add_submessages(sub_messages_vector),
-    );
+    )
 }
 
 
 fn check_executer_is_authorized_fee_receiver(deps: Deps, executer_address: String) -> Result<(), ContractError> {
     let contract_info = CONTRACT_INFO.load(deps.storage)?;
-    if executer_address.to_string() != contract_info.fee_receive_address.clone() {
+    if executer_address != contract_info.fee_receive_address {
         return Err(ContractError::Unauthorized {msg:"You are not the current fee_receiver".to_string()});
     }
     Ok(())

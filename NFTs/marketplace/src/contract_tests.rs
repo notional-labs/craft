@@ -32,8 +32,8 @@ fn initialize_contract(deps: DepsMut) -> (String, String, u128) {
         platform_fee: 5,
     };
 
-    let info = mock_info("creator", &coins(1000000, denom.clone()));
-    contract::instantiate(deps, mock_env(), info.clone(), msg.clone()).unwrap();
+    let info = mock_info("creator", &coins(1000000, &denom));
+    contract::instantiate(deps, mock_env(), info, msg.clone()).unwrap();
 
     (msg.denom, msg.fee_receive_address, msg.platform_fee)
 }
@@ -62,7 +62,7 @@ fn test_update_fee_receiver_address() {
     };
 
     // ensure the new address is not the initial one
-    assert_ne!(fee_receiver.clone(), "new_dao_address");
+    assert_ne!(fee_receiver, "new_dao_address");
 
     let useless_coins = coins(1, "ucraft");
 
@@ -76,7 +76,7 @@ fn test_update_fee_receiver_address() {
 
     // try to change it successfully as the DAO (fee receiver)
     let info = mock_info(&fee_receiver, &useless_coins);
-    contract::execute(deps.as_mut(), mock_env(), info.clone(), msg).unwrap();
+    contract::execute(deps.as_mut(), mock_env(), info, msg).unwrap();
 
     let res: ContractInfoResponse = from_binary(&contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap()).unwrap();
     // println!("New receiver: {:?}", res);
@@ -106,7 +106,7 @@ fn test_update_platform_fee() {
 
     // change as DAO, but >100 (should fail)
     let info = mock_info(&fee_receiver, &useless_coins);
-    let err = contract::execute(deps.as_mut(), mock_env(), info.clone(), high_msg.clone()).unwrap_err();
+    let err = contract::execute(deps.as_mut(), mock_env(), info, high_msg).unwrap_err();
     match err {
         ContractError::PlatformFeeToHigh {} => {}
         _ => panic!("Unexpected error: {:?}", err),
@@ -114,7 +114,7 @@ fn test_update_platform_fee() {
     
     // try to change it successfully as the DAO (fee receiver)
     let info = mock_info(&fee_receiver, &useless_coins);
-    contract::execute(deps.as_mut(), mock_env(), info.clone(), msg).unwrap();
+    contract::execute(deps.as_mut(), mock_env(), info, msg).unwrap();
 
     let res: ContractInfoResponse = from_binary(&contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap()).unwrap();
     // println!("New platform fee: {:?}", res);
@@ -141,7 +141,7 @@ fn test_force_withdraw_all_from_marketplace() {
 
     // try to change it, but you are not the dao so you can't
     let info = mock_info("not_the_fee_receiver", &useless_coins);
-    let err = contract::execute(deps.as_mut(), mock_env(), info.clone(), msg.clone()).unwrap_err();
+    let err = contract::execute(deps.as_mut(), mock_env(), info, msg.clone()).unwrap_err();
     match err {
         ContractError::Unauthorized { msg: _ } => {}
         _ => panic!("Unexpected error: {:?}", err),
@@ -157,7 +157,7 @@ fn test_force_withdraw_all_from_marketplace() {
     let res: OfferingsResponse = get_offerings(deps.as_ref());
     assert_eq!(res.offerings.len(), 2);
     // send them to users
-    contract::execute(deps.as_mut(), mock_env(), info.clone(), msg.clone()).unwrap();
+    contract::execute(deps.as_mut(), mock_env(), info, msg).unwrap();
 
     let res: OfferingsResponse = get_offerings(deps.as_ref());
     assert_eq!(res.offerings.len(), 0);
@@ -172,7 +172,7 @@ fn test_sell_offering() {
     let amount: u128 = 1_000_000; // list price & buy price
     let info = mock_info("anyone", &coins(0, &denom));
     let sell_msg = SellNft {
-        list_price: Uint128::new(amount.clone()), // so DAO should get 50k @ 5%
+        list_price: Uint128::new(amount), // so DAO should get 50k @ 5%
     };
     let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
         sender: String::from("seller_contract"),
@@ -202,9 +202,8 @@ fn test_buying_offering() {
     let (denom, _dao_address, _tax_rate) = initialize_contract(deps.as_mut());
 
     let amount: u128 = 1_000_000; // list price & buy price
-
-    let info = mock_info("anyone", &coins(0, &denom));
-    sell_nft(deps.as_mut(), info.clone(), String::from("token1"), amount.clone());
+    let info_seller = mock_info("seller", &coins(0, &denom));
+    sell_nft(deps.as_mut(), info_seller.clone(), String::from("token1"), amount);
     
 
     // Offering should be listed = length of 1
@@ -214,7 +213,7 @@ fn test_buying_offering() {
 
     // == new logic ==
     // Purchase the NFT from the store for 1mil ucraft
-    let info = mock_info("buyer", &coins(amount.clone(), &denom));
+    let info = mock_info("buyer", &coins(amount, &denom));
     let res = contract::execute(deps.as_mut(), mock_env(), info, HandleMsg::BuyNft { offering_id: value.offerings[0].id.clone() });
     match res {
         Ok(_) => {},
@@ -232,8 +231,7 @@ fn test_buying_offering() {
     // == OVERPAYING FOR AN OFFERING ==
     let for_sale_amount = 1_000_000;
     let overpay_amount = 3_100_000;
-    let buyer_info = mock_info("addr1", &coins(overpay_amount, &denom));
-    sell_nft(deps.as_mut(), buyer_info.clone(), String::from("token1"), for_sale_amount);
+    sell_nft(deps.as_mut(), info_seller.clone(), String::from("token1"), for_sale_amount);
     
 
     // get offering_id in the offering list
@@ -242,59 +240,29 @@ fn test_buying_offering() {
     let offering_id = value.offerings[0].id.clone();
     assert_eq!("2", offering_id);
 
+    // try to have the seller buy their own offering. Should error out
+    match buy_nft(deps.as_mut(), info_seller, offering_id.clone()) { // 
+        Ok(_) => panic!("should have failed, InsufficientFundsSend"),
+        Err(e) => {
+            match e {
+                ContractError::UnableToPurchaseMarketplaceItemYouSold {  } => {}, 
+                _ => panic!("should have failed with UnableToPurchaseMarketplaceItemYouSold"),
+            }
+        }
+    }
+
+    // buyer tries to buy it with an overpayment
+    let buyer_info = mock_info("addr1", &coins(overpay_amount, &denom));
     match buy_nft(deps.as_mut(), buyer_info, offering_id) { // 
         Ok(_) => panic!("should have failed, InsufficientFundsSend"),
         Err(e) => {
             match e {
                 ContractError::InsufficientFundsSend { needed: _, received: _ } => {},
+                // ContractError::UnableToPurchaseMarketplaceItemYouSold {  } => {}, // not checked this case yet
                 _ => panic!("should have failed with OverpayingForOffering"),
             }
         }
     }
-}
-
-fn buy_nft(deps: DepsMut, info: MessageInfo, offering_id: String) -> Result<(), ContractError> {
-    let res = execute(deps, mock_env(), info, HandleMsg::BuyNft { offering_id: offering_id });
-    match res {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e),
-    }
-}
-
-fn sell_nft(deps: DepsMut, info: MessageInfo, token_id: String, amount: u128) {
-// now test if you overpay (expect error) [can this be done in helper function?]
-    let sell_msg = SellNft {
-        list_price: Uint128::new(amount.clone()), // so DAO should get 50k @ 5%
-    };
-    let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
-        sender: String::from("seller_contract"),
-        token_id: String::from(token_id),
-        msg: to_binary(&sell_msg).unwrap(),
-    });
-    contract::execute(deps, mock_env(), info, msg).unwrap();
-}
-
-fn receive_nft(deps: DepsMut, info: MessageInfo, list_price: u128, token_id: String) -> Result<(), ContractError> {
-    let sell_msg = SellNft {
-        list_price: Uint128::new(list_price),
-    };
-
-    let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
-        sender: String::from("seller"),
-        token_id: String::from(token_id),
-        msg: to_binary(&sell_msg).unwrap(),
-    });
-
-    match execute(deps, mock_env(), info, msg) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e),
-    }
-}
-
-fn get_offerings(deps: Deps) -> OfferingsResponse {
-    let res = query(deps, mock_env(), QueryMsg::GetOfferings {}).unwrap();
-    let value: OfferingsResponse = from_binary(&res).unwrap();
-    value
 }
 
 #[test]
@@ -315,7 +283,7 @@ fn test_withdraw_offering() {
 
     // beneficiary can release it
     let info = mock_info("anyone", &coins(2, &denom));
-    receive_nft(deps.as_mut(), info.clone(), 5, String::from("token_id")).unwrap();
+    receive_nft(deps.as_mut(), info, 5, String::from("token_id")).unwrap();
 
 
     // Offering should be listed
@@ -332,4 +300,103 @@ fn test_withdraw_offering() {
     // Offering should be removed
     let value = get_offerings(deps.as_ref());
     assert_eq!(0, value.offerings.len());
+}
+
+#[test]
+fn test_update_offering_price() {
+    let mut deps = mock_dependencies();
+
+    let (denom, _, _) = initialize_contract(deps.as_mut());
+
+    let amount: u128 = 1_000_000; // list price & buy price
+    let info = mock_info("anyone", &coins(0, &denom));
+    sell_nft(deps.as_mut(), info.clone(), String::from("token1"), amount);
+
+    // Offering should be listed = length of 1
+    let value: OfferingsResponse = get_offerings(deps.as_ref());
+    assert_eq!(1, value.offerings.len());
+
+    // get the first offering
+    let offering_id = value.offerings[0].id.clone();
+
+    // update the price of the offering
+    let new_amount: Uint128 = Uint128::from(9_999_999_u128);
+    let update_msg = HandleMsg::UpdateListingPrice {
+        offering_id,
+        new_price: new_amount,
+    };
+
+
+    let res = contract::execute(deps.as_mut(), mock_env(), info, update_msg.clone());
+    match res {
+        Ok(_) => {},
+        Err(e) => panic!("should have succeeded: {:?}", e),
+    }
+
+    // confirm the attribute key of old_price is updated to new_price
+    let value: OfferingsResponse = get_offerings(deps.as_ref());
+    assert_eq!(new_amount, value.offerings[0].list_price);
+
+
+    // try to update the price of the offering, but with the incorrect sender
+    let info = mock_info("wrong_person", &coins(0, &denom));
+    let res = contract::execute(deps.as_mut(), mock_env(), info, update_msg);
+    match res {
+        Ok(_) => panic!("should have failed"),
+        Err(e) => {
+            match e {
+                ContractError::Unauthorized { msg: _ } => {}
+                _ => panic!("should have failed with InvalidSender"),
+            }
+        }
+    }
+
+
+}
+
+fn buy_nft(deps: DepsMut, info: MessageInfo, offering_id: String) -> Result<(), ContractError> {
+    let res = execute(deps, mock_env(), info, HandleMsg::BuyNft { offering_id });
+    match res {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            println!("{:?}", e);
+            Err(e)
+        },
+    }
+}
+
+fn sell_nft(deps: DepsMut, info: MessageInfo, token_id: String, amount: u128) {
+// now test if you overpay (expect error) [can this be done in helper function?]
+    let sell_msg = SellNft {
+        list_price: Uint128::new(amount), // so DAO should get 50k @ 5%
+    };
+    let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
+        sender: String::from(info.sender.clone()), // was "seller_contract"
+        token_id,
+        msg: to_binary(&sell_msg).unwrap(),
+    });
+    contract::execute(deps, mock_env(), info, msg).unwrap();
+}
+
+fn receive_nft(deps: DepsMut, info: MessageInfo, list_price: u128, token_id: String) -> Result<(), ContractError> {
+    let sell_msg = SellNft {
+        list_price: Uint128::new(list_price),
+    };
+
+    let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
+        sender: String::from("seller"),
+        token_id,
+        msg: to_binary(&sell_msg).unwrap(),
+    });
+
+    match execute(deps, mock_env(), info, msg) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e),
+    }
+}
+
+fn get_offerings(deps: Deps) -> OfferingsResponse {
+    let res = query(deps, mock_env(), QueryMsg::GetOfferings {}).unwrap();
+    let value: OfferingsResponse = from_binary(&res).unwrap();
+    value
 }
