@@ -269,7 +269,7 @@ pub fn force_withdraw_all( deps: DepsMut, info: MessageInfo) -> Result<Response,
         let cw721_transfer_cosmos_msg: CosmosMsg = exec_cw721_transfer.into();
 
         // remove offering from the OFFERINGS? is this needed or done for them
-        OFFERINGS.remove(deps.storage, &offering.id);
+        OFFERINGS.remove(deps.storage, &offering.offering_id);
         sub_messages_vector.push(SubMsg::new(cw721_transfer_cosmos_msg));
     }
 

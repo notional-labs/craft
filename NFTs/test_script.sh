@@ -47,10 +47,10 @@ ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0]
 TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json | jq -r '.txhash')
 MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value')
 # fee_receive_address should = DAO wallet / multisig
-MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-9","denom":"ucraft","fee_receive_address":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash')
+MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-11","denom":"ucraft","fee_receive_address":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash')
 sleep 3
 ADDRM=$(craftd query tx $MARKET_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Marketplace Address: $ADDRM"
-# export ADDRM=craft1g6kht9c5s4jwn4akfjt3zmsfh4nvguewaegjeavpz3f0q9uylrqsqefsxc
+# export ADDRM=craft1x8gwn06l85q0lyncy7zsde8zzdn588k2dck00a8j6lkprydcutwq50sx9w
 
 function mintToken() {
     CONTRACT_ADDR=$1
@@ -109,9 +109,9 @@ craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
 
 # list real estate NFT for sale
 export NFT_LISTING_BASE64=`printf '{"list_price":"1000000"}' | base64 -w 0` # 10 craft
-export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"24","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
-# craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
-craftd tx wasm execute "$ADDR721IMAGES" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"6","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
+craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+# craftd tx wasm execute "$ADDR721IMAGES" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
 
 
 # withdraw NFT so it is no longer for sale
@@ -140,5 +140,4 @@ craftd tx wasm execute $ADDRM '{"update_platform_fee":{"new_fee":"0"}}' --gas-pr
 craftd tx wasm execute $ADDRM '{"force_withdraw_all":{}}' --gas-prices="0.025ucraft" -y --from $KEY
 
 # FUTURE TO DO
-export JSON_ENCODED_MIGRATE_ARGS=`printf '{"migrate_msg":{"migrate":{}}}' | base64 -w 0`
-craftd tx wasm migrate $ADDRM "8" "$JSON_ENCODED_MIGRATE_ARGS" --gas-prices="0.025ucraft" -y --from $KEY
+craftd tx wasm migrate $ADDRM 14 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY

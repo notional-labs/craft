@@ -31,7 +31,7 @@ pub fn instantiate(deps: DepsMut, _env: Env, _info: MessageInfo, msg: InitMsg) -
         fee_receive_address: msg.fee_receive_address,
         platform_fee: msg.platform_fee,
         version: CONTRACT_VERSION.to_string(),
-        contact: "reece@crafteconomy.io".to_string(),
+        contact: "reece@crafteconomy.io".to_string(),        
     };
 
     CONTRACT_INFO.save(deps.storage, &info)?;
@@ -67,7 +67,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 
 
 #[entry_point]
-pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> Result<Response, ContractError> {
+pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, ContractError> {
     // https://docs.cosmwasm.com/docs/1.0/smart-contracts/migration/
     let ver = cw2::get_contract_version(deps.storage)?;
     // ensure we are migrating from an allowed contract
@@ -84,10 +84,15 @@ pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> Result<Response, Co
 
     // do any desired state migrations here...
     
+    
+    // update the version field in the ContractInfo
+    let mut config = CONTRACT_INFO.load(deps.storage)?;
+    config.version = CONTRACT_VERSION.to_string();
+    CONTRACT_INFO.save(deps.storage, &config)?;
+    
     Ok(Response::default()
         .add_attribute("action", "migration")
         .add_attribute("version", CONTRACT_VERSION)
-        .add_attribute("contract", CONTRACT_NAME)
-        .add_attribute("some_text", msg.some_text)
+        .add_attribute("contract", CONTRACT_NAME)        
     )
 }

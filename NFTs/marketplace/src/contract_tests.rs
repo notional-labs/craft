@@ -211,7 +211,7 @@ fn test_buying_offering() {
     // == new logic ==
     // Purchase the NFT from the store for 1mil ucraft
     let info = mock_info("buyer", &coins(amount, &denom));
-    let res = contract::execute(deps.as_mut(), mock_env(), info, HandleMsg::BuyNft { offering_id: value.offerings[0].id.clone() });
+    let res = contract::execute(deps.as_mut(), mock_env(), info, HandleMsg::BuyNft { offering_id: value.offerings[0].offering_id.clone() });
     match res {
         Ok(_) => {},
         Err(_) => panic!("should have succeeded"),
@@ -234,7 +234,7 @@ fn test_buying_offering() {
     // get offering_id in the offering list
     let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
     let value: OfferingsResponse = from_binary(&res).unwrap();
-    let offering_id = value.offerings[0].id.clone();
+    let offering_id = value.offerings[0].offering_id.clone();
     assert_eq!("2", offering_id);
 
     // try to have the seller buy their own offering. Should error out
@@ -292,7 +292,7 @@ fn test_withdraw_offering() {
     // withdraw offering
     let withdraw_info = mock_info("seller", &coins(2, &denom));
     let withdraw_msg = HandleMsg::WithdrawNft {
-        offering_id: value.offerings[0].id.clone(),
+        offering_id: value.offerings[0].offering_id.clone(),
     };
     let _res = execute(deps.as_mut(), mock_env(), withdraw_info, withdraw_msg).unwrap();
 
@@ -316,7 +316,7 @@ fn test_update_offering_price() {
     assert_eq!(1, value.offerings.len());
 
     // get the first offering
-    let offering_id = value.offerings[0].id.clone();
+    let offering_id = value.offerings[0].offering_id.clone();
 
     // update the price of the offering
     let new_amount: Uint128 = Uint128::from(9_999_999_u128);

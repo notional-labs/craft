@@ -22,7 +22,7 @@ pub fn query_offerings(deps: Deps) -> StdResult<OfferingsResponse> {
 fn parse_offering(item: StdResult<(String, Offering)>) -> StdResult<QueryOfferingsResult> {
     item.map(|(k, offering)| {
         QueryOfferingsResult {
-            id: k,
+            offering_id: k,
             token_id: offering.token_id,
             list_denom: offering.list_denom,
             list_price: offering.list_price,
@@ -40,6 +40,6 @@ pub fn query_contract_info(deps: Deps) -> StdResult<ContractInfoResponse> {
         fee_receive_address: config.fee_receive_address,
         platform_fee: config.platform_fee,
         version: config.version,
-        contact: "reece@crafteconomy.io".to_string(),
+        contact: "reece@crafteconomy.io".to_string(),        
     })
 }
