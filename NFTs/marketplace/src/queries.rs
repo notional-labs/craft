@@ -39,5 +39,7 @@ pub fn query_contract_info(deps: Deps) -> StdResult<ContractInfoResponse> {
         denom: config.denom,
         fee_receive_address: config.fee_receive_address,
         platform_fee: config.platform_fee,
+        version: config.version,
+        contact: "reece@crafteconomy.io".to_string(),
     })
 }

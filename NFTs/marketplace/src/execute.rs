@@ -36,10 +36,17 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
     let dao_addr = CONTRACT_INFO.load(deps.storage)?.fee_receive_address;
 
     // 1_000_000ucraft * 0.05 = 50000ucraft -> DAO [5 = 5/100 = 5%]
-    let dao_tax_payment = off.list_price.clone().u128() / 100 * tax_rate;
-    // // println!("dao_tax_payment: {}", &dao_tax_payment);
+    let mut dao_tax_payment = (off.list_price.clone().u128() / 100) * &tax_rate;
+    println!("dao_tax_payment: {}", &dao_tax_payment);
     // 1_000_000ucraft - 50000 = 950_000ucraft -> seller
-    let seller_payment: u128 = off.list_price.clone().u128() - dao_tax_payment;
+    let mut seller_payment: u128 = off.list_price.clone().u128() - &dao_tax_payment;
+
+    // if the offering price is <100, we dont payt any tax on it bc it is too small.
+    // doing so errors out as 0ucraft send to seller, which doesn't work.
+    if off.list_price.clone().u128() < 100 {
+        dao_tax_payment = 0;
+        seller_payment = off.list_price.clone().u128();
+    }
 
     // if the user sends more funds then the list price, return those to them on success (if any)
 
@@ -52,11 +59,11 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
     // send the ucraft -> the off.seller using BankMsg & the DAOs contract address
     let transfer_seller_tokens = BankMsg::Send {
         to_address: off.seller.to_string(),
-        amount: sellers_token_payment,
+        amount: sellers_token_payment.clone(),
     };
     let transfer_daos_tokens = BankMsg::Send {
-        to_address: dao_addr,
-        amount: daos_token_tax,
+        to_address: dao_addr.clone(),
+        amount: daos_token_tax.clone(),
     };
 
     // create transfer cw721 msg
@@ -110,6 +117,12 @@ pub fn receive_nft( deps: DepsMut, info: MessageInfo, rcv_msg: Cw721ReceiveMsg) 
 
     // save Offering
     let denom = CONTRACT_INFO.load(deps.storage)?.denom;
+
+    // done here & in the update_listing_price method. Fixes issue with tax rates if price is too low
+    if &msg.list_price < &Uint128::from(1_000_000u128) {
+        return Err(ContractError::ListingPriceTooLow {});
+    }
+
     let off = Offering {
         contract_addr: info.sender.clone(),
         list_denom: denom,
@@ -172,6 +185,10 @@ pub fn update_listing_price(deps: DepsMut, info: MessageInfo, offering_id: Strin
     }
 
     let old_price = off.list_price;
+
+    if new_price < Uint128::from(1_000_000u128) {
+        return Err(ContractError::ListingPriceTooLow {});
+    }
 
     // update offering
     let updated_offering = Offering {

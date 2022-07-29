@@ -3,14 +3,9 @@
 // Example I like & am using:
 // https://github.com/osmosis-labs/cw-usdc/blob/main/contracts/cw-usdc/src/contract_tests.rs
 
-// use cosmwasm_std::{DepsMut, Uint128};
-
-// use super::*;
 use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
 use cosmwasm_std::{coins, from_binary, Uint128, MessageInfo, Deps};
 
-// use crate::package::{ContractInfoResponse, OfferingsResponse, QueryOfferingsResult};
-// use crate::state::{increment_offerings, Offering, CONTRACT_INFO, OFFERINGS};
 use cosmwasm_std::{to_binary};
 
 use cw721::{Cw721ReceiveMsg};
@@ -21,6 +16,8 @@ use cosmwasm_std::{DepsMut};
 use crate::contract::{instantiate, execute, query};
 use crate::contract;
 use crate::msg::{OfferingsResponse};
+
+// NOTE: all selling have to be >1million utoken (1token)
 
 // test helper
 fn initialize_contract(deps: DepsMut) -> (String, String, u128) {
@@ -129,7 +126,7 @@ fn test_force_withdraw_all_from_marketplace() {
 
     // contract::update_fee_receiver_address(deps.as_mut(), mock_info("anyone", &coins(1, "token")), "new_dao_address".to_string()).unwrap();
     let msg = HandleMsg::ForceWithdrawAll {  };
-    let useless_coins = coins(1, "ucraft");
+    let useless_coins = coins(1_000_000, "ucraft");
 
     // try changing the current address as a non DAO user (should fail)
     // let non_dao_user_info = mock_info("not_the_fee_receiver", &useless_coins);
@@ -151,8 +148,8 @@ fn test_force_withdraw_all_from_marketplace() {
     // Ex: 2 NFTs on marketplace, sends all to users (& removes from marketplace offerings), until there are 0 left.
     let info = mock_info(&fee_receiver, &useless_coins);
 
-    sell_nft(deps.as_mut(), info.clone(), String::from("token1"), 12);
-    sell_nft(deps.as_mut(), info.clone(), String::from("token2"), 13);
+    sell_nft(deps.as_mut(), info.clone(), String::from("token1"), 1_100_000);
+    sell_nft(deps.as_mut(), info.clone(), String::from("token2"), 2_200_000);
 
     let res: OfferingsResponse = get_offerings(deps.as_ref());
     assert_eq!(res.offerings.len(), 2);
@@ -250,6 +247,7 @@ fn test_buying_offering() {
             }
         }
     }
+    
 
     // buyer tries to buy it with an overpayment
     let buyer_info = mock_info("addr1", &coins(overpay_amount, &denom));
@@ -263,6 +261,7 @@ fn test_buying_offering() {
             }
         }
     }
+    
 }
 
 #[test]
@@ -278,12 +277,12 @@ fn test_withdraw_offering() {
     };
     let denom = msg.denom.clone();
 
-    let info = mock_info("creator", &coins(2, &denom));
+    let info = mock_info("creator", &coins(1_000_000, &denom));
     let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
 
     // beneficiary can release it
-    let info = mock_info("anyone", &coins(2, &denom));
-    receive_nft(deps.as_mut(), info, 5, String::from("token_id")).unwrap();
+    let info = mock_info("anyone", &coins(1_000_000, &denom));
+    receive_nft(deps.as_mut(), info, 1_000_000, String::from("token_id")).unwrap();
 
 
     // Offering should be listed

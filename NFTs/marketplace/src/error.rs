@@ -24,4 +24,10 @@ pub enum ContractError {
 
     #[error("You can't set the platform fee >100 (>100%)")]
     PlatformFeeToHigh {},
+
+
+    #[error("You can't sell an NFT for less than 1craft (1_000_000ucraft)")]
+    ListingPriceTooLow {},
+
+
 }

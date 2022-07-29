@@ -41,7 +41,9 @@ pub struct ContractInfoResponse {
     pub name: String,
     pub denom: String,
     pub fee_receive_address: String, 
-    pub platform_fee: u128 // 5 = 5%.
+    pub platform_fee: u128, // 5 = 5%.
+    pub version: String,
+    pub contact: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
@@ -78,4 +80,6 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum MigrateMsg {}
+pub struct MigrateMsg {
+    pub some_text: String,
+}
