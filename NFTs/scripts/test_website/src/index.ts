@@ -16,8 +16,8 @@ import { CosmWasmClient, SigningCosmWasmClient, Secp256k1HdWallet, SigningCosmWa
 const rpcEndpoint = "http://65.108.125.182:26657/";
 const offering_api = 'http://api.crafteconomy.io/v1/marketplace/offerings';
 // http://api.crafteconomy.io/v1/nfts/get_contract_addresses
-const MARKETPLACE = "craft1nwp0ynjv84wxysf2f5ctvysl6dpm8ngm70hss6jeqt8q7e7u345sgynrhu"
-const ADDR721_REALESTATE = "craft1udfs22xpxle475m2nz7u47jfa3vngncdegmczwwdx00cmetypa3s5mr4eq"
+const MARKETPLACE = "craft1g6kht9c5s4jwn4akfjt3zmsfh4nvguewaegjeavpz3f0q9uylrqsqefsxc"
+const ADDR721_REALESTATE = "craft14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scrtpgm"
 
 
 
@@ -30,7 +30,8 @@ async function main() {
 	// getAvailableOfferings(client);
 
 	// buys an NFT buy sending a msg -> the contract to buy the offering ID, also passes through the ucraft amount to buy it
-	// buyNFT("2", 5_000_000);
+	// craftd tx wasm execute $ADDRM '{"buy_nft":{"offering_id":"5"}}' --gas-prices="0.025ucraft" --amount 3ucraft -y --from $KEY2
+	buyNFT("2", "1000000");
 
 	// Gets CRAFT tokens the user owns (real estate, skins, [images in the future])
 	// queryTokensUserOwns("craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r")	
@@ -40,8 +41,8 @@ async function main() {
 	// listNFT("craft1qjxu65ucccpg8c5kac8ng6yxfqq85fluwd0p9nt74g2304qw8eyqz8azvt", "10", 127);
 
 	// const values = await getUsersMarketplaceListings("craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r");
-	const values = await getUsersMarketplaceListings("craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl");
-	console.log(values);
+	// const values = await getUsersMarketplaceListings("craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl");
+	// console.log(values);
 
 	// withdrawNFTBack("24") // even tho the token is 10, 24 is the marketplace id listing.
 
@@ -149,7 +150,7 @@ export async function getUsersMarketplaceListings(craft_address: string) {
 	
 }
 
-export async function buyNFT(MarketplaceID: string, ucraft_amt: number) {
+export async function buyNFT(MarketplaceID: string, ucraft_amt: number | string) {
 	// buy an NFT from the marketplace with CosmWasmJS. This would be via keplr wallet in the future.
 	// teskey_test 2 mnumonic from test script
 	const gasPrice = GasPrice.fromString("0.025ucraft");
@@ -191,6 +192,9 @@ export async function buyNFT(MarketplaceID: string, ucraft_amt: number) {
 		coins(ucraft_amt, "ucraft")
 	);
 	console.log(resp);
+
+	// const c = coins(ucraft_amt, "craft");
+	// console.log(c);
 }
 
 
