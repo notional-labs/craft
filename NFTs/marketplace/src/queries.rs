@@ -46,8 +46,10 @@ pub fn query_collection_volume(
     contract_address: &str,
 ) -> StdResult<CollectionVolumeResponse> {
     let total_volumes = COLLECTION_VOLUME.may_load(deps.storage, contract_address)?;
+    let denom = CONTRACT_INFO.load(deps.storage)?.denom;
 
     Ok(CollectionVolumeResponse {
         total_volume: total_volumes.unwrap_or_else(|| Uint128::new(0)),
+        denom, 
     })
 }

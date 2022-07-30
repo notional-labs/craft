@@ -44,7 +44,7 @@ ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0]
 # export ADDR721IMAGES=craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj
 
 # marketplace
-TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json | jq -r '.txhash')
+TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json --broadcast-mode block | jq -r '.txhash')
 MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value')
 # fee_receive_address should = DAO wallet / multisig
 MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-11","denom":"ucraft","fee_receive_address":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash')
@@ -84,9 +84,9 @@ mintToken $ADDR721IMAGES 2 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https
 mintToken $ADDR721IMAGES 3 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
 mintToken $ADDR721IMAGES 4 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
 mintToken $ADDR721IMAGES 21 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
-mintToken $ADDR721IMAGES 22 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
-mintToken $ADDR721IMAGES 23 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
-mintToken $ADDR721IMAGES 24 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
+mintToken $ADDR721IMAGES 25 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
+mintToken $ADDR721IMAGES 26 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
+mintToken $ADDR721IMAGES 27 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ"
 
 
 
@@ -105,13 +105,13 @@ craftd query wasm contract-state smart $ADDR721IMAGES '{"tokens":{"owner":"craft
 
 # Query Marketplace Holdings
 craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
-
+craftd query wasm contract-state smart $ADDRM '{"get_collection_volume": {"address": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj"}}'
 
 # list real estate NFT for sale
 export NFT_LISTING_BASE64=`printf '{"list_price":"1000000"}' | base64 -w 0` # 10 craft
-export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"6","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
-craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
-# craftd tx wasm execute "$ADDR721IMAGES" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"26","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
+# craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+craftd tx wasm execute "$ADDR721IMAGES" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
 
 
 # withdraw NFT so it is no longer for sale
@@ -126,7 +126,7 @@ craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"4"}}' $CRAFTD_COM
 
 # buy the NFT with mykey2 & with ucraft
 # offering_id should match with {"get_offerings": {}} id:
-craftd tx wasm execute $ADDRM '{"buy_nft":{"offering_id":"6"}}' --gas-prices="0.025ucraft" --amount 1000000ucraft -y --from $KEY2
+craftd tx wasm execute $ADDRM '{"buy_nft":{"offering_id":"2"}}' --gas-prices="0.025ucraft" --amount 1000000ucraft -y --from $KEY2
 
 
 # update token priceing
@@ -140,4 +140,4 @@ craftd tx wasm execute $ADDRM '{"update_platform_fee":{"new_fee":"0"}}' --gas-pr
 craftd tx wasm execute $ADDRM '{"force_withdraw_all":{}}' --gas-prices="0.025ucraft" -y --from $KEY
 
 # FUTURE TO DO
-craftd tx wasm migrate $ADDRM 14 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY
+craftd tx wasm migrate $ADDRM 17 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY
