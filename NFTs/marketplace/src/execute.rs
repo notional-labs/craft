@@ -1,25 +1,28 @@
-use cosmwasm_std::{BankMsg, Deps, Uint128};
 use crate::coin_helpers::assert_sent_exact_coin;
 use crate::queries;
+use cosmwasm_std::{BankMsg, Deps, StdResult, Uint128};
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg};
 
 // use crate::package::{ContractInfoResponse};
-use crate::state::{increment_offerings, Offering, CONTRACT_INFO, OFFERINGS};
+use crate::state::{increment_offerings, Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS};
 use cosmwasm_std::{
-    from_binary, to_binary, CosmosMsg, DepsMut, MessageInfo, Response, SubMsg, WasmMsg, Coin
+    from_binary, to_binary, Coin, CosmosMsg, DepsMut, MessageInfo, Response, SubMsg, WasmMsg,
 };
 
 use crate::error::ContractError;
-use crate::msg::{SellNft};
+use crate::msg::SellNft;
 
 // receive funds & buy NFT if funds are enough
-pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result<Response, ContractError> {
-
+pub fn buy_nft(
+    deps: DepsMut,
+    info: MessageInfo,
+    offering_id: String,
+) -> Result<Response, ContractError> {
     // load offering from storage if a given offering_id exist, if not, return NoMarketplaceOfferingWithGivenID
     let off = OFFERINGS.may_load(deps.storage, &offering_id)?;
     if off.is_none() {
         return Err(ContractError::NoMarketplaceOfferingWithGivenID { id: offering_id });
-    } 
+    }
 
     let off = off.unwrap();
     if off.seller == info.sender {
@@ -29,8 +32,11 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
     let denom = CONTRACT_INFO.load(deps.storage)?.denom;
 
     // check for enough coins (>= the listing price with the same denom)
-    assert_sent_exact_coin(&info.funds, Some(Coin::new(off.list_price.clone().u128(), &denom)))?;
-    
+    assert_sent_exact_coin(
+        &info.funds,
+        Some(Coin::new(off.list_price.clone().u128(), &denom)),
+    )?;
+
     // DAO TAX AND PAYMENTS
     let tax_rate = CONTRACT_INFO.load(deps.storage)?.platform_fee; // 5 = 5%
     let dao_addr = CONTRACT_INFO.load(deps.storage)?.fee_receive_address;
@@ -77,7 +83,7 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
         funds: vec![],
     };
 
-    // == SUBMIT TRANSFERS == 
+    // == SUBMIT TRANSFERS ==
     // if everything is fine transfer ucraft to seller
     let transfer_cosmos_msg_seller: CosmosMsg = transfer_seller_tokens.into();
     let transfer_cosmos_msg_dao: CosmosMsg = transfer_daos_tokens.into();
@@ -85,15 +91,26 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
     let cw721_transfer_cosmos_msg: CosmosMsg = exec_cw721_transfer.into();
 
     let cosmos_msgs = vec![
-        SubMsg::new(transfer_cosmos_msg_seller), 
-        SubMsg::new(transfer_cosmos_msg_dao), 
-        SubMsg::new(cw721_transfer_cosmos_msg)
+        SubMsg::new(transfer_cosmos_msg_seller),
+        SubMsg::new(transfer_cosmos_msg_dao),
+        SubMsg::new(cw721_transfer_cosmos_msg),
     ];
 
     //delete offering
     OFFERINGS.remove(deps.storage, &offering_id);
 
     let price_string = format!("{} {}", off.list_price.clone().u128(), info.sender);
+
+    COLLECTION_VOLUME.update(
+        deps.storage,
+        &off.contract_addr.to_string(),
+        |value| -> StdResult<Uint128> {
+            Ok(
+                value.unwrap_or(Uint128::from(0u128))
+                    + Uint128::from(off.list_price.clone().u128()),
+            )
+        },
+    )?;
 
     Ok(Response::new()
         .add_attribute("action", "buy_nft")
@@ -108,7 +125,11 @@ pub fn buy_nft( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result
 }
 
 // gets NFT from a 721 contract
-pub fn receive_nft( deps: DepsMut, info: MessageInfo, rcv_msg: Cw721ReceiveMsg) -> Result<Response, ContractError> {
+pub fn receive_nft(
+    deps: DepsMut,
+    info: MessageInfo,
+    rcv_msg: Cw721ReceiveMsg,
+) -> Result<Response, ContractError> {
     let msg: SellNft = from_binary(&rcv_msg.msg)?;
 
     // check if same token Id form same original contract is already on sale
@@ -143,7 +164,11 @@ pub fn receive_nft( deps: DepsMut, info: MessageInfo, rcv_msg: Cw721ReceiveMsg) 
         .add_attribute("token_id", off.token_id))
 }
 
-pub fn withdraw_offering( deps: DepsMut, info: MessageInfo, offering_id: String) -> Result<Response, ContractError> {
+pub fn withdraw_offering(
+    deps: DepsMut,
+    info: MessageInfo,
+    offering_id: String,
+) -> Result<Response, ContractError> {
     // check if token_id is currently sold by the requesting address
     let off = OFFERINGS.load(deps.storage, &offering_id)?;
     if off.seller == info.sender {
@@ -171,17 +196,25 @@ pub fn withdraw_offering( deps: DepsMut, info: MessageInfo, offering_id: String)
             .add_attribute("offering_id", offering_id)
             .add_submessage(cw721_submsg));
     }
-    Err(ContractError::Unauthorized {msg:"You are not the seller of this token, so you can not withdraw it.".to_string()})
+    Err(ContractError::Unauthorized {
+        msg: "You are not the seller of this token, so you can not withdraw it.".to_string(),
+    })
 }
 
-
-pub fn update_listing_price(deps: DepsMut, info: MessageInfo, offering_id: String, new_price: Uint128) -> Result<Response, ContractError> {
-
+pub fn update_listing_price(
+    deps: DepsMut,
+    info: MessageInfo,
+    offering_id: String,
+    new_price: Uint128,
+) -> Result<Response, ContractError> {
     // check if offering_id exist & they are the seller of it
     let off = OFFERINGS.load(deps.storage, &offering_id)?;
     if off.seller != info.sender {
         // println!("{}, {}", off.seller, info.sender);
-        return Err(ContractError::Unauthorized {msg: "You are not the seller of this token, so you can not update its price.".to_string()});
+        return Err(ContractError::Unauthorized {
+            msg: "You are not the seller of this token, so you can not update its price."
+                .to_string(),
+        });
     }
 
     let old_price = off.list_price;
@@ -202,17 +235,20 @@ pub fn update_listing_price(deps: DepsMut, info: MessageInfo, offering_id: Strin
     OFFERINGS.save(deps.storage, &offering_id, &updated_offering)?;
 
     Ok(Response::new()
-        .add_attribute("action", "update_listing_price")    
+        .add_attribute("action", "update_listing_price")
         .add_attribute("old_price", old_price.to_string())
-        .add_attribute("new_price", new_price.to_string())
-    )
+        .add_attribute("new_price", new_price.to_string()))
 }
 
-pub fn update_fee_receiver_address( deps: DepsMut, info: MessageInfo, new_address: String) -> Result<Response, ContractError> {
+pub fn update_fee_receiver_address(
+    deps: DepsMut,
+    info: MessageInfo,
+    new_address: String,
+) -> Result<Response, ContractError> {
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
     // update the contract fee in memory
-    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;  
+    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
     contract_info.fee_receive_address = new_address.clone();
 
     // save to state
@@ -225,7 +261,11 @@ pub fn update_fee_receiver_address( deps: DepsMut, info: MessageInfo, new_addres
         .add_attribute("old_address", info.sender))
 }
 
-pub fn update_platform_fee( deps: DepsMut, info: MessageInfo, new_fee: u128) -> Result<Response, ContractError> {
+pub fn update_platform_fee(
+    deps: DepsMut,
+    info: MessageInfo,
+    new_fee: u128,
+) -> Result<Response, ContractError> {
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
     let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
@@ -244,15 +284,14 @@ pub fn update_platform_fee( deps: DepsMut, info: MessageInfo, new_fee: u128) -> 
         .add_attribute("old_fee", current_platform_fee.to_string()))
 }
 
-pub fn force_withdraw_all( deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
+pub fn force_withdraw_all(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
-    
     // get all offerings, loop through them.
     let offerings = queries::query_offerings(deps.as_ref())?;
 
     let mut sub_messages_vector: Vec<SubMsg> = vec![];
-    
+
     for offering in offerings {
         // transfer token back to original owner
         let transfer_cw721_msg = Cw721ExecuteMsg::TransferNft {
@@ -273,18 +312,20 @@ pub fn force_withdraw_all( deps: DepsMut, info: MessageInfo) -> Result<Response,
         sub_messages_vector.push(SubMsg::new(cw721_transfer_cosmos_msg));
     }
 
-
     Ok(Response::new()
         .add_attribute("action", "force_withdraw_all")
-        .add_submessages(sub_messages_vector),
-    )
+        .add_submessages(sub_messages_vector))
 }
 
-
-fn check_executer_is_authorized_fee_receiver(deps: Deps, executer_address: String) -> Result<(), ContractError> {
+fn check_executer_is_authorized_fee_receiver(
+    deps: Deps,
+    executer_address: String,
+) -> Result<(), ContractError> {
     let contract_info = CONTRACT_INFO.load(deps.storage)?;
     if executer_address != contract_info.fee_receive_address {
-        return Err(ContractError::Unauthorized {msg:"You are not the current fee_receiver".to_string()});
+        return Err(ContractError::Unauthorized {
+            msg: "You are not the current fee_receiver".to_string(),
+        });
     }
     Ok(())
 }

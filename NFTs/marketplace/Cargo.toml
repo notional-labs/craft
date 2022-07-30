@@ -1,6 +1,6 @@
 [package]
 name = "craft_marketplace"
-version = "0.3.3"
+version = "0.3.4"
 authors = ["Reece Williams"]
 edition = "2018"
 

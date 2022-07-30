@@ -10,14 +10,14 @@ pub enum ContractError {
     NoData {},
 
     #[error("Unauthorized. Reason: {msg:?}")]
-    Unauthorized {msg: String},
-    
+    Unauthorized { msg: String },
+
     #[error("Insufficient funds. Needed: {needed:?}, Received: {received:?}")]
-    InsufficientFundsSend {needed: String, received: String},
+    InsufficientFundsSend { needed: String, received: String },
 
     #[error("The ID {id} is not valid. Make sure to check getOfferings{}")]
-    NoMarketplaceOfferingWithGivenID {id: String},
-    
+    NoMarketplaceOfferingWithGivenID { id: String },
+
     // This may be removed in favor of just withdrawing the NFT back to themselves.
     #[error("Trying to purchase your own item")]
     UnableToPurchaseMarketplaceItemYouSold {},
@@ -25,9 +25,6 @@ pub enum ContractError {
     #[error("You can't set the platform fee >100 (>100%)")]
     PlatformFeeToHigh {},
 
-
     #[error("You can't sell an NFT for less than 1craft (1_000_000ucraft)")]
     ListingPriceTooLow {},
-
-
 }

@@ -7,10 +7,7 @@ use cosmwasm_std::Coin;
 // coin.amount.u128() >= required_amount
 // it is `coin.amount.u128() == required_amount`
 
-pub fn assert_sent_exact_coin(
-    sent: &[Coin],
-    required: Option<Coin>,
-) -> Result<(), ContractError> {
+pub fn assert_sent_exact_coin(sent: &[Coin], required: Option<Coin>) -> Result<(), ContractError> {
     if let Some(required_coin) = required {
         let required_amount = required_coin.amount.u128();
         if required_amount > 0 {
@@ -25,18 +22,17 @@ pub fn assert_sent_exact_coin(
             if sent_sufficient_funds {
                 return Ok(());
             } else {
-                return Err(ContractError::InsufficientFundsSend { 
-                    needed: required_amount.to_string(), 
-                    received: convert_vector_of_string_slices_to_string(received_amounts)
-                });                
+                return Err(ContractError::InsufficientFundsSend {
+                    needed: required_amount.to_string(),
+                    received: convert_vector_of_string_slices_to_string(received_amounts),
+                });
             }
         }
     }
     Ok(())
 }
 
-
-fn convert_vector_of_string_slices_to_string (vector: Vec<String>) -> String {
+fn convert_vector_of_string_slices_to_string(vector: Vec<String>) -> String {
     let mut string = String::new();
     for s in vector {
         string.push_str(&s);
