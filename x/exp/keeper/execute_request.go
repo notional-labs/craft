@@ -1,11 +1,13 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/notional-labs/craft/x/exp/types"
 )
 
-func (k ExpKeeper) GetMintRequest(ctx sdk.Context, accAddress sdk.AccAddress) (types.MintRequest, error) {
+func (k ExpKeeper) GetMintRequest(ctx sdk.Context, accAddress sdk.AccAddress) (mintRequset types.MintRequest, found bool) {
 	return k.GetMintRequestByKey(ctx, types.GetMintRequestAddressBytes(accAddress))
 }
 
@@ -60,7 +62,8 @@ func (k ExpKeeper) ExecuteBurnExp(ctx sdk.Context, burnRequest types.BurnRequest
 }
 
 func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest) error {
-	if mintRequest.DaoTokenMinted == sdk.NewDec(0) {
+	// must mint 1 exp
+	if sdk.NewDec(1).GTE(mintRequest.DaoTokenMinted) {
 		mintRequest.Status = types.StatusNoFundRequest
 		k.completeMintRequest(ctx, mintRequest)
 		return nil
@@ -70,6 +73,10 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 	maxToken := sdk.NewCoin(k.GetDenom(ctx), mintRequest.DaoTokenMinted.TruncateInt())
 
 	err := k.verifyAccountToWhiteList(ctx, memberAccount)
+	fmt.Println("========================")
+	fmt.Println(mintRequest.DaoTokenMinted)
+	fmt.Println("========================")
+
 	if err == nil {
 		err := k.addAddressToWhiteList(ctx, memberAccount, maxToken)
 		if err != nil {

@@ -180,9 +180,17 @@ func (k msgServer) SpendIbcAssetToExp(goCtx context.Context, msg *types.MsgSpend
 	if len(msg.Amount) != 1 || msg.Amount[0].Denom != k.GetIbcDenom(ctx) {
 		return nil, types.ErrDenomNotMatch
 	}
+	mintRequest, found := k.GetMintRequest(ctx, fromAddress)
+	if !found {
+		return nil, types.ErrAddressdNotFound
+	}
+
+	// verify time
+	if !k.ValidateMintRequestByTime(ctx, mintRequest) {
+		return nil, types.ErrTimeOut
+	}
 
 	// oracle for exp price
-
 	err = k.ExpKeeper.SendIbcOracle(ctx, fromAddress.String(), msg.Amount[0], "mint", msg.TimeoutHeight, msg.TimeoutTimestamp)
 	if err != nil {
 		return nil, err

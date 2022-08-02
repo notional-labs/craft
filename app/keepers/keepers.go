@@ -196,6 +196,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
+		&appKeepers.IBCKeeper.ChannelKeeper,
 		appKeepers.ScopedOracleKeeper,
 	)
 	expIBCModule := exp.NewIBCModule(appCodec, appKeepers.ExpKeeper)

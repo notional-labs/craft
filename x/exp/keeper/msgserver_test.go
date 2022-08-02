@@ -5,12 +5,10 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/notional-labs/craft/x/exp/keeper"
 	"github.com/notional-labs/craft/x/exp/types"
-
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (
@@ -122,7 +120,7 @@ func (suite *KeeperTestSuite) TestJoinDaoByIbcAsset() {
 				suite.Require().NoError(err)
 
 				// check record
-				mintRequest, err := suite.App.ExpKeeper.GetMintRequest(suite.Ctx, suite.TestAccs[0])
+				mintRequest, _ := suite.App.ExpKeeper.GetMintRequest(suite.Ctx, suite.TestAccs[0])
 				suite.Require().Equal(mintRequest.Account, suite.TestAccs[0].String())
 				suite.Require().Equal(mintRequest.DaoTokenLeft, sdk.NewDec(1000000))
 				suite.Require().Equal(mintRequest.DaoTokenMinted, sdk.NewDec(0))

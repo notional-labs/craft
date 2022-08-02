@@ -102,7 +102,7 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			srcPort := "ibc-exp"
-			srcChannel := "channel-1"
+			srcChannel := "channel-0"
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -139,7 +139,6 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-
 				if !timeoutHeight.IsZero() {
 					absoluteHeight := height
 					absoluteHeight.RevisionNumber += timeoutHeight.RevisionNumber
@@ -162,7 +161,7 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 					return errors.New("timeoutTimestamp is not greater than current local clock time")
 				}
 			}
-			msg := types.NewMsgSpendIbcAssetToExp(clientCtx.GetFromAddress().String(), coins)
+			msg := types.NewMsgSpendIbcAssetToExp(clientCtx.GetFromAddress().String(), coins, timeoutHeight, timeoutTimestamp)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},

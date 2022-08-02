@@ -33,11 +33,17 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 
 	k.setDaoTokenPrice(ctx, sdk.NewDec(price))
 
-	mintRequest, err := k.GetMintRequest(ctx, accAddress)
-	oracleRequest := k.GetOracleRequest(ctx, oracleID)
-	if err != nil {
-		return err
+	mintRequest, found := k.GetMintRequest(ctx, accAddress)
+
+	if !found {
+		return types.ErrAddressdNotFound
 	}
+	// verify time
+	if !k.ValidateMintRequestByTime(ctx, mintRequest) {
+		return types.ErrTimeOut
+	}
+
+	oracleRequest := k.GetOracleRequest(ctx, oracleID)
 	err = k.ExecuteMintExpByIbcToken(ctx, mintRequest, oracleRequest.AmountInRequest)
 	if err != nil {
 		return err
@@ -123,6 +129,7 @@ func (k ExpKeeper) SendBurnOracleRequest(ctx sdk.Context, burnRequest types.Burn
 		RevisionNumber: 1,
 		RevisionHeight: uint64(ctx.BlockHeight() + 100),
 	}
-	err := k.SendIbcOracle(ctx, burnRequest.Account, *burnRequest.BurnTokenLeft, "burn", timeoutHeight, 0)
-	return err
+	k.SendIbcOracle(ctx, burnRequest.Account, *burnRequest.BurnTokenLeft, "burn", timeoutHeight, types.DefaultRelativePacketTimeoutTimestamp)
+	return nil
+
 }
