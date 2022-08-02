@@ -212,6 +212,7 @@ func (appKeepers *AppKeepers) InitNormalKeepers(
 	appKeepers.StakingKeeper = *stakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(appKeepers.DistrKeeper.Hooks(), appKeepers.SlashingKeeper.Hooks()),
 	)
+	appKeepers.NFTKeeper = nftkeeper.NewKeeper(appKeepers.keys[nftkeeper.StoreKey], appCodec, appKeepers.AccountKeeper, appKeepers.BankKeeper)
 
 	// Create Transfer Keepers
 	transferKeeper := ibctransferkeeper.NewKeeper(
