@@ -2,7 +2,7 @@
   "messages": [
     {
       "@type": "/craft.exp.v1beta1.MsgJoinDaoByIbcAsset",
-      "join_address": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl",
+      "join_address": "craft146u7jj4h2m0map55623pfyqjyraqxmra6lvmm8",
       "gov_address": "craft10d07y265gmmuvt4z0w9aw880jnsr700jm5qjn0",
       "amount": "1000000"
     }
