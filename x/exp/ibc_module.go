@@ -166,6 +166,12 @@ func (am IBCModule) OnRecvPacket(
 	relayer sdk.AccAddress,
 ) ibcexported.Acknowledgement {
 	var data oracletypes.OracleResponsePacketData
+	fmt.Println("==============================")
+	fmt.Println("========v1======================")
+	fmt.Println(data)
+	fmt.Println("==============================")
+	fmt.Println("==============================")
+
 	if err := types.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
 		return channeltypes.Acknowledgement{}
 	}
@@ -181,7 +187,7 @@ func (am IBCModule) OnRecvPacket(
 	if err != nil {
 		return channeltypes.Acknowledgement{}
 	}
-	fmt.Println("==============================")
+	fmt.Println("=========v2=====================")
 	fmt.Println("==============================")
 	fmt.Println(data)
 	fmt.Println("==============================")
