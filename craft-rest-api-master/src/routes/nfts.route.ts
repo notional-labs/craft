@@ -9,5 +9,9 @@ router.get('/owned/:addr721_address/:wallet', nftController.getPlayersOwnedNFTs)
 
 router.get('/data/:addr721_address/:token_id', nftController.getDataFromTokenID);
 
+router.get('/info/:addr721_address', nftController.getContractInformation);
+
+router.get('/get_all_nfts/:craft_address', nftController.getAllUserNFTs);
+router.post('/sync_all_to_db/:craft_address', nftController.syncOtherPlatformNFTs);
 
 export default router;

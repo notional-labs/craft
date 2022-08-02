@@ -11,21 +11,61 @@ import axios from 'axios';
  * @param uuid The UUID of the property
  */
 export const getPropertyInformation = async (uuid: string) => {
-    const REDIS_KEY = `cache:property_info:${uuid}`;
-    let cachedPropertyData = await redisClient?.get(REDIS_KEY);
+    const REDIS_KEY = `cache:property_info`;
+    let cachedPropertyData = await redisClient?.hGet(REDIS_KEY, `${uuid}`);
     if(cachedPropertyData) {
         console.log(`Property found in redis cache -> ${REDIS_KEY}. Not calling MongoDB`);
         return JSON.parse(cachedPropertyData);
     }
 
     let doc = await collections?.reProperties?.find({ _id: uuid }).tryNext();
-    if (doc) { // saves to cache for 60 seconds * minutes.
-        await redisClient?.setEx(REDIS_KEY, 60*5, JSON.stringify(doc));
+
+    if (doc) { 
+        doc.cityName = await getCityNameFromID(doc?.cityId);
+        doc.buildingName = await getBuildingNameFromID(doc?.buildingId);
+        // console.log(`Cityname: ${cityName}, Buildingname: ${buildingName}`);
+
+        await redisClient.hSet(REDIS_KEY, `${uuid}`, JSON.stringify(doc));
+        // do we want to expire the HSET? maybe every hour or something.
         return doc;
     } 
     
-    return undefined;    
+    return "";    
 };
+
+
+export const getCityNameFromID = async (cityID: string) => {
+    const REDIS_KEY = `cache:citynames`;
+    let cachedCityname = await redisClient?.hGet(REDIS_KEY, `${cityID}`);
+    if(cachedCityname) {
+        console.log(`Cityname found in redis cache -> ${REDIS_KEY}. Not calling MongoDB`);
+        return cachedCityname;
+    }
+
+    let doc = await collections?.reCities?.find({ _id: cityID }).tryNext();
+    if (doc) { // saves to cache for 60 seconds * minutes.
+        await redisClient?.hSet(REDIS_KEY, `${cityID}`, doc.name);
+        return doc.name;
+    } 
+    
+    return "";    
+}
+export const getBuildingNameFromID = async (buildingId: string) => {
+    const REDIS_KEY = `cache:buildingnames`;
+    let cachedBuildingName = await redisClient?.hGet(REDIS_KEY, `${buildingId}`);
+    if(cachedBuildingName) {
+        console.log(`BuildingName found in redis cache -> ${cachedBuildingName} from ${buildingId}. Not calling MongoDB`);
+        return cachedBuildingName;
+    }
+
+    let doc = await collections?.reBuildings?.find({ _id: buildingId }).tryNext();
+    if (doc) { // saves to cache for 60 seconds * minutes.        
+        await redisClient?.hSet(REDIS_KEY, `${buildingId}`, doc.name);
+        return doc.name;
+    } 
+    
+    return "";    
+}
 
 /**
  * Gets a properties status/state (FOR_RENT, FOR_SALE, RENTED, OWNED)

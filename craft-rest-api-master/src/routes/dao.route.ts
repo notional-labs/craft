@@ -10,6 +10,7 @@ router.get('/usd_value', daoControler.getUSDValueOfDAO)
 router.get('/assets', daoControler.getTotalAssets)
 
 router.get('/exp_price', daoControler.getEXPPrice)
+router.get('/craft_price', daoControler.getCraftPrice)
 router.get('/escrow_account_info', daoControler.getServerEscrowWallet)
 
 router.post('/make_payment', daoControler.makePaymentToPlayer)

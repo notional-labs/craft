@@ -1,28 +1,30 @@
 use crate::error::ContractError;
 use cosmwasm_std::Coin;
 
+// Modified:
 // https://github.com/InterWasm/cw-contracts/blob/main/contracts/nameservice/src/contract.rs
-pub fn assert_sent_sufficient_coin(
-    sent: &[Coin],
-    required: Option<Coin>,
-) -> Result<(), ContractError> {
+// just instead of
+// coin.amount.u128() >= required_amount
+// it is `coin.amount.u128() == required_amount`
+
+pub fn assert_sent_exact_coin(sent: &[Coin], required: Option<Coin>) -> Result<(), ContractError> {
     if let Some(required_coin) = required {
         let required_amount = required_coin.amount.u128();
         if required_amount > 0 {
-            let mut received_amount = 0;
+            let mut received_amounts = vec![];
             let sent_sufficient_funds = sent.iter().any(|coin| {
                 // check if a given sent coin matches denom
                 // and has sufficient amount
-                received_amount = coin.amount.u128();
-                coin.denom == required_coin.denom && coin.amount.u128() >= required_amount
+                received_amounts.push(coin.amount.u128().to_string() + " " + &coin.denom);
+                coin.denom == required_coin.denom && coin.amount.u128() == required_amount
             });
 
             if sent_sufficient_funds {
                 return Ok(());
             } else {
-                return Err(ContractError::InsufficientFundsSend { 
-                    needed: required_amount.to_string(), 
-                    received: received_amount.to_string()
+                return Err(ContractError::InsufficientFundsSend {
+                    needed: required_amount.to_string(),
+                    received: convert_vector_of_string_slices_to_string(received_amounts),
                 });
             }
         }
@@ -30,50 +32,11 @@ pub fn assert_sent_sufficient_coin(
     Ok(())
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use cosmwasm_std::{coin, coins};
-
-    #[test]
-    fn assert_sent_sufficient_coin_works() {
-        match assert_sent_sufficient_coin(&[], Some(coin(0, "token"))) {
-            Ok(()) => {}
-            Err(e) => panic!("Unexpected error: {:?}", e),
-        };
-
-        let _sent_coins = "&[]".to_string();
-        let _required_coins = "&[coin(5, \"token\")]".to_string();
-        match assert_sent_sufficient_coin(&[], Some(coin(5, "token"))) {
-            Ok(()) => panic!("Should have raised insufficient funds error"),
-            
-            Err(ContractError::InsufficientFundsSend {
-                needed: _sent_coins,
-                received: _required_coins,
-            }) => {}
-            Err(e) => panic!("Unexpected error: {:?}", e),
-        };
-
-        let _sent_coins = "&[coin(10, \"smokin\")]".to_string();
-        let _required_coins = "&[coin(5, \"token\")]".to_string();
-        match assert_sent_sufficient_coin(&coins(10, "smokin"), Some(coin(5, "token"))) {
-            Ok(()) => panic!("Should have raised insufficient funds error"),
-            Err(ContractError::InsufficientFundsSend {
-                needed: _sent_coins,
-                received: _required_coins,
-            }) => {}
-            Err(e) => panic!("Unexpected error: {:?}", e),
-        };
-
-        match assert_sent_sufficient_coin(&coins(10, "token"), Some(coin(5, "token"))) {
-            Ok(()) => {}
-            Err(e) => panic!("Unexpected error: {:?}", e),
-        };
-
-        let sent_coins = vec![coin(2, "smokin"), coin(5, "token"), coin(1, "earth")];
-        match assert_sent_sufficient_coin(&sent_coins, Some(coin(5, "token"))) {
-            Ok(()) => {}
-            Err(e) => panic!("Unexpected error: {:?}", e),
-        };
+fn convert_vector_of_string_slices_to_string(vector: Vec<String>) -> String {
+    let mut string = String::new();
+    for s in vector {
+        string.push_str(&s);
+        string.push_str(", ");
     }
+    string
 }

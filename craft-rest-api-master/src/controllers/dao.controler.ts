@@ -1,11 +1,12 @@
 // Express
 import { Request, Response } from 'express';
 import { getAllEndpoints, makePayment, getTotalSupply, getAssets, getTotalUSDValue, getExpValueCalculation, getServersEscrowAccountInfo } from '../services/dao.service';
+import { getCraftUSDPrice } from '../services/pricing.service';
 
 export const makePaymentToPlayer = async (req: Request, res: Response) => {
-    const {secret, wallet, amount} = req.body;
+    const {secret, wallet, ucraft_amount, description} = req.body;
 
-    const response = await makePayment(secret, wallet, amount);
+    const response = await makePayment(secret, wallet, ucraft_amount, description);
     if (response) return res.status(200).json(response);
     else return res.status(404).json({ message: 'No Real Estate NFTs found for this wallet' });
 };
@@ -48,6 +49,12 @@ export const getEXPPrice = async (req: Request, res: Response) => {
     else return res.status(404).json({ message: 'ERROR:...' });
 };
 
+export const getCraftPrice = async (req: Request, res: Response) => {
+    const response = await getCraftUSDPrice();
+    if (response) return res.status(200).json({"craft_price": Number(response)});
+    else return res.status(404).json({ message: 'ERROR:...' });
+};
+
 export default {
     getAll,
     getSupply,
@@ -55,5 +62,6 @@ export default {
     getTotalAssets,
     getServerEscrowWallet,
     getEXPPrice,
+    getCraftPrice,
     makePaymentToPlayer
 };

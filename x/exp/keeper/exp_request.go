@@ -365,27 +365,36 @@ func (k ExpKeeper) GetOracleRequest(ctx sdk.Context, oracleID uint64) (oracleReq
 func (k ExpKeeper) SetBurnRequestOracle(ctx sdk.Context, oracle types.OracleRequest) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&oracle)
-	key := append(types.KeyOracleRequest, []byte(oracle.AddressRequest)...)
+	// https://github.com/go-critic/go-critic/issues/865
+	key := types.KeyOracleRequest
+	key = append(key, []byte(oracle.AddressRequest)...)
 
 	store.Set(key, bz)
 }
 
 func (k ExpKeeper) GetBurnRequestOracle(ctx sdk.Context, addressBurn string) (oracle types.OracleRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	key := append(types.KeyOracleRequest, []byte(addressBurn)...)
+	// https://github.com/go-critic/go-critic/issues/865
+	key := types.KeyOracleRequest
+	key = append(key, []byte(addressBurn)...)
 
 	bz := store.Get(key)
 	if bz == nil {
 		return types.OracleRequest{}, false
 	}
 
-	k.cdc.Unmarshal(bz, &oracle)
+	err := k.cdc.Unmarshal(bz, &oracle)
+	if err != nil {
+		panic(err)
+	}
 	return oracle, true
 }
 
 func (k ExpKeeper) RemoveBurnRequestOracle(ctx sdk.Context, addressBurn string) {
 	store := ctx.KVStore(k.storeKey)
-	key := append(types.KeyOracleRequest, []byte(addressBurn)...)
+	// https://github.com/go-critic/go-critic/issues/865
+	key := types.KeyOracleRequest
+	key = append(key, []byte(addressBurn)...)
 
 	if store.Has(key) {
 		store.Delete(key)

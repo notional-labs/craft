@@ -1,5 +1,6 @@
 
-
+import sys
+sys.dont_write_bytecode = True
 import os
 import json
 from dotenv import load_dotenv
@@ -12,7 +13,9 @@ ADDRM = os.getenv('ADDRM')
 
 links = [
     # random link(s)
-    "https://www.instagram.com/static/images/homepage/screenshots/screenshot1.png/fdfe239b7c9f.png",
+    "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ",
+    "https://ipfs.io/ipfs/QmNLjZSFV3GUMcusj8keEqVtToEE3ceTSguNom7e4S6pbJ",
+    "https://ipfs.io/ipfs/QmNLijobERK4VhSDZdKjt5SrezdRM6k813qcSHd68f3Mqg"
 ]
 
 # A normal contract for images
@@ -40,17 +43,17 @@ def part1_mintToAdminAccount():
 def part2_sendToMarketplace():
     # move to marketplace contract
     from base64 import b64encode
-    listPrice = '{"list_price":{"address":"{ADMIN_WALLET}","amount":"{AMT}","denom":"{TOKEN}"}}'\
-                .replace("{ADMIN_WALLET}", CRAFT_ADMIN_WALLET).replace("{AMT}", str(500)).replace("{TOKEN}", "ucraft")
+    listPrice = '{"list_price":"{AMT}"}'.replace("{AMT}", str(69))
 
-    SEND_NFT_JSON = '''{"send_nft":{"contract":"{ADDRM}","token_id":"{ID}","msg":"{LIST_PRICE}"}}''' \
-        .replace("{ADDRM}", ADDRM) \
-        .replace("{ID}", str(1)) \
-        .replace("{LIST_PRICE}", b64encode(listPrice.encode('utf-8')).decode('utf-8'))
-    # print(SEND_NFT_JSON)
+    for idx, link in enumerate(links, START_INDEX):
+        SEND_NFT_JSON = '''{"send_nft":{"contract":"{ADDRM}","token_id":"{ID}","msg":"{LIST_PRICE}"}}''' \
+            .replace("{ADDRM}", ADDRM) \
+            .replace("{ID}", str(idx)) \
+            .replace("{LIST_PRICE}", b64encode(listPrice.encode('utf-8')).decode('utf-8'))
+        # print(SEND_NFT_JSON)
 
-    cmd = f"""craftd tx wasm execute {ADDR_TEST721} '{SEND_NFT_JSON}' --gas-prices="0.025ucraft" --gas="auto" --gas-adjustment="1.2" -y --from $KEY"""
-    print(cmd)
+        cmd = f"""craftd tx wasm execute {ADDR_TEST721} '{SEND_NFT_JSON}' --gas-prices="0.025ucraft" -y --from $KEY"""
+        print(cmd)
 
 if __name__ == "__main__":
     main()

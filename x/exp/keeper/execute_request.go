@@ -78,7 +78,10 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 	fmt.Println("========================")
 
 	if err == nil {
-		k.addAddressToWhiteList(ctx, memberAccount, maxToken)
+		err := k.addAddressToWhiteList(ctx, memberAccount, maxToken)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = k.MintExpForAccount(ctx, sdk.NewCoins(maxToken), memberAccount)

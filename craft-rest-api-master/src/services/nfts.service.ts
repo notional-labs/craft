@@ -15,7 +15,6 @@ export const getUsersOwnedNFTs = async (addr721_address: string, wallet: string)
     console.log("getUsersOwnedNFTs", usersNFTIDs) 
 
     if(usersNFTIDs) {
-        // cache this maybe for a few seconds? even worth it?
         return Promise.all(usersNFTIDs?.tokens.map(token => queryToken(addr721_address, token)))  
     }
 
@@ -102,7 +101,7 @@ export const getUsersNFTsIDsList = async (addr721_address: string, wallet: strin
     let api = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/contract/${addr721_address}/smart/${query}`
 
     let response = await axios.get(api).catch(err => {
-        // console.log("getUsersNFTsIDsList Error (wallet does not exist)");
+        console.log("getUsersNFTsIDsList Error (wallet does not exist)");
         // return { "tokens": [] };
         return undefined;
     })
@@ -111,4 +110,30 @@ export const getUsersNFTsIDsList = async (addr721_address: string, wallet: strin
     // console.log(`getUsersNFTsIDsList`, tokens, api) // { tokens: [ '1', '101', '102', '2', '8', '9' ] }
 
     return tokens;
+};
+
+
+// { "name": "craftd-re7", "symbol": "ctest" }
+export const queryContractInfo = async (addr721_address: string) => {   
+    const REDIS_KEY = `cache:contract_info`; 
+    const REDIS_HSET_KEY = `${addr721_address}`
+    let cachedToken = await redisClient?.hGet(REDIS_KEY , REDIS_HSET_KEY);
+    if(cachedToken) {        
+        return JSON.parse(cachedToken);
+    }
+
+    let query = Buffer.from(`{"contract_info":{}}`).toString('base64'); // name and symbol
+    let api = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/contract/${addr721_address}/smart/${query}` 
+    // console.log(api);
+
+    let response = await axios.get(api).catch(err => {
+        console.log("queryContractInfo Error (wallet does not exist)");
+        // return { "tokens": [] };
+        return undefined;
+    })
+
+    let contract_info = response?.data?.data;
+    await redisClient?.hSet(REDIS_KEY, REDIS_HSET_KEY, JSON.stringify(contract_info)); // no need to expire ever, since it is 1 off info
+
+    return contract_info;
 };
