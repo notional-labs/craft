@@ -41,7 +41,7 @@ jobs:
           
           
 # uploads bin
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: craftd ${{ matrix.targetos }} ${{ matrix.arch }}
           path: cmd/*
