@@ -3,7 +3,7 @@ module github.com/notional-labs/craft
 go 1.18
 
 require (
-	cosmossdk.io/math v1.0.0-beta.2
+	cosmossdk.io/math v1.0.0-beta.3
 	github.com/CosmWasm/wasmd v0.27.0
 	github.com/cosmos/cosmos-sdk v0.46.0
 	github.com/cosmos/ibc-go/v4 v4.0.0-rc0
