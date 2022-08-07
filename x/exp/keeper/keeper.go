@@ -296,6 +296,9 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 		300000,                  // oraclePrams.ExecuteGas,need change to use gov param
 	)
 
+	timeoutHeight = clienttypes.NewHeight(0, uint64(ctx.BlockHeight())+100)
+	timeoutTimestamp = 0
+
 	// Create the IBC packet
 	packet := channeltypes.NewPacket(
 		packetData.GetBytes(),
