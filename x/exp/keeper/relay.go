@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -27,7 +26,10 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 	}
 
 	// set price to state
-	_, err = strconv.ParseFloat(strExpPrice, 64)
+	price, err := sdk.NewDecFromStr(strExpPrice)
+	fmt.Println("=======price======")
+	fmt.Println(price)
+
 	if err != nil {
 		fmt.Println("======err when parse int==========")
 		fmt.Println(err)
@@ -35,11 +37,7 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 		return err
 	}
 
-	fmt.Println("========price========")
-	fmt.Println(sdk.MustNewDecFromStr(strExpPrice))
-	fmt.Println("================")
-
-	k.setDaoTokenPrice(ctx, sdk.MustNewDecFromStr(strExpPrice))
+	k.setDaoTokenPrice(ctx, price)
 
 	mintRequest, found := k.GetMintRequest(ctx, accAddress)
 
@@ -66,12 +64,18 @@ func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest
 	}
 
 	// set price to state
-	price, err := strconv.ParseInt(strExpPrice, 10, 64)
+	price, err := sdk.NewDecFromStr(strExpPrice)
+	fmt.Println("=======price======")
+	fmt.Println(price)
+
 	if err != nil {
+		fmt.Println("======err when parse int==========")
+		fmt.Println(err)
+
 		return err
 	}
 
-	k.setDaoTokenPrice(ctx, sdk.NewDec(price))
+	k.setDaoTokenPrice(ctx, price)
 
 	burnRequest, err := k.GetBurnRequest(ctx, accAddress)
 	if err != nil {
