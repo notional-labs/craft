@@ -98,6 +98,11 @@ func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest
 // ExecuteMintExpByIbcToken only run in OnPacketRecv.
 func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.MintRequest, coin sdk.Coin) error {
 	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
+	fmt.Println("=========expWillGet=========")
+	fmt.Println(expWillGet)
+	fmt.Println("=========mintrequest=========")
+
+	fmt.Println(mintRequest)
 
 	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
 		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
@@ -114,6 +119,7 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 	}
 	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), sdk.AccAddress(mintRequest.Account))
 	if err != nil {
+		fmt.Println("=========fund err=========")
 		return sdkerrors.Wrap(err, "fund error")
 	}
 	k.removeMintRequest(ctx, mintRequest)
@@ -122,6 +128,7 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
 	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(decCoin)
 
+	fmt.Println("==================")
 	k.SetMintRequest(ctx, mintRequest)
 
 	return nil
