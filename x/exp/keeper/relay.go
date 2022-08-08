@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -25,8 +26,9 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 		return err
 	}
 
+	fmt.Println(strExpPrice)
 	// set price to state
-	price, err := sdk.NewDecFromStr(strExpPrice)
+	price, err := sdk.NewDecFromStr(strings.TrimSpace(strExpPrice))
 	fmt.Println("=======price======")
 	fmt.Println(price)
 
