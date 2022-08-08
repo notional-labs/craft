@@ -62,7 +62,8 @@ func (k ExpKeeper) GetDaoTokenPrice(ctx sdk.Context) sdk.Dec {
 func (k ExpKeeper) calculateDaoTokenValue(ctx sdk.Context, amount math.Int) sdk.Dec {
 	daoTokenPrice := k.GetDaoTokenPrice(ctx)
 
-	return daoTokenPrice.QuoInt(amount)
+	decCoin := sdk.NewDecFromInt(amount)
+	return decCoin.Quo(daoTokenPrice)
 }
 
 func (k ExpKeeper) SetBurnRequest(ctx sdk.Context, burnRequest types.BurnRequest) {
