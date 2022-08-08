@@ -379,8 +379,7 @@ func (k ExpKeeper) SetBurnRequestOracle(ctx sdk.Context, oracle types.OracleRequ
 func (k ExpKeeper) GetBurnRequestOracle(ctx sdk.Context, addressBurn string) (oracle types.OracleRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	// https://github.com/go-critic/go-critic/issues/865
-	key := types.KeyOracleRequest
-	key = append(key, []byte(addressBurn)...)
+	key := append(types.KeyOracleRequest, []byte(addressBurn)...)
 
 	bz := store.Get(key)
 	if bz == nil {
@@ -397,8 +396,7 @@ func (k ExpKeeper) GetBurnRequestOracle(ctx sdk.Context, addressBurn string) (or
 func (k ExpKeeper) RemoveBurnRequestOracle(ctx sdk.Context, addressBurn string) {
 	store := ctx.KVStore(k.storeKey)
 	// https://github.com/go-critic/go-critic/issues/865
-	key := types.KeyOracleRequest
-	key = append(key, []byte(addressBurn)...)
+	key := append(types.KeyOracleRequest, []byte(addressBurn)...)
 
 	if store.Has(key) {
 		store.Delete(key)

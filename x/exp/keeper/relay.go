@@ -137,7 +137,10 @@ func (k ExpKeeper) SendBurnOracleRequest(ctx sdk.Context, burnRequest types.Burn
 		RevisionNumber: 1,
 		RevisionHeight: uint64(ctx.BlockHeight() + 100),
 	}
-	k.SendIbcOracle(ctx, burnRequest.Account, *burnRequest.BurnTokenLeft, "burn", timeoutHeight, types.DefaultRelativePacketTimeoutTimestamp)
-	return nil
+	err := k.SendIbcOracle(ctx, burnRequest.Account, *burnRequest.BurnTokenLeft, "burn", timeoutHeight, types.DefaultRelativePacketTimeoutTimestamp)
+	if err != nil {
+		return err
+	}
 
+	return nil
 }
