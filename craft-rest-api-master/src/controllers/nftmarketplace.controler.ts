@@ -5,22 +5,32 @@ export const getMarketplaceOfferings = async (req: Request, res: Response) => {
     const found = await queryOfferings(""); // "" = all
 
     if (found) return res.status(200).json(found) 
-    else return res.status(404).json({ message: 'Transaction not found' });
+    else return res.status(404).json({ message: 'Offerings not found' });
+};
+
+export const getMarketplaceOfferingsFromGivenWallet = async (req: Request, res: Response) => {
+    const { craft_address } = req.params;
+
+    const found = await queryOfferings("", craft_address); // "" = all
+    if (found) return res.status(200).json(found) 
+    else return res.status(404).json({ message: `Offerings not found for ${craft_address}` });
 };
 
 export const getSingleMarketplaceOffering = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { offering_id } = req.params;
 
     const found = await queryOfferings(""); // "" = all
     let foundOffering = undefined;
-    if(id) {
+    if(offering_id) {
         // loop through found and find the one with the id
-        foundOffering = found.find(offering => offering.id === id);
+        foundOffering = found.find(offering => offering.offering_id === offering_id);
     }
 
     if (foundOffering) return res.status(200).json(foundOffering) 
-    else return res.status(404).json({ message: `No offering with id ${id} found.` });
+    else return res.status(404).json({ message: `No offering with offering_id ${offering_id} found.` });
 };
+
+
 
 export const getMarketplaceRealEstateOfferings = async (req: Request, res: Response) => {
     const found = await queryOfferings(`${process.env.ADDR721_REALESTATE}`); // all from our real estate collection
@@ -57,5 +67,6 @@ export default {
     getMarketplacePaintingsOfferings,
     getMarketplaceSpecificContractOffering,
     getMarketplaceFeatured,
-    getSingleMarketplaceOffering
+    getSingleMarketplaceOffering,
+    getMarketplaceOfferingsFromGivenWallet,
 };

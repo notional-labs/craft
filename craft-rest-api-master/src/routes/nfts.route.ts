@@ -11,7 +11,8 @@ router.get('/data/:addr721_address/:token_id', nftController.getDataFromTokenID)
 
 router.get('/info/:addr721_address', nftController.getContractInformation);
 
-router.get('/get_all_nfts/:craft_address', nftController.getAllUserNFTs);
+router.get('/get_all_nfts/:craft_address/:chain?', nftController.getAllUserNFTs);
+router.get('/get_all_nfts_including_offerings/:craft_address/:chain?', nftController.getAllUserNFTsIncludingOfferings);
 router.post('/sync_all_to_db/:craft_address', nftController.syncOtherPlatformNFTs);
 
 export default router;

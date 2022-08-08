@@ -16,7 +16,7 @@ config();
 
 const prefixes = {
     "cosmos": {
-        rpc: "https://rpc-cosmoshub.ecostake.com",
+        rpc: "https://rpc.cosmoshub.strange.love",
         denom: "uatom",
         coingecko: "cosmos",
     },
@@ -49,7 +49,11 @@ const prefixes = {
  */
 export const getAllEndpoints = async () => {
 
-    // def need to save to cache
+    const REDIS_KEY = `cache:dao_all_endpoints`;
+    let all_endpoints_data = await redisClient?.get(REDIS_KEY);
+    if (all_endpoints_data) {
+        return JSON.parse(all_endpoints_data);
+    }
 
     // console.log("Signer address:", account.address);
 
@@ -94,8 +98,8 @@ export const getAllEndpoints = async () => {
         EXP_TOTAL_SUPPLY: exp_total_supply / 1_000_000,
         PRICE_PER_EXP: TOTAL_USD_VALUE_OF_ASSETS / exp_total_supply,
         PRICE_PER_CRAFT: craft_price,
-    }
-    // client.disconnect();
+    }    
+    await redisClient.setEx(REDIS_KEY, 30, JSON.stringify(returnValue)); // 30 second cache
     return returnValue;
 };
 
@@ -246,9 +250,13 @@ export const getAssetHoldingAmount = async (address, prefix, rpc_url, denom) => 
     // console.log("staked_amount:", staked_amount);
     if (!staked_amount) { staked_amount = 0; }
 
-    ASSETS.ubalance = BigInt(bal.amount).toString();
+    // console.log(ASSETS.amount, ASSETS.ubalance, staked_amount);
+
+    ASSETS.ubalance = bal.amount;
     ASSETS.amount = ((BigInt(bal.amount)/BigInt(1_000_000)) + BigInt(staked_amount)).toString(); // amount in normal human readable format
     // console.log("ASSETS.amount (should include stake): ", ASSETS.amount);
+
+    // console.log(ASSETS.amount, ASSETS.ubalance, staked_amount);
 
     // save to redis
     await redisClient?.set(REDIS_KEY, JSON.stringify(ASSETS));
@@ -281,8 +289,8 @@ export const getAssets = async (addresses?) => {
             TOTAL_ASSETS[prefix] = BigInt(0);
         }
 
-        ubalances[denom] += t.ubalance;
-        TOTAL_ASSETS[prefix] += t.amount; // since we save to prefix for coingecko, we need the whole denom not micro udenom
+        ubalances[denom] += BigInt(t.ubalance);
+        TOTAL_ASSETS[prefix] += BigInt(t.amount); // since we save to prefix for coingecko, we need the whole denom not micro udenom
     }
 
     // convert every ubalances & TOTAL_ASSETS TO A STRING

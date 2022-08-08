@@ -83,6 +83,9 @@ export const queryToken = async (addr721Address: string, tokenId: string) => {
     }
     // append tokenId to the end of the json (useful for CRAFT Skins & real estate)
     returnJsonValue.tokenId = tokenId;
+    // returnJsonValue.owner = response?.data?.data?.access?.owner;
+
+    // console.log("DFASBNUIJ", returnJsonValue);
      
     // save to redis hSet cache
     await redisClient?.hSet(REDIS_KEY, REDIS_HSET_KEY, JSON.stringify(returnJsonValue));
@@ -92,11 +95,80 @@ export const queryToken = async (addr721Address: string, tokenId: string) => {
     return returnJsonValue;
 };
 
+export const queryTokenOwner = async (addr721Address: string, tokenId: string) => {
+    // hget cache:query_token 10
+
+    // Get cached
+    // const REDIS_KEY = `cache:query_token_owner`; 
+    // const REDIS_HSET_KEY = `${addr721Address}:${tokenId}` // for marketplace expansion
+    // let cachedToken = await redisClient?.hGet(REDIS_KEY , REDIS_HSET_KEY);
+    // if(cachedToken) {
+    //     return JSON.parse(cachedToken);
+    // }
+
+    const query = Buffer.from(`{"all_nft_info":{"token_id":"${tokenId}"}}`).toString('base64');
+    let api = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/contract/${addr721Address}/smart/${query}`
+    let response = await axios.get(api).catch(err => {
+        // console.log("queryToken Error (does not exist)");
+        return undefined;
+    })
+
+    // console.log("queryTokenOwner", response?.data?.data?.access?.owner)
+    // console.log(response);
+
+    // Can be a link (http, ipfs), base64 encoded, or a JSON string
+    let returnOwner = response?.data?.data?.access?.owner;
+    // console.log(`${token_uri}`)
+    if(!returnOwner) {
+        // console.log(`Error querying token ${tokenId}. Token likely does not exist`);
+        return "";
+    }
+     
+    // save to redis hSet cache
+    // await redisClient?.hSet(REDIS_KEY, REDIS_HSET_KEY, JSON.stringify(returnOwner));
+    // await redisClient?.expire(REDIS_KEY, 86400);
+    return returnOwner;
+};
+
+
+export const queryAllTokensForContract = async (addr721Address: string, start_after: number = 0, limit: number = 100) => {
+    // get all token ids for addr721Address
+    let query = Buffer.from(`{"all_tokens":{"start_after":"0","limit":${limit}}}`).toString('base64');
+    let api = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/contract/${addr721Address}/smart/${query}`
+    let response = await axios.get(api).catch(err => {
+        console.log("queryAllTokensForContract Error");
+        // return { "tokens": [] };
+        return undefined;
+    })
+
+    let tokens_list = response?.data?.data?.tokens;
+
+    // sort tokens_list in order
+    tokens_list.sort((a, b) => {
+        return a.token_id - b.token_id;
+    });
+    // loop through all & query them
+
+    return tokens_list
+};
+
+export const queryGetNFTImage = async (addr721Address: string, token_id: string) => {
+    const data = await queryToken(addr721Address, token_id);
+    if(!data) {
+        return undefined;
+    }
+
+    if(data._nft_type === "link") {
+        return data.token_uri;
+    } else {
+        return data.imageLink;
+    }
+};
 
 // this function gets all owned NFTs for a user, then queries all token_uris as well & returns that as a map.
 
-export const getUsersNFTsIDsList = async (addr721_address: string, wallet: string) => {            
-    let query = Buffer.from(`{"tokens":{"owner":"${wallet}","start_after":"0","limit":500}}`).toString('base64');
+export const getUsersNFTsIDsList = async (addr721_address: string, wallet: string, limit: number = 500) => {            
+    let query = Buffer.from(`{"tokens":{"owner":"${wallet}","start_after":"0","limit":${limit}}}`).toString('base64');
     
     let api = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/contract/${addr721_address}/smart/${query}`
 

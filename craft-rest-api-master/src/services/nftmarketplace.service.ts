@@ -14,15 +14,12 @@ import { getCraftUSDPrice } from '../services/pricing.service';
  * @param tokenId 
  * @returns JSON information about the property from the token_uri
  */
-export const queryOfferings = async (contract_address: string) => {
+export const queryOfferings = async (contract_address: string = "", from_craft_address: string = "") => {
     // Not sure if we should cache or not? maybe like 30 seconds?
-    if(!contract_address) { 
-        // get market offerings from only contracts with this contract address. if "", get all
-        contract_address = "";
-    }
 
-    // Cache'ed offerings so we don't spam contract too often
-    const REDIS_KEY = `cache:marketplace_offerings:${contract_address}`;
+    // Cache'ed offerings so we don't spam contract too often. if we requests from a single user, its just at the end
+    let REDIS_KEY = `cache:marketplace_offerings:${contract_address}`;
+    if(from_craft_address.length > 0) { REDIS_KEY += `:${from_craft_address}`; }
     let get_offerings = await redisClient?.get(REDIS_KEY);
     if (get_offerings) {
         // console.log(`Asset: ${denom} holdings ${get_wallet_value} found in redis cache -> ${REDIS_KEY}`);
@@ -46,13 +43,17 @@ export const queryOfferings = async (contract_address: string) => {
     let data = response?.data?.data?.offerings; // base64 encoded string of the values. May be other data too
     
     // Queries tokens for sale with their parent contract for the offering.
-    // 
     let offerings: string[] = []; // selective offerings we want to return based on address
     for(let i = 0; i < data.length; i++) {
         let offering = data[i];
 
         if(contract_address.length > 0 && offering.contract_addr !== contract_address) {
-            // if we only want a specific contract address to be returned, we do this
+            // we only want contracts being sold from a specific 721 contract
+            continue;
+        }
+        if(from_craft_address.length > 0 && offering.seller !== from_craft_address) {
+            // we only want contracts which are from a specific craft address
+            console.log(`Offering ${offering.token_id} is not from ${from_craft_address}`);
             continue;
         }
 
@@ -62,7 +63,6 @@ export const queryOfferings = async (contract_address: string) => {
 
         // console.log(token_data);
         if(token_data) {
-
             if(contract_info) {
                 offering.collection_name = contract_info.name; // 721
                 offering.symbol = contract_info.symbol; // 721
@@ -114,6 +114,13 @@ export const queryPaintingOfferings = async () => {
 
 
 export const queryFeatured = async (amount: number) => {
+    let REDIS_KEY = `cache:marketplace_offerings_featured:${amount}`;
+    let get_featured = await redisClient?.get(REDIS_KEY);
+    if (get_featured) {        
+        return JSON.parse(get_featured);
+    }
+
+
     let re = await queryOfferings(`${process.env.ADDR721_REALESTATE}`);
     let paintings = await queryPaintingOfferings();
 
@@ -129,6 +136,7 @@ export const queryFeatured = async (amount: number) => {
     let featured: any = {};
     featured.real_estate = feat_re;
     featured.paintings = feat_paintings;
+    await redisClient.setEx(REDIS_KEY, 2*60, JSON.stringify(featured)); // 2 minute cache
     return featured;
 }
 
