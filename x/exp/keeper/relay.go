@@ -27,7 +27,7 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 	}
 
 	// set price to state
-	price, err := strconv.ParseInt(strExpPrice, 10, 64)
+	price, err := strconv.ParseFloat(strExpPrice, 64)
 	if err != nil {
 		fmt.Println("======err when parse int==========")
 		fmt.Println(err)
@@ -37,7 +37,6 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 
 	fmt.Println("========price========")
 	fmt.Println(price)
-
 	fmt.Println("================")
 
 	k.setDaoTokenPrice(ctx, sdk.NewDec(price))
