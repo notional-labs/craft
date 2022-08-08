@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,16 +25,10 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 		return err
 	}
 
-	fmt.Println(strExpPrice)
 	// set price to state
 	price, err := sdk.NewDecFromStr(strings.TrimSpace(strExpPrice))
-	fmt.Println("=======price======")
-	fmt.Println(price)
 
 	if err != nil {
-		fmt.Println("======err when parse int==========")
-		fmt.Println(err)
-
 		return err
 	}
 
@@ -52,8 +45,6 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 	}
 
 	oracleRequest := k.GetOracleRequest(ctx, oracleID)
-	fmt.Println("======oracleRequest=========")
-	fmt.Println(oracleRequest)
 
 	err = k.ExecuteMintExpByIbcToken(ctx, mintRequest, oracleRequest.AmountInRequest)
 	if err != nil {
@@ -70,13 +61,8 @@ func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest
 
 	// set price to state
 	price, err := sdk.NewDecFromStr(strExpPrice)
-	fmt.Println("=======price======")
-	fmt.Println(price)
 
 	if err != nil {
-		fmt.Println("======err when parse int==========")
-		fmt.Println(err)
-
 		return err
 	}
 
@@ -98,11 +84,6 @@ func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest
 // ExecuteMintExpByIbcToken only run in OnPacketRecv.
 func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.MintRequest, coin sdk.Coin) error {
 	expWillGet := k.calculateDaoTokenValue(ctx, coin.Amount)
-	fmt.Println("=========expWillGet=========")
-	fmt.Println(expWillGet)
-	fmt.Println("=========mintrequest=========")
-
-	fmt.Println(mintRequest)
 
 	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
 		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
@@ -125,7 +106,6 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 	}
 	err = k.FundPoolForExp(ctx, sdk.NewCoins(coin), accAddress)
 	if err != nil {
-		fmt.Println(err)
 		return sdkerrors.Wrap(err, "fund error")
 	}
 	k.removeMintRequest(ctx, mintRequest)

@@ -188,9 +188,6 @@ func (am IBCModule) OnRecvPacket(
 		if err != nil {
 			return channeltypes.Acknowledgement{}
 		}
-		fmt.Println("========================")
-		fmt.Println(result)
-		fmt.Println("========================")
 
 		switch result.Status {
 		case "mint":

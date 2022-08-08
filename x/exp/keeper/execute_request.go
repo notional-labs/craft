@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/notional-labs/craft/x/exp/types"
 )
@@ -73,9 +71,6 @@ func (k ExpKeeper) ExecuteMintExp(ctx sdk.Context, mintRequest types.MintRequest
 	maxToken := sdk.NewCoin(k.GetDenom(ctx), mintRequest.DaoTokenMinted.TruncateInt())
 
 	err := k.verifyAccountToWhiteList(ctx, memberAccount)
-	fmt.Println("========================")
-	fmt.Println(mintRequest.DaoTokenMinted)
-	fmt.Println("========================")
 
 	if err == nil {
 		err := k.addAddressToWhiteList(ctx, memberAccount, maxToken)
