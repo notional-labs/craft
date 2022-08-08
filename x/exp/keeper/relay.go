@@ -119,7 +119,10 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 	}
 	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), sdk.AccAddress(mintRequest.Account))
 	if err != nil {
+		fmt.Println(coin)
 		fmt.Println("=========fund err=========")
+		fmt.Println(err)
+
 		return sdkerrors.Wrap(err, "fund error")
 	}
 	k.removeMintRequest(ctx, mintRequest)
