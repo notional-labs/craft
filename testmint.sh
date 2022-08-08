@@ -2,7 +2,7 @@ craftd tx gov  submit-proposal test_proposal.json --from mykey --fees 200stake -
 
 sleep 5
 
-craftd tx gov vote 4 yes --from mykey --fees 200stake  -y
+craftd tx gov vote 5 yes --from mykey --fees 200stake  -y
 
 sleep 20
 
