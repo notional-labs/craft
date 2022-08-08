@@ -1,6 +1,7 @@
 vue/node_modules
 vue/dist
 website/node_modules
+web/node_modules
 website/dist
 release/
 .idea/
