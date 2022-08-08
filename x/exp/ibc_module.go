@@ -167,15 +167,8 @@ func (am IBCModule) OnRecvPacket(
 ) ibcexported.Acknowledgement {
 	var data oracletypes.OracleResponsePacketData
 	if err := types.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
-		fmt.Println("=========================")
-		fmt.Println(err)
-		fmt.Println("=========================")
-
 		return channeltypes.Acknowledgement{}
 	}
-	fmt.Println("=========================")
-	fmt.Println(data)
-	fmt.Println("=========================")
 
 	acknowledgement := channeltypes.NewResultAcknowledgement([]byte{byte(1)})
 
@@ -188,9 +181,6 @@ func (am IBCModule) OnRecvPacket(
 	if err != nil {
 		return channeltypes.Acknowledgement{}
 	}
-	fmt.Println("=========================")
-	fmt.Println(oracleID)
-	fmt.Println("=========================")
 
 	if data.ResolveStatus == oracletypes.RESOLVE_STATUS_SUCCESS {
 		var result resultData
@@ -198,6 +188,10 @@ func (am IBCModule) OnRecvPacket(
 		if err != nil {
 			return channeltypes.Acknowledgement{}
 		}
+		fmt.Println("========================")
+		fmt.Println(result)
+		fmt.Println("========================")
+
 		switch result.Status {
 		case "mint":
 			err = am.keeper.ProccessRecvPacketMintRequest(ctx, result.AddressRequest, result.ExpPrice, oracleID)
