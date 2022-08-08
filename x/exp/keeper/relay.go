@@ -27,7 +27,7 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 	}
 
 	// set price to state
-	price, err := strconv.ParseFloat(strExpPrice, 64)
+	_, err = strconv.ParseFloat(strExpPrice, 64)
 	if err != nil {
 		fmt.Println("======err when parse int==========")
 		fmt.Println(err)
