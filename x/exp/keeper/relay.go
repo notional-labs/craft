@@ -36,10 +36,10 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 	}
 
 	fmt.Println("========price========")
-	fmt.Println(price)
+	fmt.Println(sdk.MustNewDecFromStr(strExpPrice))
 	fmt.Println("================")
 
-	k.setDaoTokenPrice(ctx, sdk.NewDec(price))
+	k.setDaoTokenPrice(ctx, sdk.MustNewDecFromStr(strExpPrice))
 
 	mintRequest, found := k.GetMintRequest(ctx, accAddress)
 
