@@ -116,6 +116,8 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 		mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
 
 		k.SetMintRequest(ctx, mintRequest)
+
+		return nil
 	}
 	accAddress, err := sdk.AccAddressFromBech32(mintRequest.Account)
 	if err != nil {
@@ -127,12 +129,10 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 		return sdkerrors.Wrap(err, "fund error")
 	}
 	k.removeMintRequest(ctx, mintRequest)
-	decCoin := sdk.NewDecFromInt(coin.Amount)
 
-	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
-	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(decCoin)
+	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(expWillGet).TruncateDec()
+	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(expWillGet).TruncateDec()
 
-	fmt.Println("==================")
 	k.SetMintRequest(ctx, mintRequest)
 
 	return nil
