@@ -52,6 +52,9 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 	}
 
 	oracleRequest := k.GetOracleRequest(ctx, oracleID)
+	fmt.Println("======oracleRequest=========")
+	fmt.Println(oracleRequest)
+
 	err = k.ExecuteMintExpByIbcToken(ctx, mintRequest, oracleRequest.AmountInRequest)
 	if err != nil {
 		return err
