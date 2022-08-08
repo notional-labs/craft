@@ -322,7 +322,10 @@ func (k ExpKeeper) SetNextOracleRequest(ctx sdk.Context, oracleRequest types.Ora
 // GetOracleRequest get oracle request by oracleID.
 func (k ExpKeeper) GetOracleRequest(ctx sdk.Context, oracleID uint64) (oracleRequest types.OracleRequest) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(GetOracleIDBytes(oracleID))
+	key := types.KeyOracleRequest
+	key = append(key, GetOracleIDBytes(oracleID)...)
+	bz := store.Get(key)
+
 	if bz == nil {
 		return types.OracleRequest{}
 	}
