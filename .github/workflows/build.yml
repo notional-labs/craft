@@ -21,8 +21,8 @@ jobs:
             
     name: craft ${{ matrix.arch }} for ${{ matrix.targetos }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2.1.3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3.2.1
         with: 
           go-version: '^1.18'
         env:
@@ -41,7 +41,7 @@ jobs:
           
           
 # uploads bin
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: craftd ${{ matrix.targetos }} ${{ matrix.arch }}
           path: cmd/*

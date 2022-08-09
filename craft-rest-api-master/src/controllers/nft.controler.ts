@@ -42,7 +42,19 @@ export const syncOtherPlatformNFTs = async (req: Request, res: Response) => {
 export const getAllUserNFTs = async (req: Request, res: Response) => {
     const { craft_address } = req.params;
 
-    const response = await getAllNFTs(craft_address); 
+    const requested_chain = req.query.chain?.toString() || "*"; // craft, omniflix, or stargaze
+    
+    const response = await getAllNFTs(craft_address, requested_chain); 
+    if (response) return res.status(200).json(response);    
+    else return res.status(404).json({}); // return an empty set = no nfts
+};
+
+// 
+export const getAllUserNFTsIncludingOfferings = async (req: Request, res: Response) => {
+    const { craft_address } = req.params;
+    const requested_chain = req.query.chain?.toString() || "*"; // craft, omniflix, or stargaze
+    
+    const response = await getAllNFTs(craft_address, requested_chain, true); 
     if (response) return res.status(200).json(response);    
     else return res.status(404).json({}); // return an empty set = no nfts
 };
@@ -61,5 +73,6 @@ export default {
     getContractAddresses,
     syncOtherPlatformNFTs,
     getAllUserNFTs,
+    getAllUserNFTsIncludingOfferings,
     getContractInformation,
 };

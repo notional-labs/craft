@@ -14,6 +14,8 @@ import realestateRouter from './routes/realestate.route';
 import nftmarketplaceRouter from './routes/nftmarketplace.route';
 import nftsRouter from './routes/nfts.route';
 import daoRouter from './routes/dao.route';
+import assetsRouter from './routes/assets.route';
+import collectionRouter from './routes/collections.route';
 
 // Initializes env variables
 config();
@@ -50,6 +52,8 @@ if(DAO_EXP_MODULE_ONLY && DAO_EXP_MODULE_ONLY.toLowerCase().startsWith('t')) {
     app.use('/v1/realestate', realestateRouter)
     app.use('/v1/nfts', nftsRouter)
     app.use('/v1/dao', daoRouter)
+    app.use('/v1/assets', assetsRouter)
+    app.use('/v1/collections', collectionRouter)
 }
 
 
@@ -72,6 +76,9 @@ app.get('/', (req, res) => {
             const nftsRoutes = nftsRouter.stack.map(({ route }) => `${urlStart}/v1/nfts` + route.path)
             const realestateRoutes = realestateRouter.stack.map(({ route }) => `${urlStart}/v1/realestate` + route.path)
             const daoRoutes = daoRouter.stack.map(({ route }) => `${urlStart}/v1/dao` + route.path)            
+            const assetsRoutes = assetsRouter.stack.map(({ route }) => `${urlStart}/v1/assets` + route.path)
+            const collectionRoutes = collectionRouter.stack.map(({ route }) => `${urlStart}/v1/collections` + route.path)
+
             ROUTER_CACHE = {
                 statistics: statisticsRoutes,
                 connections: connectionsRoutes,
@@ -79,7 +86,9 @@ app.get('/', (req, res) => {
                 nftmarketplace: nftmarketplaceRouters,
                 nfts: nftsRoutes,
                 realestate: realestateRoutes,
-                dao: daoRoutes
+                dao: daoRoutes,
+                assets: assetsRoutes,
+                collections: collectionRoutes
             }
         }
     }

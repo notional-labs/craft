@@ -3,7 +3,7 @@ module github.com/notional-labs/craft
 go 1.18
 
 require (
-	cosmossdk.io/math v1.0.0-beta.2
+	cosmossdk.io/math v1.0.0-beta.3
 	github.com/CosmWasm/wasmd v0.27.0
 	github.com/cosmos/cosmos-sdk v0.46.0
 	github.com/cosmos/ibc-go/v4 v4.0.0-rc0
@@ -21,7 +21,7 @@ require (
 	github.com/tendermint/tm-db v0.6.7
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
 	google.golang.org/grpc v1.48.0
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
