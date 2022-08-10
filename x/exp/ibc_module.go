@@ -181,12 +181,14 @@ func (am IBCModule) OnRecvPacket(
 	if err != nil {
 		return channeltypes.Acknowledgement{}
 	}
+
 	if data.ResolveStatus == oracletypes.RESOLVE_STATUS_SUCCESS {
 		var result resultData
 		err := obi.Decode(data.Result, &result)
 		if err != nil {
 			return channeltypes.Acknowledgement{}
 		}
+
 		switch result.Status {
 		case "mint":
 			err = am.keeper.ProccessRecvPacketMintRequest(ctx, result.AddressRequest, result.ExpPrice, oracleID)

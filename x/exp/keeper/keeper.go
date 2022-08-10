@@ -36,8 +36,8 @@ type ExpKeeper struct {
 
 // oracleScriptCallData represents the data that should be OBI-encoded and sent to perform an oracle request.
 type oracleScriptCallData struct {
-	AddressRequest string `obi:"address_request"`
 	RequestType    string `obi:"request_type"`
+	AddressRequest string `obi:"address_request"`
 	Status         string `obi:"status"`
 }
 
@@ -48,6 +48,7 @@ func NewKeeper(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	pk types.PortKeeper,
+	ck types.ChannelKeeper,
 	sk capabilitykeeper.ScopedKeeper,
 ) ExpKeeper {
 	// ensure module account is set
@@ -66,6 +67,7 @@ func NewKeeper(
 		paramSpace:    paramSpace,
 		accountKeeper: ak,
 		bankKeeper:    bk,
+		channelKeeper: ck,
 		portKeeper:    pk,
 		scopedKeeper:  sk,
 	}
@@ -233,8 +235,8 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 ) error {
 	requestType := "exp_price"
 	// get IBC params
-	sourcePort := "oracle"
-	sourceChannel := "channel-1"
+	sourcePort := "ibc-exp"
+	sourceChannel := "channel-0"
 
 	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)
 	if !found {
@@ -271,8 +273,8 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 	}
 	// Create the call data to be used
 	data := oracleScriptCallData{
-		AddressRequest: strings.ToLower(fromAddress),
 		RequestType:    requestType,
+		AddressRequest: strings.ToLower(fromAddress),
 		Status:         status,
 	}
 
@@ -293,6 +295,12 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 		300000,                  // oraclePrams.PrepareGas,need change to use gov param
 		300000,                  // oraclePrams.ExecuteGas,need change to use gov param
 	)
+
+	_ = timeoutHeight
+	_ = timeoutTimestamp
+
+	timeoutHeight = clienttypes.NewHeight(0, 100000000)
+	timeoutTimestamp = 0
 
 	// Create the IBC packet
 	packet := channeltypes.NewPacket(

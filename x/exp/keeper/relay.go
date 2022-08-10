@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"strconv"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -26,18 +26,25 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 	}
 
 	// set price to state
-	price, err := strconv.ParseInt(strExpPrice, 10, 64)
+	price, err := sdk.NewDecFromStr(strings.TrimSpace(strExpPrice))
 	if err != nil {
 		return err
 	}
 
-	k.setDaoTokenPrice(ctx, sdk.NewDec(price))
+	k.setDaoTokenPrice(ctx, price)
 
-	mintRequest, err := k.GetMintRequest(ctx, accAddress)
+	mintRequest, found := k.GetMintRequest(ctx, accAddress)
+
+	if !found {
+		return types.ErrAddressdNotFound
+	}
+	// verify time
+	if !k.ValidateMintRequestByTime(ctx, mintRequest) {
+		return types.ErrTimeOut
+	}
+
 	oracleRequest := k.GetOracleRequest(ctx, oracleID)
-	if err != nil {
-		return err
-	}
+
 	err = k.ExecuteMintExpByIbcToken(ctx, mintRequest, oracleRequest.AmountInRequest)
 	if err != nil {
 		return err
@@ -52,12 +59,12 @@ func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest
 	}
 
 	// set price to state
-	price, err := strconv.ParseInt(strExpPrice, 10, 64)
+	price, err := sdk.NewDecFromStr(strExpPrice)
 	if err != nil {
 		return err
 	}
 
-	k.setDaoTokenPrice(ctx, sdk.NewDec(price))
+	k.setDaoTokenPrice(ctx, price)
 
 	burnRequest, err := k.GetBurnRequest(ctx, accAddress)
 	if err != nil {
@@ -88,16 +95,21 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 		mintRequest.DaoTokenMinted = mintRequest.DaoTokenLeft.Add(mintRequest.DaoTokenMinted)
 
 		k.SetMintRequest(ctx, mintRequest)
+
+		return nil
 	}
-	err := k.FundPoolForExp(ctx, sdk.NewCoins(coin), sdk.AccAddress(mintRequest.Account))
+	accAddress, err := sdk.AccAddressFromBech32(mintRequest.Account)
+	if err != nil {
+		return err
+	}
+	err = k.FundPoolForExp(ctx, sdk.NewCoins(coin), accAddress)
 	if err != nil {
 		return sdkerrors.Wrap(err, "fund error")
 	}
 	k.removeMintRequest(ctx, mintRequest)
-	decCoin := sdk.NewDecFromInt(coin.Amount)
 
-	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(decCoin)
-	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(decCoin)
+	mintRequest.DaoTokenMinted = mintRequest.DaoTokenMinted.Add(expWillGet).TruncateDec()
+	mintRequest.DaoTokenLeft = mintRequest.DaoTokenLeft.Sub(expWillGet).TruncateDec()
 
 	k.SetMintRequest(ctx, mintRequest)
 
@@ -123,6 +135,10 @@ func (k ExpKeeper) SendBurnOracleRequest(ctx sdk.Context, burnRequest types.Burn
 		RevisionNumber: 1,
 		RevisionHeight: uint64(ctx.BlockHeight() + 100),
 	}
-	err := k.SendIbcOracle(ctx, burnRequest.Account, *burnRequest.BurnTokenLeft, "burn", timeoutHeight, 0)
-	return err
+	err := k.SendIbcOracle(ctx, burnRequest.Account, *burnRequest.BurnTokenLeft, "burn", timeoutHeight, types.DefaultRelativePacketTimeoutTimestamp)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

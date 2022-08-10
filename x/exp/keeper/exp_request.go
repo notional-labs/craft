@@ -62,7 +62,8 @@ func (k ExpKeeper) GetDaoTokenPrice(ctx sdk.Context) sdk.Dec {
 func (k ExpKeeper) calculateDaoTokenValue(ctx sdk.Context, amount math.Int) sdk.Dec {
 	daoTokenPrice := k.GetDaoTokenPrice(ctx)
 
-	return daoTokenPrice.MulInt(amount)
+	decCoin := sdk.NewDecFromInt(amount)
+	return decCoin.Quo(daoTokenPrice)
 }
 
 func (k ExpKeeper) SetBurnRequest(ctx sdk.Context, burnRequest types.BurnRequest) {
@@ -219,21 +220,19 @@ func (k ExpKeeper) setEndedMintRequest(ctx sdk.Context, mintRequest types.MintRe
 	store.Set(types.GetEndedMintRequestKey(accAddress), bz)
 }
 
-func (k ExpKeeper) GetMintRequestByKey(ctx sdk.Context, key []byte) (types.MintRequest, error) {
-	var mintRequest types.MintRequest
-
+func (k ExpKeeper) GetMintRequestByKey(ctx sdk.Context, key []byte) (mintRequest types.MintRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(key) {
-		return types.MintRequest{}, sdkerrors.Wrapf(types.ErrInvalidKey, "mintRequest")
+		return types.MintRequest{}, false
 	}
 
 	bz := store.Get(key)
 	err := k.cdc.Unmarshal(bz, &mintRequest)
 	if err != nil {
-		return types.MintRequest{}, err
+		return types.MintRequest{}, false
 	}
 
-	return mintRequest, nil
+	return mintRequest, true
 }
 
 // IterateMintRequest iterates over the all the MintRequest and performs a callback function .
@@ -276,10 +275,10 @@ func (k ExpKeeper) IterateStatusMintRequests(ctx sdk.Context, status int, cb fun
 
 // IncreaseOracleID increase oracle ID by 1.
 func (k ExpKeeper) IncreaseOracleID(ctx sdk.Context) {
-	k.setOracleID(ctx, k.GetNextOracleID(ctx))
+	k.SetOracleID(ctx, k.GetNextOracleID(ctx))
 }
 
-func (k ExpKeeper) setOracleID(ctx sdk.Context, id uint64) {
+func (k ExpKeeper) SetOracleID(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
 
 	store.Set(types.KeyOracleID, GetOracleIDBytes(id))
@@ -324,7 +323,10 @@ func (k ExpKeeper) SetNextOracleRequest(ctx sdk.Context, oracleRequest types.Ora
 // GetOracleRequest get oracle request by oracleID.
 func (k ExpKeeper) GetOracleRequest(ctx sdk.Context, oracleID uint64) (oracleRequest types.OracleRequest) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(GetOracleIDBytes(oracleID))
+	key := types.KeyOracleRequest
+	key = append(key, GetOracleIDBytes(oracleID)...)
+	bz := store.Get(key)
+
 	if bz == nil {
 		return types.OracleRequest{}
 	}

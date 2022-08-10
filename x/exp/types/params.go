@@ -13,7 +13,7 @@ const (
 	// MUST MODIFY IN GENESIS WHEN MAINNET
 	// After pass, ISO 8601 format for when they can no longer mint EXP from this proposal
 	// TODO: Justify our choice of default here.
-	DefaultClosePoolPeriod time.Duration = time.Minute * 1
+	DefaultClosePoolPeriod time.Duration = time.Minute * 100
 
 	// After pass, ISO 8601 format for when they can no longer burn EXP
 	// TODO: Justify our choice of default here.

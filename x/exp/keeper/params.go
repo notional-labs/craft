@@ -27,7 +27,13 @@ func (k ExpKeeper) GetVestingPeriodEnd(ctx sdk.Context) (duration time.Duration)
 
 // GetBurnExpPeriod get's the BurnExpPeriod from the paramSpace .
 func (k ExpKeeper) GetBurnExpPeriod(ctx sdk.Context) (duration time.Duration) {
-	k.paramSpace.Get(ctx, types.ParamStoreKeyBurnPeriod, &duration)
+	k.paramSpace.Get(ctx, types.ParamStoreKeyClosePoolPeriod, &duration)
+	return duration
+}
+
+// GetMintExpPeriod get's the BurnExpPeriod from the paramSpace .
+func (k ExpKeeper) GetMintExpPeriod(ctx sdk.Context) (duration time.Duration) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyClosePoolPeriod, &duration)
 	return duration
 }
 
