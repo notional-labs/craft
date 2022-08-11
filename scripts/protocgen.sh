@@ -24,12 +24,6 @@ cd ..
 # move proto files to the right places
 #
 # Note: Proto files are suffixed with the current binary version.
-#cp -r github.com/osmosis-labs/osmosis/v7/* ./
-#rm -rf github.com
 
 go mod tidy -compat=1.18
 
-# TODO: Uncomment once ORM/Pulsar support is needed.
-#
-# Ref: https://github.com/osmosis-labs/osmosis/pull/1589
-# ./scripts/protocgen2.sh
