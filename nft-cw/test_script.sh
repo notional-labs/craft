@@ -9,7 +9,7 @@ export KEY2="mykey2" # craft1wc5njh20antht9hd60wpup7j2sk6ajmhjwsy2r
 export KEYALGO="secp256k1"
 export CRAFT_CHAIN_ID="test-1"
 export CRAFTD_KEYRING_BACKEND="test"
-export CRAFTD_NODE="http://65.108.125.182:26657"
+export CRAFTD_NODE="http://95.217.113.126:26657"
 export CRAFTD_COMMAND_ARGS="--gas-prices="0.025ucraft" -y --from $KEY"
 
 # craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl
@@ -50,7 +50,7 @@ MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1]
 MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-11","denom":"ucraft","fee_receive_address":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash')
 sleep 3
 ADDRM=$(craftd query tx $MARKET_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Marketplace Address: $ADDRM"
-# export ADDRM=craft1x8gwn06l85q0lyncy7zsde8zzdn588k2dck00a8j6lkprydcutwq50sx9w
+# export ADDRM=craft1xr3rq8yvd7qplsw5yx90ftsr2zdhg4e9z60h5duusgxpv72hud3sc3plyl
 
 function mintToken() {
     CONTRACT_ADDR=$1
@@ -108,10 +108,33 @@ craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
 craftd query wasm contract-state smart $ADDRM '{"get_collection_volume": {"address": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj"}}'
 
 # list real estate NFT for sale
-export NFT_LISTING_BASE64=`printf '{"list_price":"1000000"}' | base64 -w 0` # 10 craft
-export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"26","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
-# craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
-craftd tx wasm execute "$ADDR721IMAGES" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+function ListTokenForSale() {
+    CONTRACT_ADDR=$1
+    TOKEN_ID=$2
+    # export NFT_LISTING_BASE64=`printf '{"list_price":"1000000"}' | base64 -w 0` # 10 craft
+    # export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"26","msg":"%s"}}' $ADDRM $NFT_LISTING_BASE64`
+    # # craftd tx wasm execute "$ADDR721" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+    # craftd tx wasm execute "$ADDR721IMAGES" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+
+    export NFT_LISTING_BASE64=`printf '{"list_price":"1000000"}' | base64 -w 0` # 10 craft
+    export SEND_NFT_JSON=`printf '{"send_nft":{"contract":"%s","token_id":"%s","msg":"%s"}}' $ADDRM $TOKEN_ID $NFT_LISTING_BASE64`    
+    craftd tx wasm execute "$CONTRACT_ADDR" "$SEND_NFT_JSON" --gas-prices="0.025ucraft" -y --from $KEY
+}
+# IMAGES
+ListTokenForSale $ADDR721IMAGES 1
+ListTokenForSale $ADDR721IMAGES 2
+ListTokenForSale $ADDR721IMAGES 3
+ListTokenForSale $ADDR721IMAGES 4
+ListTokenForSale $ADDR721IMAGES 21
+ListTokenForSale $ADDR721IMAGES 22
+
+ListTokenForSale $ADDR721 1
+ListTokenForSale $ADDR721 2
+ListTokenForSale $ADDR721 3
+ListTokenForSale $ADDR721 4
+ListTokenForSale $ADDR721 5
+ListTokenForSale $ADDR721 6
+
 
 
 # withdraw NFT so it is no longer for sale
@@ -119,8 +142,8 @@ craftd tx wasm execute $ADDRM '{"withdraw_nft":{"offering_id":"4"}}' $CRAFTD_COM
 
 
 # gets all contracts which are CW721
-# craftd q wasm list-contract-by-code 3 --output json | jq '.contracts'
-# http://65.108.125.182:1317/cosmwasm/wasm/v1/code/3/contracts?pagination.limit=100
+# craftd q wasm list-contract-by-code 1 --output json | jq '.contracts'
+# http://95.217.113.126:1317/cosmwasm/wasm/v1/code/1/contracts?pagination.limit=100
 # So our API could query this list, check which a user owns, so we get ALL iamges they own.
 
 
