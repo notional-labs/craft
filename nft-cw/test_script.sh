@@ -47,7 +47,7 @@ ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0]
 TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json --broadcast-mode block | jq -r '.txhash')
 MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value')
 # fee_receive_address should = DAO wallet / multisig
-MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-11","denom":"ucraft","fee_receive_address":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash')
+MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-2","denom":"ucraft","fee_receive_address":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash')
 sleep 3
 ADDRM=$(craftd query tx $MARKET_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Marketplace Address: $ADDRM"
 # export ADDRM=craft1xr3rq8yvd7qplsw5yx90ftsr2zdhg4e9z60h5duusgxpv72hud3sc3plyl
@@ -105,6 +105,8 @@ craftd query wasm contract-state smart $ADDR721IMAGES '{"tokens":{"owner":"craft
 
 # Query Marketplace Holdings
 craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
+craftd query wasm contract-state smart $ADDRM '{"get_offerings": {"filter_seller":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}}' # optional query specific
+
 craftd query wasm contract-state smart $ADDRM '{"get_collection_volume": {"address": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj"}}'
 
 # list real estate NFT for sale
@@ -163,4 +165,4 @@ craftd tx wasm execute $ADDRM '{"update_platform_fee":{"new_fee":"0"}}' --gas-pr
 craftd tx wasm execute $ADDRM '{"force_withdraw_all":{}}' --gas-prices="0.025ucraft" -y --from $KEY
 
 # FUTURE TO DO
-craftd tx wasm migrate $ADDRM 17 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY
+craftd tx wasm migrate $ADDRM 3 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY
