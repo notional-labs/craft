@@ -15,7 +15,7 @@ pub struct InitMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum HandleMsg {
+pub enum ExecuteMsg {
     WithdrawNft {
         offering_id: String,
     },
@@ -89,7 +89,9 @@ impl Iterator for OfferingsResponse {
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
     // GetOfferings returns a list of all offerings
-    GetOfferings {},
+    GetOfferings {
+        filter_seller: Option<String>
+    },
     // Returns info about the contract such as name, denom, dao_address, and the tax_rate (platform fee)
     GetContractInfo {},
 

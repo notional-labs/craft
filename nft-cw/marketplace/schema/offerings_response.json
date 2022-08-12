@@ -22,9 +22,9 @@
       "type": "object",
       "required": [
         "contract_addr",
-        "id",
         "list_denom",
         "list_price",
+        "offering_id",
         "seller",
         "token_id"
       ],
@@ -32,14 +32,14 @@
         "contract_addr": {
           "$ref": "#/definitions/Addr"
         },
-        "id": {
-          "type": "string"
-        },
         "list_denom": {
           "type": "string"
         },
         "list_price": {
           "$ref": "#/definitions/Uint128"
+        },
+        "offering_id": {
+          "type": "string"
         },
         "seller": {
           "$ref": "#/definitions/Addr"

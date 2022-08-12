@@ -4,14 +4,24 @@
   "type": "object",
   "required": [
     "denom",
-    "name"
+    "fee_receive_address",
+    "name",
+    "platform_fee"
   ],
   "properties": {
     "denom": {
       "type": "string"
     },
+    "fee_receive_address": {
+      "type": "string"
+    },
     "name": {
       "type": "string"
+    },
+    "platform_fee": {
+      "type": "integer",
+      "format": "uint128",
+      "minimum": 0.0
     }
   }
 }

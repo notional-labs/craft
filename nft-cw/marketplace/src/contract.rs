@@ -9,7 +9,7 @@ use cw2::set_contract_version;
 use crate::execute;
 
 use crate::error::ContractError;
-use crate::msg::{HandleMsg, InitMsg, QueryMsg};
+use crate::msg::{ExecuteMsg, InitMsg, QueryMsg};
 use crate::queries;
 use cosmwasm_std::entry_point;
 
@@ -50,34 +50,34 @@ pub fn execute(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-    msg: HandleMsg,
+    msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        HandleMsg::WithdrawNft { offering_id } => {
+        ExecuteMsg::WithdrawNft { offering_id } => {
             execute::withdraw_offering(deps, info, offering_id)
         }
-        HandleMsg::BuyNft { offering_id } => execute::buy_nft(deps, info, offering_id),
-        HandleMsg::ReceiveNft(msg) => execute::receive_nft(deps, info, msg),
+        ExecuteMsg::BuyNft { offering_id } => execute::buy_nft(deps, info, offering_id),
+        ExecuteMsg::ReceiveNft(msg) => execute::receive_nft(deps, info, msg),
 
-        HandleMsg::UpdateListingPrice {
+        ExecuteMsg::UpdateListingPrice {
             offering_id,
             new_price,
         } => execute::update_listing_price(deps, info, offering_id, new_price),
 
-        HandleMsg::UpdateFeeReceiverAddress { new_address } => {
+        ExecuteMsg::UpdateFeeReceiverAddress { new_address } => {
             execute::update_fee_receiver_address(deps, info, new_address)
         }
-        HandleMsg::UpdatePlatformFee { new_fee } => {
+        ExecuteMsg::UpdatePlatformFee { new_fee } => {
             execute::update_platform_fee(deps, info, new_fee)
         }
-        HandleMsg::ForceWithdrawAll {} => execute::force_withdraw_all(deps, info),
+        ExecuteMsg::ForceWithdrawAll {} => execute::force_withdraw_all(deps, info),
     }
 }
 
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetOfferings {} => to_binary(&queries::query_offerings(deps)?),
+        QueryMsg::GetOfferings { filter_seller } => to_binary(&queries::query_offerings(deps, filter_seller)?),
         // QueryMsg::GetPlatformFee {} => to_binary(&queries::query_platform_fee(deps)?),
         // QueryMsg::GetDenom {} => to_binary(&queries::query_denom(deps)?),
         // QueryMsg::GetDaoAddress {} => to_binary(&queries::query_dao_address(deps)?),

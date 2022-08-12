@@ -9,7 +9,47 @@
       ],
       "properties": {
         "get_offerings": {
+          "type": "object",
+          "properties": {
+            "filter_seller": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_contract_info"
+      ],
+      "properties": {
+        "get_contract_info": {
           "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_collection_volume"
+      ],
+      "properties": {
+        "get_collection_volume": {
+          "type": "object",
+          "required": [
+            "address"
+          ],
+          "properties": {
+            "address": {
+              "type": "string"
+            }
+          }
         }
       },
       "additionalProperties": false

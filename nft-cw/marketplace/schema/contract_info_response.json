@@ -3,14 +3,32 @@
   "title": "ContractInfoResponse",
   "type": "object",
   "required": [
+    "contact",
     "denom",
-    "name"
+    "fee_receive_address",
+    "name",
+    "platform_fee",
+    "version"
   ],
   "properties": {
+    "contact": {
+      "type": "string"
+    },
     "denom": {
       "type": "string"
     },
+    "fee_receive_address": {
+      "type": "string"
+    },
     "name": {
+      "type": "string"
+    },
+    "platform_fee": {
+      "type": "integer",
+      "format": "uint128",
+      "minimum": 0.0
+    },
+    "version": {
       "type": "string"
     }
   }

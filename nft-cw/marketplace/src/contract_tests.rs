@@ -8,7 +8,7 @@ use cosmwasm_std::to_binary;
 
 use crate::error::ContractError;
 use crate::msg::{
-    CollectionVolumeResponse, ContractInfoResponse, HandleMsg, InitMsg, QueryMsg, SellNft,
+    CollectionVolumeResponse, ContractInfoResponse, ExecuteMsg, InitMsg, QueryMsg, SellNft,
 };
 use cw721::Cw721ReceiveMsg;
 
@@ -19,33 +19,20 @@ use cosmwasm_std::DepsMut;
 
 // NOTE: all selling have to be >1million utoken (1token)
 
-// test helper
-fn initialize_contract(deps: DepsMut) -> (String, String, u128) {
-    let denom = String::from("ucraft");
-    let msg = InitMsg {
-        name: String::from("test market"),
-        denom: denom.clone(),
-        fee_receive_address: String::from("craftdaoaddr"),
-        platform_fee: 5,
-    };
-
-    let info = mock_info("creator", &coins(1000000, &denom));
-    contract::instantiate(deps, mock_env(), info, msg.clone()).unwrap();
-
-    (msg.denom, msg.fee_receive_address, msg.platform_fee)
-}
+const MP_NAME: &str = "test market";
+const DENOM: &str = "ucraft";
 
 #[test]
 fn proper_initialization() {
     let mut deps = mock_dependencies();
-    let (denom, dao_address, platform_fee) = initialize_contract(deps.as_mut());
+    let (_, dao_address, platform_fee) = initialize_contract(deps.as_mut());
 
     let res: ContractInfoResponse = from_binary(
         &contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap(),
     )
     .unwrap();
-    assert_eq!(res.name, "test market");
-    assert_eq!(res.denom, denom);
+    assert_eq!(res.name, MP_NAME.to_string());
+    assert_eq!(res.denom, DENOM);
     assert_eq!(res.fee_receive_address, dao_address);
     assert_eq!(res.platform_fee, platform_fee);
 }
@@ -57,7 +44,7 @@ fn test_update_fee_receiver_address() {
     // println!("Initial fee_receiver: {:?}", fee_receiver);
 
     // contract::update_fee_receiver_address(deps.as_mut(), mock_info("anyone", &coins(1, "token")), "new_dao_address".to_string()).unwrap();
-    let msg = HandleMsg::UpdateFeeReceiverAddress {
+    let msg = ExecuteMsg::UpdateFeeReceiverAddress {
         new_address: "new_dao_address".to_string(),
     };
 
@@ -94,8 +81,8 @@ fn test_update_platform_fee() {
     // println!("Initial fee_receiver: {}, platform fee: {}", fee_receiver, platform_fee);
 
     // contract::update_fee_receiver_address(deps.as_mut(), mock_info("anyone", &coins(1, "token")), "new_dao_address".to_string()).unwrap();
-    let msg = HandleMsg::UpdatePlatformFee { new_fee: 7 };
-    let high_msg = HandleMsg::UpdatePlatformFee { new_fee: 101 };
+    let msg = ExecuteMsg::UpdatePlatformFee { new_fee: 7 };
+    let high_msg = ExecuteMsg::UpdatePlatformFee { new_fee: 101 };
 
     let useless_coins = coins(1, "ucraft");
 
@@ -135,7 +122,7 @@ fn test_force_withdraw_all_from_marketplace() {
     println!("Initial fee_receiver: {}", fee_receiver);
 
     // contract::update_fee_receiver_address(deps.as_mut(), mock_info("anyone", &coins(1, "token")), "new_dao_address".to_string()).unwrap();
-    let msg = HandleMsg::ForceWithdrawAll {};
+    let msg = ExecuteMsg::ForceWithdrawAll {};
     let useless_coins = coins(1_000_000, "ucraft");
 
     // try changing the current address as a non DAO user (should fail)
@@ -191,7 +178,7 @@ fn test_sell_offering() {
     let sell_msg = SellNft {
         list_price: Uint128::new(amount), // so DAO should get 50k @ 5%
     };
-    let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
+    let msg = ExecuteMsg::ReceiveNft(Cw721ReceiveMsg {
         sender: String::from("seller_contract"),
         token_id: String::from("token_id"),
         msg: to_binary(&sell_msg).unwrap(),
@@ -206,7 +193,7 @@ fn test_sell_offering() {
     }
 
     // Offering should be listed = length of 1
-    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
+    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings { filter_seller: None }).unwrap();
     let value: OfferingsResponse = from_binary(&res).unwrap();
     assert_eq!(1, value.offerings.len());
 }
@@ -228,7 +215,7 @@ fn test_buying_offering() {
     );
 
     // Offering should be listed = length of 1
-    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
+    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings { filter_seller: None }).unwrap();
     let value: OfferingsResponse = from_binary(&res).unwrap();
     assert_eq!(1, value.offerings.len());
 
@@ -239,7 +226,7 @@ fn test_buying_offering() {
         deps.as_mut(),
         mock_env(),
         info,
-        HandleMsg::BuyNft {
+        ExecuteMsg::BuyNft {
             offering_id: value.offerings[0].offering_id.clone(),
         },
     );
@@ -252,7 +239,7 @@ fn test_buying_offering() {
     // panic!("{}", _res.unwrap_err()); // useful for debugging
 
     // check offerings again. Should be 0 since the NFT is bought
-    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
+    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings { filter_seller: None }).unwrap();
     let value: OfferingsResponse = from_binary(&res).unwrap();
     assert_eq!(0, value.offerings.len());
 
@@ -267,7 +254,7 @@ fn test_buying_offering() {
     );
 
     // get offering_id in the offering list
-    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
+    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings { filter_seller: None }).unwrap();
     let value: OfferingsResponse = from_binary(&res).unwrap();
     let offering_id = value.offerings[0].offering_id.clone();
     assert_eq!("2", offering_id);
@@ -340,7 +327,7 @@ fn test_buy_with_volume() {
         deps.as_mut(),
         mock_env(),
         info,
-        HandleMsg::BuyNft {
+        ExecuteMsg::BuyNft {
             offering_id: "1".to_string(),
         },
     );
@@ -369,7 +356,7 @@ fn test_buy_with_volume() {
     assert_eq!(Uint128::from(amount), value.total_volume);
 
     // check offerings again. Should be 0 since the NFT is bought
-    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
+    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings { filter_seller: None }).unwrap();
     let value: OfferingsResponse = from_binary(&res).unwrap();
     assert_eq!(0, value.offerings.len());
 
@@ -384,7 +371,7 @@ fn test_buy_with_volume() {
     );
 
     // get offering_id in the offering list
-    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings {}).unwrap();
+    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings { filter_seller: None }).unwrap();
     let value: OfferingsResponse = from_binary(&res).unwrap();
     let offering_id = value.offerings[0].offering_id.clone();
     assert_eq!("2", offering_id);
@@ -443,7 +430,7 @@ fn test_withdraw_offering() {
 
     // withdraw offering
     let withdraw_info = mock_info("seller", &coins(2, &denom));
-    let withdraw_msg = HandleMsg::WithdrawNft {
+    let withdraw_msg = ExecuteMsg::WithdrawNft {
         offering_id: value.offerings[0].offering_id.clone(),
     };
     let _res = execute(deps.as_mut(), mock_env(), withdraw_info, withdraw_msg).unwrap();
@@ -472,7 +459,7 @@ fn test_update_offering_price() {
 
     // update the price of the offering
     let new_amount: Uint128 = Uint128::from(9_999_999_u128);
-    let update_msg = HandleMsg::UpdateListingPrice {
+    let update_msg = ExecuteMsg::UpdateListingPrice {
         offering_id,
         new_price: new_amount,
     };
@@ -499,8 +486,58 @@ fn test_update_offering_price() {
     }
 }
 
+#[test]
+fn test_query_selective_seller_offerings_only() {
+    // test_sell_offering
+    let mut deps = mock_dependencies();
+
+    let (denom, _dao_address, _tax_rate) = initialize_contract(deps.as_mut());
+
+    let amount = 1_000_000u128; // list price & buy price
+    let info_seller = mock_info("seller", &coins(0, &denom));
+    sell_nft(
+        deps.as_mut(),
+        info_seller.clone(),
+        String::from("token1"),
+        amount,
+    );
+    sell_nft(
+        deps.as_mut(),
+        info_seller.clone(),
+        String::from("token2"),
+        amount,
+    );
+    let random_seller = mock_info("random_person", &coins(0, &denom));
+    sell_nft(
+        deps.as_mut(),
+        random_seller.clone(),
+        String::from("token2"),
+        amount,
+    );
+
+    // Offering should be listed = length of 1
+    let res = query(deps.as_ref(), mock_env(), QueryMsg::GetOfferings { filter_seller: Some("seller".to_string()) }).unwrap();
+    let value: OfferingsResponse = from_binary(&res).unwrap();
+    assert_eq!(2, value.offerings.len());
+}
+
+// ==== TEST HELPERS ====
+fn initialize_contract(deps: DepsMut) -> (String, String, u128) {
+    let msg = InitMsg {
+        name: MP_NAME.to_string(),
+        denom: DENOM.to_string(),
+        fee_receive_address: String::from("craftdaoaddr"),
+        platform_fee: 5,
+    };
+
+    let info = mock_info("creator", &coins(1000000, &DENOM.to_string()));
+    contract::instantiate(deps, mock_env(), info, msg.clone()).unwrap();
+
+    (msg.denom, msg.fee_receive_address, msg.platform_fee)
+}
+
 fn buy_nft(deps: DepsMut, info: MessageInfo, offering_id: String) -> Result<(), ContractError> {
-    let res = execute(deps, mock_env(), info, HandleMsg::BuyNft { offering_id });
+    let res = execute(deps, mock_env(), info, ExecuteMsg::BuyNft { offering_id });
     match res {
         Ok(_) => Ok(()),
         Err(e) => {
@@ -515,7 +552,7 @@ fn sell_nft(deps: DepsMut, info: MessageInfo, token_id: String, amount: u128) ->
     let sell_msg = SellNft {
         list_price: Uint128::new(amount), // so DAO should get 50k @ 5%
     };
-    let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
+    let msg = ExecuteMsg::ReceiveNft(Cw721ReceiveMsg {
         sender: String::from(info.sender.clone()), // was "seller_contract"
         token_id: token_id.clone(),
         msg: to_binary(&sell_msg).unwrap(),
@@ -535,7 +572,7 @@ fn receive_nft(
         list_price: Uint128::new(list_price),
     };
 
-    let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
+    let msg = ExecuteMsg::ReceiveNft(Cw721ReceiveMsg {
         sender: String::from("seller"),
         token_id,
         msg: to_binary(&sell_msg).unwrap(),
@@ -548,7 +585,7 @@ fn receive_nft(
 }
 
 fn get_offerings(deps: Deps) -> OfferingsResponse {
-    let res = query(deps, mock_env(), QueryMsg::GetOfferings {}).unwrap();
+    let res = query(deps, mock_env(), QueryMsg::GetOfferings { filter_seller: None }).unwrap();
     let value: OfferingsResponse = from_binary(&res).unwrap();
     value
 }

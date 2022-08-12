@@ -7,11 +7,25 @@ use crate::state::{Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS};
 
 // gets all offerings
 // ============================== Query Handlers ==============================
-pub fn query_offerings(deps: Deps) -> StdResult<OfferingsResponse> {
+pub fn query_offerings(deps: Deps, filter_seller: Option<String>) -> StdResult<OfferingsResponse> {
     let res: StdResult<Vec<QueryOfferingsResult>> = OFFERINGS
         .range(deps.storage, None, None, Order::Ascending)
         // .map(|kv_item| parse_offering(kv_item))
         .map(parse_offering)
+
+        // get just offerings from the seller we requested.
+        .filter(|item| {
+            match item {
+                Ok(item) => {
+                    if let Some(filter_seller) = &filter_seller {
+                        item.seller.to_string() == filter_seller.to_string()
+                    } else {
+                        true
+                    }
+                }
+                Err(_) => false,
+        }
+        })
         .collect();
     Ok(OfferingsResponse {
         offerings: res?, // Placeholder
@@ -50,6 +64,6 @@ pub fn query_collection_volume(
 
     Ok(CollectionVolumeResponse {
         total_volume: total_volumes.unwrap_or_else(|| Uint128::new(0)),
-        denom, 
+        denom,
     })
 }

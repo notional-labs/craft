@@ -288,7 +288,7 @@ pub fn force_withdraw_all(deps: DepsMut, info: MessageInfo) -> Result<Response, 
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
     // get all offerings, loop through them.
-    let offerings = queries::query_offerings(deps.as_ref())?;
+    let offerings = queries::query_offerings(deps.as_ref(), None)?;
 
     let mut sub_messages_vector: Vec<SubMsg> = vec![];
 
