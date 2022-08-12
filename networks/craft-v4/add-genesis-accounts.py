@@ -3,15 +3,14 @@ import os
 import json
 from pathlib import Path
 
-# cd networks/craft-testnet-1/
+# cd networks/craft-v4
 
-LAUNCH_TIME = "2022-03-30T18:15:00Z"
+LAUNCH_TIME = "2022-08-17T18:15:00Z"
 CHAIN_ID = "craft-v4"
-EXP_SEND = [{"denom": "uexp","enabled": True}]
+EXP_SEND = [{"denom": "uexp","enabled": False}]
 
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # home dir
-# GENESIS_FILE=f"{Path.home()}/Desktop/craft/networks/craft-testnet-1/genesis.json" # laptop
-FOLDER = "gentx" # since we want to give everyone with getxs tokens
+FOLDER = "gentx" # since we want to give everyone with gentx's tokens to create their validator
 
 def main():
     outputDetails()
@@ -32,6 +31,26 @@ def resetGenesisFile():
         genesis["app_state"]['bank']["params"]["send_enabled"] = EXP_SEND
 
         genesis["app_state"]['genutil']["gen_txs"] = []
+
+        genesis["app_state"]['gov']["deposit_params"]['min_deposit'][0]['denom'] = 'uexp'
+
+
+        genesis["app_state"]['exp']["params"]['max_coin_mint'] = str(10_000_000_000)
+
+        # - multisig here? Maybe we just do reece's account for testnet? or should we do this one so anyone can push through
+        genesis["app_state"]['exp']["params"]['daoAccount'] = "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" 
+
+        genesis["app_state"]['exp']["params"]['close_pool_period'] = "6000s"
+        genesis["app_state"]['exp']["params"]['vesting_period_end'] = "60s"
+        genesis["app_state"]['exp']["params"]['burn_exp_period'] = "60s"
+
+        # Maybe in the whitelist, we add some validators / accounts just to test it
+
+        # Is this initial price?
+        genesis["app_state"]['exp']["dao_asset"]['dao_token_price'] = "1.000000000000000000"
+        genesis["app_state"]['exp']["dao_asset"]['asset_dao'] = []
+
+        genesis["app_state"]['exp']['port_id'] = "336" # "ibc-exp"
 
     # save genesis.json
     with open(GENESIS_FILE, 'w') as f:
@@ -66,6 +85,8 @@ def createGenesisAccountsCommands():
             print(f"craftd add-genesis-account {delegator} 100000000000000ucraft,30000000000uexp #pbcups")
         else:
             print(f"craftd add-genesis-account {delegator} 10000000000ucraft,{amt}uexp #{moniker}")
+
+    print(f"# [!] COPY-PASTE-RUN THE ABOVE TO CREATE THE GENESIS ACCOUNTS")
 
 
 if __name__ == "__main__":
