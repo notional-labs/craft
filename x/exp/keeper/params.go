@@ -54,9 +54,9 @@ func (k ExpKeeper) GetIbcDenom(ctx sdk.Context) (denom string) {
 	return denom
 }
 
-func (k ExpKeeper) GetScriptId(ctx sdk.Context) (scriptId uint64) {
-	k.paramSpace.Get(ctx, types.ParamStoreKeyScriptId, &scriptId)
-	return scriptId
+func (k ExpKeeper) GetScriptID(ctx sdk.Context) (scriptID uint64) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyScriptID, &scriptID)
+	return scriptID
 }
 
 func (k ExpKeeper) GetAskCount(ctx sdk.Context) (askCount uint64) {

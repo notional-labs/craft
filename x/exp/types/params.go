@@ -31,7 +31,7 @@ var (
 	ParamStoreKeyVestingPeriodEnd = []byte("vestingperiodvestend")
 	ParamStoreKeyBurnPeriod       = []byte("vestingperiodburnend")
 	ParamStoreIbcDenom            = []byte("ibcassetdenom")
-	ParamStoreKeyScriptId         = []byte("scriptId")
+	ParamStoreKeyScriptID         = []byte("scriptId")
 	ParamStoreKeyAskCount         = []byte("askCount")
 	ParamStoreKeyMinCount         = []byte("minCount")
 	ParamStoreKeyFeeAmount        = []byte("feeAmount")
@@ -81,7 +81,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(ParamStoreKeyVestingPeriodEnd, &p.VestingPeriodEnd, validatePeriod),
 		paramtypes.NewParamSetPair(ParamStoreKeyBurnPeriod, &p.BurnExpPeriod, validatePeriod),
 		paramtypes.NewParamSetPair(ParamStoreIbcDenom, &p.IbcAssetDenom, validateDenom),
-		paramtypes.NewParamSetPair(ParamStoreKeyScriptId, &p.ScriptId, validateScriptId),
+		paramtypes.NewParamSetPair(ParamStoreKeyScriptID, &p.ScriptId, validateScriptID),
 		paramtypes.NewParamSetPair(ParamStoreKeyAskCount, &p.AskCount, validateAskCount),
 		paramtypes.NewParamSetPair(ParamStoreKeyMinCount, &p.MinCount, validateMinCount),
 		paramtypes.NewParamSetPair(ParamStoreKeyFeeAmount, &p.FeeAmount, validateFeeAmount),
@@ -132,7 +132,7 @@ func validatePeriod(i interface{}) error {
 	return nil
 }
 
-func validateScriptId(i interface{}) error {
+func validateScriptID(i interface{}) error {
 	_, ok := i.(uint64)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %s", i)
