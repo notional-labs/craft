@@ -284,16 +284,17 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 		return err
 	}
 
-	feeAmount := sdk.NewCoin("uband", sdk.NewInt(100000)) // 0.1band to fee, need change by gov
+	// feeAmount := sdk.NewCoin("uband", sdk.NewInt(100000)) // 0.1band to fee, need change by gov
+	param := types.DefaultParams()
 	packetData := oracletypes.NewOracleRequestPacketData(
 		fmt.Sprint(clientID),
-		209, // oracletypes.OracleScriptID(oraclePrams.ScriptID),
+		oracletypes.OracleScriptID(param.ScriptId), // oracletypes.OracleScriptID(oraclePrams.ScriptID),
 		callDataBz,
-		1,                       // oraclePrams.AskCount, need change to use gov param
-		1,                       // oraclePrams.MinCount,need change to use gov param
-		sdk.NewCoins(feeAmount), // oraclePrams.FeeAmount,need change to use gov param
-		300000,                  // oraclePrams.PrepareGas,need change to use gov param
-		300000,                  // oraclePrams.ExecuteGas,need change to use gov param
+		param.AskCount,                // oraclePrams.AskCount, need change to use gov param
+		param.MinCount,                // oraclePrams.MinCount,need change to use gov param
+		sdk.NewCoins(param.FeeAmount), // oraclePrams.FeeAmount,need change to use gov param
+		param.PrepareGas,              // oraclePrams.PrepareGas,need change to use gov param
+		param.ExecuteGas,              // oraclePrams.ExecuteGas,need change to use gov param
 	)
 
 	_ = timeoutHeight

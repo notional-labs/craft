@@ -31,6 +31,12 @@ var (
 	ParamStoreKeyVestingPeriodEnd = []byte("vestingperiodvestend")
 	ParamStoreKeyBurnPeriod       = []byte("vestingperiodburnend")
 	ParamStoreIbcDenom            = []byte("ibcassetdenom")
+	ParamStoreKeyScriptId         = []byte("scriptId")
+	ParamStoreKeyAskCount         = []byte("askCount")
+	ParamStoreKeyMinCount         = []byte("minCount")
+	ParamStoreKeyFeeAmount        = []byte("feeAmount")
+	ParamStoreKeyPrepareGas       = []byte("prepareGas")
+	ParamStoreKeyExecuteGas       = []byte("executeGas")
 )
 
 // ParamKeyTable for exp module.
@@ -57,6 +63,12 @@ func DefaultParams() Params {
 		VestingPeriodEnd: DefaultVestingPeriodEnd,
 		IbcAssetDenom:    "token",
 		BurnExpPeriod:    DefaultBurnPeriod,
+		ScriptId:         209,
+		AskCount:         1,
+		MinCount:         1,
+		FeeAmount:        sdk.NewCoin("uband", sdk.NewInt(100000)),
+		PrepareGas:       300000,
+		ExecuteGas:       300000,
 	}
 }
 
@@ -69,6 +81,12 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(ParamStoreKeyVestingPeriodEnd, &p.VestingPeriodEnd, validatePeriod),
 		paramtypes.NewParamSetPair(ParamStoreKeyBurnPeriod, &p.BurnExpPeriod, validatePeriod),
 		paramtypes.NewParamSetPair(ParamStoreIbcDenom, &p.IbcAssetDenom, validateDenom),
+		paramtypes.NewParamSetPair(ParamStoreKeyScriptId, &p.ScriptId, validateScriptId),
+		paramtypes.NewParamSetPair(ParamStoreKeyAskCount, &p.AskCount, validateAskCount),
+		paramtypes.NewParamSetPair(ParamStoreKeyMinCount, &p.MinCount, validateMinCount),
+		paramtypes.NewParamSetPair(ParamStoreKeyFeeAmount, &p.FeeAmount, validateFeeAmount),
+		paramtypes.NewParamSetPair(ParamStoreKeyPrepareGas, &p.PrepareGas, validatePrepareGas),
+		paramtypes.NewParamSetPair(ParamStoreKeyExecuteGas, &p.ExecuteGas, validateExecuteGas),
 	}
 }
 
@@ -109,6 +127,59 @@ func validatePeriod(i interface{}) error {
 
 	if v <= 0 {
 		return fmt.Errorf("time must be positive: %d", v)
+	}
+
+	return nil
+}
+
+func validateScriptId(i interface{}) error {
+	_, ok := i.(uint64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %s", i)
+	}
+	return nil
+}
+
+func validateAskCount(i interface{}) error {
+	_, ok := i.(uint64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %s", i)
+	}
+	return nil
+}
+
+func validateMinCount(i interface{}) error {
+	_, ok := i.(uint64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %s", i)
+	}
+	return nil
+}
+
+func validatePrepareGas(i interface{}) error {
+	_, ok := i.(uint64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %s", i)
+	}
+	return nil
+}
+
+func validateExecuteGas(i interface{}) error {
+	_, ok := i.(uint64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %s", i)
+	}
+	return nil
+}
+
+func validateFeeAmount(i interface{}) error {
+	v, ok := i.(sdk.Coin)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.Validate() != nil {
+		return fmt.Errorf("invalid fee amount: %+v", i)
 	}
 
 	return nil

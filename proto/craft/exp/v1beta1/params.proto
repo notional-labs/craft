@@ -24,4 +24,14 @@ message Params {
     google.protobuf.Duration close_pool_period = 5 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
     google.protobuf.Duration vesting_period_end= 6 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
     google.protobuf.Duration burn_exp_period   = 7 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+
+    uint64 script_id = 8;
+    uint64 ask_count = 9;
+    uint64 min_count = 10;
+    cosmos.base.v1beta1.Coin fee_amount = 11 [
+    (gogoproto.moretags) = "yaml:\"fee_amount\"",
+    (gogoproto.nullable) = false
+    ];
+    uint64 prepare_gas = 12;
+    uint64 execute_gas = 13;
 }
