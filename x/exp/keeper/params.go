@@ -53,3 +53,33 @@ func (k ExpKeeper) GetIbcDenom(ctx sdk.Context) (denom string) {
 	k.paramSpace.Get(ctx, types.ParamStoreIbcDenom, &denom)
 	return denom
 }
+
+func (k ExpKeeper) GetScriptID(ctx sdk.Context) (scriptID uint64) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyScriptID, &scriptID)
+	return scriptID
+}
+
+func (k ExpKeeper) GetAskCount(ctx sdk.Context) (askCount uint64) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyAskCount, &askCount)
+	return askCount
+}
+
+func (k ExpKeeper) GetMinCount(ctx sdk.Context) (minCount uint64) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyMinCount, &minCount)
+	return minCount
+}
+
+func (k ExpKeeper) GetFeeAmount(ctx sdk.Context) (feeAmount sdk.Coin) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyFeeAmount, &feeAmount)
+	return feeAmount
+}
+
+func (k ExpKeeper) GetPrepareGas(ctx sdk.Context) (prepareGas uint64) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyPrepareGas, &prepareGas)
+	return prepareGas
+}
+
+func (k ExpKeeper) GetExecuteGas(ctx sdk.Context) (executeGas uint64) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyExecuteGas, &executeGas)
+	return executeGas
+}

@@ -21,7 +21,6 @@ minecraft-integration/*/.vscode
 minecraft-integration/*/target
 minecraft-integration/output
 *__pycache__
-/proto
 proto
 .history
 NFTs/scripts/test_website/dist/*
