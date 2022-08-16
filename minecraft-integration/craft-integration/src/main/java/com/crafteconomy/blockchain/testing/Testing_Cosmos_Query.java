@@ -8,6 +8,8 @@ import java.util.Scanner;
 
 import org.json.JSONObject;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
+
 
 public class Testing_Cosmos_Query {
     
@@ -21,7 +23,7 @@ public class Testing_Cosmos_Query {
         long amount = 100;
 
         boolean matches = doesDataMatchTransaction(tendermintHash, to_address, amount, "My Test Description_Reece");
-        System.out.println("Does the data match the transaction? " + matches);
+        CraftBlockchainPlugin.log("Does the data match the transaction? " + matches);
     }
     
     protected static boolean IS_DEV_MODE = false;
@@ -32,13 +34,13 @@ public class Testing_Cosmos_Query {
         boolean doesTxMemoMatch = false;
 
         if(IS_DEV_MODE) {
-            System.out.println("Dev mode is enabled, so we will sign the tx given this & broadcast to ensure developers know.");
+            CraftBlockchainPlugin.log("Dev mode is enabled, so we will sign the tx given this & broadcast to ensure developers know.");
             return true;
         }
         
         JSONObject txObject = getTransactionObject(tendermintHash); // tx key of the above link
         if(txObject == null) {
-            // System.out.println("Error: myObject is null");
+            // CraftBlockchainPlugin.log("Error: myObject is null");
             return false;
         }
 
@@ -49,7 +51,7 @@ public class Testing_Cosmos_Query {
         // Loops through the Tx's messages trying to find one which matches to_address & amount                 
         for(Object msg : txObject.getJSONArray("messages")) {
             JSONObject msgObject = (JSONObject) msg;
-            // System.out.println(msgObject.toString());
+            // CraftBlockchainPlugin.log(msgObject.toString());
 
             // Check that the to_address matches who we expected to send it too, if not we check the next.
             String to_address = msgObject.getString("to_address");
@@ -57,7 +59,7 @@ public class Testing_Cosmos_Query {
             if(doesToAddressMatch == false) {
                 continue; // if who we were sending it too doesn't match, this is not the transaction.
             }
-            System.out.println("to_address matches expected address" + expectedToAddress );
+            CraftBlockchainPlugin.log("to_address matches expected address" + expectedToAddress );
 
            
             // Check there is a message which has the correct amount, this only runs after we checked for to_address
@@ -67,7 +69,7 @@ public class Testing_Cosmos_Query {
                 JSONObject tempAmount = (JSONObject) amounts;
                 Long msgAmount = tempAmount.getLong("amount");                    
                 if(msgAmount == expectedAmount) {
-                    System.out.println("TXHASH - Found a matching amount of " + msgAmount +"ucraft. This makes it a valid Tx if memo is correct: " + doesTxMemoMatch);
+                    CraftBlockchainPlugin.log("TXHASH - Found a matching amount of " + msgAmount +"ucraft. This makes it a valid Tx if memo is correct: " + doesTxMemoMatch);
                     transactionDataMatches = true;
                     break;
                 }

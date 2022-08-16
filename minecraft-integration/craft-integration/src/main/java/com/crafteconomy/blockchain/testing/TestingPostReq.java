@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.json.simple.JSONObject;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.utils.JavaUtils;
 
@@ -29,7 +30,7 @@ public class TestingPostReq {
         HttpURLConnection http = null;
         OutputStream stream = null;
         String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"description\": \""+description+"\", \"wallet\": \""+craft_address+"\", \"ucraft_amount\": "+ucraft_amount+"}";
-        System.out.println("depositToAddress data " + data); // TODO: Remove this from production code
+        CraftBlockchainPlugin.log("depositToAddress data " + data); // TODO: Remove this from production code
         
         try {
             url = new URL("http://api.crafteconomy.io/v1/dao/make_payment");
@@ -54,17 +55,16 @@ public class TestingPostReq {
             // parse response
             json = (JSONObject) org.json.simple.JSONValue.parse(response);
 
-
-            System.out.println("depositToAddress code: " + http.getResponseCode() + " | response: " + json);
+            CraftBlockchainPlugin.log("depositToAddress code: " + http.getResponseCode() + " | response: " + json);
             http.disconnect();
 
             if(http.getResponseCode() != 200) {
-                System.out.println("Failed payment!");
+                CraftBlockchainPlugin.log("Failed payment!");
                 return FaucetTypes.FAILURE;
             }                    
 
             if(json.keySet().contains("success")) {
-                System.out.println("Successful payment!");
+                CraftBlockchainPlugin.log("Successful payment!");
                 return FaucetTypes.SUCCESS;
                 
             } else if (json.keySet().contains("error")) {
@@ -99,7 +99,7 @@ public class TestingPostReq {
                 System.err.println("makePayment API is down!");
                 return FaucetTypes.API_DOWN;
             } else {
-                System.out.println("Some other failure!");
+                CraftBlockchainPlugin.log("Some other failure!");
                 return FaucetTypes.FAILURE;
             }
         }

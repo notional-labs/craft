@@ -30,6 +30,8 @@ import com.crafteconomy.blockchain.transactions.listeners.SignedTxCheckListener;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
+import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -68,6 +70,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     private static Integer REDIS_MINUTE_TTL = 30;   
     private static Boolean DEV_MODE = false;
+    private static Boolean DEBUGGING_MSGS = false;
 
     @Override
     public void onEnable() {
@@ -81,8 +84,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         // redisDB = new RedisManager("redis://:PASSWORD@IP:6379");
         // mongoDB = new MongoDB("mongodb://USER:PASS@IP:PORT/?authSource=AUTHDB", "crafteconomy");
 
-        System.out.println(redisDB.getRedisConnection().ping());
-        System.out.println("" + mongoDB.getDatabase().getCollection("connections").countDocuments());
+        log(redisDB.getRedisConnection().ping());
+        log("" + mongoDB.getDatabase().getCollection("connections").countDocuments());
 
 
         SERVER_WALLET = getConfig().getString("SERVER_WALLET_ADDRESS");
@@ -98,6 +101,9 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
         DEV_MODE = getConfig().getBoolean("DEV_MODE");
         if(DEV_MODE == null) DEV_MODE = false;
+
+        DEBUGGING_MSGS = getConfig().getBoolean("DEBUGGING_MSGS");
+        if(DEBUGGING_MSGS == null) DEBUGGING_MSGS = false;
 
         if(DEV_MODE) {
             // async runnable every 4 minutes
@@ -164,7 +170,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         redisPubSubTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
             @Override
             public void run() {      
-                Util.logSevere("Starting Redis PubSub Client");                          
+                CraftBlockchainPlugin.log("Starting Redis PubSub Client");                          
                 // Webapp sends this request after the Tx has been signed
                 // jedisPubSubClient.psubscribe(keyListener, "__key*__:signed_*"); 
                 // jedisPubSubClient.psubscribe(keyListener, "__keyevent@*__:expire*"); // gets expired keys from redis (after Tx is removed), so we can remove from pending
@@ -246,9 +252,22 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     public Double getTaxRate() {
         return TAX_RATE;
     }
-
     
     public String getServersWalletAddress() {
         return SERVER_WALLET;
+    }
+
+    public static void log(String msg, Level level) {
+        // we allow only severe messages through, else its based on if debugging is enabled.
+        if(level == Level.SEVERE) {
+            Bukkit.getLogger().severe(msg);
+
+        } else if(DEBUGGING_MSGS) {
+            // Bukkit.getLogger().info(msg);
+            Bukkit.getLogger().log(level, msg);
+        }
+    }
+    public static void log(String msg) {
+        log(msg, Level.INFO);    
     }
 }

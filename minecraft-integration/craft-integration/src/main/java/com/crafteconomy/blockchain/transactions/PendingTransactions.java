@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.utils.Util;
 
@@ -49,12 +50,12 @@ public class PendingTransactions {
 
                 jedis.keys(key).forEach(k -> {
                     jedis.unlink(k); // deletes the key
-                    Util.logSevere("[PendingTxs.java] Removed " + key + " from redis");
+                    CraftBlockchainPlugin.log("[PendingTxs.java] Removed " + key + " from redis");
                 });  
             }
 
         } catch (Exception e) {
-            Util.logSevere("[PendingTxs.java] Failed to clear transactions. Make sure pool is open");
+            CraftBlockchainPlugin.log("[PendingTxs.java] Failed to clear transactions. Make sure pool is open");
         }
     }
 

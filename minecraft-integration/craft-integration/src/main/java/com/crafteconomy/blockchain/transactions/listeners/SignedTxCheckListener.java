@@ -2,6 +2,7 @@ package com.crafteconomy.blockchain.transactions.listeners;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.storage.RedisManager;
@@ -34,7 +35,7 @@ public class SignedTxCheckListener implements Listener {
     public void onSignedTxCheck(SignedTransactionEvent event) {
         UUID TxID = event.getTxID();
 
-        Util.logSevere("[DEBUG] SignedTransactionEvent FIRED FOR TxID:" + TxID);
+        CraftBlockchainPlugin.log("[DEBUG] SignedTransactionEvent FIRED FOR TxID:" + TxID);
 
         // Check if Integration has a TxID which matches the TxID fired
         // If it does, we can complete the method and remove the TxID from the pending
@@ -48,18 +49,18 @@ public class SignedTxCheckListener implements Listener {
         String expectedToWallet = tx.getToWallet();
         boolean doesMatch = doesDataMatchTransaction(event.getTednermintHash(), expectedToWallet, expected_ucraft, expectedDesc);
 
-        System.out.println("[SignedTransactionEvent] Comparing our tx description -> the memo in the body of the transaction");        
+        CraftBlockchainPlugin.log("[SignedTransactionEvent] Comparing our tx description -> the memo in the body of the transaction");        
         if(doesMatch == false) {
-            Util.logWarn("[DEBUG] TxData did not match for:" + TxID + " - " + event.getTednermintHash());
-            Util.logWarn("[DEBUG] ACTUAL: desc: " + expectedDesc + "  amount (ucraft): " + expected_ucraft + "  toWallet: " + expectedToWallet);
+            CraftBlockchainPlugin.log("[DEBUG] TxData did not match for:" + TxID + " - " + event.getTednermintHash(), Level.SEVERE);
+            CraftBlockchainPlugin.log("[DEBUG] ACTUAL: desc: " + expectedDesc + "  amount (ucraft): " + expected_ucraft + "  toWallet: " + expectedToWallet);
             return;
         }                
-        Util.logFine("SignedTransactionEvent [DATA MATCH] found for " + TxID.toString().substring(0, 15) + "... Completing\n");
+        CraftBlockchainPlugin.log("SignedTransactionEvent [DATA MATCH] found for " + TxID.toString().substring(0, 15) + "... Completing\n", Level.SEVERE);
         tx.complete();
 
         // remove that TxID from the pending list
         PendingTransactions.getInstance().removePending(TxID);
-        // System.out.println("[DEBUG] TxID: " + TxID + " removed from pending list");
+        // CraftBlockchainPlugin.log("[DEBUG] TxID: " + TxID + " removed from pending list");
 
         try (Jedis jedis = redis.getRedisConnection()) {
             // gets 1 key which matches the wallets address due to unique TxID
@@ -67,14 +68,14 @@ public class SignedTxCheckListener implements Listener {
 
             for (String key : keyString) {
                 jedis.del(key);
-                System.out.println("[DEBUG-REDIS] DELETED " + key);
+                CraftBlockchainPlugin.log("[DEBUG-REDIS] DELETED " + key);
             }
 
             jedis.del("signed_" + TxID);
-            System.out.println("[DEBUG-REDIS] DELETED signed_" + TxID);
+            CraftBlockchainPlugin.log("[DEBUG-REDIS] DELETED signed_" + TxID);
 
         } catch (Exception e) {
-            System.out.println("SignedTxCheckListener Redis Error");
+            CraftBlockchainPlugin.log("SignedTxCheckListener Redis Error", Level.SEVERE);
             throw new JedisException(e);
         }
     }
@@ -86,13 +87,13 @@ public class SignedTxCheckListener implements Listener {
         boolean doesTxMemoMatch = false;
 
         if(IS_DEV_MODE) {
-            System.out.println("Dev mode is enabled, so we will sign the tx given this & broadcast to ensure developers know.");
+            CraftBlockchainPlugin.log("Dev mode is enabled, so we will sign the tx given this & broadcast to ensure developers know.");
             return true;
         }
         
         JSONObject txObject = getTransactionObject(tendermintHash); // tx key of the above link
         if(txObject == null) {
-            // System.out.println("Error: myObject is null");
+            // CraftBlockchainPlugin.log("Error: myObject is null");
             return false;
         }
 
@@ -103,7 +104,7 @@ public class SignedTxCheckListener implements Listener {
         // Loops through the Tx's messages trying to find one which matches to_address & amount                 
         for(Object msg : txObject.getJSONArray("messages")) {
             JSONObject msgObject = (JSONObject) msg;
-            // System.out.println(msgObject.toString());
+            // CraftBlockchainPlugin.log(msgObject.toString());
 
             // Check that the to_address matches who we expected to send it too, if not we check the next.
             String to_address = msgObject.getString("to_address");
@@ -111,7 +112,7 @@ public class SignedTxCheckListener implements Listener {
             if(doesToAddressMatch == false) {
                 continue; // if who we were sending it too doesn't match, this is not the transaction.
             }
-            System.out.println("to_address matches expected address" + expectedToAddress );
+            CraftBlockchainPlugin.log("to_address matches expected address" + expectedToAddress );
 
            
             // Check there is a message which has the correct amount, this only runs after we checked for to_address
@@ -121,7 +122,7 @@ public class SignedTxCheckListener implements Listener {
                 JSONObject tempAmount = (JSONObject) amounts;
                 Long msgAmount = tempAmount.getLong("amount");                    
                 if(msgAmount == expectedAmount) {
-                    System.out.println("TXHASH - Found a matching amount of " + msgAmount +"ucraft. This makes it a valid Tx if memo is correct: " + doesTxMemoMatch);
+                    CraftBlockchainPlugin.log("TXHASH - Found a matching amount of " + msgAmount +"ucraft. This makes it a valid Tx if memo is correct: " + doesTxMemoMatch);
                     transactionDataMatches = true;
                     break;
                 }

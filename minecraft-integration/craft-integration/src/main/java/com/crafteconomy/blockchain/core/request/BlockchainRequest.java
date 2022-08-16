@@ -93,7 +93,7 @@ public class BlockchainRequest {
         // curl -X GET "https://api.cosmos.network/cosmos/auth/v1beta1/accounts/cosmos10r39fueph9fq7a6lgswu4zdsg8t3gxlqvvvyvn" -H "accept: application/json"
 
         String req_url = ACCOUNT_ENDPOINT.replace("%address%", craft_address);
-        System.out.println(req_url);
+        CraftBlockchainPlugin.log(req_url);
         return EndpointQuery.req(req_url, RequestTypes.ACCOUNT, "Account Sequence Request").toString();
     }
 
@@ -107,7 +107,7 @@ public class BlockchainRequest {
         HttpURLConnection http = null;
         OutputStream stream = null;
         String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"description\": \""+description+"\", \"wallet\": \""+craft_address+"\", \"ucraft_amount\": "+ucraft_amount+"}";
-        System.out.println("depositToAddress data " + data); // TODO: Remove this from production code
+        CraftBlockchainPlugin.log("depositToAddress data " + data); // TODO: Remove this from production code
         
         try {
             url = new URL("http://api.crafteconomy.io/v1/dao/make_payment");
@@ -128,23 +128,23 @@ public class BlockchainRequest {
                 return FaucetTypes.NO_RESPONSE;
             }
 
-            System.out.println("response from API string: " + response);
+            CraftBlockchainPlugin.log("response from API string: " + response);
 
             JSONObject json = new JSONObject();
             // parse response
             json = (JSONObject) org.json.simple.JSONValue.parse(response);
 
 
-            System.out.println("depositToAddress code: " + http.getResponseCode() + " | response: " + json);
+            CraftBlockchainPlugin.log("depositToAddress code: " + http.getResponseCode() + " | response: " + json);
             http.disconnect();
 
             if(http.getResponseCode() != 200) {
-                System.out.println("Failed payment!");
+                CraftBlockchainPlugin.log("Failed payment!");
                 return FaucetTypes.FAILURE;
             }                    
 
             if(json.keySet().contains("success")) {
-                System.out.println("Successful payment!");
+                CraftBlockchainPlugin.log("Successful payment!");
                 return FaucetTypes.SUCCESS;
                 
             } else if (json.keySet().contains("error")) {
@@ -179,7 +179,7 @@ public class BlockchainRequest {
                 System.err.println("makePayment API is down!");
                 return FaucetTypes.API_DOWN;
             } else {
-                System.out.println("Some other failure!");
+                CraftBlockchainPlugin.log("Some other failure!");
                 return FaucetTypes.FAILURE;
             }
         }
@@ -208,12 +208,12 @@ public class BlockchainRequest {
             // we check how much ucraft is in the transaction data since its on chain, so get the ucraft from the Tx
 
             if(BlockchainRequest.getUCraftBalance(transaction.getToWallet()) < 0) {
-                System.out.println("No wallet balance for address");  
+                CraftBlockchainPlugin.log("No wallet balance for address");  
                 return ErrorTypes.NO_WALLET;
             }
 
             if(BlockchainRequest.getUCraftBalance(transaction.getFromWallet()) < transaction.getUCraftAmount()){
-                System.out.println("Not enough tokens to send");
+                CraftBlockchainPlugin.log("Not enough tokens to send");
                 return ErrorTypes.NOT_ENOUGH_TO_SEND;
             }            
         } else {
@@ -241,8 +241,8 @@ public class BlockchainRequest {
             String transactionJson = generateTxJSON(from, to, ucraftAmount, desc, txType);
             jsonObject = new org.json.JSONObject(transactionJson);            
        }catch (JSONException err) {
-            Util.logSevere("EBlockchainRequest.java Error " + err.toString());
-            Util.logSevere("Description: " + transaction.getDescription());
+            CraftBlockchainPlugin.log("EBlockchainRequest.java Error " + err.toString());
+            CraftBlockchainPlugin.log("Description: " + transaction.getDescription());
             return ErrorTypes.JSON_PARSE_TRANSACTION;
        }
        
@@ -272,7 +272,7 @@ public class BlockchainRequest {
 
         // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
         String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
-        // System.out.println(v);
+        // CraftBlockchainPlugin.log(v);
         return json;
     }
 }

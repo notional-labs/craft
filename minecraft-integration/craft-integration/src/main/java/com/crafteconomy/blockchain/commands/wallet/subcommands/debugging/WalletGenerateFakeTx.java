@@ -101,7 +101,7 @@ public class WalletGenerateFakeTx implements SubCommand {
                 "&7&oSign this transaction with your KEPLR wallet");
 
         } catch (Exception e) {
-            Util.logSevere("[WalletGEnFakeTx] Error setting tx_" + TxInfo.getTxID() + " in redis");
+            CraftBlockchainPlugin.log("[WalletGEnFakeTx] Error setting tx_" + TxInfo.getTxID() + " in redis");
         }
     }    
 }

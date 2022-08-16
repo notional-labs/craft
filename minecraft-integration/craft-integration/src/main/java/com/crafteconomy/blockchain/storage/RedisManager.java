@@ -3,7 +3,9 @@ package com.crafteconomy.blockchain.storage;
 import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.logging.Level;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.utils.Util;
 
 import redis.clients.jedis.Jedis;
@@ -13,8 +15,8 @@ import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.InvalidURIException;
 import redis.clients.jedis.util.JedisURIHelper;
 
-// 	Util.log("[DEBUG] Jedis Active: " + redisDB.getPool().getNumActive());
-// 	Util.log("[DEBUG] Jedis Idle: " + redisDB.getPool().getNumIdle());
+// 	CraftBlockchainPlugin.log("[DEBUG] Jedis Active: " + redisDB.getPool().getNumActive());
+// 	CraftBlockchainPlugin.log("[DEBUG] Jedis Idle: " + redisDB.getPool().getNumIdle());
 
 // ********* IMPORTANT *********
 // Ensure redis-cli -> `CONFIG SET notify-keyspace-events K$` (KEA also works)
@@ -46,17 +48,13 @@ public class RedisManager {
         //     pool = new JedisPool(config, host, port, 0);
         // }
         
-        // System.out.println(uri);
+        // CraftBlockchainPlugin.log(uri);
 
         URI redisURI = URI.create(uri);
         if (!JedisURIHelper.isValid(redisURI)) {
             throw new InvalidURIException(String.format("Cannot open Redis connection due invalid URI. %s", uri.toString()));
         }
         pool = new JedisPool(config, redisURI);
-    }    
-
-    public void debugging() {
-        System.out.println();
     }
 
     public JedisPool getPool() {
@@ -94,9 +92,9 @@ public class RedisManager {
                 jedis.setex(TxLabel, TimeToLiveMinutes*60, JSON_Output);
             }            
 
-            Util.log("Tx JSON Saved to redis as " + TxLabel + ", "+ JSON_Output + "\n");                        
+            CraftBlockchainPlugin.log("Tx JSON Saved to redis as " + TxLabel + ", "+ JSON_Output + "\n");                        
         } catch (Exception e) {
-            Util.logSevere("[RedisManager.java] Error saving Tx JSON to redis: " + e.getMessage());          
+            CraftBlockchainPlugin.log("[RedisManager.java] Error saving Tx JSON to redis: " + e.getMessage(), Level.SEVERE);          
         } 
     }
 

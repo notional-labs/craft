@@ -43,7 +43,7 @@ public class GiveTokens implements CommandExecutor {
                     Util.colorMsg(sender, "Deposited " + args[1] + " to " + player.getName() + " wallet");
                     Util.colorMsg(player, "Console just gave you " + args[1] + " tokens");
                 default:
-                    Util.logSevere("Error: This command can only be used by console. (("+args[0]+", ))");
+                    Util.colorMsg(sender, "Error: This command can only be used by console. (("+args[0]+", ))");
                     break;
             }
         });

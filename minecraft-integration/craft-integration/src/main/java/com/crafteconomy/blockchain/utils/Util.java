@@ -18,17 +18,13 @@ import java.util.logging.Logger;
 public class Util {
 	static ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 
-	private static final Logger logger = Logger.getLogger("CraftIntegration");
+	// private static final Logger logger = Logger.getLogger("CraftIntegration");
 
-	public static void log(String message) {
-		logger.info(message);		
-	}
-
-	public static void logSevere(String message) { logger.severe(message); }
-
-	public static void logWarn(String message) { logger.warning(message); }
-
-	public static void logFine(String message) { logger.fine(message); }
+	// replaced with CraftBlockchainPlugin.log("msg", optional<level>)
+	// public static void log(String message) { logger.info(message); }
+	// public static void logSevere(String message) { logger.severe(message); }
+	// public static void logWarn(String message) { logger.warning(message); }
+	// public static void logFine(String message) { logger.fine(message); }
 
 	// ---- CraftIntegration Specific ----	 
 
@@ -132,7 +128,7 @@ public class Util {
 	public static String color(String message) {
 		if(message == null){
 			message = "CRAFT_INTEGRATION_NULL_ISSUE-Util.color";
-			consoleMSG("CRAFT_INTEGRATION_NULL_ISSUE: " + Thread.currentThread().getStackTrace()[2]);
+			// consoleMSG("CRAFT_INTEGRATION_NULL_ISSUE: " + Thread.currentThread().getStackTrace()[2]);
 		}
 		return org.bukkit.ChatColor.translateAlternateColorCodes('&', message);
 	}
@@ -167,9 +163,9 @@ public class Util {
 		Bukkit.dispatchCommand(console, command);
 	}
 
-	public static void consoleMSG(String consoleMsg) {		
-		Bukkit.getLogger().info(Util.color(consoleMsg));
-	}
+	// public static void consoleMSG(String consoleMsg) {		
+	// 	Bukkit.getLogger().info(Util.color(consoleMsg));
+	// }
 
 	public static boolean isInt(String s) {
 		try {

@@ -25,7 +25,7 @@ public class ExpiredTransactionListener implements Listener {
         // check if it is in pending
         Tx tx = PendingTransactions.getInstance().getTxFromID(TxID);
         if(tx == null) {
-            Util.logSevere("[ExpiredTransactionListener.java] TxID " + TxID + " is not in pending transactions on this server, ignore");
+            CraftBlockchainPlugin.log("[ExpiredTransactionListener.java] TxID " + TxID + " is not in pending transactions on this server, ignore");
             return;
         }
         
@@ -37,7 +37,7 @@ public class ExpiredTransactionListener implements Listener {
             biConsumer.accept(tx.getFromUUID(), tx.getToUUID());
         }  
 
-        Util.logSevere("[DEBUG] ExpiredTransactionEvent FIRED FOR TxID:" + TxID + "\n Consumer logic completed");
+        CraftBlockchainPlugin.log("[DEBUG] ExpiredTransactionEvent FIRED FOR TxID:" + TxID + "\n Consumer logic completed");
     }
     
 }

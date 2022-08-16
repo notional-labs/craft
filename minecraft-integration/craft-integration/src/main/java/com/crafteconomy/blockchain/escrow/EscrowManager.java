@@ -113,7 +113,7 @@ public class EscrowManager {
         // max withdraw is the redeemAmt OR total amount in their wallet, which ever is less
         long mostTheyCanRedeemUCraft = Math.min(getUCraftBalance(uuid), ucraft_amount);
         removeUCraftBalance(uuid, mostTheyCanRedeemUCraft);
-        System.out.println("Redeeming " + (mostTheyCanRedeemUCraft / 1_000_000) + "craft from in game -> wallet via deposit");
+        CraftBlockchainPlugin.log("Redeeming " + (mostTheyCanRedeemUCraft / 1_000_000) + "craft from in game -> wallet via deposit");
         
         // deposits the tokens to their actual wallet
         final String description = "Escrow redeem via EscrowManager.java (Integration)";

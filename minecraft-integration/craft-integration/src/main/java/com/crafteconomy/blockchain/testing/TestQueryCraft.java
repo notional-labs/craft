@@ -10,11 +10,13 @@ import java.util.concurrent.CompletableFuture;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
+
 public class TestQueryCraft {
 
     public static void main(String[] args) {
         queryCraftTokenPrice().thenAccept(price -> {
-            System.out.println("Craft USD Price: " + price);
+            CraftBlockchainPlugin.log("Craft USD Price: " + price);
         });
     }
 

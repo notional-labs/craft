@@ -48,10 +48,10 @@ public class WalletMyPendingTxs implements SubCommand {
         Set<String> keys = new HashSet<String>();
 
         try (Jedis jedis = redis.getRedisConnection()) {
-            System.out.println("[DEBUG] Getting keys from redis for MyPending: " + "tx_" + walletAddress + "*");
+            CraftBlockchainPlugin.log("[DEBUG] Getting keys from redis for MyPending: " + "tx_" + walletAddress + "*");
             keys = jedis.keys("tx_" + walletAddress + "*");
         } catch (Exception e) {
-            Util.logSevere("[WalletMyPendingTxs] error with jedis.keys fetch");
+            CraftBlockchainPlugin.log("[WalletMyPendingTxs] error with jedis.keys fetch");
         }
  
         if(keys.size() > 0) {

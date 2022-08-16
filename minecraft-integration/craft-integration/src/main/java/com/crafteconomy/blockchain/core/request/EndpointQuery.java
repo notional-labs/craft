@@ -1,12 +1,12 @@
 package com.crafteconomy.blockchain.core.request;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.core.types.RequestTypes;
 import com.crafteconomy.blockchain.utils.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +30,7 @@ public class EndpointQuery {
         Object value = 0L; 
         
         try {     
-            Util.log(logMSG);
+            CraftBlockchainPlugin.log(logMSG);
 
             Request request;
 
@@ -46,14 +46,14 @@ public class EndpointQuery {
 
             HttpResponse httpResponse = request.execute().returnResponse();
             if(httpResponse.getStatusLine().getStatusCode() != 200){
-                System.out.println(httpResponse.getStatusLine());   
+                CraftBlockchainPlugin.log(httpResponse.getStatusLine().toString());   
             }
 
             if (httpResponse.getEntity() != null) {                
                 String html = EntityUtils.toString(httpResponse.getEntity());
                 
                 // if (type == RequestTypes.FAUCET) {
-                //     Util.log("Faucet Request " + html);
+                //     CraftBlockchainPlugin.log("Faucet Request " + html);
                 //     return html; // {"transfers":[{"coin":"1token","status":"ok"}]}
                 // }
 
@@ -61,7 +61,7 @@ public class EndpointQuery {
                 
                 if(type == RequestTypes.ACCOUNT) {
                     // http://65.108.125.182:1317/cosmos/auth/v1beta1/accounts/craft1s4yczg3zgr4qdxussx3wpgezangh2388xgkkz9
-                    System.out.println("JSON " + json);
+                    CraftBlockchainPlugin.log("JSON " + json);
                     json = (JSONObject) json.get("account");                    
                     return json.get("sequence").toString();
                 }
@@ -90,7 +90,7 @@ public class EndpointQuery {
                 value = ErrorTypes.NETWORK_ERROR.code;
             }
 
-            Util.logSevere(error_msg);
+            CraftBlockchainPlugin.log(error_msg);
         } 
         return value;
     }

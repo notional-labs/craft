@@ -70,7 +70,7 @@ public class WalletFaucet implements SubCommand {
 
         BlockchainRequest.depositCraftToAddress(wallet, description, craftAmount).thenAccept(faucet_status -> {
             // This runs in the Forked thread, not main (non blocking)
-            // System.out.println("The future from WalletFaucet returned " + status);
+            // CraftBlockchainPlugin.log("The future from WalletFaucet returned " + status);
             UUID userID = walletManager.getUUIDFromWallet(finalWallet);
             Player receiver = null; // TODO: How can I improve this?
             if(userID != UUID.fromString("00000000-0000-0000-0000-000000000000")) {
