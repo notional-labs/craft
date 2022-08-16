@@ -67,11 +67,9 @@ COMMISSION_RATE='0.05' # 5%
 MAX_CHANGE='0.05'      # 5%
 CHAIN_ID='craft-v4'
 PROJECT_HOME="${HOME}/.craftd/"
+KEYNAME_ADDR=$(craftd keys show $KEYNAME -a)
 echo -e "$KEYNAME\n$MONIKER\n$DETAILS\n$SECURITY_CONTACT\n$WEBSITE\n$MAX_RATE\n$COMMISSION_RATE\n$MAX_CHANGE\n$CHAIN_ID\n$HOME_DIR\n$KEYNAME_ADDR"
 # /Validator variables
-
-# Gets the craft address of your key
-KEYNAME_ADDR=$(craftd keys show $KEYNAME -a)
 
 # Remove old files if they exist
 rm $HOME/.craftd/config/genesis.json
@@ -82,7 +80,15 @@ craftd init $MONIKER --chain-id $CHAIN_ID --staking-bond-denom uexp
 craftd add-genesis-account $KEYNAME_ADDR 1000000uexp
 
 # genesis transaction using all above variables
-craftd gentx $KEYNAME 1000000uexp --home=$PROJECT_HOME --chain-id=$CHAIN_ID --moniker=$MONIKER --commission-max-change-rate=$MAX_CHANGE --commission-max-rate=$MAX_RATE --commission-rate=$COMMISSION_RATE --security-contact=$SECURITY_CONTACT --website=$WEBSITE --details=""
+craftd gentx $KEYNAME 1000000uexp \
+    --home=$PROJECT_HOME \
+    --chain-id=$CHAIN_ID \
+    --moniker=$MONIKER --commission-max-change-rate=$MAX_CHANGE \
+    --commission-max-rate=$MAX_RATE \
+    --commission-rate=$COMMISSION_RATE \
+    --security-contact=$SECURITY_CONTACT \
+    --website=$WEBSITE \
+    --details=""
 
 # Get that gentx data easily -> your home directory
 DATA=`cat ${PROJECT_HOME}/config/gentx/gentx-*.json`
@@ -90,7 +96,8 @@ FILE_LOC=$HOME/`echo $DATA | jq -r '.body.messages[0].description.moniker'`.json
 echo $DATA > $FILE_LOC
 
 # Download the file from $HOME/MONIKER.json & upload to the discord channel
-echo -e "\nPlease download '$FILE_LOC' and upload to discord. (or 'cat $FILE_LOC', copy paste send -> discord)"
+echo -e "\n\n\nPlease download '$FILE_LOC' and upload to discord. (or 'cat $FILE_LOC', copy paste send -> discord)"
+echo -e "     (also remember to backup ~/.craftd/node_key.json && ~/.craftd/priv_validator_key.json)\n"
 ```
 
 ## Peers, Seeds, Genesis & Service File (Post GenTX)
