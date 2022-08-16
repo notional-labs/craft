@@ -3,17 +3,16 @@ import json
 
 # cd networks/craft-testnet-1/
 
-# if not os.path.exists('gentx'):
-#     print('gentx folder not found')
-#     exit(1)
+FOLDER="gentx"
+if not os.path.exists(FOLDER):
+    print('gentx folder not found')
+    exit(1)
 
 # get all files within the gentx folder
-gentx_files = os.listdir('gentx')
+gentx_files = os.listdir(FOLDER)
 
 invalids = ""
-
-with open('gentx-output.txt', 'w') as outfile:
-    outfile.write("") # clean file
+output = ""
 
 for file in gentx_files:
     f = open('gentx/' + file, 'r')
@@ -31,14 +30,8 @@ for file in gentx_files:
     if int(exp['amount'])/1000000 != 1.0:
         invalids += f'[!] Invalid amount for validator: {moniker} {int(exp["amount"])/1000000}\n'
 
-    with open('gentx-output.txt', 'a') as outfile:
-        outfile.write(f"{valop} {rate}% {moniker}\n")
+    
+    output += (f"{valop} {rate}% {moniker}\n")
     # print(f"{valop} {rate}% {moniker}")
 
-with open('gentx-output.txt', 'a') as outfile:
-    outfile.write(invalids)
-
-print('Written to file gentx-output.txt')
-
-
-
+print(output)

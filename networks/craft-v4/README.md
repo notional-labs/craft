@@ -21,26 +21,30 @@
 * Linux (x86_64) or Linux (amd64) Recommended Arch Linux
 
 ### Dependencies
->Prerequisite: go1.18+ required
-* **Arch Linux:** `pacman -S go`
-* **Ubuntu sudo:** `snap install go --classic`
+>Prerequisite: go1.18+, git, gcc, make, jq
 
->Prerequisite: git
-* **Arch Linux:** `pacman -S git`
-* **Ubuntu sudo:** `apt-get install git`
+**Arch Linux:** 
+```
+pacman -S go git gcc make
+```
 
->Optional requirement: GNU make
-* **Arch Linux:** `pacman -S make`
-* **Ubuntu sudo:** `apt-get install make`
+**Ubuntu Linux:** 
+```
+sudo snap install go --classic
+sudo apt-get install git gcc make jq
+```
 
-### Craftd Installation Steps
+---
+
+## Craftd Installation Steps
 
 ```bash
-Clone git repository
+# Clone git repository
 git clone https://github.com/notional-labs/craft.git
 cd craft
-git checkout v0.2.2
-go install ./...
+git checkout v0.5.1
+make install
+# go install ./...
 ```
 > to add ledger support `go install -tags ledger ./...`
 
@@ -51,45 +55,59 @@ to add ledger key
 * `craftd keys add [key_name] --ledger` to add a ledger key 
 
 # Validator setup instructions
-## GenTx : [Skip to Post Genesis](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#become-a-validator-post-genesis)
-
+## Genesis Tx:
 ```bash
+# Validator variables
+KEYNAME='reece'
+MONIKER='pbcups'
+SECURITY_CONTACT="reece@crafteconomy.io"
+WEBSITE="https://reece.sh"
+MAX_RATE='0.20'        # 20%
+COMMISSION_RATE='0.05' # 5%
+MAX_CHANGE='0.05'      # 5%
+CHAIN_ID='craft-v4'
+HOME_DIR="${HOME}/.craftd/"
+echo -e "$KEYNAME\n$MONIKER\n$DETAILS\n$SECURITY_CONTACT\n$WEBSITE\n$MAX_RATE\n$COMMISSION_RATE\n$MAX_CHANGE\n$CHAIN_ID\n$HOME_DIR\n$KEYNAME_ADDR"
+# /Validator variables
+
+# Gets the craft address of your key
+KEYNAME_ADDR=$(craftd keys show $KEYNAME -a)
+
+# Remove old files if they exist
 rm $HOME/.craftd/config/genesis.json
-craftd init <moniker> --chain-id craft-v4 --staking-bond-denom exp
+rm $HOME/.craftd/config/gentx/*.json
+
+# Give yourself 1exp for the genesis Tx signed
+craftd init $MONIKER --chain-id $CHAIN_ID --staking-bond-denom uexp
+craftd add-genesis-account $KEYNAME_ADDR 1000000uexp
+
+# genesis transaction using all above variables
+craftd gentx $KEYNAME 1000000uexp --home=$HOME_DIR --chain-id=$CHAIN_ID --moniker=$MONIKER --commission-max-change-rate=$MAX_CHANGE --commission-max-rate=$MAX_RATE --commission-rate=$COMMISSION_RATE --security-contact=$SECURITY_CONTACT --website=$WEBSITE --details=""
+
+# Get that gentx data easily -> your home directory
+DATA=`cat ${HOME}/.craftd/config/gentx/gentx-*.json`
+FILE_LOC=$HOME/`echo $DATA | jq -r '.body.messages[0].description.moniker'`.json
+echo $DATA > $FILE_LOC
+
+# Download the file from $HOME/MONIKER.json & upload to the discord channel
+echo -e "\nPlease download '$FILE_LOC' and upload to discord. (or 'cat $FILE_LOC', copy paste send -> discord)"
 ```
 
-## Add Genesis Account
+## Peers, Seeds, Genesis & Service File (Post GenTX)
+* Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `FUTURE_GENESIS_LINK_HERE`
+<!-- `https://github.com/notional-labs/craft/blob/master/networks/craft-testnet-1/genesis.json` -->
 
-```bash
-craftd add-genesis-account <key_name> 1000000uexp
-```
-
-### Create & Submit GenTX
-```bash
-craftd gentx <key_name> 1000000uexp --home="$HOME/.craftd/" --keyring-backend=os --chain-id=craft-v4 --moniker="<your_moniker>" --commission-max-change-rate=0.01 --commission-max-rate=0.5 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
-```
-### Fork the repository 
-
-**Copy the contents of** `${HOME}/.craftd/config/gentx/gentx-XXXXXXXX.json to craft/networks/craft-testnet-1/gentx/<yourvalidatorname>.json`
-
-**Create a Pull Request to the main branch of the repository** 
-
->NOTE: The Pull Request will be merged by the maintainers to confirm the inclusion of the validator at the genesis.
-
-### Peers, Seeds, Genesis & Service File (Post GenTX)
-* Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/blob/master/networks/craft-testnet-1/genesis.json`
-
-* Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
+* Find Peers & Seeds [here](https://hackmd.io/eMqK5OrDR3uz3WpGvHUjow)
 
 * Copy below value as minimum-gas-prices in `${HOME}/.craftd/config/app.toml
 0.02ucraft`
 
 * Start craftd by creating a systemd service to run the node in the background
-```bash
-nano /etc/systemd/system/craft.service
 Copy and paste the following file into your service file. Be sure to edit as you see fit.
+```bash
+# nano /etc/systemd/system/craft.service
 [Unit]
-Description=Craft Node
+Description=Craft Economy Node
 After=network.target
 
 [Service]
@@ -106,9 +124,14 @@ LimitMEMLOCK=209715200
 [Install]
 WantedBy=multi-user.target
 ```
->Reload the service files `sudo systemctl daemon-reload` Create the symlinlk `sudo systemctl enable craft.service` 
+>Reload the service files 
+```
+sudo systemctl daemon-reload
+sudo systemctl enable craft.service
+```
 
-## Become a validator (Post Genesis)
+# Post-Genesis
+### Become a validator
 * [Install craftd binary](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#craftd-installation-steps)
 
 ### Initialize node
