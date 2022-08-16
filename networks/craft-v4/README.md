@@ -66,7 +66,7 @@ MAX_RATE='0.20'        # 20%
 COMMISSION_RATE='0.05' # 5%
 MAX_CHANGE='0.05'      # 5%
 CHAIN_ID='craft-v4'
-HOME_DIR="${HOME}/.craftd/"
+PROJECT_HOME="${HOME}/.craftd/"
 echo -e "$KEYNAME\n$MONIKER\n$DETAILS\n$SECURITY_CONTACT\n$WEBSITE\n$MAX_RATE\n$COMMISSION_RATE\n$MAX_CHANGE\n$CHAIN_ID\n$HOME_DIR\n$KEYNAME_ADDR"
 # /Validator variables
 
@@ -82,10 +82,10 @@ craftd init $MONIKER --chain-id $CHAIN_ID --staking-bond-denom uexp
 craftd add-genesis-account $KEYNAME_ADDR 1000000uexp
 
 # genesis transaction using all above variables
-craftd gentx $KEYNAME 1000000uexp --home=$HOME_DIR --chain-id=$CHAIN_ID --moniker=$MONIKER --commission-max-change-rate=$MAX_CHANGE --commission-max-rate=$MAX_RATE --commission-rate=$COMMISSION_RATE --security-contact=$SECURITY_CONTACT --website=$WEBSITE --details=""
+craftd gentx $KEYNAME 1000000uexp --home=$PROJECT_HOME --chain-id=$CHAIN_ID --moniker=$MONIKER --commission-max-change-rate=$MAX_CHANGE --commission-max-rate=$MAX_RATE --commission-rate=$COMMISSION_RATE --security-contact=$SECURITY_CONTACT --website=$WEBSITE --details=""
 
 # Get that gentx data easily -> your home directory
-DATA=`cat ${HOME}/.craftd/config/gentx/gentx-*.json`
+DATA=`cat ${PROJECT_HOME}/config/gentx/gentx-*.json`
 FILE_LOC=$HOME/`echo $DATA | jq -r '.body.messages[0].description.moniker'`.json
 echo $DATA > $FILE_LOC
 
