@@ -106,7 +106,7 @@ echo -e "     Your peer: `echo $(craftd tendermint show-node-id)@$(curl -s ifcon
 * Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json`
 <!-- `https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json` -->
 
-* Find Peers & Seeds [here](https://hackmd.io/eMqK5OrDR3uz3WpGvHUjow)
+* Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
 
 * Copy below value as minimum-gas-prices in `${HOME}/.craftd/config/app.toml
 0.02ucraft`
