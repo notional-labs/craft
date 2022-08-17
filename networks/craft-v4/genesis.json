@@ -1522,7 +1522,7 @@
     },
     "crisis": {
       "constant_fee": {
-        "denom": "stake",
+        "denom": "ucraft",
         "amount": "1000"
       }
     },

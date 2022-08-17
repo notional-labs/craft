@@ -79,6 +79,7 @@ def resetGenesisFile():
 
 
         genesis["app_state"]['staking']['params']["bond_denom"] = 'uexp' 
+        genesis["app_state"]['crisis']['constant_fee']["denom"] = 'ucraft' 
 
 
         genesis["app_state"]['mint']["minter"]["inflation"] = '0.150000000000000000' # 15% inflation
