@@ -99,6 +99,7 @@ echo $DATA > $FILE_LOC
 # Download the file from $HOME/MONIKER.json & upload to the discord channel
 echo -e "\n\n\nPlease download '$FILE_LOC' and upload to discord. (or 'cat $FILE_LOC', copy paste send -> discord)"
 echo -e "     (also remember to backup ~/.craftd/node_key.json && ~/.craftd/priv_validator_key.json)\n"
+echo -e "     Your peer: `echo $(craftd tendermint show-node-id)@$(curl -s ifconfig.me):26656`"
 ```
 
 ## Peers, Seeds, Genesis & Service File (Post GenTX)
