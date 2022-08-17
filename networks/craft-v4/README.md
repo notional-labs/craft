@@ -2,7 +2,7 @@
 
 >This is the Craft Economy Testnet-1 (craft-testnet-1)
 
->[GENESIS](https://raw.githubusercontent.com/notional-labs/craft/master/networks/craft-testnet-1/genesis.json) PUBLISHED
+>[GENESIS](https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json) PUBLISHED
 
 >[PEERS PUBLISHED](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
 
@@ -103,8 +103,8 @@ echo -e "     Your peer: `echo $(craftd tendermint show-node-id)@$(curl -s ifcon
 ```
 
 ## Peers, Seeds, Genesis & Service File (Post GenTX)
-* Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `FUTURE_GENESIS_LINK_HERE`
-<!-- `https://github.com/notional-labs/craft/blob/master/networks/craft-testnet-1/genesis.json` -->
+* Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json`
+<!-- `https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json` -->
 
 * Find Peers & Seeds [here](https://hackmd.io/eMqK5OrDR3uz3WpGvHUjow)
 
@@ -141,12 +141,12 @@ sudo systemctl enable craft.service
 
 # Post-Genesis
 ### Become a validator
-* [Install craftd binary](https://github.com/chalabi2/craft/blob/master/networks/craft-testnet-1/README.md#craftd-installation-steps)
+* [Install craftd binary](https://github.com/notional-labs/craft/tree/master/networks/craft-v4#craftd-installation-steps)
 
 ### Initialize node
 `craftd init <moniker> --chain-id  --staking-bond-denom exp`
 ### Peers, Seeds, Genesis & Service File
-* Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/blob/master/networks/craft-testnet-1/genesis.json`
+* Replace the initialized genesis `${HOME}/.craftd/config/genesis.json` with [testnet-v4 genesis](https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json) 
 
 * Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
 
