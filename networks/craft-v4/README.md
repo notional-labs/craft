@@ -42,9 +42,10 @@ sudo apt-get install git gcc make jq
 # Clone git repository
 git clone https://github.com/notional-labs/craft.git
 cd craft
-git checkout v0.5.1
+git checkout v0.5.2
 make install
 # go install ./...
+craftd config chain-id craft-v4
 ```
 > to add ledger support `go install -tags ledger ./...`
 
