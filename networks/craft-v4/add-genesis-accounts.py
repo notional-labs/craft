@@ -74,7 +74,8 @@ def resetGenesisFile():
 
         genesis["app_state"]['genutil']["gen_txs"] = []
 
-        genesis["app_state"]['gov']["deposit_params"]['min_deposit'][0]['denom'] = 'uexp'
+        genesis["app_state"]['gov']["deposit_params"]['min_deposit'][0]['denom'] = 'ucraft'
+        genesis["app_state"]['gov']["voting_params"]['voting_period'] = '43200s' # 2 days = 172800s
 
         genesis["app_state"]['slashing']['params']["signed_blocks_window"] = "10000"
         genesis["app_state"]['slashing']['params']["min_signed_per_window"] = '0.050000000000000000' # 5% * 10,000
@@ -99,7 +100,7 @@ def resetGenesisFile():
         genesis["app_state"]['exp']["params"]['close_pool_period'] = "6000s"
         genesis["app_state"]['exp']["params"]['vesting_period_end'] = "60s"
         genesis["app_state"]['exp']["params"]['burn_exp_period'] = "60s"
-        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "uexp" # TODO: Is this ucraft or uexp?
+        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "ucraft" # TODO: Is this ucraft or uexp?. I assume craft bc default = token.
 
         # Maybe in the whitelist, we add some validators / accounts just to test it
 
