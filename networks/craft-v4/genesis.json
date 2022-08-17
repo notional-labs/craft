@@ -1553,10 +1553,19 @@
         "max_coin_mint": "10000000000",
         "daoAccount": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7",
         "denom": "uexp",
-        "ibc_asset_denom": "token",
+        "ibc_asset_denom": "uexp",
         "close_pool_period": "6000s",
         "vesting_period_end": "60s",
-        "burn_exp_period": "60s"
+        "burn_exp_period": "60s",
+        "script_id": "209",
+        "ask_count": "1",
+        "min_count": "1",
+        "fee_amount": {
+          "denom": "uband",
+          "amount": "100000"
+        },
+        "prepare_gas": "300000",
+        "execute_gas": "300000"
       },
       "white_list": [
         {
@@ -1565,7 +1574,7 @@
             "denom": "uexp",
             "amount": "100000"
           },
-          "join_dao_time": "2022-08-16T13:05:26.692687774Z"
+          "join_dao_time": "2022-08-17T15:49:05.956616913Z"
         }
       ],
       "dao_asset": {
@@ -1648,11 +1657,11 @@
     },
     "mint": {
       "minter": {
-        "inflation": "0.130000000000000000",
+        "inflation": "0.150000000000000000",
         "annual_provisions": "0.000000000000000000"
       },
       "params": {
-        "mint_denom": "stake",
+        "mint_denom": "ucraft",
         "inflation_rate_change": "0.130000000000000000",
         "inflation_max": "0.200000000000000000",
         "inflation_min": "0.070000000000000000",
@@ -1667,11 +1676,11 @@
     "params": null,
     "slashing": {
       "params": {
-        "signed_blocks_window": "100",
-        "min_signed_per_window": "0.500000000000000000",
+        "signed_blocks_window": "10000",
+        "min_signed_per_window": "0.050000000000000000",
         "downtime_jail_duration": "600s",
         "slash_fraction_double_sign": "0.050000000000000000",
-        "slash_fraction_downtime": "0.010000000000000000"
+        "slash_fraction_downtime": "0.01000000000000000"
       },
       "signing_infos": [],
       "missed_blocks": []

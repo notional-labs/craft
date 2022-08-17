@@ -72,6 +72,19 @@ def resetGenesisFile():
 
         genesis["app_state"]['gov']["deposit_params"]['min_deposit'][0]['denom'] = 'uexp'
 
+        genesis["app_state"]['slashing']['params']["signed_blocks_window"] = "10000"
+        genesis["app_state"]['slashing']['params']["min_signed_per_window"] = '0.050000000000000000' # 5% * 10,000
+        genesis["app_state"]['slashing']['params']["slash_fraction_double_sign"] = '0.050000000000000000' # 5% if you SlashLikeMo
+        genesis["app_state"]['slashing']['params']["slash_fraction_downtime"] = '0.01000000000000000' # 0.01% for downtime, like Juno
+
+
+        genesis["app_state"]['staking']['params']["bond_denom"] = 'uexp' 
+
+
+        genesis["app_state"]['mint']["minter"]["inflation"] = '0.150000000000000000' # 15% inflation
+        genesis["app_state"]['mint']["params"]["mint_denom"] = 'ucraft' # exp pays in ucraft        
+
+        # wasm = permissionless for now.
 
         genesis["app_state"]['exp']["params"]['max_coin_mint'] = str(10_000_000_000)
 
@@ -81,6 +94,7 @@ def resetGenesisFile():
         genesis["app_state"]['exp']["params"]['close_pool_period'] = "6000s"
         genesis["app_state"]['exp']["params"]['vesting_period_end'] = "60s"
         genesis["app_state"]['exp']["params"]['burn_exp_period'] = "60s"
+        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "uexp" # TODO: Is this ucraft or uexp?
 
         # Maybe in the whitelist, we add some validators / accounts just to test it
 
