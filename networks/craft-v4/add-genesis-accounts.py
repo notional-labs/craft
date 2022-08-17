@@ -5,7 +5,7 @@ from pathlib import Path
 
 # cd networks/craft-v4
 
-LAUNCH_TIME = "2022-08-20T20:00:00Z"
+LAUNCH_TIME = "2022-08-19T20:00:00Z"
 CHAIN_ID = "craft-v4"
 EXP_SEND = [{"denom": "uexp","enabled": False}]
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # Home Dir of the genesis
@@ -13,7 +13,12 @@ FOLDER = "gentx" # no need to change
 
 CUSTOM_GENESIS_ACCOUNT_VALUES = {
     # Add some extra to notional / chandra station.
-    "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh": "10000000uexp,100000000000000ucraft #pbcups",    
+    "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh": "10000000uexp,1000000000000000ucraft #pbcups",  
+
+    # TESTNET V4 - DAO ACCOUNT (multisig for mainnet)
+    "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7": "1000000000uexp,1000000000000000ucraft #dao itself",    
+    # TESTNET V4 - GAME PAYMENTS (multisig for mainnet)
+    "craft14svh76rr38wkj9d3g5qmsxyjm7dhxk34v57ygy": "1000000000000000ucraft # game payments addr",    
 
     # https://github.com/notional-labs/craft/pull/12/files
     "craft1lxh0u07haj646pt9e0l2l4qc3d8htfx5se2ntp": "3000000uexp,250000000ucraft # daomember",
@@ -71,7 +76,7 @@ def resetGenesisFile():
         genesis["app_state"]['exp']["params"]['max_coin_mint'] = str(10_000_000_000)
 
         # - multisig here? Maybe we just do reece's account for testnet? or should we do this one so anyone can push through
-        genesis["app_state"]['exp']["params"]['daoAccount'] = "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" 
+        genesis["app_state"]['exp']["params"]['daoAccount'] = "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7" 
 
         genesis["app_state"]['exp']["params"]['close_pool_period'] = "6000s"
         genesis["app_state"]['exp']["params"]['vesting_period_end'] = "60s"
@@ -83,7 +88,7 @@ def resetGenesisFile():
         genesis["app_state"]['exp']["dao_asset"]['dao_token_price'] = "1.000000000000000000"
         genesis["app_state"]['exp']["dao_asset"]['asset_dao'] = []
 
-        genesis["app_state"]['exp']['port_id'] = "336" # "ibc-exp"
+        genesis["app_state"]['exp']['port_id'] = "ibc-exp"
 
     # save genesis.json
     with open(GENESIS_FILE, 'w') as f:
