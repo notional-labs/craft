@@ -6,7 +6,7 @@ from pathlib import Path
 # cd networks/craft-v4
 
 # LAUNCH_TIME = "2022-08-19T20:00:00Z" # TODO: USE THIS ONE, IS ACTUAL
-LAUNCH_TIME = "2022-08-17T20:10:00Z"
+LAUNCH_TIME = "2022-08-17T20:35:00Z"
 CHAIN_ID = "craft-v4"
 EXP_SEND = [{"denom": "uexp","enabled": False}]
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # Home Dir of the genesis
@@ -15,7 +15,9 @@ FOLDER = "gentx" # no need to change
 CUSTOM_GENESIS_ACCOUNT_VALUES = {
     # Add some extra to notional / chandra station.
     "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh": "1000000uexp,1000000000000000ucraft #pbcups (craft-validator)",  
-    "craft1r8sd9cgfnwzyt0dm06hnajy9mkljhl6suczml5": "1000000uexp,1000000000000000ucraft #pbcups - test dedi (temp)",  
+    "craft1r8sd9cgfnwzyt0dm06hnajy9mkljhl6suczml5": "1000000uexp,1000000000000000ucraft #pbcups - test dedi (temp)",
+
+    "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0": "1000000000000000ucraft #reeces main",  
 
     # TESTNET V4 - DAO ACCOUNT (multisig for mainnet)
     "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7": "1000000000000000ucraft #dao itself",    

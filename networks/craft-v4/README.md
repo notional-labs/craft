@@ -69,8 +69,9 @@ MAX_CHANGE='0.05'      # 5%
 CHAIN_ID='craft-v4'
 PROJECT_HOME="${HOME}/.craftd/"
 KEYNAME_ADDR=$(craftd keys show $KEYNAME -a)
-echo -e "$KEYNAME\n$MONIKER\n$DETAILS\n$SECURITY_CONTACT\n$WEBSITE\n$MAX_RATE\n$COMMISSION_RATE\n$MAX_CHANGE\n$CHAIN_ID\n$HOME_DIR\n$KEYNAME_ADDR"
 # /Validator variables
+
+# echo -e "$KEYNAME\n$MONIKER\n$DETAILS\n$SECURITY_CONTACT\n$WEBSITE\n$MAX_RATE\n$COMMISSION_RATE\n$MAX_CHANGE\n$CHAIN_ID\n$HOME_DIR\n$KEYNAME_ADDR"
 
 # Remove old files if they exist
 rm $HOME/.craftd/config/genesis.json
@@ -100,6 +101,7 @@ echo $DATA > $FILE_LOC
 echo -e "\n\n\nPlease download '$FILE_LOC' and upload to discord. (or 'cat $FILE_LOC', copy paste send -> discord)"
 echo -e "     (also remember to backup ~/.craftd/node_key.json && ~/.craftd/priv_validator_key.json)\n"
 echo -e "     Your peer: `echo $(craftd tendermint show-node-id)@$(curl -s ifconfig.me):26656`"
+# DO NOT SUBMIT A PR FOR THIS, POST IN THE DISCORD `gentx-submit` CHANNEL THANK YOU!
 ```
 
 ## Peers, Seeds, Genesis & Service File (Post GenTX)
