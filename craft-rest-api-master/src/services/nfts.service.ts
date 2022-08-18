@@ -2,6 +2,10 @@ import { collections, redisClient } from './database.service';
 
 import axios from 'axios';
 
+// create boolean to disable caching
+const allowCache = false;
+
+
 /**
  * Get a users CRAFT owned NFTs id list
  * { tokens: [ '1', '101', '102', '2', '8', '9' ] }
@@ -40,7 +44,7 @@ export const queryToken = async (addr721Address: string, tokenId: string) => {
     const REDIS_KEY = `cache:query_token`; 
     const REDIS_HSET_KEY = `${addr721Address}:${tokenId}` // for marketplace expansion
     let cachedToken = await redisClient?.hGet(REDIS_KEY , REDIS_HSET_KEY);
-    if(cachedToken) {
+    if(allowCache && cachedToken) {
         // console.log(`Token ${tokenId} found in redis cache -> ${REDIS_KEY}`);
         return JSON.parse(cachedToken);
     }
@@ -99,12 +103,12 @@ export const queryTokenOwner = async (addr721Address: string, tokenId: string) =
     // hget cache:query_token 10
 
     // Get cached
-    // const REDIS_KEY = `cache:query_token_owner`; 
-    // const REDIS_HSET_KEY = `${addr721Address}:${tokenId}` // for marketplace expansion
-    // let cachedToken = await redisClient?.hGet(REDIS_KEY , REDIS_HSET_KEY);
-    // if(cachedToken) {
-    //     return JSON.parse(cachedToken);
-    // }
+    const REDIS_KEY = `cache:query_token_owner`; 
+    const REDIS_HSET_KEY = `${addr721Address}:${tokenId}` // for marketplace expansion
+    let cachedToken = await redisClient?.hGet(REDIS_KEY , REDIS_HSET_KEY);
+    if(allowCache && cachedToken) {
+        return JSON.parse(cachedToken);
+    }
 
     const query = Buffer.from(`{"all_nft_info":{"token_id":"${tokenId}"}}`).toString('base64');
     let api = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/contract/${addr721Address}/smart/${query}`
@@ -190,7 +194,7 @@ export const queryContractInfo = async (addr721_address: string) => {
     const REDIS_KEY = `cache:contract_info`; 
     const REDIS_HSET_KEY = `${addr721_address}`
     let cachedToken = await redisClient?.hGet(REDIS_KEY , REDIS_HSET_KEY);
-    if(cachedToken) {        
+    if(allowCache && cachedToken) {        
         return JSON.parse(cachedToken);
     }
 

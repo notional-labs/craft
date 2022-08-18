@@ -14,7 +14,7 @@ export const getCraftUSDPrice = async () => {
 export const getPrice = async (coin: string) => {
     // Get cached
     const REDIS_KEY = `cache:coingecko_coin_prices`;
-    const TTL = 120; // 30 seconds / 2 minutes
+    const TTL = 60; // 30 seconds / 2 minutes
     const REDIS_HSET_KEY = `${coin}` // for marketplace expansion
     let cached_usd_price = await redisClient?.hGet(REDIS_KEY, REDIS_HSET_KEY);
     if (cached_usd_price) {

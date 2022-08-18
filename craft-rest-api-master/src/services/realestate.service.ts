@@ -4,6 +4,9 @@ import { getUsersOwnedNFTs } from './nfts.service'; // getUsersNFTsIDsList, quer
 
 import axios from 'axios';
 
+// create boolean to disable caching
+const allowCache = false;
+
 /**
  * Get data about a property (name, desc, worldName, imageLink, etc.) - from reProperties server database
  * http://127.0.0.1:4000/v1/realestate/dbcd78cb-326e-4842-982b-9252f9ca25a7
@@ -13,7 +16,7 @@ import axios from 'axios';
 export const getPropertyInformation = async (uuid: string) => {
     const REDIS_KEY = `cache:property_info`;
     let cachedPropertyData = await redisClient?.hGet(REDIS_KEY, `${uuid}`);
-    if(cachedPropertyData) {
+    if(allowCache && cachedPropertyData) {
         console.log(`Property found in redis cache -> ${REDIS_KEY}. Not calling MongoDB`);
         return JSON.parse(cachedPropertyData);
     }
@@ -37,7 +40,7 @@ export const getPropertyInformation = async (uuid: string) => {
 export const getCityNameFromID = async (cityID: string) => {
     const REDIS_KEY = `cache:citynames`;
     let cachedCityname = await redisClient?.hGet(REDIS_KEY, `${cityID}`);
-    if(cachedCityname) {
+    if(allowCache && cachedCityname) {
         console.log(`Cityname found in redis cache -> ${REDIS_KEY}. Not calling MongoDB`);
         return cachedCityname;
     }
@@ -53,7 +56,7 @@ export const getCityNameFromID = async (cityID: string) => {
 export const getBuildingNameFromID = async (buildingId: string) => {
     const REDIS_KEY = `cache:buildingnames`;
     let cachedBuildingName = await redisClient?.hGet(REDIS_KEY, `${buildingId}`);
-    if(cachedBuildingName) {
+    if(allowCache && cachedBuildingName) {
         console.log(`BuildingName found in redis cache -> ${cachedBuildingName} from ${buildingId}. Not calling MongoDB`);
         return cachedBuildingName;
     }

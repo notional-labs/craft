@@ -9,6 +9,8 @@ import {getUsersOwnedNFTs, queryContractInfo} from './nfts.service';
 import {queryOfferings} from './nftmarketplace.service';
 import {getDetails_Offering_TokenData_Owner} from './assets.service';
 
+const allowCache = false;
+
 // ! TODO: Query craft contracts (get contract code, get all instances of 721 contracts, query if craft owns any NFTs there)
 
 const allowedExtensions = [".png", ".jpg", ".jpeg"];
@@ -134,9 +136,9 @@ export async function getAllCW721ContractAddresses() {
 async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = false) {
     const REDIS_KEY = `cache:craft_cw_721s:${craftWallet}`;
     const TTL = 30;  // 10 seconds
-    let cacched_cw721_craft = await redisClient?.get(REDIS_KEY);
-    if (cacched_cw721_craft) {        
-        return JSON.parse(cacched_cw721_craft);
+    let cached_cw721_craft = await redisClient?.get(REDIS_KEY);
+    if (allowCache && cached_cw721_craft) {        
+        return JSON.parse(cached_cw721_craft);
     }
 
     const addresses = await getAllCW721ContractAddresses();
@@ -162,7 +164,7 @@ async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = fals
             console.log(nft);
             const newData = await getDetails_Offering_TokenData_Owner(addr, nft.tokenId);
             if(newData) {
-                console.log(newData);
+                // console.log(newData);
                 myCraftNFTs.push(newData);
             }           
         }
@@ -173,8 +175,12 @@ async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = fals
             console.log(nft);
             const newData = await getDetails_Offering_TokenData_Owner(addr, nft.token_id);
             if(newData) {
-                console.log(newData);
-                myCraftNFTs.push(newData);
+                // console.log(newData);
+                // console.log(newData.owner);                
+
+                if(newData.owner === craftWallet) {
+                    myCraftNFTs.push(newData);
+                }                
             }
         }
 

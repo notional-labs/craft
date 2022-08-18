@@ -108,7 +108,7 @@ export const signTx = async (uuid: string, tenderminthash: string) => {
 
 
 
-const RPC = `${process.env.CRAFTD_NODE}`;
+// const RPC = `${process.env.CRAFTD_NODE}`;
 // http://localhost:4000/v1/tx/confirm/craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl/100/My%20Test%20Description_Reece/0054F78B96E3E690EAC85E13088BC05EE19DCEC9330D66A6FF04D98943E09F01
 /*
 export const confirmTransactionDataMatches = async (to_address: string, ucraft_amt: string, description: string, tendermint_hash: string) => {

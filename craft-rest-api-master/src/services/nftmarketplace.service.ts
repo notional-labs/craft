@@ -4,6 +4,10 @@ import axios from 'axios';
 
 import { queryToken, queryContractInfo } from '../services/nfts.service';
 import { getCraftUSDPrice } from '../services/pricing.service';
+
+// create boolean to disable caching
+const allowCache = false;
+
 /**
  * 
  * Queries a smart contract defined in .env (ADDR721) by token name. 
@@ -21,7 +25,7 @@ export const queryOfferings = async (contract_address: string = "", from_craft_a
     let REDIS_KEY = `cache:marketplace_offerings:${contract_address}`;
     if(from_craft_address.length > 0) { REDIS_KEY += `:${from_craft_address}`; }
     let get_offerings = await redisClient?.get(REDIS_KEY);
-    if (get_offerings) {
+    if (allowCache && get_offerings) {
         // console.log(`Asset: ${denom} holdings ${get_wallet_value} found in redis cache -> ${REDIS_KEY}`);
         return JSON.parse(get_offerings);
     }
@@ -44,6 +48,8 @@ export const queryOfferings = async (contract_address: string = "", from_craft_a
     
     // Queries tokens for sale with their parent contract for the offering.
     let offerings: string[] = []; // selective offerings we want to return based on address
+    if(!data) { return offerings; }
+    
     for(let i = 0; i < data.length; i++) {
         let offering = data[i];
 
@@ -88,7 +94,7 @@ export const queryPaintingOfferings = async () => {
     // TODO: Redis Cache
     const REDIS_KEY = `cache:marketplace_offerings:paintings`;
     let painting_offerings = await redisClient?.get(REDIS_KEY);
-    if (painting_offerings) {
+    if (allowCache && painting_offerings) {
         // console.log(`Asset: ${denom} holdings ${get_wallet_value} found in redis cache -> ${REDIS_KEY}`);
         return JSON.parse(painting_offerings);
     }
@@ -116,7 +122,7 @@ export const queryPaintingOfferings = async () => {
 export const queryFeatured = async (amount: number) => {
     let REDIS_KEY = `cache:marketplace_offerings_featured:${amount}`;
     let get_featured = await redisClient?.get(REDIS_KEY);
-    if (get_featured) {        
+    if (allowCache && get_featured) {        
         return JSON.parse(get_featured);
     }
 

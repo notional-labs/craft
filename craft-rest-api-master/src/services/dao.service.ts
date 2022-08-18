@@ -14,6 +14,9 @@ import { fromBech32, toBech32, toHex } from "@cosmjs/encoding";
 import { config } from 'dotenv';
 config();
 
+// create boolean to disable caching
+const allowCache = false;
+
 const prefixes = {
     "cosmos": {
         rpc: "https://rpc.cosmoshub.strange.love",
@@ -48,10 +51,9 @@ const prefixes = {
  * http://127.0.0.1:4000/v1/dao/get_wallet
  */
 export const getAllEndpoints = async () => {
-
     const REDIS_KEY = `cache:dao_all_endpoints`;
     let all_endpoints_data = await redisClient?.get(REDIS_KEY);
-    if (all_endpoints_data) {
+    if (allowCache && all_endpoints_data) {
         return JSON.parse(all_endpoints_data);
     }
 
@@ -134,7 +136,7 @@ export const getTotalSupply = async (coin: string) => {
     const TTL = 30 * 5; // 5 min
     const REDIS_HSET_KEY = `${coin}` // ucraft, uexp
     let cached_total_supply = await redisClient?.hGet(REDIS_KEY, REDIS_HSET_KEY);
-    if (cached_total_supply) {
+    if (allowCache && cached_total_supply) {
         console.log(`TotalSupply token: ${coin} found in redis -> ${REDIS_KEY}`);
         return JSON.parse(cached_total_supply);
     }
@@ -161,7 +163,7 @@ export const getTotalUSDValue = async (TOTAL_ASSETS?) => {
     const REDIS_KEY = `cache:total_dao_usd_value`;
     const TTL = 60 * 5;
     let get_total_value = await redisClient?.get(REDIS_KEY);
-    if (get_total_value) {
+    if (allowCache && get_total_value) {
         console.log(`Total Value: $ ${get_total_value} found in redis cache -> ${REDIS_KEY}`);
         return JSON.parse(get_total_value);
     }
@@ -197,9 +199,15 @@ export const getTotalUSDValue = async (TOTAL_ASSETS?) => {
 // escrow account
 export const getCraftBalance = async (wallet_addr) => {
     // get craft escrow account
-    const client = await SigningStargateClient.connectWithSigner(`${process.env.CRAFTD_NODE}`, wallet_addr);
-    // const balance = await client.getAllBalances(account.address)
-    const balance = await client.getBalance(wallet_addr, "ucraft")
+    let balance = coin(-1, "ucraft");
+    try {
+        const client = await SigningStargateClient.connectWithSigner(`${process.env.CRAFTD_NODE}`, wallet_addr);
+        // const balance = await client.getAllBalances(account.address)
+        balance = await client.getBalance(wallet_addr, "ucraft")        
+    } catch (error) {
+        console.log("getCraftBalance", error);
+    }
+
     return balance;
 }
 
@@ -209,7 +217,7 @@ export const getAssetHoldingAmount = async (address, prefix, rpc_url, denom) => 
 
     const REDIS_KEY = `cache:dao_wallet_holding_amt-${address}`;
     let get_wallet_value = await redisClient?.get(REDIS_KEY);
-    if (get_wallet_value) {
+    if (allowCache && get_wallet_value) {
         // console.log(`Asset: ${denom} holdings ${get_wallet_value} found in redis cache -> ${REDIS_KEY}`);
         return JSON.parse(get_wallet_value);
     }
@@ -312,7 +320,12 @@ export const getExpValueCalculation = async () => {
         // get the number of it and / 1mil
         exp_supply = Number(exp_supply) / 1_000_000;
     }
-    return dao_usd_value / exp_supply;
+
+    const value = dao_usd_value / exp_supply;
+    if(value < 0) {
+        return -1;
+    }
+    return value;
 }
 
 export const getWallets = async () => {

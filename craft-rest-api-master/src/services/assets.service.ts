@@ -6,6 +6,11 @@ import { queryToken, queryTokenOwner, queryContractInfo, queryAllTokensForContra
 import { getAllCW721ContractAddresses } from './nftsync.service';
 import { queryOfferings } from './nftmarketplace.service';
 
+// TODO: Which of these are in the collections service? which do we remove?
+
+// create boolean to disable caching
+const allowCache = false;
+
 export const getDetails_Offering_TokenData_Owner = async (contract_address: string, token_id: string) => {
     // const REDIS_KEY = `cache:all_details:${contract_address}`;
     // const TTL = 30;  // 10 seconds
@@ -70,7 +75,7 @@ export const getCollectionTotalVolume = async (contract_address: string = "") =>
     // Cache'ed offerings so we don't spam contract too often. if we requests from a single user, its just at the end
     let REDIS_KEY = `cache:collection_volume:${contract_address}`;    
     let get_volume = await redisClient?.get(REDIS_KEY);
-    if (get_volume) {    
+    if (allowCache && get_volume) {    
         return JSON.parse(get_volume);
     }
 
@@ -105,7 +110,7 @@ export const getAllCollections = async () => {
     const REDIS_KEY = `cache:all_collections`;
     const TTL = 10;  // TODO: Make this like 1 day+
     let cached_collection_data = await redisClient?.get(REDIS_KEY);
-    if (cached_collection_data) { 
+    if (allowCache && cached_collection_data) { 
         return JSON.parse(cached_collection_data);
     }
 
