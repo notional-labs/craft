@@ -23,15 +23,14 @@ for file in gentx_files:
     rate = float(validatorData['commission']['rate']) * 100
     valop = validatorData['validator_address']
     exp = validatorData['value']
+    amt = int(exp["amount"])/1_000_000
 
     if exp['denom'] != 'uexp':
         invalids += f'[!] Invalid denomination for validator: {moniker} {exp["denom"]} \n'
-
-    if int(exp['amount'])/1000000 != 1.0:
-        invalids += f'[!] Invalid amount for validator: {moniker} {int(exp["amount"])/1000000}\n'
-
-    
-    output += (f"{valop} {rate}% {moniker}\n")
-    # print(f"{valop} {rate}% {moniker}")
+    elif amt > 1.0:
+        invalids += f'[!] Invalid exp amount for validator: {moniker} {amt}\n'
+    else:
+        output += (f"{valop} {rate}%\texp: {amt}, {moniker.strip()}\n")    
 
 print(output)
+print(f"{invalids}")
