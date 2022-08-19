@@ -15,8 +15,8 @@ FOLDER = "gentx" # no need to change
 CUSTOM_GENESIS_ACCOUNT_VALUES = {
     # Add some extra to notional / chandra station.
     "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh": "1000000uexp,1000000000000000ucraft #pbcups (craft-validator)",  
-    "craft1r8sd9cgfnwzyt0dm06hnajy9mkljhl6suczml5": "1000000uexp,1000000000000000ucraft #pbcups - test dedi (temp)",
-    "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0": "1000000000000000ucraft #reeces main",  
+    # "craft1r8sd9cgfnwzyt0dm06hnajy9mkljhl6suczml5": "1000000uexp,1000000000000000ucraft #pbcups - test dedi (temp)",
+    "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0": "1000000000000000ucraft,1000000000token #reeces main",  
 
     # TESTNET V4 - DAO ACCOUNT (multisig for mainnet)
     "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7": "1000000000000000ucraft #dao itself",    
@@ -99,7 +99,7 @@ def resetGenesisFile():
         genesis["app_state"]['exp']["params"]['close_pool_period'] = "6000s"
         genesis["app_state"]['exp']["params"]['vesting_period_end'] = "60s"
         genesis["app_state"]['exp']["params"]['burn_exp_period'] = "60s"
-        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "ucraft" # TODO: Is this ucraft or uexp?. I assume craft bc default = token.
+        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "token" # vuong said do token, only reece has
 
         # Maybe in the whitelist, we add some validators / accounts just to test it
 
