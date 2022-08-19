@@ -148,7 +148,7 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload
 sudo systemctl start craft.service
 sudo systemctl enable craft.service
-# journalctl -u craft.service -n 250 -f
+# journalctl -u craft.service -n 250 -f --output cat
 ```
 
 # Post-Genesis
