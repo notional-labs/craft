@@ -105,16 +105,23 @@ echo -e "     Your peer: `echo $(craftd tendermint show-node-id)@$(curl -s ifcon
 ```
 
 ## Peers, Seeds, Genesis & Service File (Post GenTX)
-* Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json`
-<!-- `https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json` -->
+<!-- * Replace the contents of your `${HOME}/.craftd/config/genesis.json` with that of `https://github.com/notional-labs/craft/raw/master/networks/craft-v4/genesis.json` -->
+```bash
+curl https://raw.githubusercontent.com/notional-labs/craft/master/networks/craft-v4/genesis.json > ${HOME}/.craftd/config/genesis.json
+```
 
-* Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
+### Find Peers & Seeds [here](https://hackmd.io/YsZv1UXeRHOsJUH-Mkrfvw)
 
-* Copy below value as minimum-gas-prices in `${HOME}/.craftd/config/app.toml
-0.02ucraft`
+<br/>
 
-* Start craftd by creating a systemd service to run the node in the background
-Copy and paste the following file into your service file. Be sure to edit as you see fit.
+<!-- * Copy below value as minimum-gas-prices in `${HOME}/.craftd/config/app.toml -->
+> Update minimum gas price for craft
+```bash
+# nano ${HOME}/.craftd/config/app.toml # minimum-gas-prices -> "0.025ucraft"
+sed -i 's/minimum-gas-prices = "0ucraft"/minimum-gas-prices = "0.025ucraft"/g' ${HOME}/.craftd/config/app.toml
+```
+
+> systemd service file, best to NOT run your node in a screen.
 ```bash
 # nano /etc/systemd/system/craft.service
 [Unit]
@@ -135,10 +142,13 @@ LimitMEMLOCK=209715200
 [Install]
 WantedBy=multi-user.target
 ```
->Reload the service files 
-```
+
+>Reload the service files & start running it
+```bash
 sudo systemctl daemon-reload
+sudo systemctl start craft.service
 sudo systemctl enable craft.service
+# journalctl -u craft.service -n 250 -f
 ```
 
 # Post-Genesis
