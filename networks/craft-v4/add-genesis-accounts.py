@@ -5,7 +5,7 @@ from pathlib import Path
 
 # cd networks/craft-v4
 
-LAUNCH_TIME = "2022-08-19T20:00:00Z" # TODO: USE THIS ONE, IS ACTUAL
+LAUNCH_TIME = "2022-08-20T01:00:00Z" # TODO: USE THIS ONE, IS ACTUAL
 # LAUNCH_TIME = "2022-08-17T21:10:00Z" # TODO: USE THIS ONE, IS ACTUAL
 CHAIN_ID = "craft-v4"
 EXP_SEND = [{"denom": "uexp","enabled": False}]
