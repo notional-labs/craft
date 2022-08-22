@@ -11,6 +11,7 @@ import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.core.types.RequestTypes;
 import com.crafteconomy.blockchain.transactions.Tx;
+import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -111,28 +112,33 @@ public class EscrowManager {
         ucraft_amount = Math.abs(ucraft_amount);
 
         // max withdraw is the redeemAmt OR total amount in their wallet, which ever is less
-        long mostTheyCanRedeemUCraft = Math.min(getUCraftBalance(uuid), ucraft_amount);
+        long mostTheyCanRedeemUCraft = Math.min(getUCraftBalance(uuid), ucraft_amount);        
+
+        final String description = "Escrow redeem via Escrow Manager (Craft Integration) for " + mostTheyCanRedeemUCraft/1_000_000 + "craft.";
+        
+
+        // TODO: This needs cleanup to only remove craft from escrow IF payment was successful.
+        // ^ if payment fails, it currently saves that to DB. Which would = double withdraw.
         removeUCraftBalance(uuid, mostTheyCanRedeemUCraft);
-        CraftBlockchainPlugin.log("Redeeming " + (mostTheyCanRedeemUCraft / 1_000_000) + "craft from in game -> wallet via deposit");
-        
-        // deposits the tokens to their actual wallet
-        final String description = "Escrow redeem via EscrowManager.java (Integration)";
-        
+        CraftBlockchainPlugin.log(description);
+
         BlockchainRequest.depositUCraftToAddress(walletManager.getAddress(uuid), description, mostTheyCanRedeemUCraft).thenAccept(status_type -> {
             Player player = Bukkit.getPlayer(uuid);
 
             String messages = "";
             if (status_type == FaucetTypes.SUCCESS) {
+                
+
                 String amt = (mostTheyCanRedeemUCraft/1_000_000) + "craft";
-                messages = "You have redeemed " + amt + " from your escrow account -> wallet.\n";
-                messages += "Your new escrow balance is: " + getCraftBalance(uuid);
+                messages = "&aYou have redeemed &f" + amt + "&a from your escrow account -> wallet.\n";
+                messages += "&f&oYour new escrow balance is: &f&n" + getCraftBalance(uuid);
             } else {
-                messages = "An error occurred while redeeming your escrow account -> wallet.\n";
-                messages += "Error: " + status_type.toString();
+                // Since the faucet already post the error now, not required here.
+                // messages = "\n\n\n\n&6Escrow Error: "+status_type.toString()+"(Ignore above messages)\n&7 - &f Your balance is still here in escrow, please try again later.\n";                                
             }
 
-            if(player != null) {
-                player.sendMessage(messages);
+            if(player != null) {                
+                Util.colorMsg(player, messages);
             }
         });
             

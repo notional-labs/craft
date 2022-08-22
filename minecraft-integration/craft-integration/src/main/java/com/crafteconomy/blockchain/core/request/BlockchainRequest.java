@@ -5,11 +5,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
@@ -21,8 +26,16 @@ import com.crafteconomy.blockchain.transactions.PendingTransactions;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.JavaUtils;
 import com.crafteconomy.blockchain.utils.Util;
+import com.crafteconomy.blockchain.wallets.WalletManager;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.json.JSONException;
 import org.json.simple.JSONObject;
 
@@ -34,6 +47,10 @@ public class BlockchainRequest {
 
     // http://65.108.125.182:1317/cosmos/bank/v1beta1
     private static final String API_ENDPOINT = blockchainPlugin.getApiEndpoint();
+
+    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"); 
+
+    private static WalletManager walletManager = WalletManager.getInstance();
 
     // Found via https://v1.cosmos.network/rpc/v0.41.4
     private static final String BALANCES_ENDPOINT = API_ENDPOINT + "cosmos/bank/v1beta1/balances/%address%/by_denom?denom=%denomination%";
@@ -51,8 +68,7 @@ public class BlockchainRequest {
             return (long) cacheAmount; 
         }
         
-        // TODO: Add uexp as well, only show if >0 OR just loop through directly:
-        // http://65.108.125.182:1317/cosmos/bank/v1beta1/balances/craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0
+        // Add uexp as well?- http://65.109.38.251:1317/cosmos/bank/v1beta1/balances/craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0
 
         String req_url = BALANCES_ENDPOINT.replace("%address%", craft_address).replace("%denomination%", denomination);
 
@@ -108,7 +124,7 @@ public class BlockchainRequest {
         OutputStream stream = null;
         String endpoint = CraftBlockchainPlugin.getInstance().getApiMakePaymentEndpoint();
         String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"description\": \""+description+"\", \"wallet\": \""+craft_address+"\", \"ucraft_amount\": \""+ucraft_amount+"\"}";
-        CraftBlockchainPlugin.log("url: "+endpoint+", depositToAddress data " + data); // TODO: Remove this from production code
+        // CraftBlockchainPlugin.log("url: "+endpoint+", depositToAddress data " + data);
         
         try {
             url = new URL(endpoint);
@@ -122,21 +138,19 @@ public class BlockchainRequest {
             stream.write(out);
 
             // get the return value of the POST request
-            // {"success":{"wallet":"craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0","ucraft_amount":1,"craft_amount":0.000001,"serverBalLeft":"9955.493893craft"}}
+            // {"success":{"craft_amount":"1","wallet":"craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0","ucraft_amount":"1000000","serverCraftBalLeft":"999999910.196505craft",
+            //      "transactionHash":"EFF47C0977F82CC6533B6CFDDF7E5D93A45D7F955210B457B3CD8DE6E33EA289","height":40486}}
             String response = JavaUtils.streamToString(http.getInputStream());
             if(response.length() == 0) {
                 System.err.println("No response from server API (length 0 string)");
                 return FaucetTypes.NO_RESPONSE;
-            }
+            }            
 
-            CraftBlockchainPlugin.log("response from API string: " + response);
-
-            JSONObject json = new JSONObject();
-            // parse response
+            JSONObject json = new JSONObject();        
             json = (JSONObject) org.json.simple.JSONValue.parse(response);
 
 
-            CraftBlockchainPlugin.log("depositToAddress code: " + http.getResponseCode() + " | response: " + json);
+            CraftBlockchainPlugin.log("API Response: " + http.getResponseCode() + " | response: " + json);
             http.disconnect();
 
             if(http.getResponseCode() != 200) {
@@ -149,6 +163,7 @@ public class BlockchainRequest {
                 return FaucetTypes.SUCCESS;
                 
             } else if (json.keySet().contains("error")) {
+                boolean doSaveToDBForRunLater = true;
                 json = (JSONObject) json.get("error");
                 String errorCode = (String) json.get("code");
                 // https://github.com/cosmos/cosmos-sdk/blob/main/types/errors/errors.go
@@ -165,27 +180,99 @@ public class BlockchainRequest {
                     }
                     case "19" -> {
                         output = "Transaction is already in the mem pool (duplicate transaction)!";
+                        doSaveToDBForRunLater = false;
                     }
                     default -> {
                         output = "No success in response from server API: " + json;
                     }
-                }
-                System.err.println(output);
+                }            
+                CraftBlockchainPlugin.log(output, Level.SEVERE);
+                if(doSaveToDBForRunLater) { saveFailedTransaction(craft_address, description, ucraft_amount, output); }
+
                 return returnType;           
             }
                 
         } catch (Exception e) {
             e.printStackTrace();
-            if(e.getMessage().startsWith("Server returned HTTP response code: 502 for URL:")) {
-                System.err.println("makePayment API is down!");
+
+            saveFailedTransaction(craft_address, description, ucraft_amount, e.getMessage());
+            if(e.getMessage().startsWith("Server returned HTTP response code: 502 for URL:")) {                
+                CraftBlockchainPlugin.log("makePayment API is down!", Level.SEVERE);
                 return FaucetTypes.API_DOWN;
-            } else {
-                CraftBlockchainPlugin.log("Some other failure!");
+            } else {                
+                CraftBlockchainPlugin.log("makePayment API is down!", Level.SEVERE);
                 return FaucetTypes.FAILURE;
             }
         }
         
         return FaucetTypes.FAILURE;
+    }
+
+    // save a failed transaction to the database to be run later. From EscrowManager.java
+    private static MongoDatabase db = CraftBlockchainPlugin.getInstance().getMongo().getDatabase();
+    private static String FAILED_TXS = "failedTxs";
+    public static void saveFailedTransaction(String craft_address, String description, long ucraft_amount, String failure_reason) {
+        CraftBlockchainPlugin.log("Saving failed transaction to database...");
+        
+        // get current time in human readable format
+        Document doc = getUsersDocument(craft_address);
+        Document failedTX = createFailedTransaction(craft_address, description, ucraft_amount, failure_reason);
+
+        if(doc == null) { // users first unpaied payment
+            // put the document into database as an array
+            ArrayList<Document> FaileTxsList = new ArrayList<Document>();
+            FaileTxsList.add(failedTX);
+
+            doc = new Document("craft_address", craft_address);
+            doc.put(FAILED_TXS, FaileTxsList);
+
+            getCollection().insertOne(doc);
+
+        } else {
+            // getCollection().updateOne(Filters.eq("_id", uuid.toString()), Updates.set("ucraft_amount", newBalance));
+            Object s = doc.get(FAILED_TXS);
+            ArrayList<Document> failedTXs = (ArrayList<Document>) s;             
+            if (failedTXs == null) {
+                failedTXs = new ArrayList<Document>();
+            }
+
+            failedTXs.add(failedTX);
+            doc.put(FAILED_TXS, failedTXs);
+            getCollection().replaceOne(Filters.eq("craft_address", craft_address), doc);
+        }
+
+        // Notify the user that their payment failed but is pending for later send.
+        Optional<UUID> uuid = walletManager.getUUIDFromWallet(craft_address);
+        if(uuid.isPresent()) {
+            // get the uuid & see if player is online
+            UUID uuidValue = uuid.get();
+            Player p = Bukkit.getPlayer(uuidValue);
+            if(p != null) {
+                Util.colorMsg(p, "&6[!] Error: Payment failed. Saved to database & will be tried again soon.");
+                Util.colorMsg(p, "&e&oReason: " + failure_reason);
+                Util.colorMsg(p, "&e&oAmount: " + ucraft_amount/1_000_000 + " craft.");
+                Util.colorMsg(p, "&6NOTE: No action is required on your part.");
+            }
+        }
+
+        CraftBlockchainPlugin.log("Saved failed transaction to database!");
+    }    
+    private static Document createFailedTransaction(String craft_address, String description, long ucraft_amount, String failure_reason) {        
+        Document doc = new Document();
+        doc.put("craft_address", craft_address);
+        doc.put("description", description);
+        doc.put("ucraft_amount", ucraft_amount);
+        doc.put("time_epoch", System.currentTimeMillis() / 1000);
+        doc.put("time_human", dtf.format(LocalDateTime.now()));
+        doc.put("failure_reason", failure_reason);
+        return doc;
+    }
+    private static Document getUsersDocument(String craft_address) {
+        Bson filter = Filters.eq("craft_address", craft_address);
+        return getCollection().find(filter).first();
+    }
+    private static MongoCollection<Document> getCollection() {
+        return db.getCollection("failedPayments");
     }
     
 

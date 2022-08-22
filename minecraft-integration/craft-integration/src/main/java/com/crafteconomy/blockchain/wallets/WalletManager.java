@@ -2,6 +2,7 @@ package com.crafteconomy.blockchain.wallets;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
@@ -113,7 +114,7 @@ public class WalletManager {
         return null;        
     }
 
-    public UUID getUUIDFromWallet(String wallet) {
+    public Optional<UUID> getUUIDFromWallet(String wallet) {
         Bson filter = Filters.eq("keplrId", wallet);
         Document doc = getCollection().find(filter).first();
 
@@ -121,10 +122,10 @@ public class WalletManager {
             Object uuid = doc.get("minecraftId");
             if(uuid != null){
                 String myUUID = (String) uuid;
-                return UUID.fromString(myUUID);
+                return Optional.of(UUID.fromString(myUUID));                
             } 
-        }
-        return UUID.fromString("00000000-0000-0000-0000-000000000000");        
+        }        
+        return Optional.empty();        
     }
 
     private MongoCollection<Document> getCollection() {

@@ -153,6 +153,11 @@ public class Util {
 			sender.sendMessage(color(message));
 		}
 	}
+	public static void colorMsg(UUID uuid, String message) {
+		Player player = Bukkit.getPlayer(uuid);
+		if(player == null) { return; }
+		colorMsg(player, message);
+	}
 
 	@SuppressWarnings("deprecation")
 	public static void coloredBroadcast(String msg) {

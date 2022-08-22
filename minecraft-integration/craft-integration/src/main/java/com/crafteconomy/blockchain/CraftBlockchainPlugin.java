@@ -259,7 +259,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         return SERVER_WALLET;
     }
 
-    public String getApiMakePaymentEndpoint() { // TODO: add to API?
+    public String getApiMakePaymentEndpoint() {
         return API_MAKE_PAYMENT_ENDPOINT;
     }
 
