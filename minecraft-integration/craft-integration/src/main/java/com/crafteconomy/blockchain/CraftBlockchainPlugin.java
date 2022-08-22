@@ -58,6 +58,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     private Double TAX_RATE;
 
     private String SERVER_WALLET = null;
+    private String API_MAKE_PAYMENT_ENDPOINT = "http://api.crafteconomy.io/v1/dao/make_payment";
 
     private BukkitTask redisPubSubTask = null;
     private Jedis jedisPubSubClient = null;
@@ -89,6 +90,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
 
         SERVER_WALLET = getConfig().getString("SERVER_WALLET_ADDRESS");
+        API_MAKE_PAYMENT_ENDPOINT = getConfig().getString("API_MAKE_PAYMENT_ENDPOINT");
 
         webappLink = getConfig().getString("SIGNING_WEBAPP_LINK");
         TX_QUERY_ENDPOINT = getConfig().getString("TX_QUERY_ENDPOINT");
@@ -255,6 +257,10 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     
     public String getServersWalletAddress() {
         return SERVER_WALLET;
+    }
+
+    public String getApiMakePaymentEndpoint() { // TODO: add to API?
+        return API_MAKE_PAYMENT_ENDPOINT;
     }
 
     public static void log(String msg, Level level) {

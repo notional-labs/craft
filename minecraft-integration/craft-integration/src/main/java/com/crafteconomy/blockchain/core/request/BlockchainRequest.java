@@ -106,11 +106,12 @@ public class BlockchainRequest {
         URL url = null;
         HttpURLConnection http = null;
         OutputStream stream = null;
-        String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"description\": \""+description+"\", \"wallet\": \""+craft_address+"\", \"ucraft_amount\": "+ucraft_amount+"}";
-        CraftBlockchainPlugin.log("depositToAddress data " + data); // TODO: Remove this from production code
+        String endpoint = CraftBlockchainPlugin.getInstance().getApiMakePaymentEndpoint();
+        String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"description\": \""+description+"\", \"wallet\": \""+craft_address+"\", \"ucraft_amount\": \""+ucraft_amount+"\"}";
+        CraftBlockchainPlugin.log("url: "+endpoint+", depositToAddress data " + data); // TODO: Remove this from production code
         
         try {
-            url = new URL("http://api.crafteconomy.io/v1/dao/make_payment");
+            url = new URL(endpoint);
             http = (HttpURLConnection)url.openConnection();
             http.setRequestMethod("POST");
             http.setDoOutput(true);

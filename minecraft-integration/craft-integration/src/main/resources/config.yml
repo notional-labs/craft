@@ -5,10 +5,11 @@ Redis:
   uri: "redis://PASSWORD@IP:6379"
 TAX_RATE: 0.05
 DAO_ESCROW_ENDPOINT_SECRET: "some.secret.here"
-REDIS_KEY_EXPIRE_TIME: 0
 DEV_MODE: false
 DEBUGGING_MSGS: false
 API_ENDPOINT: http://95.217.113.126:1317/
-SERVER_WALLET_ADDRESS: craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0
+# http://api.crafteconomy.io/v1/dao/escrow_account_info
+SERVER_WALLET_ADDRESS: craft14svh76rr38wkj9d3g5qmsxyjm7dhxk34v57ygy
+API_MAKE_PAYMENT_ENDPOINT: "http://api.crafteconomy.io/v1/dao/make_payment"
 SIGNING_WEBAPP_LINK: http://15.204.162.18:8081/
 TX_QUERY_ENDPOINT: "http://95.217.113.126:1317/cosmos/tx/v1beta1/txs/{TENDERMINT_HASH}"
