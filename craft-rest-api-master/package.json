@@ -19,7 +19,7 @@
     "@cosmjs/stargate": "^0.28.11",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
-    "discord.js": "^13.8.1",
+    "discord.js": "^14.3.0",
     "dotenv": "^16.0.1",
     "express": "^4.17.2",
     "joi": "^17.6.0",
