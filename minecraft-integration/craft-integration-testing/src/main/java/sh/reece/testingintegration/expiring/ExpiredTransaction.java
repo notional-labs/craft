@@ -1,4 +1,4 @@
-package sh.reece.testingintegration.simple;
+package sh.reece.testingintegration.expiring;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;

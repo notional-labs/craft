@@ -3,10 +3,11 @@ package sh.reece.testingintegration;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import sh.reece.testingintegration.expiring.ExpiredTransaction;
+import sh.reece.testingintegration.expiring.ManualExpire;
 import sh.reece.testingintegration.simple.Balance;
 import sh.reece.testingintegration.simple.CraftUSDPrice;
 import sh.reece.testingintegration.simple.EscrowSpendExample;
-import sh.reece.testingintegration.simple.ExpiredTransaction;
 import sh.reece.testingintegration.simple.GiveTokens;
 import sh.reece.testingintegration.simple.HowToKepler;
 import sh.reece.testingintegration.simple.MyExampleTransaction;
@@ -33,6 +34,7 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginCommand("test-escrowspend").setExecutor(new EscrowSpendExample());
         Bukkit.getPluginCommand("test-craftusd").setExecutor(new CraftUSDPrice());
         Bukkit.getPluginCommand("test-expire").setExecutor(new ExpiredTransaction());
+        Bukkit.getPluginCommand("test-manual-expire").setExecutor(new ManualExpire());
     }
 
 
