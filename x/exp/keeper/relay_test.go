@@ -7,6 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
+	"github.com/notional-labs/craft/x/exp/types"
 	oracletypes "github.com/notional-labs/craft/x/oracle"
 )
 
@@ -80,36 +81,60 @@ func (suite *KeeperTestSuite) TestOnOracleRequestTimeoutPacket() {
 
 func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 
-	type resultData struct {
-		ExpPrice       string `obi:"exp_price"`
-		AddressRequest string `obi:"address_request"`
-		RequestType    string `obi:"request_type"`
-		Status         string `obi:"status"`
-	}
+	// type resultData struct {
+	// 	ExpPrice       string `obi:"exp_price"`
+	// 	AddressRequest string `obi:"address_request"`
+	// 	RequestType    string `obi:"request_type"`
+	// 	Status         string `obi:"status"`
+	// }
 
-	addressRequest := genTestBech32List(1)
+	addr := genTestBech32List(1)
+	addressRequest, _ := sdk.AccAddressFromBech32(addr[0])
 	strExpPrice := sdk.NewDec(1).String()
-	oracleID := suite.querier.GetNextOracleID()
+	oracleID := suite.querier.GetNextOracleID(suite.Ctx)
 
 	for _, tc := range []struct {
 		desc string
-		fn func()
+		fn   func()
 		err  error
-	} {
+	}{
 		{
 			desc: "Success",
 			fn: func() {
+				// Create mint request
 				mintRequest := types.MintRequest{
-					Account:        sdk.AccAddressFromBech32(addressRequest),
-					DaoTokenLeft:   sdk.NewDec(0),
+					Account:        addr[0],
+					DaoTokenLeft:   sdk.NewDec(1000000),
 					DaoTokenMinted: sdk.NewDec(0),
 					Status:         types.StatusOnGoingRequest,
 					RequestTime:    suite.Ctx.BlockHeader().Time,
 				}
-
 				suite.querier.SetMintRequest(suite.Ctx, mintRequest)
+
+				// Create oracle request
+				clientID := oracleID
+				coin := sdk.NewCoin("token", sdk.NewInt(1000000))
+				oracleRequest := types.OracleRequest{
+					OracleId:        clientID,
+					Type:            "mint",
+					AddressRequest:  addressRequest.String(),
+					AmountInRequest: coin,
+				}
+				suite.querier.SetNextOracleRequest(suite.Ctx, oracleRequest)
+
 			},
 			err: nil,
 		},
+	} {
+		tc := tc
+		suite.Run(tc.desc, func() {
+			suite.SetupTest()
+			suite.FundAcc(addressRequest, defaultAcctFunds)
+			tc.fn()
+
+			err := suite.querier.ProccessRecvPacketMintRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
+			suite.Require().NoError(err)
+		})
+
 	}
 }
