@@ -69,7 +69,12 @@ String webappAddr = api.getWebAppAddress()
 CompletableFuture<Float> usd_price = api.getCraftUSDPrice();
 
 // Gets a decimal tax rate. This is automatically added to Txs after generation
-Double rate = api.getTaxRate()
+Double rate = api.getTaxRate();
+
+// manually removes a transaction from the server & redis AND runs the logic which
+// expires a transaction (if set). This is useful to revert a change without waiting
+// the full time for the Tx to expire (such as wagering in minigame lobby)
+boolean wasSuccessful = api.expireTransaction(txinfo.getTxID());
 ```
 
 # Escrow
@@ -239,5 +244,3 @@ event.getTxID(); // with this, you could get the pending Tx from PendingTransact
 public void onSignedTransactionEvent(SignedTransactionEvent event)
 event.getTxID();
 ```
-
-should
