@@ -12,6 +12,7 @@ import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.escrow.EscrowErrors;
 import com.crafteconomy.blockchain.escrow.EscrowManager;
+import com.crafteconomy.blockchain.transactions.PendingTransactions;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
@@ -146,6 +147,24 @@ public class IntegrationAPI {
         return blockchainPlugin.getTaxRate();
     }
 
+    
+    /**
+     * Expires a transaction & runs that logic if the plugin wants to do this earlier than intended.
+     * Ex: useful for minigames if the user does not sign before the game starts, expire the transaction
+     * @param transaction_uuid
+     * @return true if it was expired, false if the key was not found
+     */
+    public boolean expireTransaction(UUID transaction_uuid) {
+        // clear the key from the redis cache & 
+        Tx tx = PendingTransactions.getInstance().getTxFromID(transaction_uuid);
+        if(tx == null) {
+            CraftBlockchainPlugin.log("[API, expireTransaction] TxID " + transaction_uuid + " is not in pending transactions on this server. Cannot expire it.");
+            return false;
+        }
+
+        // expire the redis cache key from redismanager
+        return PendingTransactions.getInstance().expireTransaction(transaction_uuid);
+    }
 
     /**
      * Send Tokens to another player/wallet. Blockchain integration will run the callback
