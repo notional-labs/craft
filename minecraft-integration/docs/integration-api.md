@@ -2,7 +2,7 @@
 
 # Overview
 
-The Integration plugin creates a simple solution for generating blockchain transactions to be signed. The API & Tx builder gives just enough to create minecraft functions without having to deal with all the backed understanding of a cosmos & signing.
+The Integration plugin creates a simple solution for generating blockchain transactions to be signed. The API & Tx builder gives just enough to create Minecraft functions without having to deal with all the backed understanding of a cosmos & signing.
 
 You can read a rough overview [HERE](https://github.com/notional-labs/craft/blob/master/minecraft-integration/docs/security.md) which includes the backend, security mitigation techniques, and infrastructure.
 
@@ -19,7 +19,7 @@ You can read a rough overview [HERE](https://github.com/notional-labs/craft/blob
 <dependency>
     <groupId>com.crafteconomy</groupId>
     <artifactId>craft-integration</artifactId>
-    <version>4.3.0</version>
+    <version>4.4.1</version>
     <scope>provided</scope>
 </dependency>
 ```
