@@ -7,6 +7,7 @@ import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -14,15 +15,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-// TODO: Remove when live
-
 public class WalletFaucet implements SubCommand {
 
     WalletManager walletManager = WalletManager.getInstance();
     int requiredWalletLength = CraftBlockchainPlugin.getInstance().getWalletLength();
 
     @Override
-    public void onCommand(CommandSender sender, String[] args) {
+    public void onCommand(CommandSender sender, String[] args) {        
+        if (!(sender instanceof ConsoleCommandSender)) {
+            sender.sendMessage(Util.color("&cYou must be a console to run this command."));
+            return;
+        }
 
         String wallet = null;
         long craftAmount = 0;
@@ -71,11 +74,11 @@ public class WalletFaucet implements SubCommand {
         BlockchainRequest.depositCraftToAddress(wallet, description, craftAmount).thenAccept(faucet_status -> {
             // This runs in the Forked thread, not main (non blocking)
             // CraftBlockchainPlugin.log("The future from WalletFaucet returned " + status);
-            UUID userID = walletManager.getUUIDFromWallet(finalWallet);
-            Player receiver = null; // TODO: How can I improve this?
-            if(userID != UUID.fromString("00000000-0000-0000-0000-000000000000")) {
-                receiver = Bukkit.getPlayer(userID);
-            }       
+            Optional<UUID> userID = walletManager.getUUIDFromWallet(finalWallet);
+            Player receiver = null; 
+            if(userID.isPresent()) {
+                receiver = Bukkit.getPlayer(userID.get());
+            }
 
             if(faucet_status == FaucetTypes.SUCCESS) {
                 if(sender instanceof ConsoleCommandSender) {
@@ -83,7 +86,7 @@ public class WalletFaucet implements SubCommand {
                 }
                 
                 if(receiver != null && receiver.isOnline()) {
-                    Util.colorMsg(receiver, "&aIncoming Payment! &fYou received +" + finalAmount + "ucraft to your wallet: &a" + reducedWallet);
+                    Util.colorMsg(receiver, "&aIncoming Payment! &fYou received +" + finalAmount + "craft to your wallet: &a" + reducedWallet);
                 }                
             } else {
                 Util.colorMsg(sender, "&c&o[!] ERROR: payment request failed for " + reducedWallet + ". Error: " + faucet_status);

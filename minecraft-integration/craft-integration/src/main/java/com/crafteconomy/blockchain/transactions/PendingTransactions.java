@@ -39,6 +39,30 @@ public class PendingTransactions {
         return pending.keySet();
     }
 
+    public boolean expireTransaction(UUID txID) {
+        if(getKeys().contains(txID)) {            
+            try (Jedis jedis = RedisManager.getInstance().getRedisConnection()) {
+            
+                // deletes redis keys which are in pending keys since we do not save to DB
+                String key = "tx_*_"+ txID.toString();
+                // String value = jedis.get(key);
+
+                jedis.keys(key).forEach(k -> {
+                    // jedis.unlink(k); // deletes the key
+                    jedis.setex(k, 1, "expired");
+                    CraftBlockchainPlugin.log("[PendingTxs.java] Expired " + key + " from redis");
+                });  
+
+                // removePending(txID);
+                return true;
+
+            } catch (Exception e) {
+                CraftBlockchainPlugin.log("[PendingTxs.java] Failed to clear transactions. Make sure pool is open");
+            }                        
+        }
+        return false;
+    }
+
     public static void clearUncompletedTransactionsFromRedis() {
         try (Jedis jedis = RedisManager.getInstance().getRedisConnection()) {
             

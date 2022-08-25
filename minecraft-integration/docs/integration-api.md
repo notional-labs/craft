@@ -2,7 +2,7 @@
 
 # Overview
 
-The Integration plugin creates a simple solution for generating blockchain transactions to be signed. The API & Tx builder gives just enough to create minecraft functions without having to deal with all the backed understanding of a cosmos & signing.
+The Integration plugin creates a simple solution for generating blockchain transactions to be signed. The API & Tx builder gives just enough to create Minecraft functions without having to deal with all the backed understanding of a cosmos & signing.
 
 You can read a rough overview [HERE](https://github.com/notional-labs/craft/blob/master/minecraft-integration/docs/security.md) which includes the backend, security mitigation techniques, and infrastructure.
 
@@ -19,7 +19,7 @@ You can read a rough overview [HERE](https://github.com/notional-labs/craft/blob
 <dependency>
     <groupId>com.crafteconomy</groupId>
     <artifactId>craft-integration</artifactId>
-    <version>4.3.0</version>
+    <version>4.4.1</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -69,7 +69,12 @@ String webappAddr = api.getWebAppAddress()
 CompletableFuture<Float> usd_price = api.getCraftUSDPrice();
 
 // Gets a decimal tax rate. This is automatically added to Txs after generation
-Double rate = api.getTaxRate()
+Double rate = api.getTaxRate();
+
+// manually removes a transaction from the server & redis AND runs the logic which
+// expires a transaction (if set). This is useful to revert a change without waiting
+// the full time for the Tx to expire (such as wagering in minigame lobby)
+boolean wasSuccessful = api.expireTransaction(txinfo.getTxID());
 ```
 
 # Escrow
@@ -239,5 +244,3 @@ event.getTxID(); // with this, you could get the pending Tx from PendingTransact
 public void onSignedTransactionEvent(SignedTransactionEvent event)
 event.getTxID();
 ```
-
-should

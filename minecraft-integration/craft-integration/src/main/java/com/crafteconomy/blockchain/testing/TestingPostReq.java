@@ -30,7 +30,7 @@ public class TestingPostReq {
         HttpURLConnection http = null;
         OutputStream stream = null;
         String data = "{\"secret\": \""+ENDPOINT_SECRET+"\", \"description\": \""+description+"\", \"wallet\": \""+craft_address+"\", \"ucraft_amount\": "+ucraft_amount+"}";
-        CraftBlockchainPlugin.log("depositToAddress data " + data); // TODO: Remove this from production code
+        // CraftBlockchainPlugin.log("depositToAddress data " + data);
         
         try {
             url = new URL("http://api.crafteconomy.io/v1/dao/make_payment");

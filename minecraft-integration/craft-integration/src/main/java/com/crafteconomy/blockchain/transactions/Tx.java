@@ -124,8 +124,7 @@ public class Tx implements Serializable {
             this.getFunction().accept(this.fromUUID);
         }
     }
-
-    // TODO Does this mess with the @getter and setter stuff? or override
+    
     public Tx setTxType(TransactionType txType) {
         // sets the type of transaction for the webapp to better sort each ID.
         // (optional)

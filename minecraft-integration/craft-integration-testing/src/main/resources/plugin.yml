@@ -45,3 +45,7 @@ commands:
   test-expire:
     description: expires a tx & then runs the logic for it after 1 min
     usage: /<command>  
+
+  test-manual-expire:
+    description: manually expire a transaction for testing
+    usage: /<command>  
