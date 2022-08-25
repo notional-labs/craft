@@ -91,7 +91,7 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 	addr := genTestBech32List(1)
 	addressRequest, _ := sdk.AccAddressFromBech32(addr[0])
 	strExpPrice := sdk.NewDec(1).String()
-	oracleID := suite.querier.GetNextOracleID(suite.Ctx)
+	oracleID := suite.App.ExpKeeper.GetNextOracleID(suite.Ctx)
 
 	for _, tc := range []struct {
 		desc string
@@ -109,7 +109,7 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 					Status:         types.StatusOnGoingRequest,
 					RequestTime:    suite.Ctx.BlockHeader().Time,
 				}
-				suite.querier.SetMintRequest(suite.Ctx, mintRequest)
+				suite.App.ExpKeeper.SetMintRequest(suite.Ctx, mintRequest)
 
 				// Create oracle request
 				clientID := oracleID
@@ -120,7 +120,7 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 					AddressRequest:  addressRequest.String(),
 					AmountInRequest: coin,
 				}
-				suite.querier.SetNextOracleRequest(suite.Ctx, oracleRequest)
+				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
 
 			},
 			err: nil,
@@ -132,7 +132,7 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 			suite.FundAcc(addressRequest, defaultAcctFunds)
 			tc.fn()
 
-			err := suite.querier.ProccessRecvPacketMintRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
+			err := suite.App.ExpKeeper.ProccessRecvPacketMintRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
 			suite.Require().NoError(err)
 		})
 
