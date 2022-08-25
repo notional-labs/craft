@@ -59,7 +59,7 @@ func (k ExpKeeper) ProccessRecvPacketBurnRequest(ctx sdk.Context, addressRequest
 	}
 
 	// set price to state
-	price, err := sdk.NewDecFromStr(strExpPrice)
+	price, err := sdk.NewDecFromStr(strings.TrimSpace(strExpPrice))
 	if err != nil {
 		return err
 	}

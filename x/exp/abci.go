@@ -39,10 +39,6 @@ func BurnRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 			continue
 		}
 
-		fmt.Println("=====================")
-		fmt.Println(burnRequest)
-		fmt.Println("=====================")
-
 		err := keeper.SendBurnOracleRequest(ctx, burnRequest)
 		if err != nil {
 			return err
