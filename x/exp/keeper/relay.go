@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -30,6 +31,10 @@ func (k ExpKeeper) ProccessRecvPacketMintRequest(ctx sdk.Context, addressRequest
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("====================================")
+	fmt.Println(price)
+	fmt.Println("====================================")
 
 	k.setDaoTokenPrice(ctx, price)
 
