@@ -34,7 +34,7 @@ func BurnRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 		if keeper.ValidateBurnRequestByTime(ctx, burnRequest) {
 			continue
 		}
-		err := keeper.ExecuteBurnExp(ctx, burnRequest)
+		err := keeper.SendBurnOracleRequest(ctx, burnRequest)
 		if err != nil {
 			return err
 		}
