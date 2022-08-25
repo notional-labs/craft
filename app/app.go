@@ -37,8 +37,8 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
-	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
-	ibc "github.com/cosmos/ibc-go/v5/modules/core"
+	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
+	ibc "github.com/cosmos/ibc-go/v4/modules/core"
 
 	// Authz.
 
@@ -97,7 +97,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 
 	// IBC: These modules enable the base level features of IBC, like clients, connections and channels.
 

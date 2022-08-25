@@ -24,7 +24,7 @@ import (
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	ibcclient "github.com/cosmos/ibc-go/v5/modules/core/02-client"
+	ibcclient "github.com/cosmos/ibc-go/v4/modules/core/02-client"
 
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta2 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
@@ -44,10 +44,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ibcclienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
-	porttypes "github.com/cosmos/ibc-go/v5/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/v5/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
+	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 
 	// Exp module.
 	"github.com/notional-labs/craft/x/exp"
@@ -55,9 +55,9 @@ import (
 	exptypes "github.com/notional-labs/craft/x/exp/types"
 
 	// IBC transfer module: Enables IBC transfer of coins between accounts using the transfer port on an IBC channel.
-	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v5/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
+	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v4/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 )
 
 type AppKeepers struct {
