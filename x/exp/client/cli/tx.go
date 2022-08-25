@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	clienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
-	channelutils "github.com/cosmos/ibc-go/v4/modules/core/04-channel/client/utils"
+	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
+	channelutils "github.com/cosmos/ibc-go/v5/modules/core/04-channel/client/utils"
 	"github.com/notional-labs/craft/x/exp/types"
 )
 
@@ -135,7 +135,7 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 			// if the timeouts are not absolute, retrieve latest block height and block timestamp
 			// for the consensus state connected to the destination port/channel
 			if !absoluteTimeouts {
-				_, height, _, err := channelutils.QueryLatestConsensusState(clientCtx, srcPort, srcChannel)
+				consensusState, height, _, err := channelutils.QueryLatestConsensusState(clientCtx, srcPort, srcChannel)
 				if err != nil {
 					return err
 				}
@@ -146,19 +146,22 @@ func NewSpendIbcAssetForExpCmd() *cobra.Command {
 					timeoutHeight = absoluteHeight
 				}
 
-				// Original: https://github.com/notional-labs/craft/commit/d631b248d044cbe64f637a41519e0500c884110b
-				// can't be <0 bc unsigned int
-				if timeoutTimestamp == 0 {
-					return errors.New("local clock time is not greater than Jan 1st, 1970 12:00 AM")
-				}
-
-				now := uint64(time.Now().UnixNano())
-				// consensusStateTimestamp := consensusState.GetTimestamp()
-
-				// if the timeout is less than current time, then error.
-				// though, is timeoutTimestamp in nano or normal seconds? if so we need to multiply
-				if timeoutTimestamp < now {
-					return errors.New("timeoutTimestamp is not greater than current local clock time")
+				if timeoutTimestamp != 0 {
+					// use local clock time as reference time if it is later than the
+					// consensus state timestamp of the counter party chain, otherwise
+					// still use consensus state timestamp as reference
+					now := time.Now().UnixNano()
+					consensusStateTimestamp := consensusState.GetTimestamp()
+					if now > 0 {
+						now := uint64(now)
+						if now > consensusStateTimestamp {
+							timeoutTimestamp = now + timeoutTimestamp
+						} else {
+							timeoutTimestamp = consensusStateTimestamp + timeoutTimestamp
+						}
+					} else {
+						return errors.New("local clock time is not greater than Jan 1st, 1970 12:00 AM")
+					}
 				}
 			}
 			msg := types.NewMsgSpendIbcAssetToExp(clientCtx.GetFromAddress().String(), coins, timeoutHeight, timeoutTimestamp)
