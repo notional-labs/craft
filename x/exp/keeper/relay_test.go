@@ -7,6 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/notional-labs/craft/x/exp/keeper"
 	"github.com/notional-labs/craft/x/exp/types"
 	oracletypes "github.com/notional-labs/craft/x/oracle"
 )
@@ -88,15 +90,15 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 	// 	Status         string `obi:"status"`
 	// }
 
-	addr := genTestBech32List(1)
+	addr := genTestBech32List(2)
 	addressRequest, _ := sdk.AccAddressFromBech32(addr[0])
 	strExpPrice := sdk.NewDec(1).String()
 	oracleID := suite.App.ExpKeeper.GetNextOracleID(suite.Ctx)
 
 	for _, tc := range []struct {
-		desc string
-		fn   func()
-		err  error
+		desc      string
+		fn        func()
+		shouldErr bool
 	}{
 		{
 			desc: "Success",
@@ -123,7 +125,85 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
 
 			},
-			err: nil,
+			shouldErr: false,
+		},
+		{
+			desc: "Invalid Address",
+			fn: func() {
+				// Create mint request
+				mintRequest := types.MintRequest{
+					Account:        addr[1],
+					DaoTokenLeft:   sdk.NewDec(1000000),
+					DaoTokenMinted: sdk.NewDec(0),
+					Status:         types.StatusOnGoingRequest,
+					RequestTime:    suite.Ctx.BlockHeader().Time,
+				}
+				suite.App.ExpKeeper.SetMintRequest(suite.Ctx, mintRequest)
+
+				// Create oracle request
+				clientID := oracleID
+				coin := sdk.NewCoin("token", sdk.NewInt(1000000))
+				oracleRequest := types.OracleRequest{
+					OracleId:        clientID,
+					Type:            "mint",
+					AddressRequest:  addressRequest.String(),
+					AmountInRequest: coin,
+				}
+				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
+			},
+			shouldErr: true,
+		},
+		{
+			desc: "Token Amount Not Enough",
+			fn: func() {
+				// Create mint request
+				mintRequest := types.MintRequest{
+					Account:        addr[1],
+					DaoTokenLeft:   sdk.NewDec(100000000),
+					DaoTokenMinted: sdk.NewDec(0),
+					Status:         types.StatusOnGoingRequest,
+					RequestTime:    suite.Ctx.BlockHeader().Time,
+				}
+				suite.App.ExpKeeper.SetMintRequest(suite.Ctx, mintRequest)
+
+				// Create oracle request
+				clientID := oracleID
+				coin := sdk.NewCoin("token", sdk.NewInt(1000000))
+				oracleRequest := types.OracleRequest{
+					OracleId:        clientID,
+					Type:            "mint",
+					AddressRequest:  addressRequest.String(),
+					AmountInRequest: coin,
+				}
+				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
+			},
+			shouldErr: true,
+		},
+		{
+			desc: "Ibc Assets Denom",
+			fn: func() {
+				// Create mint request
+				mintRequest := types.MintRequest{
+					Account:        addr[1],
+					DaoTokenLeft:   sdk.NewDec(1000000),
+					DaoTokenMinted: sdk.NewDec(0),
+					Status:         types.StatusOnGoingRequest,
+					RequestTime:    suite.Ctx.BlockHeader().Time,
+				}
+				suite.App.ExpKeeper.SetMintRequest(suite.Ctx, mintRequest)
+
+				// Create oracle request
+				clientID := oracleID
+				coin := sdk.NewCoin("ibc", sdk.NewInt(1000000))
+				oracleRequest := types.OracleRequest{
+					OracleId:        clientID,
+					Type:            "mint",
+					AddressRequest:  addressRequest.String(),
+					AmountInRequest: coin,
+				}
+				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
+			},
+			shouldErr: true,
 		},
 	} {
 		tc := tc
@@ -131,9 +211,77 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 			suite.SetupTest()
 			suite.FundAcc(addressRequest, defaultAcctFunds)
 			tc.fn()
+			if tc.shouldErr {
+				err := suite.App.ExpKeeper.ProccessRecvPacketMintRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
+				suite.Require().Error(err)
+			} else {
+				err := suite.App.ExpKeeper.ProccessRecvPacketMintRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
+				suite.Require().NoError(err)
+			}
+		})
 
-			err := suite.App.ExpKeeper.ProccessRecvPacketMintRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
+	}
+}
+
+func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
+
+	addr := genTestBech32List(2)
+	addressRequest, _ := sdk.AccAddressFromBech32(addr[0])
+	strExpPrice := sdk.NewDec(1).String()
+	oracleID := suite.App.ExpKeeper.GetNextOracleID(suite.Ctx)
+
+	for _, tc := range []struct {
+		desc      string
+		fn        func()
+		shouldErr bool
+	}{
+		{
+			desc: "Success",
+			fn: func() {
+				oracleRequest := types.OracleRequest{
+					OracleId:        oracleID,
+					Type:            "burn",
+					AddressRequest:  addressRequest.String(),
+					AmountInRequest: sdk.NewCoin("uexp", sdk.NewInt(1000000)),
+				}
+				suite.App.ExpKeeper.SetBurnRequestOracle(suite.Ctx, oracleRequest)
+				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
+
+			},
+			shouldErr: false,
+		},
+	} {
+		tc := tc
+		suite.Run(tc.desc, func() {
+			suite.SetupTest()
+			tc.fn()
+
+			msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
+
+			req := types.MsgJoinDaoByNonIbcAsset{
+				JoinAddress: addressRequest.String(),
+				GovAddress:  suite.App.AccountKeeper.GetModuleAccount(suite.Ctx, govtypes.ModuleName).GetAddress().String(),
+				MaxToken:    1000000,
+			}
+			_, err := msgServer.JoinDaoByNonIbcAsset(sdk.WrapSDKContext(suite.Ctx), &req)
 			suite.Require().NoError(err)
+
+			// Mint before burn
+			msgServerMint := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
+			mintReq := types.MsgMintAndAllocateExp{
+				Amount:      sdk.NewCoins(sdk.NewCoin("uexp", sdk.NewInt(1000000))),
+				FromAddress: daoAddress,
+				Member:      addressRequest.String(),
+			}
+			_, err = msgServerMint.MintAndAllocateExp(sdk.WrapSDKContext(suite.Ctx), &mintReq)
+			suite.Require().NoError(err)
+
+			if tc.shouldErr {
+				suite.Require().True(true)
+			} else {
+				err := suite.App.ExpKeeper.ProccessRecvPacketBurnRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
+				suite.Require().NoError(err)
+			}
 		})
 
 	}
