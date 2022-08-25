@@ -217,7 +217,7 @@ func (k ExpKeeper) requestBurnCoinFromAddress(ctx sdk.Context, memberAccount sdk
 	if err != nil {
 		return err
 	}
-	timeCheck := ar.GetJoinDaoTime().Add(k.GetClosePoolPeriod(ctx))
+	timeCheck := ar.GetJoinDaoTime().Add(k.GetVestingPeriodEnd(ctx))
 
 	if ctx.BlockTime().Before(timeCheck) {
 		return sdkerrors.Wrap(types.ErrTimeOut, fmt.Sprintf("exp in vesting time, cannot burn, UNLOCK TIME %s", timeCheck))

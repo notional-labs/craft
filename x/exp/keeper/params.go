@@ -33,7 +33,7 @@ func (k ExpKeeper) GetBurnExpPeriod(ctx sdk.Context) (duration time.Duration) {
 
 // GetMintExpPeriod get's the BurnExpPeriod from the paramSpace .
 func (k ExpKeeper) GetMintExpPeriod(ctx sdk.Context) (duration time.Duration) {
-	k.paramSpace.Get(ctx, types.ParamStoreKeyClosePoolPeriod, &duration)
+	k.paramSpace.Get(ctx, types.ParamStoreKeyBurnPeriod, &duration)
 	return duration
 }
 
