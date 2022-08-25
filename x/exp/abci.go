@@ -1,6 +1,7 @@
 package exp
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
@@ -29,11 +30,19 @@ func BurnRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 	if len(burnList) == 0 {
 		return nil
 	}
+	fmt.Println("=====================")
+	fmt.Println(burnList)
+	fmt.Println("=====================")
 
 	for _, burnRequest := range burnList {
 		if keeper.ValidateBurnRequestByTime(ctx, burnRequest) {
 			continue
 		}
+
+		fmt.Println("=====================")
+		fmt.Println(burnRequest)
+		fmt.Println("=====================")
+
 		err := keeper.SendBurnOracleRequest(ctx, burnRequest)
 		if err != nil {
 			return err
@@ -49,7 +58,6 @@ func MintRequestListEndBlocker(ctx sdk.Context, keeper keeper.ExpKeeper) error {
 	if len(mintListOnGoing) == 0 {
 		return nil
 	}
-
 	for _, mintRequst := range mintListOnGoing {
 		if keeper.ValidateMintRequestByTime(ctx, mintRequst) {
 			continue
