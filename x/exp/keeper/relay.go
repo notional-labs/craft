@@ -86,7 +86,12 @@ func (k ExpKeeper) ExecuteMintExpByIbcToken(ctx sdk.Context, mintRequest types.M
 	if expWillGet.GTE(mintRequest.DaoTokenLeft) {
 		coinSpend := sdk.NewCoin(k.GetIbcDenom(ctx), mintRequest.DaoTokenLeft.TruncateInt())
 
-		err := k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), sdk.AccAddress(mintRequest.Account))
+		accAddress, err := sdk.AccAddressFromBech32(mintRequest.Account)
+		if err != nil {
+			return err
+		}
+
+		err = k.FundPoolForExp(ctx, sdk.NewCoins(coinSpend), accAddress)
 		if err != nil {
 			return err
 		}
