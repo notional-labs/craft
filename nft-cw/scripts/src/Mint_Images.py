@@ -6,7 +6,7 @@ import json
 from dotenv import load_dotenv
 load_dotenv()
 
-START_INDEX = 1
+START_INDEX = 20
 CRAFT_ADMIN_WALLET = os.getenv("CRAFT_ADMIN_WALLET") 
 ADDR_TEST721 = os.getenv("ADDR_TEST721")
 ADDRM = os.getenv('ADDRM')
@@ -15,7 +15,8 @@ links = [
     # random link(s)
     "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ",
     "https://ipfs.io/ipfs/QmNLjZSFV3GUMcusj8keEqVtToEE3ceTSguNom7e4S6pbJ",
-    "https://ipfs.io/ipfs/QmNLijobERK4VhSDZdKjt5SrezdRM6k813qcSHd68f3Mqg"
+    "https://ipfs.io/ipfs/QmNLijobERK4VhSDZdKjt5SrezdRM6k813qcSHd68f3Mqg",    
+    "https://i.imgur.com/sqmreSn.png",
 ]
 
 # A normal contract for images
@@ -30,6 +31,7 @@ def main():
 
 
 def part1_mintToAdminAccount():
+    output = ""
     for idx, link in enumerate(links, START_INDEX):
         # we do not base64 encode this since we want it to be a standard base CW721 contract
         # we convert it to our offering in the API so as to not break CW721 standard
@@ -37,14 +39,20 @@ def part1_mintToAdminAccount():
             .replace("{IDX}", str(idx)) \
             .replace("{ADMIN_WALLET}", CRAFT_ADMIN_WALLET) \
             .replace("{LINK}", link)
-        mintCmd = f'''craftd tx wasm execute {ADDR_TEST721} '{mintJSON}' --from $KEY --output json -y'''
-        print(mintCmd)
+        output += f'''craftd tx wasm execute {ADDR_TEST721} '{mintJSON}' --from $KEY --output json -y\n'''
+        # print(mintCmd)
+
+    # save output to file
+    os.makedirs("images", exist_ok=True)
+    with open("images/mint_images.txt", "w") as f:
+        f.write(output)
 
 def part2_sendToMarketplace():
     # move to marketplace contract
     from base64 import b64encode
-    listPrice = '{"list_price":"{AMT}"}'.replace("{AMT}", str(69))
+    listPrice = '{"list_price":"{AMT}"}'.replace("{AMT}", str(5_000_000))
 
+    output = ""
     for idx, link in enumerate(links, START_INDEX):
         SEND_NFT_JSON = '''{"send_nft":{"contract":"{ADDRM}","token_id":"{ID}","msg":"{LIST_PRICE}"}}''' \
             .replace("{ADDRM}", ADDRM) \
@@ -52,8 +60,13 @@ def part2_sendToMarketplace():
             .replace("{LIST_PRICE}", b64encode(listPrice.encode('utf-8')).decode('utf-8'))
         # print(SEND_NFT_JSON)
 
-        cmd = f"""craftd tx wasm execute {ADDR_TEST721} '{SEND_NFT_JSON}' --gas-prices="0.025ucraft" -y --from $KEY"""
-        print(cmd)
+        output += f"""craftd tx wasm execute {ADDR_TEST721} '{SEND_NFT_JSON}' --gas-prices="0.025ucraft" -y --from $KEY\n"""
+        # print(cmd)
+
+    # save output to file
+    os.makedirs("images", exist_ok=True)
+    with open("images/to_marketplace.txt", "w") as f:
+        f.write(output)
 
 if __name__ == "__main__":
     main()

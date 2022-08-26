@@ -32,10 +32,10 @@ cd $(basedir "$0")
 TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
 CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
 # NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re1","symbol": "ctest","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-realestate" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
-NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re1","symbol": "ctest","minter": "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh"}' --label "craft-realestate" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
+NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re2","symbol": "ctest","minter": "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh"}' --label "craft-realestate" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
 sleep 3
 ADDR721=$(craftd query tx $NFT721_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "ADDR 721: $ADDR721"
-# export ADDR721=craft14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scrtpgm
+# export ADDR721=craft1ltd0maxmte3xf4zshta9j5djrq9cl692ctsp9u5q0p9wss0f5lmsh738wk
 
 # ADDR_test721 (testing images)
 TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
@@ -165,7 +165,7 @@ craftd tx wasm execute $ADDRM '{"update_listing_price":{"offering_id":"1","new_p
 
 # update params as the DAO
 # update_fee_receiver_address, update_platform_fee, force_withdraw_all
-craftd query wasm contract-state smart $ADDRM '{"get_contract_info": {}}'
+craftd query wasm contract-state smart $ADDRM '{"get_contract_info": {}}' # 'dao' key for testnet
 
 craftd tx wasm execute $ADDRM '{"update_platform_fee":{"new_fee":"0"}}' --gas-prices="0.025ucraft" -y --from $KEY
 craftd tx wasm execute $ADDRM '{"force_withdraw_all":{}}' --gas-prices="0.025ucraft" -y --from $KEY

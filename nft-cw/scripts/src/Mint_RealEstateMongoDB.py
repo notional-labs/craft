@@ -3,22 +3,24 @@ Reece Williams | June 27, 2022.
 Use this NFT script to generate CRAFT real estate NFTs for the 721/marketplace.
 Commands are from commands.md. & list prices are based on the floor volume & type of property.
 
-[!] This script REQUIRES that you already have the 20, 721, and marketplace NFTs instantiated on chain
+[!] This script REQUIRES that you already have the 721 and marketplace NFTs instantiated on chain
 [!] This requires that you set the values of chain, keys, node, etc via commands.md top export commands
 '''
 
 # ---- Configuration --------------------------------------------------------------------------------------------------
-# START_IDX = 1 # put at 1 for mainnet mint
+START_IDX = 1 # put at 1 for mainnet mint
 
 MINT_PRICES = { # price per sqBlock (floor volume) IN UCRAFT (1mill ucraft = 1 craft.)
     # src/main/java/com/crafteconomy/realestate/property/PropertyType.java
     "GOVERNMENT": -1, # not for sale
-    "RESIDENTIAL": 1_000_000,
-    "BUSINESS": 3_000_000, # (500 floorArea * 3 = 1500craft list price on marketplace)
+    "RESIDENTIAL": 2_000_000,
+    "BUSINESS": 5_000_000, # (500 floorArea * 5 = 2500craft list price on marketplace)
 }
 
 mintCommands = {}
 removeKeys = ["state", "restrictions", "restrictionTemplate", "rentingPlayer", "lastPayment", "lastFailedPayment", "price", "ownerId", "region", "rentalPeriod"]
+
+NON_GOV_PROPERTY_NAMES_CHECK = ["apartment", "home", "house"] # if these are type GOVERNMENT, then we need to error out so that can be regenerated.
 
 DENOM = "ucraft"
 
@@ -37,11 +39,9 @@ from Util import Contract_Tx
 
 
 
-# --- User Defined Variables -------------------------------------------------------------------------------------------
-CRAFTD_REST = "http://65.108.125.182:1317"
-
-# Hardcoded once you Contract_Initialize
+# --- Initialization ---------------------------------------------------------------------------------------------------
 load_dotenv()
+CRAFTD_REST = os.getenv("CRAFTD_REST", "https://craft-rest.crafteconomy.io")
 ADDR721=os.getenv("ADDR721_REALESTATE")
 ADDRM=os.getenv("ADDRM")
 
@@ -49,9 +49,6 @@ if ADDR721 == None:
     print("Please set the ADDR721 variable in the script.")
     exit()
 
-
-# --- Initialization ---------------------------------------------------------------------------------------------------
-load_dotenv()
 uri = os.getenv("CRAFT_MONGO_DB")
 admin_wallet = os.getenv("CRAFT_ADMIN_WALLET")
 
@@ -72,7 +69,7 @@ reBuildings = db['reBuildings']
 def main():
     step1_prepareRealEstateDocuments()
     step2_encodeRealEstateDocumentAndSaveMintToFile()
-    input("Did you already run commands from step2?"); 
+    input("Did you already run commands from step2? (copy paste from the mint.txt file in terminal, ensure to use the correct '$KEY' variable)"); 
     step3_generateRESendCommandsToMarketplaceContract()
     # moved to rest API
     # q = Contract_Query.getNFTContractInfo()
@@ -200,9 +197,26 @@ def step1_prepareRealEstateDocuments():
     print("Step 1: Preparing real estate documents from MongoDB. Put into 'mintCommands' variable.")
     # Get all properties from MongoDB & save to the mintCommands dict (key=id, value = dict or data)
     global mintCommands
-    for idx, doc in enumerate(reProperties.find()):     #, START_IDX
+    for idx, doc in enumerate(reProperties.find(), START_IDX): # 1
         for k in removeKeys:
-            del doc[k]
+            if k in doc:
+                del doc[k]
+
+        if len(doc['imageLink']) == 0:
+            # print(f"[!] Skipping {doc['_id']} as it has no imageLink")            
+            doc['imageLink'] = "https://i.imgur.com/z7qnMGD.png"
+            # continue
+
+        
+
+        # CHECK IF ANY strings in NON_GOV are in name
+        name = str(doc['name']).lower()
+        if any(x in name for x in NON_GOV_PROPERTY_NAMES_CHECK) and "firehouse" not in name:
+            if str(doc['type']).lower().startswith("gov"):
+                
+                print(f"ERROR, {doc['name']} is a gov property, but has a non-government name...")
+                continue # TODO: exit for mainnet
+
         doc['cityName'] = Utils.getCityFromID(doc['cityId'])
         doc['buildingName'] = Utils.getBuildingFromID(doc['buildingId'])
         doc['_nft_type'] = "real_estate"
@@ -246,7 +260,8 @@ def step3_generateRESendCommandsToMarketplaceContract():
 
         # v = input("\n>>>")
         # ADDR721, id, forSalePrice, fileName
-        cTx.transferNFTToMarketplace(ADDR721, int(tokenId), listingCraftPrice, "RE_txSendToMarketplace.txt")
+        cTx.transferNFTToMarketplace(ADDR721, int(tokenId), listingCraftPrice, os.path.join(current_dir, "RE_txSendToMarketplace.txt"))
+        print(f"Commands to send NFT -> marketplace -> {current_dir}")
 
 if __name__ == '__main__':
     main()
