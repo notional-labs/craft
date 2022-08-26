@@ -105,14 +105,6 @@ public class BlockchainRequest {
         return getTotalSupply("ucraft");
     }
 
-    public static String getAccountSequence(String craft_address) {
-        // curl -X GET "https://api.cosmos.network/cosmos/auth/v1beta1/accounts/cosmos10r39fueph9fq7a6lgswu4zdsg8t3gxlqvvvyvn" -H "accept: application/json"
-
-        String req_url = ACCOUNT_ENDPOINT.replace("%address%", craft_address);
-        CraftBlockchainPlugin.log(req_url);
-        return EndpointQuery.req(req_url, RequestTypes.ACCOUNT, "Account Sequence Request").toString();
-    }
-
     // -= GIVING TOKENS =-
     private static final String ENDPOINT_SECRET = CraftBlockchainPlugin.getInstance().getSecret();
 

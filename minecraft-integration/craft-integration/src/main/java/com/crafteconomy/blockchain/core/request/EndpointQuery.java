@@ -50,14 +50,9 @@ public class EndpointQuery {
             }
 
             if (httpResponse.getEntity() != null) {                
-                String html = EntityUtils.toString(httpResponse.getEntity());
-                
-                // if (type == RequestTypes.FAUCET) {
-                //     CraftBlockchainPlugin.log("Faucet Request " + html);
-                //     return html; // {"transfers":[{"coin":"1token","status":"ok"}]}
-                // }
+                String html = EntityUtils.toString(httpResponse.getEntity());            
 
-                json = (JSONObject) parser.parse(html);            
+                json = (JSONObject) parser.parse(html);
                 
                 if(type == RequestTypes.ACCOUNT) {
                     // http://65.108.125.182:1317/cosmos/auth/v1beta1/accounts/craft1s4yczg3zgr4qdxussx3wpgezangh2388xgkkz9
