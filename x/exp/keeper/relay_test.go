@@ -83,13 +83,6 @@ func (suite *KeeperTestSuite) TestOnOracleRequestTimeoutPacket() {
 
 func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 
-	// type resultData struct {
-	// 	ExpPrice       string `obi:"exp_price"`
-	// 	AddressRequest string `obi:"address_request"`
-	// 	RequestType    string `obi:"request_type"`
-	// 	Status         string `obi:"status"`
-	// }
-
 	addr := genTestBech32List(2)
 	addressRequest, _ := sdk.AccAddressFromBech32(addr[0])
 	strExpPrice := sdk.NewDec(1).String()
@@ -123,7 +116,6 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketMintRequest() {
 					AmountInRequest: coin,
 				}
 				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
-
 			},
 			shouldErr: false,
 		},
@@ -257,7 +249,6 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 				}
 				suite.App.ExpKeeper.SetBurnRequestOracle(suite.Ctx, oracleRequest)
 				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
-
 			},
 			shouldErr: false,
 		},
@@ -280,7 +271,6 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 				}
 				suite.App.ExpKeeper.SetBurnRequestOracle(suite.Ctx, oracleRequest)
 				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
-
 			},
 			shouldErr: true,
 		},
@@ -303,7 +293,6 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 				}
 				suite.App.ExpKeeper.SetBurnRequestOracle(suite.Ctx, oracleRequest)
 				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
-
 			},
 			shouldErr: true,
 		},
