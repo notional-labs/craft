@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -45,63 +46,64 @@ public class BlockchainRequest {
     private static RedisManager redisDB = blockchainPlugin.getRedis();
     private static String SERVER_ADDRESS = blockchainPlugin.getServersWalletAddress();
 
-    // http://65.108.125.182:1317/cosmos/bank/v1beta1
-    private static final String API_ENDPOINT = blockchainPlugin.getApiEndpoint();
-
     private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"); 
 
     private static WalletManager walletManager = WalletManager.getInstance();
 
-    // Found via https://v1.cosmos.network/rpc/v0.41.4
-    private static final String BALANCES_ENDPOINT = API_ENDPOINT + "cosmos/bank/v1beta1/balances/%address%/by_denom?denom=%denomination%";
-    private static final String SUPPLY_ENDPOINT = API_ENDPOINT + "cosmos/bank/v1beta1/supply/by_denom?denom=%denomination%";
-    private static final String ACCOUNT_ENDPOINT = API_ENDPOINT + "cosmos/auth/v1beta1/accounts/%address%";
-
     // -= BALANCES =-
-    public static long getBalance(String craft_address, String denomination) {
+    public static CompletableFuture<Long> getBalance(String craft_address, String denomination) {
+        CompletableFuture<Long> future = new CompletableFuture<>();
         if(craft_address == null) {
-            return ErrorTypes.NO_WALLET.code;
+            future.complete((long) ErrorTypes.NO_WALLET.code);
+            // return ErrorTypes.NO_WALLET.code;
         }
         
         Object cacheAmount = Caches.getIfPresent(RequestTypes.BALANCE, craft_address);
         if(cacheAmount != null) { 
-            return (long) cacheAmount; 
+            future.complete((long) cacheAmount);
+            // return (long) cacheAmount; 
         }
-        
-        // Add uexp as well?- http://65.109.38.251:1317/cosmos/bank/v1beta1/balances/craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0
 
-        String req_url = BALANCES_ENDPOINT.replace("%address%", craft_address).replace("%denomination%", denomination);
+        EndpointQuery.getBalance(craft_address, denomination).thenAcceptAsync(amt -> {
+            Caches.put(RequestTypes.BALANCE, craft_address, amt);
+            future.complete(amt);
+        });
 
-        long amount = Long.parseLong(EndpointQuery.req(req_url, RequestTypes.BALANCE, "Balance Request").toString());
+        // String req_url = BALANCES_ENDPOINT.replace("%address%", craft_address).replace("%denomination%", denomination);
+        // long amount = Long.parseLong(EndpointQuery.req(req_url, RequestTypes.BALANCE, "Balance Request").toString());
 
-        Caches.put(RequestTypes.BALANCE, craft_address, amount);
-        return amount;
+        return future;
     }
 
-    public static long getUCraftBalance(String craft_address) { // 1_000_000ucraft = 1craft
+    public static CompletableFuture<Long> getUCraftBalance(String craft_address) { // 1_000_000ucraft = 1craft
         return getBalance(craft_address, "ucraft");
     }
 
-    public static float getCraftBalance(String craft_address) { // 1 craft
-        return (float) (getUCraftBalance(craft_address) / 1_000_000);
+    public static CompletableFuture<Float> getCraftBalance(String craft_address) { // 1 craft
+        // return (float) (getUCraftBalance(craft_address) / 1_000_000);
+        return getBalance(craft_address, "craft").thenApplyAsync(amt -> (float) (amt / 1_000_000));
     }
 
 
     // -= TOTAL SUPPLY =-
-    public static long getTotalSupply(String denomination) {
+    public static CompletableFuture<Long> getTotalSupply(String denomination) {
+        CompletableFuture<Long> future = new CompletableFuture<>();
+
         Object totalSupply = Caches.getIfPresent(RequestTypes.SUPPLY, denomination);        
         if(totalSupply != null) { 
-            return (long) totalSupply; 
+            future.complete((long) totalSupply);            
         }
+        
+        // long supply = Long.parseLong(EndpointQuery.req(URL, RequestTypes.SUPPLY, "Total Supply Request").toString());
+        EndpointQuery.getSupply(denomination).thenAcceptAsync(amount -> {
+            Caches.put(RequestTypes.SUPPLY, denomination, amount); 
+            future.complete(amount);  
+        });        
 
-        String URL = SUPPLY_ENDPOINT.replace("%denomination%", denomination);
-        long supply = Long.parseLong(EndpointQuery.req(URL, RequestTypes.SUPPLY, "Total Supply Request").toString());
-
-        Caches.put(RequestTypes.SUPPLY, denomination, supply);
-        return supply;
+        return future;
     }
 
-    public static long getTotalSupply() {
+    public static CompletableFuture<Long> getTotalSupply() {
         return getTotalSupply("ucraft");
     }
 
@@ -287,15 +289,34 @@ public class BlockchainRequest {
         if(CraftBlockchainPlugin.getIfInDevMode() == false) {
             // we check how much ucraft is in the transaction data since its on chain, so get the ucraft from the Tx
 
-            if(BlockchainRequest.getUCraftBalance(transaction.getToWallet()) < 0) {
-                CraftBlockchainPlugin.log("No wallet balance for address");  
-                return ErrorTypes.NO_WALLET;
-            }
+            // if(BlockchainRequest.getUCraftBalance(transaction.getToWallet()) < 0) {
+            //     CraftBlockchainPlugin.log("No wallet balance for address");  
+            //     return ErrorTypes.NO_WALLET;
+            // }
 
-            if(BlockchainRequest.getUCraftBalance(transaction.getFromWallet()) < transaction.getUCraftAmount()){
-                CraftBlockchainPlugin.log("Not enough tokens to send");
-                return ErrorTypes.NOT_ENOUGH_TO_SEND;
-            }            
+            // TODO: Thread blocking
+            // CompletableFuture<Long> v = BlockchainRequest.getUCraftBalance(transaction.getToWallet()).thenAcceptAsync(amt -> {
+            //     CraftBlockchainPlugin.log("No wallet balance for address");  
+            //     return 0L; // ErrorTypes.NO_WALLET
+            // });
+
+            // get value from BlockchainRequest.getUCraftBalance ffuture
+            
+            try {
+                long amount = BlockchainRequest.getUCraftBalance(transaction.getToWallet()).get();
+
+                if(amount < 0) {
+                    CraftBlockchainPlugin.log("No wallet balance for address");  
+                    return ErrorTypes.NO_WALLET;
+
+                }else if(amount < transaction.getUCraftAmount()) {
+                    CraftBlockchainPlugin.log("Not enough tokens to send");
+                    return ErrorTypes.NOT_ENOUGH_TO_SEND;
+                }
+
+            } catch (InterruptedException | ExecutionException e) {                
+                e.printStackTrace();
+            }
         } else {
             String name = Bukkit.getPlayer(transaction.getFromUUID()).getName().toUpperCase();
             Util.coloredBroadcast("&cDEV MODE IS ENABLED FOR THIS TRANSACTION "+name+" (config.yml, no blockchain request)");
@@ -311,8 +332,8 @@ public class BlockchainRequest {
         TransactionType txType = transaction.getTxType(); // used for webapp
 
         int redisMinuteTTL = transaction.getRedisMinuteTTL(); // minutes till this transaction should be: rm from redis, rm from pending, run the following:
-        Consumer<UUID> runOnExpire = transaction.getConsumerOnExpire(); // check these are not null,
-        BiConsumer<UUID, UUID> runOnBiExpire = transaction.getBiConsumerOnExpire();
+        // Consumer<UUID> runOnExpire = transaction.getConsumerOnExpire(); // check these are not null,
+        // BiConsumer<UUID, UUID> runOnBiExpire = transaction.getBiConsumerOnExpire();
 
         
         org.json.JSONObject jsonObject;

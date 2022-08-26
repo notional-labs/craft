@@ -1,6 +1,7 @@
 package com.crafteconomy.blockchain.commands.wallet.subcommands;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.commands.SubCommand;
@@ -85,13 +86,19 @@ public class WalletBalance implements SubCommand {
             return "&c"+otherUser+" does not have a wallet set!";
         }
 
-        float amount = BlockchainRequest.getCraftBalance(wallet);
-
-        if(otherUser != null) {
-            return otherUser + " has " + amount + walletPrefix;
-        } else {
-            return "You have " + amount + "craft";
+        float amount;
+        try {
+            amount = BlockchainRequest.getCraftBalance(wallet).get();
+            if(otherUser != null) {
+                return otherUser + " has " + amount + walletPrefix;
+            } else {
+                return "You have " + amount + "craft";
+            }            
+        } catch (InterruptedException | ExecutionException e) {            
+            e.printStackTrace();
         }
+
+        return "&c&lERROR: &f&lCould not get balance for " + otherUser;        
     }
 
     private String getWalletBalanceOutput(String wallet){
@@ -100,7 +107,15 @@ public class WalletBalance implements SubCommand {
         }
 
         // long amount = BlockchainRequest.getUCraftBalance(wallet);
-        float craft_amount = BlockchainRequest.getCraftBalance(wallet);
+        // float craft_amount = BlockchainRequest.getCraftBalance(wallet);
+
+        // TODO: Correct value here?
+        float craft_amount = 0;
+        try {
+            craft_amount = BlockchainRequest.getCraftBalance(wallet).get();
+        } catch (InterruptedException | ExecutionException e) {            
+            e.printStackTrace();
+        }
 
         // negative number checks
         if(craft_amount == ErrorTypes.NO_TOKENS_FOR_WALLET.code || craft_amount == ErrorTypes.NO_WALLET.code) {
