@@ -20,41 +20,32 @@ echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor 
 echo "flag meat remind stamp unveil junior goose first hold atom deny ramp raven party lens jazz tape dad produce wrap citizen common vital hungry" | craftd keys add $KEY2 --keyring-backend $CRAFTD_KEYRING_BACKEND --algo $KEYALGO --recover
 
 # export KEY_ADDR=`craftd keys show $KEY -a`
-export KEY_ADDR="craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh" # reeces testnet valiadtor address (validaator)
-# export KEY_ADDR2=`craftd keys show $KEY2 -a`
+export KEY_ADDR="craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7" # controls the real estate, will be a multisig
 
+# TODO: Ensure minters = KEY_ADDR = DAO wallet (multisig ) for mainnet
 
-
-# get this diredctory with basedir command
-cd $(basedir "$0")
-
-# NFT Contract (Code id 3 rn)
-TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
-CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
-# NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re1","symbol": "ctest","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-realestate" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
-NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re2","symbol": "ctest","minter": "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh"}' --label "craft-realestate" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
-sleep 3
-ADDR721=$(craftd query tx $NFT721_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "ADDR 721: $ADDR721"
-# export ADDR721=craft1ltd0maxmte3xf4zshta9j5djrq9cl692ctsp9u5q0p9wss0f5lmsh738wk
+# NFT Contract (Change to metadata contract in future?)
+TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --broadcast-mode sync --output json | jq -r '.txhash') && echo $TX721
+CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && echo $CODE_ID_721
+NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re3","symbol": "cre","minter": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7"}' --label "craft-realestate" $CRAFTD_COMMAND_ARGS --broadcast-mode sync --output json -y --admin $KEY_ADDR | jq -r '.txhash') && echo $NFT721_TX_UPLOAD
+ADDR721=$(craftd query tx $NFT721_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Real Estate ADDR 721: $ADDR721"
+# export ADDR721=craft1wl59k23zngj34l7d42y9yltask7rjlnxgccawc7ltrknp6n52fpsaug5jn
 
 # ADDR_test721 (testing images)
-TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --output json | jq -r '.txhash') && sleep 1
-CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && sleep 1
-# IMAGE_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craft-images1","symbol": "cimg","minter": "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}' --label "craft-images" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
-IMAGE_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craft-images1","symbol": "cimg","minter": "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh"}' --label "craft-images" $CRAFTD_COMMAND_ARGS --output json -y --admin $KEY_ADDR | jq -r '.txhash') && sleep 1
-sleep 3
+TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --broadcast-mode sync --output json | jq -r '.txhash')
+CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value')
+IMAGE_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craft-images2","symbol": "cimg","minter": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7"}' --label "craft-images" $CRAFTD_COMMAND_ARGS --broadcast-mode sync --output json -y --admin $KEY_ADDR | jq -r '.txhash') && echo $IMAGE_TX_UPLOAD
 ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "ADDR 721 IMAGES (LINKS): $ADDR721IMAGES"
-# export ADDR721IMAGES=craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj
+# export ADDR721IMAGES=craft1dt3lk455ed360pna38fkhqn0p8y44qndsr77qu73ghyaz2zv4whqgg28q2
 
 # marketplace
-TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --output json --broadcast-mode block | jq -r '.txhash')
+TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --broadcast-mode sync  --output json --broadcast-mode block | jq -r '.txhash')
 MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value')
 # fee_receive_address should = DAO wallet / multisig
 # MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-2","denom":"ucraft","fee_receive_address":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash')
-MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-1","denom":"ucraft","fee_receive_address":"craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --output json | jq -r '.txhash')
-sleep 3
+MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace-2","denom":"ucraft","fee_receive_address":"craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --broadcast-mode sync --output json | jq -r '.txhash')
 ADDRM=$(craftd query tx $MARKET_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Marketplace Address: $ADDRM"
-# export ADDRM=craft1xr3rq8yvd7qplsw5yx90ftsr2zdhg4e9z60h5duusgxpv72hud3sc3plyl
+# export ADDRM=craft1fkwjqyfdyktgu5f59jpwhvl23zh8aav7f98ml9quly62jx2sehys8t86pv
 
 function mintToken() {
     CONTRACT_ADDR=$1
@@ -67,7 +58,8 @@ function mintToken() {
 }
 
 # ==================================PROPERTIES EXAMPLE====================================================
-# base64 is from the Mint_RealEstate.py script
+# base64 is from the Mint_RealEstate.py script.
+# use scripts/scr/Mint_*.py instead of below mints.
 
 # mintToken $ADDR721 1 "craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl" "eyJfaWQiOiAiNDY2YjJjMjEtNTY4MC00Mzg2LTk3ZDUtYzM0MDcwZjU0NjI0IiwgIm5hbWUiOiAiTWVnYS1NYW5zaW9uICMxIiwgImRlc2NyaXB0aW9uIjogIkEgbHV4dXJpb3VzIGFuZCBsYXJnZSBtYW5zaW9uIGxvY2F0ZWQgb24gdGhlIGVkZ2Ugb2YgY2l0eS4iLCAiaW1hZ2VMaW5rIjogImh0dHBzOi8vaS5pbWd1ci5jb20vTXc3OGp4dS5wbmciLCAiZmxvb3JBcmVhIjogMjA4NTYsICJ0b3RhbFZvbHVtZSI6IDYyNTY4LCAid29ybGROYW1lIjogIndvcmxkIiwgImNpdHlJZCI6ICJiZjcxM2RkOS03ZTFhLTRjYTUtYTA3Ny0yNTFjNTc0ZDQ5YjMiLCAiYnVpbGRpbmdJZCI6IG51bGwsICJ0eXBlIjogIlJFU0lERU5USUFMIiwgImNpdHlOYW1lIjogIkNyYWZ0IENpdHkiLCAiYnVpbGRpbmdOYW1lIjogIiIsICJfbmZ0X3R5cGUiOiAicmVhbF9lc3RhdGUifQ=="
 mintToken $ADDR721 1 "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh" "eyJfaWQiOiAiNDY2YjJjMjEtNTY4MC00Mzg2LTk3ZDUtYzM0MDcwZjU0NjI0IiwgIm5hbWUiOiAiTWVnYS1NYW5zaW9uICMxIiwgImRlc2NyaXB0aW9uIjogIkEgbHV4dXJpb3VzIGFuZCBsYXJnZSBtYW5zaW9uIGxvY2F0ZWQgb24gdGhlIGVkZ2Ugb2YgY2l0eS4iLCAiaW1hZ2VMaW5rIjogImh0dHBzOi8vaS5pbWd1ci5jb20vTXc3OGp4dS5wbmciLCAiZmxvb3JBcmVhIjogMjA4NTYsICJ0b3RhbFZvbHVtZSI6IDYyNTY4LCAid29ybGROYW1lIjogIndvcmxkIiwgImNpdHlJZCI6ICJiZjcxM2RkOS03ZTFhLTRjYTUtYTA3Ny0yNTFjNTc0ZDQ5YjMiLCAiYnVpbGRpbmdJZCI6IG51bGwsICJ0eXBlIjogIlJFU0lERU5USUFMIiwgImNpdHlOYW1lIjogIkNyYWZ0IENpdHkiLCAiYnVpbGRpbmdOYW1lIjogIiIsICJfbmZ0X3R5cGUiOiAicmVhbF9lc3RhdGUifQ=="

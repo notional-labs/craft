@@ -8,8 +8,18 @@ Commands are from commands.md. & list prices are based on the floor volume & typ
 '''
 
 # ---- Configuration --------------------------------------------------------------------------------------------------
+# ensure it matches for real estate & images
+import requests
 START_IDX = 1 # put at 1 for mainnet mint
+addresses = requests.get("https://api.crafteconomy.io/v1/nfts/get_contract_addresses").json()
+ADDR721 = addresses['ADDR721_REALESTATE']
+ADDR721IMAGES = addresses['ADDR721_IMAGES']
+ADDRM = addresses['MARKETPLACE']
+DAO_MULTISIG = "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7" # dao account for now. They should be the one who inited the 721 contract (DAO)
+CRAFTD_REST = "https://craft-rest.crafteconomy.io"
 
+
+# Specific to real estate
 MINT_PRICES = { # price per sqBlock (floor volume) IN UCRAFT (1mill ucraft = 1 craft.)
     # src/main/java/com/crafteconomy/realestate/property/PropertyType.java
     "GOVERNMENT": -1, # not for sale
@@ -18,8 +28,8 @@ MINT_PRICES = { # price per sqBlock (floor volume) IN UCRAFT (1mill ucraft = 1 c
 }
 
 mintCommands = {}
+OTHER_OWNERS = {"78e7445f-e079-421e-a9b4-b1019ac329cb": "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh"} # if a DAO member pre owns a property, set their wallet as the owner. In this case reece validator as example
 removeKeys = ["state", "restrictions", "restrictionTemplate", "rentingPlayer", "lastPayment", "lastFailedPayment", "price", "ownerId", "region", "rentalPeriod"]
-
 NON_GOV_PROPERTY_NAMES_CHECK = ["apartment", "home", "house"] # if these are type GOVERNMENT, then we need to error out so that can be regenerated.
 
 DENOM = "ucraft"
@@ -29,28 +39,16 @@ import sys
 sys.dont_write_bytecode = True
 import os
 import json
-import time
 import requests
 from base64 import b64decode, b64encode
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from Util import Contract_Tx
-
+# from Util import Contract_Tx
 
 
 # --- Initialization ---------------------------------------------------------------------------------------------------
 load_dotenv()
-CRAFTD_REST = os.getenv("CRAFTD_REST", "https://craft-rest.crafteconomy.io")
-ADDR721=os.getenv("ADDR721_REALESTATE")
-ADDRM=os.getenv("ADDRM")
-
-if ADDR721 == None:
-    print("Please set the ADDR721 variable in the script.")
-    exit()
-
-uri = os.getenv("CRAFT_MONGO_DB")
-admin_wallet = os.getenv("CRAFT_ADMIN_WALLET")
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 os.makedirs(f"{current_dir}/real_estate", exist_ok=True)
@@ -59,6 +57,7 @@ current_dir = f"{current_dir}/real_estate"
 params_base64 = {'encoding': 'base64'}
 
 # --- Database ---------------------------------------------------------------------------------------------------------
+uri = os.getenv("CRAFT_MONGO_DB")
 client = MongoClient(uri)
 db = client['crafteconomy']
 reProperties = db['reProperties']
@@ -67,10 +66,14 @@ reBuildings = db['reBuildings']
 
 
 def main():
-    step1_prepareRealEstateDocuments()
-    step2_encodeRealEstateDocumentAndSaveMintToFile()
-    input("Did you already run commands from step2? (copy paste from the mint.txt file in terminal, ensure to use the correct '$KEY' variable)"); 
+    encodeRealEstateDocumentAndSaveMintToFile()    
     step3_generateRESendCommandsToMarketplaceContract()
+
+    print("\nHow to Sign & Broadcast:")
+    print(f"1. Run ' craftd tx sign real_estate_mint.json --from <key> '") # --multisig=<multisig_key> how ??
+    print(f" (We Just need the signature at the end so we can broadcast it from the DAO mutlisig)")
+    print(f"1. Run 'craftd tx broadcast real_estate_to_marketplace.json'")
+
     # moved to rest API
     # q = Contract_Query.getNFTContractInfo()
     # q = Contract_Query.getNFTInfo(1)
@@ -104,10 +107,8 @@ class Utils:
         mintMultiplier = int(MINT_PRICES[property_type])
         floorArea = int(floor_area)
         product = floorArea * mintMultiplier
-        print(f"{mintMultiplier=}, {floorArea=}, {product=}")
+        # print(f"{mintMultiplier=}, {floorArea=}, {product=}")
         return product
-
-
 
 class Contract_Query:
     # All moved to official rest API + redis caching.
@@ -192,10 +193,13 @@ class Contract_Query:
 
 # --- Other ------------------------------------------------------------------------------------------------------------
 
+# We will add messages for minting from here, just copy first
+# FORMAT = { "body": { "messages": [], "memo": "", "timeout_height": "0", "extension_options": [], "non_critical_extension_options": []}, "auth_info": {"signer_infos": [],"fee": {"amount": [],"gas_limit": "10000000","payer": "","granter": ""},"tip": None},"signatures": []}
 
-def step1_prepareRealEstateDocuments():
+
+def _step1_prepareRealEstateDocuments():
     print("Step 1: Preparing real estate documents from MongoDB. Put into 'mintCommands' variable.")
-    # Get all properties from MongoDB & save to the mintCommands dict (key=id, value = dict or data)
+    # Get all properties from MongoDB & s   ave to the mintCommands dict (key=id, value = dict or data)
     global mintCommands
     for idx, doc in enumerate(reProperties.find(), START_IDX): # 1
         for k in removeKeys:
@@ -207,13 +211,10 @@ def step1_prepareRealEstateDocuments():
             doc['imageLink'] = "https://i.imgur.com/z7qnMGD.png"
             # continue
 
-        
-
         # CHECK IF ANY strings in NON_GOV are in name
         name = str(doc['name']).lower()
         if any(x in name for x in NON_GOV_PROPERTY_NAMES_CHECK) and "firehouse" not in name:
-            if str(doc['type']).lower().startswith("gov"):
-                
+            if str(doc['type']).lower().startswith("gov"):                
                 print(f"ERROR, {doc['name']} is a gov property, but has a non-government name...")
                 continue # TODO: exit for mainnet
 
@@ -225,43 +226,88 @@ def step1_prepareRealEstateDocuments():
         # input(f"{doc=}")
 
 # in the future we need to craftd tx sign as a big array of messages, but for now this works
-def step2_encodeRealEstateDocumentAndSaveMintToFile():
-    fileName = "tx_mint_realestate_commands.txt"
+def encodeRealEstateDocumentAndSaveMintToFile():
+    _step1_prepareRealEstateDocuments()
+    fileName = "real_estate_mint.json"
     print(f"Step 2: Encoding Real Estate Documents from Step1 -> {fileName}")
+
+    msgFmt = { "body": { "messages": [], "memo": "minting images", "timeout_height": "0", "extension_options": [], "non_critical_extension_options": []}, "auth_info": {"signer_infos": [],"fee": {"amount": [],"gas_limit": "10000000","payer": "","granter": ""},"tip": None},"signatures": []}
     for idx, data in mintCommands.items():
         b64Data = b64encode(json.dumps(data).encode('utf-8')).decode('utf-8')
         # print(b64Data)
         # we use the base64 data as the token URI rather than requiring even more queries to other locations for the data (ipfs)
-        mintJSON = '''{"mint":{"token_id":"{IDX}","owner":"{ADMIN_WALLET}","token_uri":"{B64DATA}"}}''' \
-            .replace("{IDX}", str(idx)) \
-            .replace("{ADMIN_WALLET}", admin_wallet) \
-            .replace("{B64DATA}", b64Data)
 
-        mintCmd = f"""craftd tx wasm execute {ADDR721} '{mintJSON}' --from $KEY --output json -y"""
-        with open(os.path.join(current_dir, f"{fileName}"), 'a') as mintF:
-            mintF.write(mintCmd + "\n")
-    print(f"Commands to mint saved to file {fileName}. Please run these before continuing to Step3.")
+        # Some properties may be owned by others, so we send to them in mint
+        property_owner = str(DAO_MULTISIG)
+        if data["_id"] in OTHER_OWNERS.keys():
+            property_owner = OTHER_OWNERS[data["_id"]]
+
+        # in the future maybe use a metadata contract for real estate?
+
+        msgFmt['body']['messages'].append({
+            "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
+            "sender": f"{DAO_MULTISIG}", # wallet who can mint (DAO multisig)
+            "contract": f"{ADDR721}",
+            "msg": {
+                "mint": {
+                    "token_id": f"{idx}",
+                    "owner": f"{property_owner}", # DAO by default (admin wallet), unless another member owns it pre launch
+                    "token_uri": f"{b64Data}"
+                }
+            },
+            "funds": []
+        })
+
+    # save msgFmt to file
+    with open(os.path.join(current_dir, f"{fileName}"), 'w') as mintF:
+        mintF.write(json.dumps(msgFmt, indent=4))
+    print(f"You can now mint the NFts by signing {fileName}.")
 
 
+# TODO: change this to just mint asbed off of the pregen we made, no need to query
 def step3_generateRESendCommandsToMarketplaceContract():
-    nft_token_list = list(Contract_Query.getUserOwnedNFTsALL(f"{admin_wallet}", decodeBase64=False).keys())
-    print(nft_token_list)
+    fileName = "real_estate_to_marketplace.json"
 
-    cTx = Contract_Tx(admin_wallet)
-    for tokenId in nft_token_list:
-        metadata = dict(json.loads(Contract_Query.queryToken(tokenId, decodeBase64=True)))
-        floorArea = metadata['floorArea']
-        
-        listingCraftPrice = Utils._calcListingPrice(metadata.get("type"), floorArea)
-        print(f"{listingCraftPrice}")
+    # since we already needed this in step 2, just reuse
+    msgFmt = { "body": { "messages": [], "memo": "images to marketplace", "timeout_height": "0", "extension_options": [], "non_critical_extension_options": []}, "auth_info": {"signer_infos": [],"fee": {"amount": [],"gas_limit": "10000000","payer": "","granter": ""},"tip": None},"signatures": []}
+    for tokenId, data in mintCommands.items():
+        # print(idx, data) # data = dict (non base64)
+
+        floorArea = data['floorArea']
+        listingCraftPrice = Utils._calcListingPrice(data["type"], floorArea)
         if listingCraftPrice <= 0:
             print(f"[!] Property {tokenId} is a government property & will not be listed (listingCraftPrice <= 0).")
             continue
 
-        # v = input("\n>>>")
-        # ADDR721, id, forSalePrice, fileName
-        cTx.transferNFTToMarketplace(ADDR721, int(tokenId), listingCraftPrice, os.path.join(current_dir, "RE_txSendToMarketplace.txt"))
-        print(f"Commands to send NFT -> marketplace -> {current_dir}")
+        listPriceBase64 = b64encode(json.dumps({"list_price": f"{listingCraftPrice}"}).encode('utf-8')).decode('utf-8')
+
+        # Some properties may be owned by others, so if they own the property we minted, we cant send it.
+        property_owner = str(DAO_MULTISIG)
+        if data["_id"] in OTHER_OWNERS.keys():
+            print(f"This property is owned by another member. Owned by: {OTHER_OWNERS[data['_id']]}. Skipping...")
+            continue
+
+        msgFmt['body']['messages'].append({
+            "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
+            "sender": f"{DAO_MULTISIG}", # wallet who can mint, always the DAO (contract init)
+            "contract": f"{ADDR721}",
+            "msg": {
+                "send_nft": {
+                    "contract": f"{ADDRM}",
+                    "token_id": f"{tokenId}",
+                    "msg": f"{listPriceBase64}"
+                }
+            },
+            "funds": []
+        })
+
+        # save msgFmt to file
+    with open(os.path.join(current_dir, f"{fileName}"), 'w') as mintF:
+        mintF.write(json.dumps(msgFmt, indent=4))
+    print(f"You can now send non gov NFTs -> marketplace. {fileName}.")
+
+
+
 
 if __name__ == '__main__':
     main()

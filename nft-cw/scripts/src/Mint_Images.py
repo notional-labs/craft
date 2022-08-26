@@ -3,14 +3,20 @@ import sys
 sys.dont_write_bytecode = True
 import os
 import json
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
-START_INDEX = 20
-CRAFT_ADMIN_WALLET = os.getenv("CRAFT_ADMIN_WALLET") 
-ADDR_TEST721 = os.getenv("ADDR_TEST721")
-ADDRM = os.getenv('ADDRM')
+import requests
+START_IDX = 30 # put at 1 for mainnet mint
+addresses = requests.get("https://api.crafteconomy.io/v1/nfts/get_contract_addresses").json()
+ADDR721 = addresses['ADDR721_REALESTATE']
+ADDR721IMAGES = addresses['ADDR721_IMAGES']
+ADDRM = addresses['MARKETPLACE']
+DAO_MULTISIG = "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7" # dao account for now. They should be the one who inited the 721 contract (DAO)
+CRAFTD_REST = "https://craft-rest.crafteconomy.io"
 
+
+COST_PER_IMAGE = 5 # 5craft
 links = [
     # random link(s)
     "https://ipfs.io/ipfs/QmNLoezbXkk37m1DX5iYADRwpqvZ3yfu5UjMG6sndu1AaQ",
@@ -30,43 +36,54 @@ def main():
     part2_sendToMarketplace()
 
 
-def part1_mintToAdminAccount():
-    output = ""
-    for idx, link in enumerate(links, START_INDEX):
-        # we do not base64 encode this since we want it to be a standard base CW721 contract
-        # we convert it to our offering in the API so as to not break CW721 standard
-        mintJSON = '''{"mint":{"token_id":"{IDX}","owner":"{ADMIN_WALLET}","token_uri":"{LINK}"}}''' \
-            .replace("{IDX}", str(idx)) \
-            .replace("{ADMIN_WALLET}", CRAFT_ADMIN_WALLET) \
-            .replace("{LINK}", link)
-        output += f'''craftd tx wasm execute {ADDR_TEST721} '{mintJSON}' --from $KEY --output json -y\n'''
-        # print(mintCmd)
+def part1_mintToAdminAccount():    
+    msgFmt = { "body": { "messages": [], "memo": "minting real estate", "timeout_height": "0", "extension_options": [], "non_critical_extension_options": []}, "auth_info": {"signer_infos": [],"fee": {"amount": [],"gas_limit": "10000000","payer": "","granter": ""},"tip": None},"signatures": []}
+    for idx, link in enumerate(links, START_IDX):
+        msgFmt['body']['messages'].append({
+            "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
+            "sender": f"{DAO_MULTISIG}", # wallet who can mint (DAO multisig)
+            "contract": f"{ADDR721IMAGES}",
+            "msg": {
+                "mint": {
+                    "token_id": f"{idx}",
+                    "owner": f"{DAO_MULTISIG}", # dao owns all images it mints
+                    "token_uri": f"{link}"
+                }
+            },
+            "funds": []
+        })
 
     # save output to file
-    os.makedirs("images", exist_ok=True)
-    with open("images/mint_images.txt", "w") as f:
-        f.write(output)
+    os.makedirs("images", exist_ok=True)    
+    # save msgFmt to images 
+    with open("images/mint_images.json", "w") as f:
+        json.dump(msgFmt, f, indent=4)
 
 def part2_sendToMarketplace():
     # move to marketplace contract
     from base64 import b64encode
-    listPrice = '{"list_price":"{AMT}"}'.replace("{AMT}", str(5_000_000))
+    listPriceBase64 = b64encode(json.dumps({"list_price": f"{COST_PER_IMAGE*1_000_000}"}).encode('utf-8')).decode('utf-8')
 
-    output = ""
-    for idx, link in enumerate(links, START_INDEX):
-        SEND_NFT_JSON = '''{"send_nft":{"contract":"{ADDRM}","token_id":"{ID}","msg":"{LIST_PRICE}"}}''' \
-            .replace("{ADDRM}", ADDRM) \
-            .replace("{ID}", str(idx)) \
-            .replace("{LIST_PRICE}", b64encode(listPrice.encode('utf-8')).decode('utf-8'))
-        # print(SEND_NFT_JSON)
-
-        output += f"""craftd tx wasm execute {ADDR_TEST721} '{SEND_NFT_JSON}' --gas-prices="0.025ucraft" -y --from $KEY\n"""
-        # print(cmd)
+    msgFmt = { "body": { "messages": [], "memo": "minting real estate", "timeout_height": "0", "extension_options": [], "non_critical_extension_options": []}, "auth_info": {"signer_infos": [],"fee": {"amount": [],"gas_limit": "10000000","payer": "","granter": ""},"tip": None},"signatures": []}
+    for idx, link in enumerate(links, START_IDX):
+        msgFmt['body']['messages'].append({
+            "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
+            "sender": f"{DAO_MULTISIG}", # wallet who can mint, always the DAO (contract init)
+            "contract": f"{ADDR721IMAGES}",
+            "msg": {
+                "send_nft": {
+                    "contract": f"{ADDRM}",
+                    "token_id": f"{idx}",
+                    "msg": f"{listPriceBase64}"
+                }
+            },
+            "funds": []
+        })
 
     # save output to file
     os.makedirs("images", exist_ok=True)
-    with open("images/to_marketplace.txt", "w") as f:
-        f.write(output)
+    with open("images/images_to_marketplace.json", "w") as f:
+        json.dump(msgFmt, f, indent=4)
 
 if __name__ == "__main__":
     main()
