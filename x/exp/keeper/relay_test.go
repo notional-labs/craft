@@ -227,9 +227,11 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 
 	addr := genTestBech32List(2)
 	addressRequest, _ := sdk.AccAddressFromBech32(addr[0])
+	invalidAddress, _ := sdk.AccAddressFromBech32(addr[1])
 	strExpPrice := sdk.NewDec(1).String()
 	oracleID := suite.App.ExpKeeper.GetNextOracleID(suite.Ctx)
 	coin := sdk.NewCoin("uexp", sdk.NewInt(1000000))
+	coinBurnInvalid := sdk.NewCoin("uexp", sdk.NewInt(10000000))
 
 	for _, tc := range []struct {
 		desc      string
@@ -259,6 +261,52 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 			},
 			shouldErr: false,
 		},
+		{
+			desc: "Invalid Address",
+			fn: func() {
+				burnRequest := types.BurnRequest{
+					Account:       invalidAddress.String(),
+					BurnTokenLeft: &coin,
+					RequestTime:   suite.Ctx.BlockTime(),
+					Status:        types.StatusOnGoingRequest,
+				}
+				suite.App.ExpKeeper.SetBurnRequest(suite.Ctx, burnRequest)
+
+				oracleRequest := types.OracleRequest{
+					OracleId:        oracleID,
+					Type:            "burn",
+					AddressRequest:  addressRequest.String(),
+					AmountInRequest: coin,
+				}
+				suite.App.ExpKeeper.SetBurnRequestOracle(suite.Ctx, oracleRequest)
+				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
+
+			},
+			shouldErr: true,
+		},
+		{
+			desc: "Burn GT total amount",
+			fn: func() {
+				burnRequest := types.BurnRequest{
+					Account:       invalidAddress.String(),
+					BurnTokenLeft: &coinBurnInvalid,
+					RequestTime:   suite.Ctx.BlockTime(),
+					Status:        types.StatusOnGoingRequest,
+				}
+				suite.App.ExpKeeper.SetBurnRequest(suite.Ctx, burnRequest)
+
+				oracleRequest := types.OracleRequest{
+					OracleId:        oracleID,
+					Type:            "burn",
+					AddressRequest:  addressRequest.String(),
+					AmountInRequest: coinBurnInvalid,
+				}
+				suite.App.ExpKeeper.SetBurnRequestOracle(suite.Ctx, oracleRequest)
+				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
+
+			},
+			shouldErr: true,
+		},
 	} {
 		tc := tc
 		suite.Run(tc.desc, func() {
@@ -287,7 +335,8 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 			suite.Require().NoError(err)
 
 			if tc.shouldErr {
-				suite.Require().True(true)
+				err := suite.App.ExpKeeper.ProccessRecvPacketBurnRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
+				suite.Require().Error(err)
 			} else {
 				err := suite.App.ExpKeeper.ProccessRecvPacketBurnRequest(suite.Ctx, addr[0], strExpPrice, oracleID)
 				suite.Require().NoError(err)
