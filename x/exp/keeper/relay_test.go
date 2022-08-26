@@ -229,6 +229,7 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 	addressRequest, _ := sdk.AccAddressFromBech32(addr[0])
 	strExpPrice := sdk.NewDec(1).String()
 	oracleID := suite.App.ExpKeeper.GetNextOracleID(suite.Ctx)
+	coin := sdk.NewCoin("uexp", sdk.NewInt(1000000))
 
 	for _, tc := range []struct {
 		desc      string
@@ -238,11 +239,19 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 		{
 			desc: "Success",
 			fn: func() {
+				burnRequest := types.BurnRequest{
+					Account:       addressRequest.String(),
+					BurnTokenLeft: &coin,
+					RequestTime:   suite.Ctx.BlockTime(),
+					Status:        types.StatusOnGoingRequest,
+				}
+				suite.App.ExpKeeper.SetBurnRequest(suite.Ctx, burnRequest)
+
 				oracleRequest := types.OracleRequest{
 					OracleId:        oracleID,
 					Type:            "burn",
 					AddressRequest:  addressRequest.String(),
-					AmountInRequest: sdk.NewCoin("uexp", sdk.NewInt(1000000)),
+					AmountInRequest: coin,
 				}
 				suite.App.ExpKeeper.SetBurnRequestOracle(suite.Ctx, oracleRequest)
 				suite.App.ExpKeeper.SetNextOracleRequest(suite.Ctx, oracleRequest)
@@ -256,6 +265,7 @@ func (suite *KeeperTestSuite) TestProccessRecvPacketBurnRequest() {
 			suite.SetupTest()
 			tc.fn()
 
+			// Join before mint
 			msgServer := keeper.NewMsgServerImpl(suite.App.ExpKeeper)
 
 			req := types.MsgJoinDaoByNonIbcAsset{
