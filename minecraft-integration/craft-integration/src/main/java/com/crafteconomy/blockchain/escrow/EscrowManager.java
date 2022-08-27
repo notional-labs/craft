@@ -1,6 +1,7 @@
 package com.crafteconomy.blockchain.escrow;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
@@ -79,7 +80,11 @@ public class EscrowManager {
     public EscrowErrors depositUCraft(UUID uuid, long ucraft_amount) {
         // Get the most the user can withdraw from their chain ucraft wallet or what
         // they want, which would be the minimum of the 2
-        ucraft_amount = Math.min(api.getUCraftBalance(uuid), ucraft_amount);
+        try {
+            ucraft_amount = Math.min(api.getUCraftBalance(uuid).get(), ucraft_amount);
+        } catch (InterruptedException | ExecutionException e) {            
+            e.printStackTrace();
+        }
 
         Tx tx = new Tx();
         tx.setFromUUID(uuid);

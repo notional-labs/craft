@@ -1,6 +1,9 @@
 package com.crafteconomy.blockchain.commands.wallet.subcommands;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.commands.SubCommand;
@@ -22,7 +25,6 @@ public class WalletBalance implements SubCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-
         String username = null;
         UUID uuid = null;
         String wallet = null;
@@ -57,60 +59,83 @@ public class WalletBalance implements SubCommand {
         }
 
         if(wallet != null) {
-            String walletBalance = getWalletBalanceOutput(args[1]);
-            Util.colorMsg(sender, walletBalance);
+            String walletBalance;
+            try {
+                walletBalance = getWalletBalanceOutput(args[1]).get();
+                Util.colorMsg(sender, walletBalance);
+            } catch (InterruptedException | ExecutionException e) {                
+                e.printStackTrace();
+            }            
 
-        } else if(uuid == null) {
-            String output = "&c&lERROR: &f&lInvalid wallet address.";
+        } else if(uuid == null) {            
             if(args.length >= 2) { 
-                output = getWalletBalanceOutput(args[1]);
-            } 
-
-            Util.colorMsg(sender, "\n" + output);
+                try {                    
+                    Util.colorMsg(sender, "\n" + getWalletBalanceOutput(args[1]).get());
+                } catch (InterruptedException | ExecutionException e) {                    
+                    Util.colorMsg(sender, "\n&c&lERROR: &f&lInvalid wallet address.");
+                    e.printStackTrace();
+                }
+            }             
 
         } else {
             wallet = walletManager.getAddress(uuid);
 
-            Util.colorMsg(sender, getPlayerBalanceOutput(wallet, username));
-            if(wallet != null) {
-                Util.clickableCopy(sender, wallet, "&7&oWallet: &n%value%", "&7&oClick to copy wallet address");
-            }
+            // Util.colorMsg(sender, getPlayerBalanceOutput(wallet, username));
+
+            final String their_wallet = wallet;
+            final String their_username = username;
+            Bukkit.getScheduler().runTaskAsynchronously(CraftBlockchainPlugin.getInstance(), () -> {
+                try {
+                    if(their_wallet == null) {
+                        Util.colorMsg(sender, "&c"+their_username+" does not have a wallet set!");
+                    }
             
-        }
-        
+                    float amount = BlockchainRequest.getCraftBalance(their_wallet).get();
+            
+                    if(their_username != null) {
+                        Util.colorMsg(sender, their_username + " has " + amount + walletPrefix);
+                    } else {
+                        Util.colorMsg(sender, "You have " + amount + "craft");
+                    }
+
+                    if(their_wallet != null) {
+                        Util.clickableCopy(sender, their_wallet, "&7&oWallet: &n%value%", "&7&oClick to copy wallet address");
+                    } 
+
+                } catch (InterruptedException | ExecutionException e) {                
+                    e.printStackTrace();
+                }
+            });              
+        }   
     }
 
-    private String getPlayerBalanceOutput(String wallet, String otherUser){        
-        if(wallet == null) {
-            return "&c"+otherUser+" does not have a wallet set!";
-        }
+    private CompletableFuture<String> getWalletBalanceOutput(String wallet){        
+        return CompletableFuture.supplyAsync(new Supplier<String>() {
+            @Override
+            public String get() {
+                if(!wallet.startsWith(walletPrefix)){
+                    return "";
+                }
 
-        float amount = BlockchainRequest.getCraftBalance(wallet);
+                long amount = -1;
+                try {
+                    amount = BlockchainRequest.getUCraftBalance(wallet).get();
+                } catch (InterruptedException | ExecutionException e) {                    
+                    e.printStackTrace();
+                }
+                float craft_amount = amount / 1_000_000;          
 
-        if(otherUser != null) {
-            return otherUser + " has " + amount + walletPrefix;
-        } else {
-            return "You have " + amount + "craft";
-        }
-    }
+                // negative number checks
+                if(craft_amount == ErrorTypes.NO_TOKENS_FOR_WALLET.code || craft_amount == ErrorTypes.NO_WALLET.code) {
+                    return "&c[!] That wallet is not apart of the BlockchainChain!";
 
-    private String getWalletBalanceOutput(String wallet){
-        if(!wallet.startsWith(walletPrefix)){
-            return "";
-        }
+                } else if(craft_amount == ErrorTypes.NODE_DOWN.code) {            
+                    return "&c[!] Blockchain is currently down, please try again later.";
+                }
 
-        // long amount = BlockchainRequest.getUCraftBalance(wallet);
-        float craft_amount = BlockchainRequest.getCraftBalance(wallet);
-
-        // negative number checks
-        if(craft_amount == ErrorTypes.NO_TOKENS_FOR_WALLET.code || craft_amount == ErrorTypes.NO_WALLET.code) {
-            return "&c[!] That wallet is not apart of the BlockchainChain!";
-
-        } else if(craft_amount == ErrorTypes.NODE_DOWN.code) {            
-            return "&c[!] Blockchain is currently down, please try again later.";
-        }
-
-        return wallet + " has " + craft_amount + "craft";
+                return wallet + " has " + craft_amount + "craft";
+            }
+        });        
     }
     
 }

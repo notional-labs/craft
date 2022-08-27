@@ -10,7 +10,8 @@ public enum ErrorTypes {
     NODE_DOWN(-5), // no BlockchainAPI (1317)
     NETWORK_ERROR(-6),
     NO_TOKENS_FOR_WALLET(-7), // When wallet address is not on chain
-    JSON_PARSE_TRANSACTION(-19);
+    JSON_PARSE_TRANSACTION(-19),
+    QUERY_ERROR(-20); // when a future query issue happens
 
     public int code;
 

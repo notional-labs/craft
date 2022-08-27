@@ -121,10 +121,10 @@ public class IntegrationAPI {
      * @param player_uuid
      * @return
      */
-    public long getUCraftBalance(UUID player_uuid) {
+    public CompletableFuture<Long> getUCraftBalance(UUID player_uuid) {
         String walletAddr = getWallet(player_uuid);
         if(walletAddr == null) {
-            return 0;
+            return CompletableFuture.completedFuture((long) ErrorTypes.NO_WALLET.code);
         }
         return BlockchainRequest.getUCraftBalance(walletAddr);
     }
@@ -134,8 +134,9 @@ public class IntegrationAPI {
      * @param player_uuid
      * @return
      */
-    public float getCraftBalance(UUID player_uuid) {
-        return getUCraftBalance(player_uuid) / 1_000_000;
+    public CompletableFuture<Float> getCraftBalance(UUID player_uuid) {
+        // return getUCraftBalance(player_uuid) / 1_000_000;
+        return getUCraftBalance(player_uuid).thenApply(ucraft -> convertUCRAFTtoBeReadable(ucraft));
     }
 
     /**
