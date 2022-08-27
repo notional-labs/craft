@@ -28,15 +28,22 @@ public class IntegrationAPI {
     private CraftBlockchainPlugin blockchainPlugin;
 
     // singleton, sets wallet to the server wallet in config
-    private final String SERVER_WALLET; 
+    private final String SERVER_WALLET, ESCROW_WALLET_REST_API; 
     private final String webappAddress;
     private IntegrationAPI() {    
         blockchainPlugin = CraftBlockchainPlugin.getInstance();
 
-        SERVER_WALLET = blockchainPlugin.getServersWalletAddress();
+        SERVER_WALLET = blockchainPlugin.getServerDaoTaxWallet(); // main wallet used for taxes -> the dow directly.
         if(SERVER_WALLET == null) {
             throw new IllegalStateException("SERVER_WALLET_ADDRESS is not set in config.yml");
         }
+
+        ESCROW_WALLET_REST_API = blockchainPlugin.getServerEscrowRestApiWalletAddress(); // main wallet used for taxes -> the dow directly.
+        if(ESCROW_WALLET_REST_API == null) {
+            throw new IllegalStateException("ESCROW_WALLET_REST_API wallet is not set in config.yml");
+        }
+
+
         webappAddress = blockchainPlugin.getConfig().getString("SIGNING_WEBAPP_LINK");
         if(webappAddress == null) {
             throw new IllegalStateException("SIGNING_WEBAPP_LINK is not set in config.yml");
@@ -44,11 +51,21 @@ public class IntegrationAPI {
     }
 
     /**
-     * Gets the server wallet, used for paying the server for transactions (ex. taxes) 
+     * Gets the server wallet, used for paying the server for transactions (ex. taxes) = The DAO multisig
      * @return String Wallet
      */
     public String getServerWallet() {
         return SERVER_WALLET;
+    }
+
+    /**
+     * Gets the escrow wallet which holds & pays escrows (controlled by the DAO, but is not the DAO fund / multisig.)
+     * http://api.crafteconomy.io/v1/dao/escrow_account_info
+     * 
+     * @return String Wallet
+     */
+    public String getServerEscrowRestApiWallet() {
+        return ESCROW_WALLET_REST_API;
     }
 
     /**

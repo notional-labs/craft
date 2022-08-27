@@ -96,6 +96,11 @@ public class Tx implements Serializable {
         this.toWallet = api.getServerWallet();
     }
 
+    public void setToWalletAsEscrowRestAPIAccount() {
+        // http://api.crafteconomy.io/v1/dao/escrow_account_info
+        this.toWallet = api.getServerEscrowRestApiWallet();
+    }
+
     public Double getTotalTaxAmount() {
         return api.getTaxRate() * this.uCraftAmount;
     }

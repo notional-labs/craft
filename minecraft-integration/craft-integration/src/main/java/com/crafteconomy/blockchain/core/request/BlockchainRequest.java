@@ -44,7 +44,7 @@ public class BlockchainRequest {
     
     private static CraftBlockchainPlugin blockchainPlugin = CraftBlockchainPlugin.getInstance();
     private static RedisManager redisDB = blockchainPlugin.getRedis();
-    private static String SERVER_ADDRESS = blockchainPlugin.getServersWalletAddress();
+    private static String DAO_TAX_WALLET = blockchainPlugin.getServerDaoTaxWallet(); // taxes paid directly to the DAO
 
     // http://65.108.125.182:1317/cosmos/bank/v1beta1
     private static final String API_ENDPOINT = blockchainPlugin.getApiEndpoint();
@@ -359,7 +359,7 @@ public class BlockchainRequest {
         // ",\"timestamp\": "+variable.toString()+
 
         // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
-        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+SERVER_ADDRESS+"}}";
+        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+DAO_TAX_WALLET+"}}";
         // CraftBlockchainPlugin.log(v);
         return json;
     }

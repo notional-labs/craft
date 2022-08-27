@@ -57,7 +57,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
     private Double TAX_RATE;
 
-    private String SERVER_WALLET = null;
+    private String DAO_SERVER_WALLET = null;
+    private String REST_API_WALLET_ADDRESS = null;
     private String API_MAKE_PAYMENT_ENDPOINT = "http://api.crafteconomy.io/v1/dao/make_payment";
 
     private BukkitTask redisPubSubTask = null;
@@ -89,7 +90,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         log("" + mongoDB.getDatabase().getCollection("connections").countDocuments());
 
 
-        SERVER_WALLET = getConfig().getString("SERVER_WALLET_ADDRESS");
+        DAO_SERVER_WALLET = getConfig().getString("DAO_TAX_WALLET_ADDRESS"); // DAO_TAX_WALLET_ADDRESS
+        REST_API_WALLET_ADDRESS = getConfig().getString("REST_API_WALLET_ADDRESS");
         API_MAKE_PAYMENT_ENDPOINT = getConfig().getString("API_MAKE_PAYMENT_ENDPOINT");
 
         webappLink = getConfig().getString("SIGNING_WEBAPP_LINK");
@@ -255,8 +257,12 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         return TAX_RATE;
     }
     
-    public String getServersWalletAddress() {
-        return SERVER_WALLET;
+    public String getServerDaoTaxWallet() { // used for SERVER payments -> the DAO (taxes)
+        return DAO_SERVER_WALLET;
+    }
+
+    public String getServerEscrowRestApiWalletAddress() { // used for ESCROW account payments
+        return REST_API_WALLET_ADDRESS;
     }
 
     public String getApiMakePaymentEndpoint() {

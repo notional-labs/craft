@@ -87,8 +87,8 @@ public class EscrowManager {
         }
 
         Tx tx = new Tx();
-        tx.setFromUUID(uuid);
-        tx.setToWalletAsServer();
+        tx.setFromUUID(uuid);        
+        tx.setToWalletAsEscrowRestAPIAccount(); // pays the escrow account (cosmjs in the API)
         tx.setUCraftAmount(ucraft_amount);
         tx.setDescription("ESCROWING " + ucraft_amount / 1_000_000 + "craft (" + ucraft_amount + "ucraft) FOR "
                 + uuid.toString());
@@ -131,12 +131,11 @@ public class EscrowManager {
             Player player = Bukkit.getPlayer(uuid);
 
             String messages = "";
-            if (status_type == FaucetTypes.SUCCESS) {
-                
-
+            if (status_type == FaucetTypes.SUCCESS) {        
                 String amt = (mostTheyCanRedeemUCraft/1_000_000) + "craft";
                 messages = "&aYou have redeemed &f" + amt + "&a from your escrow account -> wallet.\n";
                 messages += "&f&oYour new escrow balance is: &f&n" + getCraftBalance(uuid);
+                // TODO: Print out transaction hash here too?
             } else {
                 // Since the faucet already post the error now, not required here.
                 // messages = "\n\n\n\n&6Escrow Error: "+status_type.toString()+"(Ignore above messages)\n&7 - &f Your balance is still here in escrow, please try again later.\n";                                
