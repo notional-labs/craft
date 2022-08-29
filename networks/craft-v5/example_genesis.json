@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2022-09-01T01:00:00Z",
+  "genesis_time": "2022-08-31T20:00:00Z",
   "chain_id": "craft-v5",
   "initial_height": "1",
   "consensus_params": {
@@ -713,7 +713,7 @@
         "max_coin_mint": "10000000000",
         "daoAccount": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7",
         "denom": "uexp",
-        "ibc_asset_denom": "token",
+        "ibc_asset_denom": "ucraft",
         "close_pool_period": "86400s",
         "vesting_period_end": "43200s",
         "burn_exp_period": "43200s",

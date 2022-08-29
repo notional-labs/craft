@@ -3,13 +3,14 @@ import os
 import json
 from pathlib import Path
 
-# cd networks/craft-v4
+# cd networks/craft-v5
 
-LAUNCH_TIME = "2022-09-01T01:00:00Z" # TODO: USE THIS ONE, IS ACTUAL
+# Thursday
+LAUNCH_TIME = "2022-08-31T20:00:00Z" # 20 = 3pm CST (4pm EST)
 CHAIN_ID = "craft-v5"
 EXP_SEND = [{"denom": "uexp","enabled": False}]
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # Home Dir of the genesis
-FOLDER = "gentx" # no need to change
+FOLDER = "gentx"
 
 CUSTOM_GENESIS_ACCOUNT_VALUES = {
     # Add some extra to notional / chandra station.
@@ -98,7 +99,7 @@ def resetGenesisFile():
         genesis["app_state"]['exp']["params"]['close_pool_period'] = "86400s"   # 24h testnet, XXX for mainnet?
         genesis["app_state"]['exp']["params"]['vesting_period_end'] = "43200s"  # 12h testnet, 28 day mainnet
         genesis["app_state"]['exp']["params"]['burn_exp_period'] = "43200s"     # 12h testnet, 28 day mainnet
-        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "token"      # vuong said do token, only reece has init. ibc hash of USDC or just ucraft mainnet?
+        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "ucraft"     # vuong said do token, only reece has init. ibc hash of USDC or just ucraft mainnet?
 
         # Maybe in the whitelist, we add some validators / accounts just to test it
 
