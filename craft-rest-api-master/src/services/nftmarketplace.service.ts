@@ -76,7 +76,7 @@ export const queryOfferings = async (contract_address: string = "", from_craft_a
         }
         if(from_craft_address.length > 0 && offering.seller !== from_craft_address) {
             // we only want contracts which are from a specific craft address
-            console.log(`Offering ${offering.token_id} is not from ${from_craft_address}`);
+            // console.log(`Offering ${offering.token_id} is not from ${from_craft_address}`);
             continue;
         }
 

@@ -54,8 +54,15 @@ export const queryToken = async (client: CosmWasmClient, addr721Address: string,
         }        
     }
     
-    const result = await client.queryContractSmart(addr721Address, {nft_info: { token_id: tokenId }});    
-    let token_uri = result.token_uri;
+    const result = await client.queryContractSmart(addr721Address, { nft_info: { token_id: tokenId } }).catch((err) => {
+        console.log("queryToken error, tokenID probably not apart of this contract... -> ", err);
+        return null;
+    });
+    // let token_uri = result.token_uri;
+    let token_uri;
+    if(result) {
+        token_uri = result.token_uri;
+    }
 
     // Can be a link (http, ipfs), base64 encoded, or a JSON string
     // let token_uri = response?.data?.data?.token_uri;
@@ -135,17 +142,20 @@ export const queryTokenOwner = async (client: CosmWasmClient, addr721Address: st
 };
 
 
-export const queryAllTokensForContract = async (client: CosmWasmClient, addr721Address: string, start_after: number = 0, limit: number = 100) => {
-    const tokens_list_query = await client.queryContractSmart(addr721Address, {all_tokens: { start_after: start_after, limit: limit }});
-    let tokens_list = tokens_list_query.tokens;
+export const queryAllTokensForContract = async (client: CosmWasmClient, addr721Address: string, start_after: number = 0, limit: number = 100) => {    
+    // console.log("queryAllTokensForContract", addr721Address);
 
-    // let tokens_list = response?.data?.data?.tokens;
+    // TODO: why does the start_after & limit not work with contract in spec?
+    // const tokens_list_query = await client.queryContractSmart(addr721Address, { all_tokens: { start_after: start_after, limit: limit }});    
+    const tokens_list_query = await client.queryContractSmart(addr721Address, { all_tokens: { }});    
+    let tokens_list = tokens_list_query.tokens;    
 
     // sort tokens_list in order
     tokens_list.sort((a, b) => {
         return a.token_id - b.token_id;
     });
     // loop through all & query them
+    // console.log("queryAllTokensForContract", tokens_list);
 
     return tokens_list
 };
@@ -192,6 +202,11 @@ export const queryContractInfo = async (client: CosmWasmClient, addr721_address:
         if(cachedToken) {
             return JSON.parse(cachedToken);
         }        
+    }
+    
+    if(addr721_address && (!addr721_address.startsWith("craft") || addr721_address.length !== (64))) { // 59 chars + 5 ('craft') = 64.
+        console.log("queryContractInfo: Invalid addr721_address", addr721_address);
+        return undefined;
     }
 
     

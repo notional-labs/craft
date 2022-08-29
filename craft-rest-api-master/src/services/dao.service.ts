@@ -2,7 +2,7 @@ import { redisClient, collections } from './database.service';
 import { sendDiscordWebhook } from './discord.service';
 import { getPrice, getCraftUSDPrice } from './pricing.service';
 
-import axios from 'axios';
+import axios from 'axios'; // TODO: use QueryClient bankExtension to query totalSupply
 
 // https://cosmos.github.io/cosmjs/
 import { StdFee, assertIsDeliverTxSuccess, calculateFee, GasPrice, SigningStargateClient, StargateClient, QueryClient } from "@cosmjs/stargate";

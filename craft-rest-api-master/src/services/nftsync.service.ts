@@ -133,6 +133,8 @@ export async function getAllCW721ContractAddresses() { // that the DAO owns / mi
     // if(!addresses) { return []; }
     // return addresses.data.contracts;
 
+    // TODO: future, query all by the CW code id so its automatic. For now just DAO approved contracts.
+
 
     // get OTHER_DAO_721_CONTRACTS from env
     let CONTRACTS: string[] = [`${process.env.ADDR721_REALESTATE}`, `${process.env.ADDR721_IMAGES}`];
@@ -141,6 +143,7 @@ export async function getAllCW721ContractAddresses() { // that the DAO owns / mi
         CONTRACTS.push(...process.env.OTHER_DAO_721_CONTRACTS.split(','));
     }
 
+    // console.log("getAllCW721ContractAddresses", CONTRACTS);
     return CONTRACTS;
 }
 

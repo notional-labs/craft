@@ -14,7 +14,8 @@ import { CosmWasmClient } from 'cosmwasm';
 export const getAllCollectionData = async (req: Request, res: Response) => {
     // const { contract_address, token_id } = req.params;
 
-    const all_collections = await getAllCollections();
+    const client = await CosmWasmClient.connect(`${process.env.CRAFTD_NODE}/`);
+    const all_collections = await getAllCollections(client);
     // console.log(all_collections)
 
     if (all_collections) return res.status(200).json(all_collections) 
