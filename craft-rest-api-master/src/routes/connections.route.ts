@@ -4,6 +4,5 @@ import connectionsController from '../controllers/connections.controller';
 
 // Routes for connections
 router.post('/link', connectionsController.createConnectionLink);
-router.get('/code/:minecraftCode', connectionsController.getMinecraftIDFromCode);
 
 export default router;

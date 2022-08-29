@@ -14,6 +14,7 @@ export const sendDiscordWebhook = async (title: string, description: string, fie
 
     embed.setTitle(title).setDescription(description).setColor(color);
     for(let key in fields) {
+        // console.log(key, fields[key]);
         embed.addField(key, fields[key]);
     }
 
