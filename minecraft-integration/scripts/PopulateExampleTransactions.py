@@ -5,7 +5,8 @@ import os
 import json
 import uuid
 import time
-from random import randint
+# from random import randint
+from secrets import randbelow
 import redis
 from dotenv import load_dotenv
 
@@ -49,14 +50,15 @@ for i in range(50):
 
         # copy schema and update values just for this 1 key
         SCHEMA_COPY = SCHEMA.copy()
-        SCHEMA_COPY["tx_type"] = TX_TYPES[randint(0,len(TX_TYPES)-1)]
-        SCHEMA_COPY["amount"] = f"{randint(1_000_000,10_000_000)}"
+        SCHEMA_COPY["tx_type"] = TX_TYPES[randbelow(len(TX_TYPES)-1)]
+        SCHEMA_COPY["amount"] = f"{randbelow(10_000_000)}"
+        if int(SCHEMA_COPY["amount"]) < 1_000_000:
+            SCHEMA_COPY["amount"] = f"1000000"
         SCHEMA_COPY["description"] = f"Here is a test description for type {SCHEMA_COPY['tx_type']} time_{epoch}"
         SCHEMA_COPY["from_address"] = f"{WALLET}"
 
         # no tax for this one
-        # random n number between 1 and 5
-        n = randint(1,5)
+        n = randbelow(4)
         if n == 1:
             # remove the tax section from the schema copy
             SCHEMA_COPY.pop("tax", None)
