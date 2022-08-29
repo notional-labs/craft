@@ -7,6 +7,8 @@ public enum TransactionType {
     LIQUIDITY_POOL,
     COMPANY,
     LAND_CLAIM,
-    AUTHENTICATION,
-    REAL_ESTATE;
+    REAL_ESTATE,
+
+    ESCROW_DEPOSIT, // tax free transactions in BlockchainRequests.java
+    AUTHENTICATION;
 }

@@ -351,15 +351,22 @@ public class BlockchainRequest {
      * @return String JSON Amino (Readable by webapp)
      */
     private static String generateTxJSON(String FROM, String TO, long UCRAFT_AMOUNT, String DESCRIPTION, TransactionType txType) {    
-        double taxAmount = UCRAFT_AMOUNT * blockchainPlugin.getTaxRate();
+        double taxAmount = UCRAFT_AMOUNT * blockchainPlugin.getTaxRate();        
         long now = Instant.now().getEpochSecond();
-
         // EX: {"amount":"2","description":"Purchase Business License for 2","to_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p","tax":{"amount":0.1,"address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"},"denom":"uosmo","from_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"}
-        
-        // ",\"timestamp\": "+variable.toString()+
-
+              
         // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
         String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+DAO_TAX_WALLET+"}}";
+
+        // Escrow, Authentication types = No tax.
+        switch (txType) {
+            case AUTHENTICATION:
+            case ESCROW_DEPOSIT:
+                json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\"}";
+                break;
+            default:
+                break;
+        }        
         // CraftBlockchainPlugin.log(v);
         return json;
     }
