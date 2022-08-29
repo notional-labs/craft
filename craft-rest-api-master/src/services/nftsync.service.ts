@@ -7,7 +7,8 @@ import { fromBech32, toBech32 } from "@cosmjs/encoding";
 
 import {getUsersOwnedNFTs, queryContractInfo} from './nfts.service';
 import {queryOfferings} from './nftmarketplace.service';
-import {getDetails_Offering_TokenData_Owner} from './assets.service';
+// import {getDetails_Offering_TokenData_Owner} from './assets.service';
+import {getDetails_Offering_TokenData_Owner} from './collections.service';
 
 const allowCache = false;
 
@@ -30,6 +31,7 @@ export const getUsersNFTsFromOtherPlatforms = async (craft_address: string) => {
 }
 
 import { collections } from './database.service';
+import { CosmWasmClient } from 'cosmwasm';
 async function saveNFTsToMongoDB(craft_address: string, nfts: any) {
     // save to the NFT collection to their address.
     await collections?.nfts?.updateOne({ address: craft_address }, { $set: { nfts } }, { upsert: true });
@@ -121,16 +123,25 @@ async function queryStargazeNFTs(starsWallet) {
 }
 
 // TODO: Move to NFTs.service
-export async function getAllCW721ContractAddresses() {
-    const CONTRACT_ADDRESSES = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/code/${process.env.CW721_CODE}/contracts?pagination.limit=100`
+export async function getAllCW721ContractAddresses() { // that the DAO owns / minted.
+    // const CONTRACT_ADDRESSES = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/code/${process.env.CW721_CODE}/contracts?pagination.limit=100`
     // console.log(CONTRACT_ADDRESSES);
-    const addresses = await axios.get(CONTRACT_ADDRESSES).catch(err => {
-        console.log(err);
-        return undefined;
-    });
+    // const addresses = await axios.get(CONTRACT_ADDRESSES).catch(err => {
+    //     console.log(err);
+    //     return undefined;
+    // });
+    // if(!addresses) { return []; }
+    // return addresses.data.contracts;
 
-    if(!addresses) { return []; }
-    return addresses.data.contracts;
+
+    // get OTHER_DAO_721_CONTRACTS from env
+    let CONTRACTS: string[] = [`${process.env.ADDR721_REALESTATE}`, `${process.env.ADDR721_IMAGES}`];
+    
+    if (process.env.OTHER_DAO_721_CONTRACTS && process.env.OTHER_DAO_721_CONTRACTS.length > 0) {
+        CONTRACTS.push(...process.env.OTHER_DAO_721_CONTRACTS.split(','));
+    }
+
+    return CONTRACTS;
 }
 
 async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = false) {
@@ -143,46 +154,81 @@ async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = fals
 
     const addresses = await getAllCW721ContractAddresses();
 
+    const client = await CosmWasmClient.connect(`${process.env.CRAFTD_NODE}/`);
+
     var myCraftNFTs: any = [];
     if(addresses === undefined) { return myCraftNFTs; }
     // console.log("addresses", addresses);
 
     for(const addr of addresses) {
-        const contract_data = await queryContractInfo(addr);
-        let data = {
-            contract_details: {
-                name: contract_data.name,
-                symbol: contract_data.symbol,
-                address: addr,
-            },
-            token_data: {},
-        }
+        // const contract_data = await queryContractInfo(addr);
+        // let data = {
+        //     contract_details: {
+        //         name: contract_data.name,
+        //         symbol: contract_data.symbol,
+        //         address: addr,
+        //     },
+        //     token_data: {},
+        // }        
+
+        console.log("LOGGING addr", addr, Date.now());
 
         // gets user owned direct tokens
         const tokens = await getUsersOwnedNFTs(addr, craftWallet);
+
+        console.log("get users owned nfts", Date.now());
+
+        // list of await functions to promise all on
+        let promises: any = [];
+
         for(const nft of tokens) {
-            console.log(nft);
-            const newData = await getDetails_Offering_TokenData_Owner(addr, nft.tokenId);
-            if(newData) {
-                // console.log(newData);
-                myCraftNFTs.push(newData);
-            }           
+            // console.log(nft);
+            // const newData = await getDetails_Offering_TokenData_Owner(addr, nft.tokenId);
+            promises.push(getDetails_Offering_TokenData_Owner(client, addr, nft.tokenId));
+            // if(newData) {
+            //     // console.log(newData);
+            //     myCraftNFTs.push(newData);
+            // }           
         }
+
+        // wait for all promises to resolve
+        const results = await Promise.all(promises);
+        for(const result of results) {
+            if(result) {
+                myCraftNFTs.push(result);
+            }
+        }
+
+        console.log("held tokens", Date.now());
 
         // get NFTs which are being sold in the marketplace, so technically the user still owns BUT they are being sold there
         const tokens_offerings = await queryOfferings("", craftWallet);
+        let promises2: any = [];
         for(const nft of tokens_offerings) {
             console.log(nft);
-            const newData = await getDetails_Offering_TokenData_Owner(addr, nft.token_id);
-            if(newData) {
-                // console.log(newData);
-                // console.log(newData.owner);                
+            // const newData = await getDetails_Offering_TokenData_Owner(addr, nft.token_id);
+            // if(newData) {
+            //     // console.log(newData);
+            //     // console.log(newData.owner);                
 
-                if(newData.owner === craftWallet) {
-                    myCraftNFTs.push(newData);
-                }                
-            }
+            //     if(newData.owner === craftWallet) {
+            //         myCraftNFTs.push(newData);
+            //     }                
+            // }
+            promises2.push(getDetails_Offering_TokenData_Owner(client, addr, nft.token_id));            
         }
+
+        // wait for all promises to resolve
+        const results2 = await Promise.all(promises2);
+        for(const result of results2) {
+            if(result) {
+                if(result.owner === craftWallet) {
+                    myCraftNFTs.push(result);
+                }
+            }
+        }     
+        
+        console.log("offerings", Date.now());
 
     }
 
