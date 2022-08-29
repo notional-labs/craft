@@ -9,6 +9,7 @@ Commands are from commands.md. & list prices are based on the floor volume & typ
 
 # ---- Configuration --------------------------------------------------------------------------------------------------
 # ensure it matches for real estate & images
+from pprint import pprint
 import requests
 START_IDX = 1 # put at 1 for mainnet mint
 addresses = requests.get("https://api.crafteconomy.io/v1/nfts/get_contract_addresses").json()
@@ -51,8 +52,12 @@ from pymongo import MongoClient
 load_dotenv()
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-os.makedirs(f"{current_dir}/real_estate", exist_ok=True)
 current_dir = f"{current_dir}/real_estate"
+testing = f"{current_dir}/re_testing"
+
+os.makedirs(current_dir, exist_ok=True)
+os.makedirs(testing, exist_ok=True)
+
 
 params_base64 = {'encoding': 'base64'}
 
@@ -200,30 +205,72 @@ class Contract_Query:
 def _step1_prepareRealEstateDocuments():
     print("Step 1: Preparing real estate documents from MongoDB. Put into 'mintCommands' variable.")
     # Get all properties from MongoDB & s   ave to the mintCommands dict (key=id, value = dict or data)
+
+    # if property has name which was already used by another UUID, then report it
+    # name, uuid
+    propertyNames = {}
+    noImageLinks = {}
+    PROPERTIES = {
+        "GOVERNMENT": [],
+        "RESIDENTIAL": [],
+        "BUSINESS": [],
+    }
+
     global mintCommands
     for idx, doc in enumerate(reProperties.find(), START_IDX): # 1
         for k in removeKeys:
             if k in doc:
                 del doc[k]
 
-        if len(doc['imageLink']) == 0:
-            # print(f"[!] Skipping {doc['_id']} as it has no imageLink")            
-            doc['imageLink'] = "https://i.imgur.com/z7qnMGD.png"
-            # continue
-
-        # CHECK IF ANY strings in NON_GOV are in name
-        name = str(doc['name']).lower()
-        if any(x in name for x in NON_GOV_PROPERTY_NAMES_CHECK) and "firehouse" not in name:
-            if str(doc['type']).lower().startswith("gov"):                
-                print(f"ERROR, {doc['name']} is a gov property, but has a non-government name...")
-                continue # TODO: exit for mainnet
-
+        name = doc['name']
+        uuid = doc['_id']
+        prop_type = doc['type']
+        imageLink = doc['imageLink']
         doc['cityName'] = Utils.getCityFromID(doc['cityId'])
         doc['buildingName'] = Utils.getBuildingFromID(doc['buildingId'])
         doc['_nft_type'] = "real_estate"
-        # print(f"Getting data for {idx}, {doc}")
+
+        propertyNames[name] = uuid
         mintCommands[idx] = doc
-        # input(f"{doc=}")
+
+        if len(imageLink) == 0:                       
+            # doc['imageLink'] = "https://i.imgur.com/z7qnMGD.png"
+            noImageLinks[name] = uuid
+            # continue
+
+        # CHECK IF ANY strings in NON_GOV are in name. This is now done manually
+        # name = str(doc['name']).lower()
+        # if any(x in name for x in NON_GOV_PROPERTY_NAMES_CHECK) and "firehouse" not in name:
+        #     if str(doc['type']).lower().startswith("gov"):                
+        #         print(f"[ERROR], {doc['name']} {doc['_id']} is a gov property, but has a non-government name...")                
+        #         continue
+
+        PROPERTIES[prop_type].append([name, uuid, imageLink])
+
+
+    # ! error checking
+    # if len(noImageLinks) > 0:
+    #     print(f"\n\n[ERROR] There are {len(noImageLinks)} properties with no imageLink. Please fix this before minting.")
+    #     pprint(noImageLinks, width=1, compact=True)
+    #     exit()
+
+    # pprint(PROPERTIES)
+
+    # save properties to file
+    with open(os.path.join(testing, "property_catagory_checker.json"), 'w') as f:
+        json.dump(PROPERTIES, f, indent=4, sort_keys=True)
+
+    # save propertyNames to json
+    with open(os.path.join(testing, "propertyNames.json"), 'w') as f:
+        json.dump(propertyNames, f, indent=4, sort_keys=True)
+
+    # dump properties which do not have an image set (image len of 0)
+    with open(os.path.join(testing, "noImageLinks.json"), 'w') as f:
+        json.dump(noImageLinks, f, indent=4, sort_keys=True)
+    
+
+    print(f"Saved output to {testing} folder, check there for errors.")
+    print("=========================================\n\n")
 
 # in the future we need to craftd tx sign as a big array of messages, but for now this works
 def encodeRealEstateDocumentAndSaveMintToFile():
