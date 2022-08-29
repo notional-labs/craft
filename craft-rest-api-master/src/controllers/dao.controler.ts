@@ -6,8 +6,6 @@ import { getCraftUSDPrice } from '../services/pricing.service';
 export const makePaymentToPlayer = async (req: Request, res: Response) => {
     const {secret, wallet, ucraft_amount, description} = req.body;
 
-    // console.log("makePayment:", secret, wallet, ucraft_amount, description);
-
     const response = await makePayment(secret, wallet, ucraft_amount, description);
     if (response) return res.status(200).json(response);
     else return res.status(404).json({ message: 'No Real Estate NFTs found for this wallet' });
@@ -47,23 +45,13 @@ export const getTotalAssets = async (req: Request, res: Response) => {
 // get EXP price
 export const getEXPPrice = async (req: Request, res: Response) => {
     const response = await getExpValueCalculation();
-    if (response) return res.status(200).json(
-        {
-            "exp_price": Number(response),
-            "uexp_price": Number(response)/1_000_000
-        }
-    );
+    if (response) return res.status(200).json({"exp_price": Number(response)});
     else return res.status(404).json({ message: 'ERROR:...' });
 };
 
 export const getCraftPrice = async (req: Request, res: Response) => {
     const response = await getCraftUSDPrice();
-    if (response) return res.status(200).json(
-        {
-            "craft_price": Number(response),
-            "ucraft_price": Number(response)/1_000_000,
-        }
-    );
+    if (response) return res.status(200).json({"craft_price": Number(response)});
     else return res.status(404).json({ message: 'ERROR:...' });
 };
 

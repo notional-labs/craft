@@ -6,15 +6,17 @@ import { queryToken, queryTokenOwner, queryContractInfo, queryAllTokensForContra
 import { getAllCW721ContractAddresses } from './nftsync.service';
 import { queryOfferings } from './nftmarketplace.service';
 
+// TODO: Which of these are in the collections service? which do we remove?
+
 // create boolean to disable caching
 const allowCache = false;
 
 export const getDetails_Offering_TokenData_Owner = async (contract_address: string, token_id: string) => {
     // const REDIS_KEY = `cache:all_details:${contract_address}`;
-    // const TTL = 10;  // 10 seconds
+    // const TTL = 30;  // 10 seconds
     // const REDIS_HSET_KEY = `${token_id}`
     // let cached_information = await redisClient?.hGet(REDIS_KEY, REDIS_HSET_KEY);
-    // if (allowCache && cached_information) {        
+    // if (cached_information) {        
     //     return JSON.parse(cached_information);
     // }
 
@@ -79,7 +81,7 @@ export const getCollectionTotalVolume = async (contract_address: string = "") =>
 
     // Make query to the contract, we don't use CosmJS bc of error handling issues
     // const query = Buffer.from(`{"get_offerings":{}}`).toString('base64');
-    const query = Buffer.from(`{"get_collection_volume":{"address":"craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj"}}`).toString('base64');
+    const query = Buffer.from(`{"get_collection_volume":{"address":"${contract_address}"}}`).toString('base64');
     let api = `${process.env.CRAFTD_REST}/cosmwasm/wasm/v1/contract/${process.env.ADDRM}/smart/${query}`
     console.log(`Querying coll_volume ${contract_address} from ${api}`);
 
@@ -134,8 +136,9 @@ export const getAllCollections = async () => {
             symbol: contract_info.symbol,
             _nft_type: _nft_type,
             preview: await queryGetNFTImage(addr, token_ids[0]),
+            volume: await getCollectionTotalVolume(addr),
             num_tokens: token_ids.length,
-            token_ids: token_ids,            
+            token_ids: token_ids,       
         }
     }
 

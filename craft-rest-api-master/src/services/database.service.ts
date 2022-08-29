@@ -10,9 +10,7 @@ export const collections: {
     reCities?: mongo.Collection;
     reBuildings?: mongo.Collection; 
     webappSyncCodes?: mongo.Collection; 
-    nfts?: mongo.Collection;
-    escrow?: mongo.Collection; // balances
-} = {};
+    nfts?: mongo.Collection } = {};
 // Connected redis client
 export let redisClient: redis.RedisClientType<any, any>;
 
@@ -39,8 +37,6 @@ export const connectToMongo = async (connectionString, dbName) => {
 
     collections.webappSyncCodes = db.collection('webappSyncCodes'); // used for syncing in game -> the webapp
     collections.nfts = db.collection('nftImageLinks'); // TODO: used to sync a players image NFTs from chain -> in game database.  [!] Need to see how Joel wants these stored
-
-    collections.escrow = db.collection('escrow'); // balances
 
     console.log(`Successfully connected to Mongo Database ${db.databaseName}`);
 };

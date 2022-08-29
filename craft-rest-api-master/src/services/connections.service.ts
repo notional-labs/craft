@@ -43,13 +43,9 @@ export const getLink = async (options: LinkOptions) => {
  * @param code - the available code they generated in game
  */
 export const getMCUUID = async (minecraftCode: string) => {
-    const document = await collections?.webappSyncCodes?.find({ code: minecraftCode }).tryNext();    
-    return document;
-};
+    const document = await collections?.webappSyncCodes?.find({ code: minecraftCode }).tryNext();
+    // console.log(document);
 
-
-export const deleteMCuuid = async (minecraftUUID: string) => {
-    const document = await collections?.webappSyncCodes?.deleteOne({ _id: minecraftUUID });    
     return document;
 };
 
@@ -59,24 +55,6 @@ export const deleteMCuuid = async (minecraftUUID: string) => {
  * @returns {Promise<InsertOneResult<Document> | undefined>}
  */
 export const createLink = async (options: LinkOptions) => {
-    // query the connections & find a document if any match
-    const prev_document = await collections?.connections?.find({ $or: [
-        { discordId: options.discordId },
-        { keplrId: options.keplrId },
-        { minecraftId: options.minecraftId }
-    ] }).tryNext();
-
-    // either way a new document is going in, so delete old sync code as its been used.
-    deleteMCuuid(options.minecraftId);
-
-    // if it does, we update the document with the new options
-    if (prev_document) {
-        const result = await collections?.connections?.updateOne({ _id: prev_document._id }, { $set: options });
-        // console.log("Updated one: ", result);
-        return result;
-    }
-    
-    // console.log("Inserting new document: ", options);    
     return collections?.connections?.insertOne({
         discordId: options.discordId,
         keplrId: options.keplrId,
