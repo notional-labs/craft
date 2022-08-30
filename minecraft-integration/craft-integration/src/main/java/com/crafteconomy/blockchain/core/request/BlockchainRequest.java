@@ -362,6 +362,7 @@ public class BlockchainRequest {
         switch (txType) {
             case AUTHENTICATION:
             case ESCROW_DEPOSIT:
+            case ESCROW_WITHDRAW:
                 json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\"}";
                 break;
             default:

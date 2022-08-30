@@ -10,5 +10,6 @@ public enum TransactionType {
     REAL_ESTATE,
 
     ESCROW_DEPOSIT, // tax free transactions in BlockchainRequests.java
+    ESCROW_WITHDRAW,
     AUTHENTICATION;
 }
