@@ -1,0 +1,46 @@
+# AUTO GENERATED FROM add-genesis-accounts.py
+craftd add-genesis-account craft1dt8664k9pxrax37u30gqzansdyf2gg6mp8ah20 1000000uexp,10000000000ucraft #StakeLab
+craftd add-genesis-account craft1qs735j7mfdae8x723kxzlmpfc339w9adm27zfk 1000000uexp,10000000000ucraft #Cros-nest
+craftd add-genesis-account craft1up3slj4nr5y23gxkvqn8h5ra9mv0pj2v84g0me 1000000uexp,10000000000ucraft #SpacePotato
+craftd add-genesis-account craft1dx00f0x9qw0g4eghetwtpn37l2chh53whu08cc 1000000uexp,10000000000ucraft #Chandra Station
+craftd add-genesis-account craft16ksjumn5pyny0xve522ez63ftkn3pswfgs462q 1000000uexp,10000000000ucraft #Imperator.co
+craftd add-genesis-account craft17n56v5xsdf80lfncr3jq34ct49pstegyz8sn0h 1000000uexp,10000000000ucraft #Enigma
+craftd add-genesis-account craft1wtqqettvaahq78lem9usp690s28jy06aeawnra 1000000uexp,10000000000ucraft #SkyNet | Validators
+craftd add-genesis-account craft1jt9w26mpxxjsk63mvd4m2ynj0af09cslzhd3vd 1000000uexp,10000000000ucraft #polkachu.com
+craftd add-genesis-account craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh 1500000uexp,1000000000000000ucraft #pbcups validator
+craftd add-genesis-account craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0 500000000ucraft,1000000000token #reeces main
+craftd add-genesis-account craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7 1000000000000000ucraft #dao itself
+craftd add-genesis-account craft14svh76rr38wkj9d3g5qmsxyjm7dhxk34v57ygy 1000000000000000ucraft # game payments addr
+craftd add-genesis-account craft16n64zcvzjr6s5suj3fraaj3gawuu5vyuz94t93 500000000000ucraft # craft foundation
+craftd add-genesis-account craft1qjnp5sc82kjt5gzcvaj3av8hanut0c5s89s8qs 250000000000ucraft # craft foundation
+craftd add-genesis-account craft1cjk0hg8ert3q9ez9vfxs487u4xuwvsq2hy8x66 250000000000ucraft # craft foundation
+craftd add-genesis-account craft155ultvhmlu4lfrsmv956d5tu4hwknmyk9pnjuq 250000000000ucraft # craft foundation
+craftd add-genesis-account craft14v657ax375g3swwffm5qtthrqp2e4x8dttthv9 250000000000ucraft # craft foundation
+craftd add-genesis-account craft1egk9lma2wxwx0nhkkzy2vpd9wkd88egcvgeded 250000000000ucraft # craft foundation
+craftd add-genesis-account craft1lxh0u07haj646pt9e0l2l4qc3d8htfx5se2ntp 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1fpsv3uk2tqq362zvh82777gjexjduu79t8z29v 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1f4sjvl8ujk9g6vtdvratlzmz7k7a5d9dnm325l 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft165qvsanfcnm075vld6r90haypxwe27rjlzw6r7 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1uc8a9f43fqc4pum8ejfr3n69l87c87r2ja2xwq 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1nzd8jnu69w8eux3dcg4axxyarm7age86p4pjd4 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1ray0cavvxaa92xp08affex2casrekddgxt2lcl 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft12sczd7vmheqat355txqducgm6fk86ye4s5lkz8 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1h2kjnnnryh9ezgzj6yrax4snzfner9qaqjfqr9 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1pcal3gqemz4g9e6p52had37azx2p9hg64rapfk 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft13t0vcrdlj3vju5pqgwzlyr7lcw9s96kahfgla4 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1f0043tu4clcs7skhzs7760hw095xzv6tflvvfd 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft18r6j04h3pa49kmhazdqz6plt5t35jxswdv4y93 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1j8s87w3fctz7nlcqtkl5clnc805r2404eu8xvq 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1gmgck2kytg9tj60m2c3m9gdaavencp7l77nwd6 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1s42j67d3f6julvx4nhjgmcxf74xfph26t9vcn2 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1r8qt0k0t7kywdndjs2udlem4j7m2yk29ua47mm 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1fasl4wc76fxxxmvkrkzre9cejyn0x2lmgckyqz 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1hg49kyr022qvj9hq6esvm5g9gtax4c262hutn2 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1f0l4wt43gyktrveku2aqc3mw9tz3dk9j7nwese 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft14l4g4lvwl0tg6thmpl5q9337drs3he44mr0795 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1dv3v662kd3pp6pxfagck4zyysas82ads89ldp8 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1w9rugshphy0a849yp56klt5ul8y55mne7g7vf0 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1ddd9vf56hv5jntdqkd85dv6je6xes25g3ykyn4 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft145r7j5u2868er6ylj3nt9zzg5lnc9gyt4d6282 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1me3g0a2nr24sjykmhvpl687f6zt66nlvhv0y9h 100uexp,250000000ucraft # daomember
+craftd add-genesis-account craft1ugjgu3hg7jcmafq3tr6g857950vuyj0kua0hka 100uexp,250000000ucraft # daomember

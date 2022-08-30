@@ -12,16 +12,21 @@ EXP_SEND = [{"denom": "uexp","enabled": False}]
 GENESIS_FILE=f"{Path.home()}/.craftd/config/genesis.json" # Home Dir of the genesis
 FOLDER = "gentx"
 
-CUSTOM_GENESIS_ACCOUNT_VALUES = {
-    # Add some extra to notional / chandra station.
-    "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh": "1500000uexp,1000000000000000ucraft #pbcups validator", # 1.5 exp, 1 is bonded, 0.5 for testing.  
-    # "craft1r8sd9cgfnwzyt0dm06hnajy9mkljhl6suczml5": "1000000uexp,1000000000000000ucraft #pbcups - test dedi (temp)",
-    "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0": "1000000000000000ucraft,1000000000token #reeces main",  
+CUSTOM_GENESIS_ACCOUNT_VALUES = {    
+    "craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh": "1500000uexp,1000000000000000ucraft #pbcups validator", # 1.5 exp, 1 is bonded, 0.5 for testing.      
+    "craft10r39fueph9fq7a6lgswu4zdsg8t3gxlqd6lnf0": "500000000ucraft,1000000000token #reeces main",  
 
     # TESTNET V4 - DAO ACCOUNT (multisig for mainnet)
     "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7": "1000000000000000ucraft #dao itself",    
     # TESTNET V4 - GAME PAYMENTS (multisig for mainnet)
-    "craft14svh76rr38wkj9d3g5qmsxyjm7dhxk34v57ygy": "1000000000000000ucraft # game payments addr",    
+    "craft14svh76rr38wkj9d3g5qmsxyjm7dhxk34v57ygy": "1000000000000000ucraft # game payments addr",
+
+    "craft16n64zcvzjr6s5suj3fraaj3gawuu5vyuz94t93": "500000000000ucraft # craft foundation", # C
+    "craft1qjnp5sc82kjt5gzcvaj3av8hanut0c5s89s8qs": "250000000000ucraft # craft foundation", # b
+    "craft1cjk0hg8ert3q9ez9vfxs487u4xuwvsq2hy8x66": "250000000000ucraft # craft foundation", # v
+    "craft155ultvhmlu4lfrsmv956d5tu4hwknmyk9pnjuq": "250000000000ucraft # craft foundation", # Jo
+    "craft14v657ax375g3swwffm5qtthrqp2e4x8dttthv9": "250000000000ucraft # craft foundation", # Mi
+    "craft1egk9lma2wxwx0nhkkzy2vpd9wkd88egcvgeded": "250000000000ucraft # craft foundation", # Ja
 
     # https://github.com/notional-labs/craft/pull/12/files
     "craft1lxh0u07haj646pt9e0l2l4qc3d8htfx5se2ntp": "100uexp,250000000ucraft # daomember", # giving dao members 100uexp just to ensure this works. 10k-exp for launch
@@ -131,6 +136,7 @@ def outputDetails() -> str:
 def createGenesisAccountsCommands():
     gentx_files = os.listdir(FOLDER)
     # give validators their amounts in the genesis (1uexp & some craft)
+    output = "# AUTO GENERATED FROM add-genesis-accounts.py\n"
     for file in gentx_files:
         f = open(FOLDER + "/" + file, 'r')
         data = json.load(f)
@@ -141,13 +147,20 @@ def createGenesisAccountsCommands():
         amt = validatorData['value']['amount']
 
         if val_addr not in CUSTOM_GENESIS_ACCOUNT_VALUES.keys():
-            print(f"craftd add-genesis-account {val_addr} {amt}uexp,10000000000ucraft #{moniker}")
+            # print()
+            output += f"craftd add-genesis-account {val_addr} {amt}uexp,10000000000ucraft #{moniker}\n"
             continue # 
                 
     for account in CUSTOM_GENESIS_ACCOUNT_VALUES:
-        print(f"craftd add-genesis-account {account} {CUSTOM_GENESIS_ACCOUNT_VALUES[account]}")
+        # print(f"craftd add-genesis-account {account} {CUSTOM_GENESIS_ACCOUNT_VALUES[account]}")
+        output += f"craftd add-genesis-account {account} {CUSTOM_GENESIS_ACCOUNT_VALUES[account]}\n"
 
-    print(f"# [!] COPY-PASTE-RUN THE ABOVE TO CREATE THE GENESIS ACCOUNTS")
+    # save output to file in this directory
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(current_dir, "run_these_genesis_balances.sh"), 'w') as f:
+        f.write(output)
+
+    print(f"# [!] COPY-PASTE-RUN THE \"sh run_these_genesis_balances.sh\" ABOVE TO CREATE THE GENESIS ACCOUNTS")
     print(f"# [!] THEN `craftd collect-gentxs --gentx-dir gentx/`")
     print(f"# [!] THEN `craftd validate-genesis`")
     print(f"# [!] THEN `code (LOCATION_OF_GENESIS_FILE), AND PUT ON MACHINES`")
