@@ -1,6 +1,7 @@
 package com.crafteconomy.blockchain.escrow;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
@@ -10,6 +11,7 @@ import com.crafteconomy.blockchain.core.request.Caches;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.core.types.RequestTypes;
+import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
@@ -79,11 +81,15 @@ public class EscrowManager {
     public EscrowErrors depositUCraft(UUID uuid, long ucraft_amount) {
         // Get the most the user can withdraw from their chain ucraft wallet or what
         // they want, which would be the minimum of the 2
-        ucraft_amount = Math.min(api.getUCraftBalance(uuid), ucraft_amount);
+        try {
+            ucraft_amount = Math.min(api.getUCraftBalance(uuid).get(), ucraft_amount);
+        } catch (InterruptedException | ExecutionException e) {            
+            e.printStackTrace();
+        }
 
         Tx tx = new Tx();
-        tx.setFromUUID(uuid);
-        tx.setToWalletAsServer();
+        tx.setFromUUID(uuid);        
+        tx.setToWalletAsEscrowRestAPIAccount(); // pays the escrow account (cosmjs in the API)
         tx.setUCraftAmount(ucraft_amount);
         tx.setDescription("ESCROWING " + ucraft_amount / 1_000_000 + "craft (" + ucraft_amount + "ucraft) FOR "
                 + uuid.toString());
@@ -105,9 +111,7 @@ public class EscrowManager {
      */
     public long redeemUCraft(UUID uuid, long ucraft_amount) {
         String wallet = api.getWallet(uuid);
-        if (wallet == null) {
-            return ErrorTypes.NO_WALLET.code;
-        }
+        if (wallet == null) { return ErrorTypes.NO_WALLET.code; }
 
         ucraft_amount = Math.abs(ucraft_amount);
 
@@ -115,33 +119,54 @@ public class EscrowManager {
         long mostTheyCanRedeemUCraft = Math.min(getUCraftBalance(uuid), ucraft_amount);        
 
         final String description = "Escrow redeem via Escrow Manager (Craft Integration) for " + mostTheyCanRedeemUCraft/1_000_000 + "craft.";
-        
 
-        // TODO: This needs cleanup to only remove craft from escrow IF payment was successful.
-        // ^ if payment fails, it currently saves that to DB. Which would = double withdraw.
-        removeUCraftBalance(uuid, mostTheyCanRedeemUCraft);
-        CraftBlockchainPlugin.log(description);
+        // We make them sign a transaction for 1ucraft to confirm they are themselfs to redeem & launch the redeem process from the chain
+        Tx tx = new Tx();
+        tx.setFromUUID(uuid);
+        tx.setToUUID(uuid); // sending to themself
+        tx.setUCraftAmount(1);
+        tx.setTxType(TransactionType.ESCROW_WITHDRAW);
+        tx.setDescription(description + " from " + uuid.toString());                
+        tx.setFunction((user_uuid) -> {
+            // TODO: This needs cleanup to only remove craft from escrow IF payment was successful.
+            // ^ if payment fails, it currently saves that to DB. Which would = double withdraw.
+            removeUCraftBalance(uuid, mostTheyCanRedeemUCraft);
+            CraftBlockchainPlugin.log(description);
 
-        BlockchainRequest.depositUCraftToAddress(walletManager.getAddress(uuid), description, mostTheyCanRedeemUCraft).thenAccept(status_type -> {
-            Player player = Bukkit.getPlayer(uuid);
+            BlockchainRequest.depositUCraftToAddress(walletManager.getAddress(uuid), description, mostTheyCanRedeemUCraft).thenAccept(status_type -> {
+                Player player = Bukkit.getPlayer(uuid);
 
-            String messages = "";
-            if (status_type == FaucetTypes.SUCCESS) {
-                
+                String messages = "";
+                if (status_type == FaucetTypes.SUCCESS) {
+                    
 
-                String amt = (mostTheyCanRedeemUCraft/1_000_000) + "craft";
-                messages = "&aYou have redeemed &f" + amt + "&a from your escrow account -> wallet.\n";
-                messages += "&f&oYour new escrow balance is: &f&n" + getCraftBalance(uuid);
-            } else {
-                // Since the faucet already post the error now, not required here.
-                // messages = "\n\n\n\n&6Escrow Error: "+status_type.toString()+"(Ignore above messages)\n&7 - &f Your balance is still here in escrow, please try again later.\n";                                
-            }
+                    String amt = (mostTheyCanRedeemUCraft/1_000_000) + "craft";
+                    messages = "&aYou have redeemed &f" + amt + "&a from your escrow account -> wallet.\n";
+                    messages += "&f&oYour new escrow balance is: &f&n" + getCraftBalance(uuid);
+                } else {
+                    // Since the faucet already post the error now, not required here.
+                    // messages = "\n\n\n\n&6Escrow Error: "+status_type.toString()+"(Ignore above messages)\n&7 - &f Your balance is still here in escrow, please try again later.\n";                                
+                }
 
-            if(player != null) {                
-                Util.colorMsg(player, messages);
-            }
+                if(player != null) {                
+                    Util.colorMsg(player, messages);
+                }
+            });
         });
-            
+
+        tx = tx.sendTxIDClickable().sendWebappLink();         
+        tx.submit();
+        
+        // notify user to sign tx to get their payment
+        Player player = Bukkit.getPlayer(uuid);
+        if(player != null) {            
+            Util.colorMsg(player, "&7You have requested &f" + ucraft_amount/1_000_000 + " craft &7tokens to your wallet from escrow");
+            Util.colorMsg(player, "&7&o((Please sign the above transaction to process this requests))\n");
+            if(mostTheyCanRedeemUCraft < ucraft_amount) {
+                Util.colorMsg(player, "&6[!] &eNOTE&7: &fThis was less than you requested "+ucraft_amount/1000000+", since you only had " + mostTheyCanRedeemUCraft/1_000_000 + " in escrow");
+            }
+        }
+                   
         return mostTheyCanRedeemUCraft;
     }
 

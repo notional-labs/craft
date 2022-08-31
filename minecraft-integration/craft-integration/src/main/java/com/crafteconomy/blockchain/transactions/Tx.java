@@ -96,9 +96,18 @@ public class Tx implements Serializable {
         this.toWallet = api.getServerWallet();
     }
 
+    public void setToWalletAsEscrowRestAPIAccount() {
+        // http://api.crafteconomy.io/v1/dao/escrow_account_info
+        this.toWallet = api.getServerEscrowRestApiWallet();
+    }
+
     public Double getTotalTaxAmount() {
         return api.getTaxRate() * this.uCraftAmount;
     }
+
+    // IDEA:
+    // Could make transactions change the tax rate here when generating? 
+    // Then in BlockchainRequests.java just pass through the Tx, getTaxRate, if == 0, no tax 
 
     public void setCraftAmount(float amount) {
         this.uCraftAmount = (long)(amount*1_000_000);

@@ -87,8 +87,7 @@ public class TestQueryCraft {
         });
         return future;
     }
-
-    // long amount = Long.parseLong(EndpointQuery.req(req_url, RequestTypes.BALANCE, "Balance Request").toString());
+    
     public static CompletableFuture<Long> getUCraftBalance(String craft_addr) {
         CompletableFuture<Long> future = new CompletableFuture<>();
         //  { "balance": { "denom": "ucraft", "amount": "999919751059492" } }
@@ -115,8 +114,7 @@ public class TestQueryCraft {
     public static CompletableFuture<Long> getSupply(String denomination) {
         CompletableFuture<Long> future = new CompletableFuture<>();
         //  { "balance": { "denom": "ucraft", "amount": "999919751059492" } }        
-        
-        // long supply = Long.parseLong(EndpointQuery.req(URL, RequestTypes.SUPPLY, "Total Supply Request").toString());
+                
         String url_link = SUPPLY_ENDPOINT.replace("%denomination%", denomination);
         makeGetRequests(url_link).thenAcceptAsync(response -> {
             try {

@@ -85,24 +85,26 @@ public class TradeCommand implements CommandExecutor {
         }
 
         // Check to ensure user has enough CRAFT to actually send that much
-        float craft_amount = Float.parseFloat(args[1]);
-        if(api.getCraftBalance(from.getUniqueId()) < craft_amount) {
-            Util.colorMsg(sender, "&c&oYou do not have enough CRAFT");
-            return true;
-        }
+        // float craft_amount = Float.parseFloat(args[1]);
+        // if(api.getCraftBalance(from.getUniqueId()) < craft_amount) {
+        //     Util.colorMsg(sender, "&c&oYou do not have enough CRAFT");
+        //     return true;
+        // }
 
-        // [!] save backup of those items incase they log off / server goes down, etc
-        
-        // Create unfinished template for Transaction (Since we will not know items trading OR description until user accepts)
-        Tx txInfo = api.createNewTx(fromUUID, receiverUUID, toWallet, craft_amount, null, null);
+        api.getCraftBalance(from.getUniqueId()).thenAcceptAsync((craft_amount) -> {
+            // [!] save backup of those items incase they log off / server goes down, etc
+            
+            // Create unfinished template for Transaction (Since we will not know items trading OR description until user accepts)
+            Tx txInfo = api.createNewTx(fromUUID, receiverUUID, toWallet, craft_amount, null, null);
 
-        // Saves to others UUID for when they /trade accept, real projects would do /trade accept <user>
-        pendingTradeRequest.put(receiverUUID, txInfo);
+            // Saves to others UUID for when they /trade accept, real projects would do /trade accept <user>
+            pendingTradeRequest.put(receiverUUID, txInfo);
 
-        // Inform users the trade request was sent & how to accept it
-        Util.colorMsg(sender, "&2[!] &aSent trade request to &e&o" + receiver.getName());        
-        Util.colorMsg(receiver, "\n&6[!] &eYou have been sent a trading request by " + from.getName());  
-        Util.colorMsg(receiver, "&7&o(( /test-trade accept ))"); 
+            // Inform users the trade request was sent & how to accept it
+            Util.colorMsg(sender, "&2[!] &aSent trade request to &e&o" + receiver.getName());        
+            Util.colorMsg(receiver, "\n&6[!] &eYou have been sent a trading request by " + from.getName());  
+            Util.colorMsg(receiver, "&7&o(( /test-trade accept ))");             
+        });        
         return true; 
     }
 

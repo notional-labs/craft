@@ -24,8 +24,8 @@ public class EndpointQuery {
 
     private static JSONParser parser = new JSONParser();
     private static JSONObject json;
-
-    // TODO: Convert to CompletableFuture
+    
+    // Only run these from completeable futures async
     public static Object req(String URL, RequestTypes type, String body, String logMSG) {
         Object value = 0L; 
         
@@ -88,8 +88,7 @@ public class EndpointQuery {
             CraftBlockchainPlugin.log(error_msg);
         } 
         return value;
-    }
-    
+    }    
     public static Object req(String URL, RequestTypes type, String logMSG){
         return req(URL, type, null, logMSG);
     }

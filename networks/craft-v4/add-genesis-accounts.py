@@ -96,10 +96,10 @@ def resetGenesisFile():
         # - multisig here? Maybe we just do reece's account for testnet? or should we do this one so anyone can push through
         genesis["app_state"]['exp']["params"]['daoAccount'] = "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7" 
 
-        genesis["app_state"]['exp']["params"]['close_pool_period'] = "6000s"
-        genesis["app_state"]['exp']["params"]['vesting_period_end'] = "60s"
-        genesis["app_state"]['exp']["params"]['burn_exp_period'] = "60s"
-        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "token" # vuong said do token, only reece has
+        genesis["app_state"]['exp']["params"]['close_pool_period'] = "86400s"   # 24h testnet, XX for mainnet?
+        genesis["app_state"]['exp']["params"]['vesting_period_end'] = "43200s"  # 12h testnet, 28 days for mainnet
+        genesis["app_state"]['exp']["params"]['burn_exp_period'] = "43200s"     # 12h testnet, 28 days for mainnet
+        genesis["app_state"]['exp']["params"]['ibc_asset_denom'] = "token" # vuong said do token, only reece has init, ibc hash in future, or just ucraft?
 
         # Maybe in the whitelist, we add some validators / accounts just to test it
 

@@ -36,16 +36,20 @@ public class MyExampleTransaction implements CommandExecutor {
             return true;
         }
 
-        float craft_balance = api.getCraftBalance(player.getUniqueId());
-        if(craft_balance < 0) {
-            Util.colorMsg(player, "Error:" + ErrorTypes.of((int) craft_balance));
-            return true;
-        }
-         
-        if(craft_balance > 10) {
+        // float craft_balance = api.getCraftBalance(player.getUniqueId());
+        // if(craft_balance < 0) {
+        //     Util.colorMsg(player, "Error:" + ErrorTypes.of((int) craft_balance));
+        //     return true;
+        // }
 
-            // Creates inline transaction
-            // Tx tx1 = api.createNewTx(player.getUniqueId(), to_wallet, 10, "Describe what it does here", Logic.purchaseBusinessLicense());
+        api.getCraftBalance(player.getUniqueId()).thenAcceptAsync((craft_balance) -> {
+            // if(craft_balance < 0) {
+            //     Util.colorMsg(player, "Error:" + ErrorTypes.of(Integer.valueOf(Math.round(craft_balance))));
+            //     // return true;
+            // } else if(craft_balance > 10) {
+                // Creates inline transaction
+                // Tx tx1 = api.createNewTx(player.getUniqueId(), to_wallet, 10, "Describe what it does here", Logic.purchaseBusinessLicense());
+
             Tx txinfo = new Tx(); // getTxID() -> auto generated. just a UUID [/wallet pending shows all]
             txinfo.setFromUUID(player.getUniqueId());
             txinfo.setToWallet(to_wallet);
@@ -67,9 +71,14 @@ public class MyExampleTransaction implements CommandExecutor {
             } else {
                 Util.colorMsg(player, "Error: " + error.toString());
             }
-        } else {
-            Util.colorMsg(player, "You do not have 10 craft to purchase a business license");
-        }
+            
+            // } 
+            // else {
+            //     Util.colorMsg(player, "You do not have 10 craft to purchase a business license");
+            // }
+        });
+         
+        
 
         return true;
     }
