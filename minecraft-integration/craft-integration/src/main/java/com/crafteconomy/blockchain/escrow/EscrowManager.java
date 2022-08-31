@@ -11,6 +11,7 @@ import com.crafteconomy.blockchain.core.request.Caches;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.core.types.FaucetTypes;
 import com.crafteconomy.blockchain.core.types.RequestTypes;
+import com.crafteconomy.blockchain.core.types.TransactionType;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 import com.crafteconomy.blockchain.wallets.WalletManager;
@@ -124,6 +125,7 @@ public class EscrowManager {
         tx.setFromUUID(uuid);
         tx.setToUUID(uuid); // sending to themself
         tx.setUCraftAmount(1);
+        tx.setTxType(TransactionType.ESCROW_WITHDRAW);
         tx.setDescription(description + " from " + uuid.toString());                
         tx.setFunction((user_uuid) -> {
             // TODO: This needs cleanup to only remove craft from escrow IF payment was successful.
