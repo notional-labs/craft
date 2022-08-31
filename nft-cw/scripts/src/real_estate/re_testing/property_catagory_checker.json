@@ -24,6 +24,16 @@
             "ConstructionZone",
             "d5a86eb4-231c-40c6-88cc-2652233f307a",
             ""
+        ],
+        [
+            "Office Building 1",
+            "f0c4f43c-3330-4ab5-82a5-cb1ed5398c66",
+            ""
+        ],
+        [
+            "Gas Station 1",
+            "664ab22e-1aa4-41ef-a515-83f1a3f0655c",
+            ""
         ]
     ],
     "GOVERNMENT": [
@@ -50,6 +60,21 @@
         [
             "Apartments 3",
             "dcd12a55-c30c-4b9b-ab17-d63604849c46",
+            ""
+        ],
+        [
+            "Craft City Park",
+            "254fbb85-3cb6-4c1e-aa34-954e4bf04137",
+            ""
+        ],
+        [
+            "Liquidity Zone",
+            "78eb677d-dc72-4e51-a790-e2f61a6aa4eb",
+            ""
+        ],
+        [
+            "Trading Zone",
+            "90627e8e-9b73-4857-bc58-2b69c1599c7a",
             ""
         ]
     ],

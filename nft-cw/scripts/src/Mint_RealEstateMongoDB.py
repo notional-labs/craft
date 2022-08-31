@@ -75,9 +75,12 @@ def main():
     step3_generateRESendCommandsToMarketplaceContract()
 
     print("\nHow to Sign & Broadcast:")
-    print(f"1. Run ' craftd tx sign real_estate_mint.json --from <key> '") # --multisig=<multisig_key> how ??
-    print(f" (We Just need the signature at the end so we can broadcast it from the DAO mutlisig)")
-    print(f"1. Run 'craftd tx broadcast real_estate_to_marketplace.json'")
+    print("(Ensure you are in the real_estate folder)")
+    print(f"1. Run ' craftd tx sign real_estate_mint.json --from dao  &> signed_estate_mint.json '") # --multisig=<multisig_key> how ??    
+    print(f"1. Run ' craftd tx sign real_estate_to_marketplace.json --from dao  &> signed_estate_marketplace.json '") # --multisig=<multisig_key> how ??    
+    print()
+    print(f"3. Run 'craftd tx broadcast signed_estate_mint.json'")
+    print(f"4. Run 'craftd tx broadcast signed_estate_marketplace.json'")
 
     # moved to rest API
     # q = Contract_Query.getNFTContractInfo()

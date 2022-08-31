@@ -4,7 +4,7 @@
             {
                 "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
                 "sender": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7",
-                "contract": "craft1dt3lk455ed360pna38fkhqn0p8y44qndsr77qu73ghyaz2zv4whqgg28q2",
+                "contract": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj",
                 "msg": {
                     "mint": {
                         "token_id": "30",
@@ -17,7 +17,7 @@
             {
                 "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
                 "sender": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7",
-                "contract": "craft1dt3lk455ed360pna38fkhqn0p8y44qndsr77qu73ghyaz2zv4whqgg28q2",
+                "contract": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj",
                 "msg": {
                     "mint": {
                         "token_id": "31",
@@ -30,7 +30,7 @@
             {
                 "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
                 "sender": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7",
-                "contract": "craft1dt3lk455ed360pna38fkhqn0p8y44qndsr77qu73ghyaz2zv4whqgg28q2",
+                "contract": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj",
                 "msg": {
                     "mint": {
                         "token_id": "32",
@@ -43,7 +43,7 @@
             {
                 "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
                 "sender": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7",
-                "contract": "craft1dt3lk455ed360pna38fkhqn0p8y44qndsr77qu73ghyaz2zv4whqgg28q2",
+                "contract": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj",
                 "msg": {
                     "mint": {
                         "token_id": "33",

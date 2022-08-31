@@ -25,6 +25,8 @@ links = [
     "https://i.imgur.com/sqmreSn.png",
 ]
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
 # A normal contract for images
 # craftd tx wasm execute craft1zjd5lwhch4ndnmayqxurja4x5y5mavy9ktrk6fzsyzan4wcgawnq7d4srp '{"mint":{"token_id":"1","owner":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl","token_uri":"https://www.instagram.com/static/images/homepage/screenshots/screenshot1.png/fdfe239b7c9f.png"}}' --from $KEY --output json -y
 
@@ -35,6 +37,11 @@ def main():
     part1_mintToAdminAccount()
     part2_sendToMarketplace()
 
+def _saveToFile(msgFmt, filename):
+    p = os.path.join(current_dir, "images")   
+    os.makedirs(p, exist_ok=True)
+    with open(os.path.join(p, filename), "w") as f:
+        json.dump(msgFmt, f, indent=4)
 
 def part1_mintToAdminAccount():    
     msgFmt = { "body": { "messages": [], "memo": "minting real estate", "timeout_height": "0", "extension_options": [], "non_critical_extension_options": []}, "auth_info": {"signer_infos": [],"fee": {"amount": [],"gas_limit": "10000000","payer": "","granter": ""},"tip": None},"signatures": []}
@@ -53,11 +60,7 @@ def part1_mintToAdminAccount():
             "funds": []
         })
 
-    # save output to file
-    os.makedirs("images", exist_ok=True)    
-    # save msgFmt to images 
-    with open("images/mint_images.json", "w") as f:
-        json.dump(msgFmt, f, indent=4)
+    _saveToFile(msgFmt, "mint_images.json")
 
 def part2_sendToMarketplace():
     # move to marketplace contract
@@ -80,10 +83,13 @@ def part2_sendToMarketplace():
             "funds": []
         })
 
-    # save output to file
-    os.makedirs("images", exist_ok=True)
-    with open("images/images_to_marketplace.json", "w") as f:
-        json.dump(msgFmt, f, indent=4)
+    _saveToFile(msgFmt, "images_to_marketplace.json")
 
 if __name__ == "__main__":
     main()
+    print("Ensure you are in the images folder")
+    print("craftd tx sign mint_images.json --from dao &> signed_mint_images.json")
+    print("craftd tx sign images_to_marketplace.json --from dao &> signed_images_marketplace.json")
+    print()
+    print("craftd tx broadcast signed_mint_images.json")
+    print("craftd tx broadcast signed_images_marketplace.json")
