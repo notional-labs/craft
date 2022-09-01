@@ -9,7 +9,6 @@ import com.crafteconomy.blockchain.storage.RedisManager;
 import com.crafteconomy.blockchain.transactions.PendingTransactions;
 import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.transactions.events.SignedTransactionEvent;
-import com.crafteconomy.blockchain.utils.Util;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -49,7 +48,7 @@ public class SignedTxCheckListener implements Listener {
         String expectedToWallet = tx.getToWallet();
         boolean doesMatch = doesDataMatchTransaction(event.getTednermintHash(), expectedToWallet, expected_ucraft, expectedDesc);
 
-        CraftBlockchainPlugin.log("[SignedTransactionEvent] Comparing our tx description -> the memo in the body of the transaction");        
+        // CraftBlockchainPlugin.log("[SignedTransactionEvent] Comparing our tx description -> the memo in the body of the transaction");        
         if(doesMatch == false) {
             CraftBlockchainPlugin.log("[DEBUG] TxData did not match for:" + TxID + " - " + event.getTednermintHash(), Level.SEVERE);
             CraftBlockchainPlugin.log("[DEBUG] ACTUAL: desc: " + expectedDesc + "  amount (ucraft): " + expected_ucraft + "  toWallet: " + expectedToWallet);
@@ -68,11 +67,11 @@ public class SignedTxCheckListener implements Listener {
 
             for (String key : keyString) {
                 jedis.del(key);
-                CraftBlockchainPlugin.log("[DEBUG-REDIS] DELETED " + key);
+                // CraftBlockchainPlugin.log("[DEBUG-REDIS] DELETED " + key);
             }
 
             jedis.del("signed_" + TxID);
-            CraftBlockchainPlugin.log("[DEBUG-REDIS] DELETED signed_" + TxID);
+            // CraftBlockchainPlugin.log("[DEBUG-REDIS] DELETED signed_" + TxID);
 
         } catch (Exception e) {
             CraftBlockchainPlugin.log("SignedTxCheckListener Redis Error", Level.SEVERE);

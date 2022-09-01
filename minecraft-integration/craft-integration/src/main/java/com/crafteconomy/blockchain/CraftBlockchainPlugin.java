@@ -180,6 +180,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
                 // jedisPubSubClient.psubscribe(keyListener, "__keyevent@*__:expire*"); // gets expired keys from redis (after Tx is removed), so we can remove from pending
 
                 jedisPubSubClient.psubscribe(keyListener, "*");  // testing, but this works for now until I add a better regex pattern.
+                // for now manual expires don't work, we just only show some patterns
             }
         });
         

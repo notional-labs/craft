@@ -30,8 +30,35 @@ public class RedisKeyListener extends JedisPubSub {
     SignedTransactionEvent event = new SignedTransactionEvent(null);
     ExpiredTransactionEvent expiredEvent = new ExpiredTransactionEvent(null);
     
+    // put events which we want to actually put in console to debug this application.
+    // "__keyspace@0__:tx", "",
+    // "__keyevent@0__:expire",
+    // "__keyspace@0__:signed_"
+    final String[][] allowedChannelMatches = new String[][] { 
+        {"__keyspace@0__:tx_", ""},
+        {"__keyspace@0__:signed_", ""},
+        {"__keyevent@0__:expire", "tx_"},
+    };
+
     @Override
     public void onPMessage(String pattern, String channel, String message) {
+        // TODO: instead of this, match required patterns in teh main psubscribe listerner.
+        boolean isAllowedChannel = false;
+        for (String[] allowedChannelMatch : allowedChannelMatches) {
+            String eventType = allowedChannelMatch[0];
+            String msgStart = allowedChannelMatch[1];
+            if (channel.startsWith(eventType)) {
+                if(msgStart.length() == 0 || message.startsWith(msgStart)) {
+                    isAllowedChannel = true;
+                    break;
+                }
+            }
+        }
+        if(isAllowedChannel == false) {
+            return;
+        }
+
+
         CraftBlockchainPlugin.log("onPMessage pattern:" + pattern + " | channel:" + channel + " | message:" + message);
         // CraftBlockchainPlugin.log(channel.split("signed_")[1]);  
 

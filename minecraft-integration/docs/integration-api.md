@@ -28,7 +28,7 @@ You can read a rough overview [HERE](https://github.com/notional-labs/craft/blob
 
 Example in production: [CRAFT PRIVATE GITLAB LINK](https://gitlab.com/craft-economy/plugins/craft-2fa-authentication/-/blob/master/src/main/java/com/crafteconomy/authentication/command/RequestAuthenticateCommand.java)
 
-*& also in github → notional-labs/craft Integration → test plugin*
+*& also in Github → notional-labs/craft Integration → test plugin*
 
 ## plugin.yml
 
@@ -49,8 +49,8 @@ String wallet   = api.getWallet(uuid);
 boolean result  = api.setWallet(uuid, craftwallet)
 
 // Gets balance from chain query
-long ubalance    = api.getUCraftBalance(uuid);
-float balance    = api.getCraftBalance(uuid);
+CompletableFuture<Long> ubalance = api.getUCraftBalance(uuid);
+CompletableFuture<Float> balance  = api.getCraftBalance(uuid);
 
 // The DAO's wallet
 String swallet  = api.getServerWallet();
@@ -102,8 +102,7 @@ long escrowUCraftRedeem(uuid, float craft_amount)
 long escrowCraftRedeem(uuid, long ucraft_amount)
 
 // TODO:
-// Get DAO Account (all 9's from string) & allow people to pay -> it.
-
+// Allow a way for ppl to pay the DAO via escrow? DAO address = all 0's?
 // /escrow pay <OnlinePlayerName> <FloatCraftAmount>
 // /escrow balance
 // /escrow deposit <CraftAmount>
@@ -159,12 +158,17 @@ tx.setTxType(TransactionType.DEFAULT);
 tx.setCraftAmount(10);
 tx.setDescription(fromUUID + " paid " + toUUID + " 10 for their trade of items");
 
-tx.setRedisMinuteTTL(3); // OPTIONAL: expires in 1 minutes
+tx.setRedisMinuteTTL(3); // OPTIONAL: expires in 3 minutes
 
 // OPTIONAL: On expire, we may want to run code (such as giving items back from a middleman trade)
 tx.setConsumerOnExpire(Examples.revertSomeActionOnExpire());
 tx.setBiConsumerOnExpire(Examples.revertSomeActionOnExpireFor2People());
 
+// NOTE: if you want to manually expire a Tx later, use the following api call.
+// This works even if setRedisMinuteTTL is not set. Useful for wager system
+api.expireTransaction(tx.getTxID());
+
+// Set the logic to complete once the Tx is signed
 tx.setFunction((Consumer<UUID>) Logic.purchaseBusinessLicense());
 // OR
 tx.setBiFunction(Logic.trade(Player1UUID, Player2UUID)); 
@@ -200,6 +204,8 @@ tcc.send(player);
 // Other
 p.sendMessage("Sign your Tx at " + api.getWebAppAddress());
 ```
+
+
 
 # Clickables / Messages
 

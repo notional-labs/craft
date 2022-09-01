@@ -90,9 +90,8 @@ public class RedisManager {
                 jedis.set(TxLabel, JSON_Output);
             } else {
                 jedis.setex(TxLabel, TimeToLiveMinutes*60, JSON_Output);
-            }            
-
-            CraftBlockchainPlugin.log("Tx JSON Saved to redis as " + TxLabel + ", "+ JSON_Output + "\n");                        
+            }
+            // CraftBlockchainPlugin.log("Tx JSON Saved to redis as " + TxLabel + ", "+ JSON_Output + "\n");                        
         } catch (Exception e) {
             CraftBlockchainPlugin.log("[RedisManager.java] Error saving Tx JSON to redis: " + e.getMessage(), Level.SEVERE);          
         } 
