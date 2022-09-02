@@ -4,7 +4,7 @@ use cosmwasm_std::{BankMsg, Deps, StdResult, Uint128, WasmQuery};
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg, Cw721QueryMsg, NftInfoResponse};
 
 // use crate::package::{ContractInfoResponse};
-use crate::state::{increment_offerings, Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS, Volume};
+use crate::state::{increment_offerings, Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS, Volume, RECENTLY_SOLD};
 use cosmwasm_std::{
     from_binary, to_binary, Coin, CosmosMsg, DepsMut, MessageInfo, Response, SubMsg, WasmMsg,
 };
@@ -117,6 +117,28 @@ pub fn buy_nft(
                 num_traded: volume.unwrap_or_else(|| v_default).num_traded + Uint128::new(1),
             })
         },
+    )?;  
+
+    // TODO: move to on init so we dont have to do error catching every time (just required for testnet)
+    let recent = RECENTLY_SOLD.may_load(deps.storage);
+    match recent {
+        Ok(_) => (),
+        Err(_) => {
+            let sold: Vec<Offering> = vec![];
+            RECENTLY_SOLD.save(deps.storage, &sold)?;
+        },
+    }
+
+    // update the last sold item in the array.
+    RECENTLY_SOLD.update(
+        deps.storage, 
+        |mut recently_sold: Vec<Offering>| -> StdResult<Vec<Offering>> {            
+            recently_sold.push(off.clone());            
+            if recently_sold.len() > 50 { // TODO: make this a struct the dao can update
+                recently_sold.remove(0);
+            }
+            Ok(recently_sold)
+        }
     )?;
 
     Ok(Response::new()

@@ -5,6 +5,8 @@ use cw721::Cw721ReceiveMsg;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::state::Offering;
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InitMsg {
     pub name: String,
@@ -87,6 +89,11 @@ pub struct OfferingsResponse {
     pub offerings: Vec<QueryOfferingsResult>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct RecentlySoldResponse {
+    pub recently_sold: Vec<Offering>,
+}
+
 impl Iterator for OfferingsResponse {
     type Item = QueryOfferingsResult;
     fn next(&mut self) -> Option<Self::Item> {
@@ -107,6 +114,8 @@ pub enum QueryMsg {
     // GetCollectionVolume { address: String },
 
     GetCollectionData { address: String }, // move collectionvolume to here?
+
+    GetRecentlySold {},
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

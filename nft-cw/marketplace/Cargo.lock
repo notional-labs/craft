@@ -107,7 +107,7 @@ dependencies = [
 
 [[package]]
 name = "craft_marketplace"
-version = "0.4.2"
+version = "0.4.9"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",

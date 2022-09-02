@@ -41,7 +41,7 @@ ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0]
 
 # marketplace
 TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --broadcast-mode sync  --output json --broadcast-mode block | jq -r '.txhash')
-MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value')
+MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value') && echo $MARKET_CODE_ID
 # fee_receive_address should = DAO wallet / multisig
 MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace","denom":"ucraft","fee_receive_address":"craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --broadcast-mode sync --output json | jq -r '.txhash')
 ADDRM=$(craftd query tx $MARKET_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Marketplace Address: $ADDRM"
@@ -105,8 +105,13 @@ craftd query wasm contract-state smart $ADDR721IMAGES '{"tokens":{"owner":"craft
 craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
 craftd query wasm contract-state smart $ADDRM '{"get_offerings": {"filter_seller":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}}' # optional query specific
 
+
 # craftd query wasm contract-state smart $ADDRM '{"get_collection_volume": {"address": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj"}}' # deprecated
 craftd query wasm contract-state smart $ADDRM '{"get_collection_data": {"address": "craft14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scrtpgm"}}'
+
+# Recent Sells (last XX)
+craftd query wasm contract-state smart $ADDRM '{"get_recently_sold": {}}'
+
 
 # list real estate NFT for sale
 function ListTokenForSale() {
@@ -163,5 +168,4 @@ craftd query wasm contract-state smart $ADDRM '{"get_contract_info": {}}' # 'dao
 craftd tx wasm execute $ADDRM '{"update_platform_fee":{"new_fee":"0"}}' --gas-prices="0.025ucraft" -y --from $KEY
 craftd tx wasm execute $ADDRM '{"force_withdraw_all":{}}' --gas-prices="0.025ucraft" -y --from $KEY
 
-# FUTURE TO DO
-craftd tx wasm migrate $ADDRM 6 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY
+craftd tx wasm migrate $ADDRM 13 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY

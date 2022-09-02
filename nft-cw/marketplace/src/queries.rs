@@ -1,9 +1,9 @@
-use crate::msg::{OfferingsResponse, QueryOfferingsResult, CollectionDataResponse}; // TODO: move these to msg
+use crate::msg::{OfferingsResponse, QueryOfferingsResult, CollectionDataResponse, RecentlySoldResponse}; // TODO: move these to msg
                                                            // use crate::msg::{PlatformFeeResponse, DenomResponse, DaoAddressResponse};
 use crate::msg::{CollectionVolumeResponse, ContractInfoResponse};
 use cosmwasm_std::{Deps, Order, StdResult, Uint128};
 
-use crate::state::{Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS, Volume};
+use crate::state::{Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS, Volume, RECENTLY_SOLD};
 
 // gets all offerings
 // ============================== Query Handlers ==============================
@@ -118,5 +118,16 @@ pub fn query_collection_data(
         total_offerings: offerings.len() as u128,
         ceiling_price: ceiling_price,
         volume: volume_data,     
+    })
+}
+
+
+pub fn query_recently_sold(
+    deps: Deps
+) -> StdResult<RecentlySoldResponse> {
+    let recent = RECENTLY_SOLD.may_load(deps.storage)?;
+    
+    Ok(RecentlySoldResponse {
+        recently_sold: recent.unwrap_or_else(|| vec![]),
     })
 }

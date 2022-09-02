@@ -29,6 +29,9 @@ pub const OFFERINGS: Map<&str, Offering> = Map::new("offerings");
 
 pub const COLLECTION_VOLUME: Map<&str, Volume> = Map::new("collection_volume");
 
+// we only keep storage of last 20, pop()'ed off when a new NFT is bought from any collection
+pub const RECENTLY_SOLD: Item<Vec<Offering>> = Item::new("recently_sold");
+
 pub const OFFERINGS_COUNT: Item<u64> = Item::new("num_offerings");
 
 pub const CONTRACT_INFO: Item<ContractInfoResponse> = Item::new("marketplace_info");

@@ -1,5 +1,5 @@
 use crate::msg::{ContractInfoResponse, MigrateMsg};
-use crate::state::CONTRACT_INFO;
+use crate::state::{CONTRACT_INFO, RECENTLY_SOLD, Offering};
 use cosmwasm_std::{
     to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
 };
@@ -39,7 +39,10 @@ pub fn instantiate(
         platform_fee: msg.platform_fee,
         version: CONTRACT_VERSION.to_string(),
         contact: "reece@crafteconomy.io".to_string(),
-    };
+    };    
+
+    let sold: Vec<Offering> = vec![];
+    RECENTLY_SOLD.save(deps.storage, &sold)?;
 
     CONTRACT_INFO.save(deps.storage, &info)?;
     Ok(Response::new().add_attribute("action", "instantiate"))
@@ -89,6 +92,10 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         // also gets volume data, maybe just merge the 2?
         QueryMsg::GetCollectionData { address } => {
             to_binary(&queries::query_collection_data(deps, &address)?)
+        }
+
+        QueryMsg::GetRecentlySold { } => {
+            to_binary(&queries::query_recently_sold(deps)?)
         }
     }
 }
