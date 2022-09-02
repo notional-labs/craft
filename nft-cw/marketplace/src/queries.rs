@@ -38,6 +38,7 @@ fn parse_offering(item: StdResult<(String, Offering)>) -> StdResult<QueryOfferin
         token_id: offering.token_id,
         list_denom: offering.list_denom,
         list_price: offering.list_price,
+        token_uri: offering.token_uri,
         contract_addr: offering.contract_addr,
         seller: offering.seller,
     })

@@ -13,6 +13,7 @@ pub struct Offering {
     pub token_id: String,
     pub list_denom: String,
     pub contract_addr: Addr,
+    pub token_uri: String,
     pub seller: Addr,
     pub list_price: Uint128,
 }

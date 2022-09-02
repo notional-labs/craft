@@ -57,6 +57,10 @@ from_scratch () {
   craftd add-genesis-account craft14mt78hz73d9tdwpdvkd59ne9509kxw8y53sjt9 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
   craftd add-genesis-account craft1vwe2yz785u4th7hnc9glnr2ssksqcwmxjmnthv 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
 
+  # test dao account
+  craftd add-genesis-account craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
+  craftd add-genesis-account craft13vhr3gkme8hqvfyxd4zkmf5gaus840j5hwuqkh 1000000uexp,10000000000ucraft --keyring-backend $KEYRING
+
   # Sign genesis transaction
   craftd gentx $KEY 1000000000000uexp --keyring-backend $KEYRING --chain-id $CHAINID
 

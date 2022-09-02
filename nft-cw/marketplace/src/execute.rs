@@ -1,7 +1,7 @@
 use crate::coin_helpers::assert_sent_exact_coin;
 use crate::queries;
-use cosmwasm_std::{BankMsg, Deps, StdResult, Uint128};
-use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg};
+use cosmwasm_std::{BankMsg, Deps, StdResult, Uint128, WasmQuery};
+use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg, Cw721QueryMsg, NftInfoResponse};
 
 // use crate::package::{ContractInfoResponse};
 use crate::state::{increment_offerings, Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS};
@@ -144,10 +144,19 @@ pub fn receive_nft(
         return Err(ContractError::ListingPriceTooLow {});
     }
 
+    // Queries the CW721 contract & gets the token_uri. If no token_uri, uses "".to_string()
+    let cw721_query_msg = WasmQuery::Smart { 
+        contract_addr: info.sender.to_string(), 
+        msg: to_binary(&Cw721QueryMsg::NftInfo { token_id: rcv_msg.token_id.clone() })?
+    };
+    let cw721_res: NftInfoResponse<()> = deps.querier.query(&cw721_query_msg.into())?;
+    let token_uri = cw721_res.token_uri.or_else(|| Some("".to_string())).unwrap();
+
     let off = Offering {
         contract_addr: info.sender.clone(),
         list_denom: denom,
         token_id: rcv_msg.token_id,
+        token_uri: token_uri,
         seller: deps.api.addr_validate(&rcv_msg.sender)?,
         list_price: msg.list_price,
     };
@@ -228,6 +237,7 @@ pub fn update_listing_price(
         contract_addr: off.contract_addr,
         list_denom: off.list_denom,
         token_id: off.token_id,
+        token_uri: off.token_uri,
         seller: off.seller,
         list_price: new_price,
     };

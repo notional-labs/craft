@@ -12,6 +12,7 @@ export CRAFT_CHAIN_ID="craft-v5"
 # export CRAFTD_KEYRING_BACKEND="test"
 export CRAFTD_KEYRING_BACKEND="os"
 export CRAFTD_NODE="http://65.109.38.251:26657"
+# export CRAFTD_NODE="http://localhost:26657"
 export CRAFTD_COMMAND_ARGS="--gas-prices="0.025ucraft" -y --from $KEY"
 
 # craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl

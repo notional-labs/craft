@@ -61,6 +61,7 @@ pub struct ContractInfoResponse {
 pub struct QueryOfferingsResult {
     pub offering_id: String,
     pub token_id: String,
+    pub token_uri: String,
     pub list_denom: String,
     pub list_price: Uint128,
     pub contract_addr: Addr,
