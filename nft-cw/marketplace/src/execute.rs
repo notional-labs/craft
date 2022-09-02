@@ -4,7 +4,7 @@ use cosmwasm_std::{BankMsg, Deps, StdResult, Uint128, WasmQuery};
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg, Cw721QueryMsg, NftInfoResponse};
 
 // use crate::package::{ContractInfoResponse};
-use crate::state::{increment_offerings, Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS};
+use crate::state::{increment_offerings, Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS, Volume};
 use cosmwasm_std::{
     from_binary, to_binary, Coin, CosmosMsg, DepsMut, MessageInfo, Response, SubMsg, WasmMsg,
 };
@@ -101,14 +101,21 @@ pub fn buy_nft(
 
     let price_string = format!("{} {}", off.list_price.clone().u128(), info.sender);
 
+    // default value to update the collection volume information
+    let v_default: Volume = Volume {
+        collection_volume: Uint128::new(0),
+        num_traded: Uint128::new(0),
+    };
+
+    // update COLLECTION_VOLUME with the new volume
     COLLECTION_VOLUME.update(
         deps.storage,
         &off.contract_addr.to_string(),
-        |value| -> StdResult<Uint128> {
-            Ok(
-                value.unwrap_or(Uint128::from(0u128))
-                    + Uint128::from(off.list_price.clone().u128()),
-            )
+        |volume| -> StdResult<Volume> {
+            Ok(Volume {
+                collection_volume: volume.clone().unwrap_or_else(|| v_default.clone()).collection_volume + off.list_price.clone(),
+                num_traded: volume.unwrap_or_else(|| v_default).num_traded + Uint128::new(1),
+            })
         },
     )?;
 

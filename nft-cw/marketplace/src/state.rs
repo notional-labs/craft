@@ -18,14 +18,22 @@ pub struct Offering {
     pub list_price: Uint128,
 }
 
+#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct Volume {
+    pub collection_volume: Uint128,
+    pub num_traded: Uint128,
+}
+
 /// OFFERINGS is a map which maps the offering_id to an offering. Offering_id is derived from OFFERINGS_COUNT.
 pub const OFFERINGS: Map<&str, Offering> = Map::new("offerings");
 
-pub const COLLECTION_VOLUME: Map<&str, Uint128> = Map::new("collection_volume");
+pub const COLLECTION_VOLUME: Map<&str, Volume> = Map::new("collection_volume");
 
 pub const OFFERINGS_COUNT: Item<u64> = Item::new("num_offerings");
+
 pub const CONTRACT_INFO: Item<ContractInfoResponse> = Item::new("marketplace_info");
 
+// Offerings helpers
 pub fn num_offerings(storage: &dyn Storage) -> StdResult<u64> {
     Ok(OFFERINGS_COUNT.may_load(storage)?.unwrap_or_default())
 }

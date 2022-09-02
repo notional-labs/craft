@@ -53,8 +53,7 @@ pub struct ContractInfoResponse {
     pub fee_receive_address: String,
     pub platform_fee: u128, // 5 = 5%.
     pub version: String,
-    pub contact: String,
-    // pub code_id: String,
+    pub contact: String,    
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
@@ -71,7 +70,16 @@ pub struct QueryOfferingsResult {
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct CollectionVolumeResponse {
     pub total_volume: Uint128,
+    pub num_traded: Uint128,
     pub denom: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct CollectionDataResponse {
+    pub floor_price: Uint128,
+    pub ceiling_price: Uint128,
+    pub total_offerings: u128,
+    pub volume: CollectionVolumeResponse,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -96,7 +104,9 @@ pub enum QueryMsg {
     // Returns info about the contract such as name, denom, dao_address, and the tax_rate (platform fee)
     GetContractInfo {},
 
-    GetCollectionVolume { address: String },
+    // GetCollectionVolume { address: String },
+
+    GetCollectionData { address: String }, // move collectionvolume to here?
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

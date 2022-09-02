@@ -78,13 +78,17 @@ pub fn execute(
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetOfferings { filter_seller } => to_binary(&queries::query_offerings(deps, filter_seller)?),
-        // QueryMsg::GetPlatformFee {} => to_binary(&queries::query_platform_fee(deps)?),
-        // QueryMsg::GetDenom {} => to_binary(&queries::query_denom(deps)?),
-        // QueryMsg::GetDaoAddress {} => to_binary(&queries::query_dao_address(deps)?),
+
         QueryMsg::GetContractInfo {} => to_binary(&queries::query_contract_info(deps)?),
 
-        QueryMsg::GetCollectionVolume { address } => {
-            to_binary(&queries::query_collection_volume(deps, &address)?)
+        // deprecated by GetCollectionData
+        // QueryMsg::GetCollectionVolume { address } => {
+        //     to_binary(&queries::query_collection_volume(deps, &address)?)
+        // }
+
+        // also gets volume data, maybe just merge the 2?
+        QueryMsg::GetCollectionData { address } => {
+            to_binary(&queries::query_collection_data(deps, &address)?)
         }
     }
 }

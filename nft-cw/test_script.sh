@@ -105,7 +105,8 @@ craftd query wasm contract-state smart $ADDR721IMAGES '{"tokens":{"owner":"craft
 craftd query wasm contract-state smart $ADDRM '{"get_offerings": {}}'
 craftd query wasm contract-state smart $ADDRM '{"get_offerings": {"filter_seller":"craft1hj5fveer5cjtn4wd6wstzugjfdxzl0xp86p9fl"}}' # optional query specific
 
-craftd query wasm contract-state smart $ADDRM '{"get_collection_volume": {"address": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj"}}'
+# craftd query wasm contract-state smart $ADDRM '{"get_collection_volume": {"address": "craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj"}}' # deprecated
+craftd query wasm contract-state smart $ADDRM '{"get_collection_data": {"address": "craft14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scrtpgm"}}'
 
 # list real estate NFT for sale
 function ListTokenForSale() {
@@ -163,4 +164,4 @@ craftd tx wasm execute $ADDRM '{"update_platform_fee":{"new_fee":"0"}}' --gas-pr
 craftd tx wasm execute $ADDRM '{"force_withdraw_all":{}}' --gas-prices="0.025ucraft" -y --from $KEY
 
 # FUTURE TO DO
-craftd tx wasm migrate $ADDRM 3 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY
+craftd tx wasm migrate $ADDRM 6 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY
