@@ -3,6 +3,7 @@ import { collections, redisClient } from './database.service';
 import { getUsersOwnedNFTs } from './nfts.service'; // getUsersNFTsIDsList, queryToken
 
 import axios from 'axios';
+import { CosmWasmClient } from 'cosmwasm';
 
 // create boolean to disable caching
 const allowCache = false;
@@ -96,8 +97,8 @@ export const getPropertiesState = async (state: string) => {
  * 
  * @param wallet The CRAFT address of the user
  */
-export const getOwnedUUIDsList = async (wallet: string) => {
-    let usersProperties = await getUsersOwnedNFTs(`${process.env.ADDR721_REALESTATE}`, wallet); // [{_id, name, type, imageLink, ...}, {...}]
+export const getOwnedUUIDsList = async (client: CosmWasmClient, wallet: string) => {
+    let usersProperties = await getUsersOwnedNFTs(client, `${process.env.ADDR721_REALESTATE}`, wallet); // [{_id, name, type, imageLink, ...}, {...}]
     
     if(usersProperties) {
         // [ "dbcd78cb-326e-4842-982b-9252f9ca25a7", "84561fc8-9450-4a70-9fa2-7d43227ee98f", ...]

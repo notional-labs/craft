@@ -19,11 +19,11 @@ const prefixes = ["craft", "stars", "omniflix"];
 
 // TODO: Put behind a redis hset? or just do with MongoDB? add cooldown?
 
-export const getUsersNFTsFromOtherPlatforms = async (craft_address: string) => {
+export const getUsersNFTsFromOtherPlatforms = async (client: CosmWasmClient, craft_address: string) => {
     if (craft_address === undefined || craft_address === null) { return {}; }
     if(isValidAddress(craft_address) == false) { return {}; }
 
-    var allMyNFTs = await getAllNFTs(craft_address);
+    var allMyNFTs = await getAllNFTs(client, craft_address);
 
     // TODO: Cooldown in future
     await saveNFTsToMongoDB(craft_address, allMyNFTs);
@@ -37,7 +37,7 @@ async function saveNFTsToMongoDB(craft_address: string, nfts: any) {
     await collections?.nfts?.updateOne({ address: craft_address }, { $set: { nfts } }, { upsert: true });
 }
 
-export async function getAllNFTs(craft_address: string, chain: string = "*", includeOfferings: boolean = false) {
+export async function getAllNFTs(client: CosmWasmClient, craft_address: string, chain: string = "*", includeOfferings: boolean = false) {
     if (craft_address === undefined || craft_address === null) { return {}; }
     if(isValidAddress(craft_address) == false) { return {}; }
 
@@ -59,7 +59,7 @@ export async function getAllNFTs(craft_address: string, chain: string = "*", inc
             case "craft": {
                 // check chain is * or craft
                 if(chain === "*" || chain.includes("craft")) {
-                    await queryCraftCW721NFTs(address, includeOfferings).then(data => {
+                    await queryCraftCW721NFTs(client, address, includeOfferings).then(data => {
                         allMyNFTs.craft = data;
                     });
                 }   
@@ -147,7 +147,7 @@ export async function getAllCW721ContractAddresses() { // that the DAO owns / mi
     return CONTRACTS;
 }
 
-async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = false) {
+async function queryCraftCW721NFTs(client: CosmWasmClient, craftWallet, includeOfferings: boolean = false) {
     const REDIS_KEY = `cache:craft_cw_721s:${craftWallet}`;
     const TTL = 30;  // 10 seconds
     let cached_cw721_craft = await redisClient?.get(REDIS_KEY);
@@ -155,9 +155,7 @@ async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = fals
         return JSON.parse(cached_cw721_craft);
     }
 
-    const addresses = await getAllCW721ContractAddresses();
-
-    const client = await CosmWasmClient.connect(`${process.env.CRAFTD_NODE}/`);
+    const addresses = await getAllCW721ContractAddresses();    
 
     var myCraftNFTs: any = [];
     if(addresses === undefined) { return myCraftNFTs; }
@@ -177,7 +175,7 @@ async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = fals
         console.log("LOGGING addr", addr, Date.now());
 
         // gets user owned direct tokens
-        const tokens = await getUsersOwnedNFTs(addr, craftWallet);
+        const tokens = await getUsersOwnedNFTs(client, addr, craftWallet);
 
         console.log("get users owned nfts", Date.now());
 
@@ -205,7 +203,7 @@ async function queryCraftCW721NFTs(craftWallet, includeOfferings: boolean = fals
         console.log("held tokens", Date.now());
 
         // get NFTs which are being sold in the marketplace, so technically the user still owns BUT they are being sold there
-        const tokens_offerings = await queryOfferings("", craftWallet);
+        const tokens_offerings = await queryOfferings(client, "", craftWallet);
         let promises2: any = [];
         for(const nft of tokens_offerings) {
             console.log(nft);

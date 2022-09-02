@@ -2,7 +2,7 @@ import { collections, redisClient } from './database.service';
 
 import axios from 'axios';
 
-import { queryToken, queryContractInfo } from '../services/nfts.service';
+import { queryToken, queryContractInfo, get_token_uri_json } from '../services/nfts.service';
 import { getCraftUSDPrice } from '../services/pricing.service';
 
 // import { queryContract } from './cwclient.service';
@@ -22,7 +22,7 @@ const allowCache = false;
  * @param tokenId 
  * @returns JSON information about the property from the token_uri
  */
-export const queryOfferings = async (contract_address: string = "", from_craft_address: string = "") => {
+export const queryOfferings = async (client: CosmWasmClient, contract_address: string = "", from_craft_address: string = "") => {
     // Not sure if we should cache or not? maybe like 30 seconds?
 
     // Cache'ed offerings so we don't spam contract too often. if we requests from a single user, its just at the end
@@ -54,11 +54,13 @@ export const queryOfferings = async (contract_address: string = "", from_craft_a
     // let data = response?.data?.data?.offerings; // base64 encoded string of the values. May be other data too
 
     // console.log("query contract");
-    // const rvalue = await queryContract(contract_address, {get_offerings: {}});
+    // const rvalue = await queryContract(contract_address, {get_offerings: {}});    
 
-    const client = await CosmWasmClient.connect(`${process.env.CRAFTD_NODE}/`);        
-    const offerigns_query = await client.queryContractSmart(`${process.env.ADDRM}`, {get_offerings: {}});
-    const data = offerigns_query.offerings;
+    const offerings_query = await client.queryContractSmart(`${process.env.ADDRM}`, {get_offerings: {}})
+    .then((res) => { return res })
+    .catch((err) => { return []; });
+
+    const data = offerings_query.offerings;
     // console.log("data", data);
     
     // Queries tokens for sale with their parent contract for the offering.
@@ -80,9 +82,15 @@ export const queryOfferings = async (contract_address: string = "", from_craft_a
             continue;
         }
 
+        // taken from nfts.service.ts -> queryToken
+        // used to get the proper format without need for an extra query for offerings.
+        let token_data = await get_token_uri_json(offering.token_uri, offering.token_id);
+
+
         // query tokens for a promise.all later to resolve, then modify the offerings.
         pending_querytokens.push({
-            queryToken: queryToken(client, offering.contract_addr, offering.token_id),
+            // queryToken: queryToken(client, offering.contract_addr, offering.token_id), // removed as we put token_uri in the offering now via WasmQuery
+            queryToken: token_data,
             queryContractInfo: queryContractInfo(client, offering.contract_addr),
             offering: offering
         })
@@ -124,7 +132,7 @@ export const queryOfferings = async (contract_address: string = "", from_craft_a
 };
 
 
-export const queryPaintingOfferings = async () => {
+export const queryPaintingOfferings = async (client: CosmWasmClient) => {
     // TODO: Redis Cache
     const REDIS_KEY = `cache:marketplace_offerings:paintings`;
     let painting_offerings = await redisClient?.get(REDIS_KEY);
@@ -134,9 +142,13 @@ export const queryPaintingOfferings = async () => {
     }
 
     const addr_to_ignore = `${process.env.ADDR721_REALESTATE}`;
-    let offerings = await queryOfferings("");
+    let offerings = await queryOfferings(client, "");
 
     let paintings: string[] = [];
+    if(!offerings) {
+        return paintings;
+    }
+
     for(let i = 0; i < offerings.length; i++) {
         let offering = offerings[i];
         // and/or check token_data as well?
@@ -153,7 +165,7 @@ export const queryPaintingOfferings = async () => {
 }
 
 
-export const queryFeatured = async (amount: number) => {
+export const queryFeatured = async (client: CosmWasmClient, amount: number) => {
     let REDIS_KEY = `cache:marketplace_offerings_featured:${amount}`;    
     if (allowCache) {        
         let get_featured = await redisClient?.get(REDIS_KEY);
@@ -163,8 +175,8 @@ export const queryFeatured = async (amount: number) => {
     }
 
     let [re, paintings] = await Promise.all([
-        queryOfferings(`${process.env.ADDR721_REALESTATE}`),
-        queryPaintingOfferings()
+        queryOfferings(client, `${process.env.ADDR721_REALESTATE}`),
+        queryPaintingOfferings(client)
     ]);
 
     let [feat_re, feat_paintings] = await Promise.all([
@@ -187,6 +199,11 @@ export const queryFeatured = async (amount: number) => {
 
 
 const getTopOfferingsSorted = async (offerings: any[], amount: number) => {
+
+    if(!offerings) {
+        return [];
+    }
+
     let sorted = offerings.sort((a, b) => {
         // console.log(`a: ${a.usd_cost} b: ${b.usd_cost}`);
         return b.usd_cost - a.usd_cost;

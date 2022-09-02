@@ -1,6 +1,7 @@
 // Express
 import { CosmWasmClient } from 'cosmwasm';
 import { Request, Response } from 'express';
+import { getCosmWasmClient } from '../services/wasmclient.service';
 import { getUsersOwnedNFTs, queryToken, queryContractInfo } from '../services/nfts.service';
 import { getUsersNFTsFromOtherPlatforms, getAllNFTs } from '../services/nftsync.service';
 
@@ -8,7 +9,10 @@ export const getPlayersOwnedNFTs = async (req: Request, res: Response) => {
     const { addr721_address, wallet } = req.params;
     // console.log(wallet)
 
-    const response = await getUsersOwnedNFTs(addr721_address, wallet);
+    const client = await getCosmWasmClient();
+    if(!client) { return res.status(500).json({ message: `Error: could not connect to craft node.` }); }
+
+    const response = await getUsersOwnedNFTs(client, addr721_address, wallet);
     if (response) return res.status(200).json(response);
     else return res.status(404).json({ message: 'No Real Estate NFTs found for this wallet' });
 };
@@ -16,7 +20,8 @@ export const getPlayersOwnedNFTs = async (req: Request, res: Response) => {
 export const getDataFromTokenID = async (req: Request, res: Response) => {
     const { addr721_address, token_id } = req.params;
 
-    const client = await CosmWasmClient.connect(`${process.env.CRAFTD_NODE}/`);
+    const client = await getCosmWasmClient();
+    if(!client) { return res.status(500).json({ message: `Error: could not connect to craft node.` }); }
 
     // {"_id": "dbcd78cb-326e-4842-982b-9252f9ca25a7","name": "Mid-sized Mansion", "description": "A beautiful mansion.", ...}
     const response = await queryToken(client, addr721_address, token_id); 
@@ -27,7 +32,8 @@ export const getDataFromTokenID = async (req: Request, res: Response) => {
 export const getContractInformation = async (req: Request, res: Response) => {
     const { addr721_address } = req.params;
 
-    const client = await CosmWasmClient.connect(`${process.env.CRAFTD_NODE}/`);
+    const client = await getCosmWasmClient();
+    if(!client) { return res.status(500).json({ message: `Error: could not connect to craft node.` }); }
 
     // {"_id": "dbcd78cb-326e-4842-982b-9252f9ca25a7","name": "Mid-sized Mansion", "description": "A beautiful mansion.", ...}
     const response = await queryContractInfo(client, addr721_address); 
@@ -38,8 +44,11 @@ export const getContractInformation = async (req: Request, res: Response) => {
 export const syncOtherPlatformNFTs = async (req: Request, res: Response) => {
     const { craft_address } = req.params;
 
+    const client = await getCosmWasmClient();
+    if(!client) { return res.status(500).json({ message: `Error: could not connect to craft node.` }); }
+
     // {"_id": "dbcd78cb-326e-4842-982b-9252f9ca25a7","name": "Mid-sized Mansion", "description": "A beautiful mansion.", ...}
-    const response = await getUsersNFTsFromOtherPlatforms(craft_address); 
+    const response = await getUsersNFTsFromOtherPlatforms(client, craft_address); 
     if (response) return res.status(200).json(response);
     else return res.status(404).json({ message: `No NFTS to sync! Make this a post in the future!` });
 };
@@ -48,8 +57,11 @@ export const getAllUserNFTs = async (req: Request, res: Response) => {
     const { craft_address } = req.params;
 
     const requested_chain = req.query.chain?.toString() || "*"; // craft, omniflix, or stargaze
+
+    const client = await getCosmWasmClient();
+    if(!client) { return res.status(500).json({ message: `Error: could not connect to craft node.` }); }
     
-    const response = await getAllNFTs(craft_address, requested_chain); 
+    const response = await getAllNFTs(client, craft_address, requested_chain); 
     if (response) return res.status(200).json(response);    
     else return res.status(404).json({}); // return an empty set = no nfts
 };
@@ -58,8 +70,11 @@ export const getAllUserNFTs = async (req: Request, res: Response) => {
 export const getAllUserNFTsIncludingOfferings = async (req: Request, res: Response) => {
     const { craft_address } = req.params;
     const requested_chain = req.query.chain?.toString() || "*"; // craft, omniflix, or stargaze
+
+    const client = await getCosmWasmClient();
+    if(!client) { return res.status(500).json({ message: `Error: could not connect to craft node.` }); }
     
-    const response = await getAllNFTs(craft_address, requested_chain, true); 
+    const response = await getAllNFTs(client, craft_address, requested_chain, true); 
     if (response) return res.status(200).json(response);    
     else return res.status(404).json({}); // return an empty set = no nfts
 };

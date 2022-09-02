@@ -16,6 +16,7 @@ import nftsRouter from './routes/nfts.route';
 import daoRouter from './routes/dao.route';
 import assetsRouter from './routes/assets.route';
 import collectionRouter from './routes/collections.route';
+import { getCosmWasmClient } from './services/wasmclient.service';
 
 // Initializes env variables
 config();
@@ -100,4 +101,12 @@ app.get('/', (req, res) => {
 // Start REST api
 app.listen(API_PORT, async () => {
     console.log(`Started Craft Economy REST API on port ${API_PORT}`);
+
+    const client = await getCosmWasmClient();
+    if(client) {
+        console.log(`Connected to Craftd node: ${process.env.CRAFTD_NODE}`);
+    } else {
+        console.log(`Error connecting to Craftd node: ${process.env.CRAFTD_NODE}/`);
+        process.exit(1);
+    }
 });

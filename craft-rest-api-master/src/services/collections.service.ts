@@ -2,7 +2,7 @@
 import { redisClient } from './database.service';
 // import axios from 'axios';
 
-import { queryToken, queryTokenOwner, queryContractInfo, queryAllTokensForContract, queryGetNFTImage } from './nfts.service';
+import { queryToken, queryTokenOwner, queryContractInfo, queryAllTokensForContract, queryGetNFTImage, get_token_uri_json } from './nfts.service';
 import { getAllCW721ContractAddresses } from './nftsync.service';
 import { queryOfferings } from './nftmarketplace.service';
 
@@ -11,7 +11,7 @@ import { CosmWasmClient } from 'cosmwasm';
 // create boolean to disable caching
 const allowCache = false;
 
-export const getCollectionTotalVolume = async (client: CosmWasmClient, contract_address: string = "") => {
+export const getCollectionData = async (client: CosmWasmClient, contract_address: string = "") => {
     // Not sure if we should cache or not? maybe like 30 seconds?
 
     // Cache'ed offerings so we don't spam contract too often. if we requests from a single user, its just at the end
@@ -24,12 +24,49 @@ export const getCollectionTotalVolume = async (client: CosmWasmClient, contract_
         }
     }
 
-    let volume = await client.queryContractSmart(`${process.env.ADDRM}`, {get_collection_volume: {address: contract_address}});    
+    let collection_data = await client.queryContractSmart(`${process.env.ADDRM}`, {get_collection_data: {address: contract_address}})
+    .then((res) => { return res })
+    .catch((err) => { return 0; });    
+
     if(allowCache) {
-        await redisClient?.set(REDIS_KEY, JSON.stringify(volume));
+        await redisClient?.set(REDIS_KEY, JSON.stringify(collection_data));
         await redisClient?.expire(REDIS_KEY, 2*60); 
     }    
-    return volume;
+    return collection_data;
+};
+
+export const getRecentlySoldItems = async (client: CosmWasmClient, limit: number = -1) => {
+    // Not sure if we should cache or not? maybe like 30 seconds?
+
+    // Cache'ed offerings so we don't spam contract too often. if we requests from a single user, its just at the end
+    let REDIS_KEY = `cache:recently_sold`;        
+    if (allowCache) {    
+        let get_recent = await redisClient?.get(REDIS_KEY);
+        if (get_recent) {
+            return JSON.parse(get_recent);
+        }
+    }
+
+    let recently_sold_offerings = await client.queryContractSmart(`${process.env.ADDRM}`, {get_recently_sold: {}})
+    .then((res) => { return res })
+    .catch((err) => { return []; });
+    
+    let recent: any = [];
+
+    for(let element of recently_sold_offerings.recently_sold) {
+        let offering = element;
+        // console.log(offering);
+        
+        let token_data = await get_token_uri_json(offering.token_uri, offering.token_id);
+        offering.token_data = token_data;
+        recent.push(offering);      
+    }
+
+    if(allowCache) {
+        await redisClient?.set(REDIS_KEY, JSON.stringify(recently_sold_offerings));
+        await redisClient?.expire(REDIS_KEY, 30); 
+    }    
+    return recently_sold_offerings;
 };
 
 // call from Promise.all()
@@ -52,7 +89,7 @@ export const getDetails_Offering_TokenData_Owner = async (client: CosmWasmClient
         return undefined;
     }
 
-    const found = await queryOfferings(contract_address); // "" = all
+    const found = await queryOfferings(client, contract_address); // "" = all
     let offering = found.find(offering => offering.contract_addr === contract_address && offering.token_id === token_id) || undefined;
 
 
@@ -149,6 +186,11 @@ export const getAllCollections = async (client: CosmWasmClient) => {
     for(const [contract_info, token_ids, addr] of result) {
         let _nft_type = "link"
         if(addr === process.env.ADDR721_REALESTATE) { _nft_type = "real_estate"; }
+
+        if(!contract_info || !token_ids || !addr) {
+            console.log(`Error: collection data not found for: ${addr}`);
+            continue;
+        }
 
         collections[addr] = {
             name: contract_info.name,

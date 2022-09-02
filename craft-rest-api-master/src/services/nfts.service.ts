@@ -16,11 +16,9 @@ const allowCache = false;
  * 
  * @param wallet The CRAFT address of the user
  */
-export const getUsersOwnedNFTs = async (addr721_address: string, wallet: string) => {
+export const getUsersOwnedNFTs = async (client: CosmWasmClient, addr721_address: string, wallet: string) => {
     let usersNFTIDs = await getUsersNFTsIDsList(addr721_address, wallet); // { tokens: [ '1', '101', '102', '2', '8', '9' ] }
     console.log("getUsersOwnedNFTs", usersNFTIDs) 
-
-    const client = await CosmWasmClient.connect(`${process.env.CRAFTD_NODE}/`);
 
     if(usersNFTIDs) {
         return Promise.all(usersNFTIDs?.tokens.map(token => queryToken(client, addr721_address, token)))  
@@ -54,10 +52,10 @@ export const queryToken = async (client: CosmWasmClient, addr721Address: string,
         }        
     }
     
-    const result = await client.queryContractSmart(addr721Address, { nft_info: { token_id: tokenId } }).catch((err) => {
-        console.log("queryToken error, tokenID probably not apart of this contract... -> ", err);
-        return null;
-    });
+    const result = await client.queryContractSmart(addr721Address, { nft_info: { token_id: tokenId } })
+    .then((res) => { return res })
+    .catch((err) => { return undefined; });
+
     // let token_uri = result.token_uri;
     let token_uri;
     if(result) {
@@ -72,6 +70,19 @@ export const queryToken = async (client: CosmWasmClient, addr721Address: string,
         return undefined;
     }
 
+    let returnJsonValue = get_token_uri_json(token_uri, tokenId);
+     
+    // save to redis hSet cache
+    if(allowCache) {
+        await redisClient?.hSet(REDIS_KEY, REDIS_HSET_KEY, JSON.stringify(returnJsonValue));
+        // sadly we can not expire a child, this can be done in KeyDB (redis fork) but not standalone.
+        // so we expire the top level key (cache:query_token) every 24 hours
+        await redisClient?.expire(REDIS_KEY, 86400 * 3); // TODO: 3 days, we may be able to never expire need to check
+    }
+    return returnJsonValue;
+};
+
+export const get_token_uri_json = async (token_uri: string, token_id: String = "") => {
     let returnJsonValue;
 
     // If its a link, we just want to return that link directly. Could also add check for http / ipfs
@@ -86,7 +97,7 @@ export const queryToken = async (client: CosmWasmClient, addr721Address: string,
             returnJsonValue = JSON.parse(base64Decoded);            
         } catch (error) {
             // Is just normal JSON, so parse it & save
-            console.log(`Token ${tokenId} catch error ${error}`);
+            console.log(`Token ${token_id} catch error ${error}`);
             returnJsonValue = JSON.parse(token_uri);
         }
     } else {
@@ -94,20 +105,10 @@ export const queryToken = async (client: CosmWasmClient, addr721Address: string,
         returnJsonValue = JSON.parse(token_uri);
     }
     // append tokenId to the end of the json (useful for CRAFT Skins & real estate)
-    returnJsonValue.tokenId = tokenId;
-    // returnJsonValue.owner = response?.data?.data?.access?.owner;
-
-    // console.log("DFASBNUIJ", returnJsonValue);
-     
-    // save to redis hSet cache
-    if(allowCache) {
-        await redisClient?.hSet(REDIS_KEY, REDIS_HSET_KEY, JSON.stringify(returnJsonValue));
-        // sadly we can not expire a child, this can be done in KeyDB (redis fork) but not standalone.
-        // so we expire the top level key (cache:query_token) every 24 hours
-        await redisClient?.expire(REDIS_KEY, 86400 * 3); // TODO: 3 days, we may be able to never expire need to check
-    }
+    returnJsonValue.tokenId = token_id;
+    // returnJsonValue.owner = response?.data?.data?.access?.owner; 
     return returnJsonValue;
-};
+}
 
 export const queryTokenOwner = async (client: CosmWasmClient, addr721Address: string, tokenId: string) => {
     // hget cache:query_token 10
@@ -122,7 +123,9 @@ export const queryTokenOwner = async (client: CosmWasmClient, addr721Address: st
         }
     }
 
-    const all_info_query = await client.queryContractSmart(addr721Address, {all_nft_info: { token_id: tokenId }});
+    const all_info_query = await client.queryContractSmart(addr721Address, {all_nft_info: { token_id: tokenId }})
+    .then((res) => { return res })
+    .catch((err) => { return undefined; });
     const returnOwner = all_info_query.access.owner;
 
     // Can be a link (http, ipfs), base64 encoded, or a JSON string
@@ -145,9 +148,15 @@ export const queryTokenOwner = async (client: CosmWasmClient, addr721Address: st
 export const queryAllTokensForContract = async (client: CosmWasmClient, addr721Address: string, start_after: number = 0, limit: number = 100) => {    
     // console.log("queryAllTokensForContract", addr721Address);
 
-    // TODO: why does the start_after & limit not work with contract in spec?
-    // const tokens_list_query = await client.queryContractSmart(addr721Address, { all_tokens: { start_after: start_after, limit: limit }});    
-    const tokens_list_query = await client.queryContractSmart(addr721Address, { all_tokens: { }});    
+    // TODO: why does the start_after & limit not work with contract in spec?    
+    const tokens_list_query = await client.queryContractSmart(addr721Address, { all_tokens: { }})
+    .then((res) => { return res })
+    .catch((err) => { return undefined; });
+
+    if(!tokens_list_query) {
+        return undefined; // or [] ?
+    }
+
     let tokens_list = tokens_list_query.tokens;    
 
     // sort tokens_list in order
@@ -210,7 +219,13 @@ export const queryContractInfo = async (client: CosmWasmClient, addr721_address:
     }
 
     
-    const contract_info = await client.queryContractSmart(addr721_address, { contract_info: {} }); // grab .data from this?
+    const contract_info = await client.queryContractSmart(addr721_address, { contract_info: {} })
+    .then((res) => { return res })
+    .catch((err) => { return undefined; });
+
+    if(!contract_info) {
+        return undefined;
+    }
     // console.log("queryContractInfo", contract_info);
 
     // let contract_info = response?.data?.data;
