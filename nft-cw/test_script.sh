@@ -11,7 +11,7 @@ export KEYALGO="secp256k1"
 export CRAFT_CHAIN_ID="craft-v5"
 # export CRAFTD_KEYRING_BACKEND="test"
 export CRAFTD_KEYRING_BACKEND="os"
-export CRAFTD_NODE="http://65.109.38.251:26657"
+export CRAFTD_NODE="https://craft-rpc.crafteconomy.io:443"
 # export CRAFTD_NODE="http://localhost:26657"
 export CRAFTD_COMMAND_ARGS="--gas-prices="0.025ucraft" -y --from $KEY"
 
@@ -26,21 +26,21 @@ export KEY_ADDR="craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7" # controls the re
 # TODO: Ensure minters = KEY_ADDR = DAO wallet (multisig ) for mainnet
 
 # NFT Contract (Change to metadata contract in future?)
-TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --broadcast-mode sync --output json | jq -r '.txhash') && echo $TX721
+TX721=$(craftd tx wasm store already_compiled/cw721_base.wasm --from $KEY -y --broadcast-mode sync --output json | jq -r '.txhash') && echo $TX721
 CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value') && echo $CODE_ID_721
 NFT721_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craftd-re","symbol": "cre","minter": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7"}' --label "craft-realestate" $CRAFTD_COMMAND_ARGS --broadcast-mode sync --output json -y --admin $KEY_ADDR | jq -r '.txhash') && echo $NFT721_TX_UPLOAD
 ADDR721=$(craftd query tx $NFT721_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "Real Estate ADDR 721: $ADDR721"
 # export ADDR721=craft14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scrtpgm
 
 # ADDR_test721 (testing images)
-TX721=$(craftd tx wasm store cw721_base.wasm --from $KEY -y --broadcast-mode sync --output json | jq -r '.txhash')
+TX721=$(craftd tx wasm store already_compiled/cw721_base.wasm --from $KEY -y --broadcast-mode sync --output json | jq -r '.txhash')
 CODE_ID_721=$(craftd query tx $TX721 --output json | jq -r '.logs[0].events[-1].attributes[0].value')
 IMAGE_TX_UPLOAD=$(craftd tx wasm instantiate "$CODE_ID_721" '{"name": "craft-images","symbol": "cimg","minter": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7"}' --label "craft-images" $CRAFTD_COMMAND_ARGS --broadcast-mode sync --output json -y --admin $KEY_ADDR | jq -r '.txhash') && echo $IMAGE_TX_UPLOAD
 ADDR721IMAGES=$(craftd query tx $IMAGE_TX_UPLOAD --output json | jq -r '.logs[0].events[0].attributes[0].value') && echo "ADDR 721 IMAGES (LINKS): $ADDR721IMAGES"
 # export ADDR721IMAGES=craft1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrs8k85qj
 
 # marketplace
-TXM=$(craftd tx wasm store craft_marketplace.wasm --from $KEY -y --broadcast-mode sync  --output json --broadcast-mode block | jq -r '.txhash')
+TXM=$(craftd tx wasm store already_compiled/craft_marketplace.wasm --from $KEY -y --broadcast-mode sync  --output json --broadcast-mode block | jq -r '.txhash')
 MARKET_CODE_ID=$(craftd query tx $TXM --output json | jq -r '.logs[0].events[-1].attributes[0].value') && echo $MARKET_CODE_ID
 # fee_receive_address should = DAO wallet / multisig
 MARKET_TX_UPLOAD=$(craftd tx wasm instantiate "$MARKET_CODE_ID" '{"name":"marketplace","denom":"ucraft","fee_receive_address":"craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7","platform_fee":"5"}' --label "marketplace" $CRAFTD_COMMAND_ARGS --admin $KEY_ADDR -y --broadcast-mode sync --output json | jq -r '.txhash')
@@ -168,4 +168,4 @@ craftd query wasm contract-state smart $ADDRM '{"get_contract_info": {}}' # 'dao
 craftd tx wasm execute $ADDRM '{"update_platform_fee":{"new_fee":"0"}}' --gas-prices="0.025ucraft" -y --from $KEY
 craftd tx wasm execute $ADDRM '{"force_withdraw_all":{}}' --gas-prices="0.025ucraft" -y --from $KEY
 
-craftd tx wasm migrate $ADDRM 13 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from $KEY
+craftd tx wasm migrate $ADDRM 16 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from dao

@@ -27,4 +27,7 @@ pub enum ContractError {
 
     #[error("You can't sell an NFT for less than 1craft (1_000_000ucraft)")]
     ListingPriceTooLow {},
+
+    #[error("The selling status is already set as {status:?}")]
+    SellingStatusAlreadySet { status: bool },
 }

@@ -38,11 +38,12 @@ pub fn instantiate(
         fee_receive_address: msg.fee_receive_address,
         platform_fee: msg.platform_fee,
         version: CONTRACT_VERSION.to_string(),
+        is_selling_allowed: true,
         contact: "reece@crafteconomy.io".to_string(),
     };    
 
     let sold: Vec<Offering> = vec![];
-    RECENTLY_SOLD.save(deps.storage, &sold)?;
+    RECENTLY_SOLD.save(deps.storage, &sold)?;    
 
     CONTRACT_INFO.save(deps.storage, &info)?;
     Ok(Response::new().add_attribute("action", "instantiate"))
@@ -67,6 +68,7 @@ pub fn execute(
             new_price,
         } => execute::update_listing_price(deps, info, offering_id, new_price),
 
+
         ExecuteMsg::UpdateFeeReceiverAddress { new_address } => {
             execute::update_fee_receiver_address(deps, info, new_address)
         }
@@ -74,6 +76,8 @@ pub fn execute(
             execute::update_platform_fee(deps, info, new_fee)
         }
         ExecuteMsg::ForceWithdrawAll {} => execute::force_withdraw_all(deps, info),
+
+        ExecuteMsg::ToggleAbilityToSell { status } => execute::toggle_selling_status(deps, info, status),
     }
 }
 
@@ -117,14 +121,14 @@ pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, C
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     // do any desired state migrations here...
-
     // update the version field in the ContractInfo
-    let mut config = CONTRACT_INFO.load(deps.storage)?;
+    let mut config: ContractInfoResponse = CONTRACT_INFO.load(deps.storage)?;    
     config.version = CONTRACT_VERSION.to_string();
+    config.is_selling_allowed = true;
     CONTRACT_INFO.save(deps.storage, &config)?;
 
     Ok(Response::default()
         .add_attribute("action", "migration")
         .add_attribute("version", CONTRACT_VERSION)
-        .add_attribute("contract", CONTRACT_NAME))
+        .add_attribute("contract", CONTRACT_NAME))    
 }

@@ -10,7 +10,7 @@ use cosmwasm_std::{
 };
 
 use crate::error::ContractError;
-use crate::msg::SellNft;
+use crate::msg::{SellNft};
 
 // receive funds & buy NFT if funds are enough
 pub fn buy_nft(
@@ -298,6 +298,30 @@ pub fn update_fee_receiver_address(
         .add_attribute("new_address", new_address)
         // since you have to run this as the fee receiver, you can use your own address as the old address, this is the old address
         .add_attribute("old_address", info.sender))
+}
+
+pub fn toggle_selling_status(
+    deps: DepsMut,
+    info: MessageInfo,
+    status: bool,
+) -> Result<Response, ContractError> {
+    check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
+
+    // update the contract status for selling
+    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
+
+    // check the selling_allowed status, if it == the status we are trying to set, return an error
+    if contract_info.is_selling_allowed == status {
+        return Err(ContractError::SellingStatusAlreadySet { status: status });
+    }
+
+    contract_info.is_selling_allowed = status;
+    CONTRACT_INFO.save(deps.storage, &contract_info)?;
+
+    Ok(Response::new()
+        .add_attribute("action", "toggle_selling_status")
+        .add_attribute("new_status", status.to_string())
+    ) 
 }
 
 pub fn update_platform_fee(

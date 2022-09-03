@@ -52,7 +52,8 @@ pub fn query_contract_info(deps: Deps) -> StdResult<ContractInfoResponse> {
         fee_receive_address: config.fee_receive_address,
         platform_fee: config.platform_fee,
         version: config.version,
-        contact: "reece@crafteconomy.io".to_string(),
+        is_selling_allowed: config.is_selling_allowed,
+        contact: "reece@crafteconomy.io".to_string(),        
     })
 }
 

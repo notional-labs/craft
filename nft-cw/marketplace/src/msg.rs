@@ -31,13 +31,15 @@ pub enum ExecuteMsg {
         new_price: Uint128,
     },
 
+    // DAO / Fee receiver only functions
     UpdateFeeReceiverAddress {
-        new_address: String,
+        new_address: String, // change to a new DAO wallet / admin of the contract
     },
     UpdatePlatformFee {
-        new_fee: u128,
+        new_fee: u128, // 1 = 1%, 2=2% etc...
     },
-    ForceWithdrawAll {}, // contract admin sends ALL NFTs back to original owners
+    ForceWithdrawAll {}, // contract admin sends ALL NFTs back to original owners (good for during upgrades)
+    ToggleAbilityToSell{ status: bool }, // contract admin can turn off selling, useful to do before force withdrawing all
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -47,7 +49,6 @@ pub struct SellNft {
 }
 
 // ======= RESPONSES =======
-// should these be in their own file??
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct ContractInfoResponse {
     pub name: String,
@@ -55,7 +56,8 @@ pub struct ContractInfoResponse {
     pub fee_receive_address: String,
     pub platform_fee: u128, // 5 = 5%.
     pub version: String,
-    pub contact: String,    
+    pub contact: String,   
+    pub is_selling_allowed: bool, 
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
