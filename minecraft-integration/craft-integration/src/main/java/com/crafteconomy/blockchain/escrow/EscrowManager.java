@@ -120,10 +120,20 @@ public class EscrowManager {
 
         final String description = "Escrow redeem via Escrow Manager (Craft Integration) for " + mostTheyCanRedeemUCraft/1_000_000 + "craft.";
 
+        final String wallet_addr = walletManager.getAddress(uuid);
+        if(wallet_addr == null) {
+            // get player & tell them why this failed
+            Player player = Bukkit.getPlayer(uuid);
+            if(player != null) {
+                player.sendMessage("You do not have a wallet address. Please sync it on the webapp.");
+            }
+            return ErrorTypes.NO_WALLET.code;
+        }
+
         // We make them sign a transaction for 1ucraft to confirm they are themselfs to redeem & launch the redeem process from the chain
         Tx tx = new Tx();
         tx.setFromUUID(uuid);
-        tx.setToUUID(uuid); // sending to themself
+        tx.setToWallet(wallet_addr);
         tx.setUCraftAmount(1);
         tx.setTxType(TransactionType.ESCROW_WITHDRAW);
         tx.setDescription(description + " from " + uuid.toString());                
@@ -137,9 +147,7 @@ public class EscrowManager {
                 Player player = Bukkit.getPlayer(uuid);
 
                 String messages = "";
-                if (status_type == FaucetTypes.SUCCESS) {
-                    
-
+                if (status_type == FaucetTypes.SUCCESS) {                
                     String amt = (mostTheyCanRedeemUCraft/1_000_000) + "craft";
                     messages = "&aYou have redeemed &f" + amt + "&a from your escrow account -> wallet.\n";
                     messages += "&f&oYour new escrow balance is: &f&n" + getCraftBalance(uuid);

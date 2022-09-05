@@ -296,15 +296,17 @@ public class BlockchainRequest {
         // IF we are in dev mode, don't try to send request to the blockchain, just do the transactions
         if(CraftBlockchainPlugin.getIfInDevMode() == false) {
             // we check how much ucraft is in the transaction data since its on chain, so get the ucraft from the Tx
-            try {
-                long balance = BlockchainRequest.getUCraftBalance(transaction.getToWallet()).get();
-                if (balance < transaction.getUCraftAmount()) {
-                    CraftBlockchainPlugin.log("Not enough balance for transaction");  
-                    return ErrorTypes.NOT_ENOUGH_TO_SEND;
-                }
-            } catch (Exception e) {
-                return ErrorTypes.QUERY_ERROR;
-            }            
+
+            // ISSUE: With this logic the user can not redeem from escrow. They just cant sign it anyways so is redundant.
+            // try {
+            //     long balance = BlockchainRequest.getUCraftBalance(transaction.getToWallet()).get();
+            //     if (balance < transaction.getUCraftAmount()) {
+            //         CraftBlockchainPlugin.log("Not enough balance for transaction");  
+            //         return ErrorTypes.NOT_ENOUGH_TO_SEND;
+            //     }
+            // } catch (Exception e) {
+            //     return ErrorTypes.QUERY_ERROR;
+            // }            
         } else {
             String name = Bukkit.getPlayer(transaction.getFromUUID()).getName().toUpperCase();
             Util.coloredBroadcast("&cDEV MODE IS ENABLED FOR THIS TRANSACTION "+name+" (config.yml, no blockchain request)");
