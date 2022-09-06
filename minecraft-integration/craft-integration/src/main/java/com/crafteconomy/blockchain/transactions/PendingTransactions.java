@@ -74,12 +74,41 @@ public class PendingTransactions {
 
                 jedis.keys(key).forEach(k -> {
                     jedis.unlink(k); // deletes the key
+                    pending.remove(TxID);
                     CraftBlockchainPlugin.log("[PendingTxs.java] Removed " + key + " from redis");
                 });  
             }
 
         } catch (Exception e) {
             CraftBlockchainPlugin.log("[PendingTxs.java] Failed to clear transactions. Make sure pool is open");
+        }
+    }
+
+
+    public static void clearTransactionsFromWallet(String wallet) {
+        if(wallet == null) return;
+        // modified clearUncompletedTransactionsFromRedis function
+        try (Jedis jedis = RedisManager.getInstance().getRedisConnection()) {
+            
+            // deletes redis keys which are in pending keys since we do not save to DB
+            for(UUID TxID : pending.keySet()) {
+
+                // String key = "tx_"+wallet+"_"+ TxID.toString();
+                String key = "tx_"+wallet+"_*";
+                // String value = jedis.get(key);                
+
+                jedis.keys(key).forEach(k -> {
+                    System.out.println("Deleting " + key + " -> " + k);
+                    jedis.unlink(k); // deletes the key
+
+                    if(pending.containsKey(TxID)) {
+                        pending.remove(TxID);
+                    }                    
+                    CraftBlockchainPlugin.log("[PendingTxs.java] Removed " + key + " from redis");
+                });                  
+            }            
+        } catch (Exception e) {
+            CraftBlockchainPlugin.log("[clearTransactionsFromWallet.java] " + e.getMessage());            
         }
     }
 

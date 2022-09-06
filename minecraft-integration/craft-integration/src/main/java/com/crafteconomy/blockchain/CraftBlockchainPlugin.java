@@ -9,6 +9,7 @@ import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowPay;
 import com.crafteconomy.blockchain.commands.escrow.subcommands.EscrowRedeem;
 import com.crafteconomy.blockchain.commands.wallet.WalletCMD;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletBalance;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletClearPending;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletFaucet;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletHelp;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletMyPendingTxs;
@@ -143,6 +144,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         cmd.registerCommand(new String[] {"fakesign"}, new WalletFakeSign());
         cmd.registerCommand(new String[] {"allpending", "allkeys"}, new WalletOutputPendingTxs());
         cmd.registerCommand(new String[] {"mypending", "pending", "mykeys", "keys"}, new WalletMyPendingTxs());
+        cmd.registerCommand(new String[] {"clearpending", "clear"}, new WalletClearPending());
 
         cmd.registerCommand(new String[] {"craft", "craftprice"}, new CraftTokenPrice());
 
@@ -157,7 +159,7 @@ public class CraftBlockchainPlugin extends JavaPlugin {
         escrowCMD.registerCommand("help", new EscrowHelp());
         escrowCMD.registerCommand(new String[] {"b", "bal", "balance"}, new EscrowBalance());
         escrowCMD.registerCommand(new String[] {"d", "dep", "deposit"}, new EscrowDeposit());
-        escrowCMD.registerCommand(new String[] {"r", "red", "redeem"}, new EscrowRedeem());
+        escrowCMD.registerCommand(new String[] {"r", "red", "redeem", "withdraw", "w"}, new EscrowRedeem());
         escrowCMD.registerCommand(new String[] {"p", "pay", "payment"}, new EscrowPay());
         // arg[0] commands which will tab complete
         escrowCMD.addTabComplete(new String[] {"balance","deposit","redeem","pay"});

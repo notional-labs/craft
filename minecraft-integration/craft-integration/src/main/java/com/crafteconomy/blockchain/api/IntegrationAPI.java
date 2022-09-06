@@ -185,6 +185,15 @@ public class IntegrationAPI {
     }
 
     /**
+     * Clears a users wallet from all pending transactions in game AND in the redis server.
+     * This used to be done via the RestAPI, but can now be done on a per user basis as it is more secure.
+     * @param wallet_address
+     */
+    public void clearUsersPendingTxs(String wallet_address) {
+        PendingTransactions.clearTransactionsFromWallet(wallet_address);
+    }
+
+    /**
      * Send Tokens to another player/wallet. Blockchain integration will run the callback
      * @param from_uuid     Who it is from
      * @param to_wallet     Who to send the CRAFT tokens too

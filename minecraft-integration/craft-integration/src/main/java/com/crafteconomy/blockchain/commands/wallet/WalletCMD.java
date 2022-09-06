@@ -27,7 +27,9 @@ public class WalletCMD implements CommandExecutor, TabCompleter {
             args = new String[]{ "help" };
         }
 
-        commands.get(args[0]).onCommand(sender, args);
+        // TODO: if user does not have wallet here, send them api.sendClickableKeplrInstallDocs ?
+
+        commands.get(args[0].toLowerCase()).onCommand(sender, args);
         return true;
     }
 
