@@ -79,6 +79,26 @@ public class RedisManager {
         }
     }
 
+    public void removePendingTxsOnStartupIfServerNameMatches(final String server_name) {
+        // loop through all keys in redis, get their values. Check if server_name.equalsIgnroeCase(servername)
+        // if so, remove the key
+        try (Jedis jedis = RedisManager.getInstance().getRedisConnection()) {
+            for (String key : jedis.keys("*")) {
+                if (key.startsWith("tx_")) {
+                    String value = jedis.get(key);
+                    if (value != null) {                        
+                        if(value.contains(CraftBlockchainPlugin.SERVER_NAME)) {
+                            CraftBlockchainPlugin.log("Deleting key since it is a straggler from last shutdown:" + value);                            
+                            jedis.unlink(key);
+                        }                        
+                    }
+                }
+            }
+        } catch (Exception e) {
+            CraftBlockchainPlugin.log("[RedisManager.java] Failed to clear stale transactions from last shutdown.");
+        }
+    }
+
    
     public void submitTxForSigning(String FROM_ADDRESS, UUID TxID, String JSON_Output, int TimeToLiveMinutes) {
         String TxLabel = "tx_" + FROM_ADDRESS + "_" + TxID.toString();

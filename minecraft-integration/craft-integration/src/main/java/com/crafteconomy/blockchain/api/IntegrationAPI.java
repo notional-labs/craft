@@ -30,6 +30,7 @@ public class IntegrationAPI {
     // singleton, sets wallet to the server wallet in config
     private final String SERVER_WALLET, ESCROW_WALLET_REST_API; 
     private final String webappAddress;
+    private final String SERVER_NAME;
     private IntegrationAPI() {    
         blockchainPlugin = CraftBlockchainPlugin.getInstance();
 
@@ -48,6 +49,8 @@ public class IntegrationAPI {
         if(webappAddress == null) {
             throw new IllegalStateException("SIGNING_WEBAPP_LINK is not set in config.yml");
         }
+
+        SERVER_NAME = CraftBlockchainPlugin.SERVER_NAME;
     }
 
     /**
@@ -56,6 +59,14 @@ public class IntegrationAPI {
      */
     public String getServerWallet() {
         return SERVER_WALLET;
+    }
+
+    /**
+     * Gets the name of the server, ex: economy-1 or hub-1 (depends on the name of the folder)
+     * @return String server_name (parent folder)
+     */
+    public String getServerName() {
+        return SERVER_NAME;
     }
 
     /**

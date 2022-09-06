@@ -75,9 +75,15 @@ public class CraftBlockchainPlugin extends JavaPlugin {
     private static Boolean DEV_MODE = false;
     private static Boolean DEBUGGING_MSGS = false;
 
+    public static String SERVER_NAME = "";
+
     @Override
     public void onEnable() {
         instance = this;
+
+        // get SERVER_NAME
+        String[] folder_location = Bukkit.getWorldContainer().getAbsolutePath().split("/");
+        SERVER_NAME = folder_location[folder_location.length - 2]; // gets the world folder, then back a directory = server name (ex: economy-1)              
 
         getConfig().options().copyDefaults(true);
         saveConfig();
@@ -109,6 +115,9 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
         DEBUGGING_MSGS = getConfig().getBoolean("DEBUGGING_MSGS");
         if(DEBUGGING_MSGS == null) DEBUGGING_MSGS = false;
+
+        // if the server crashed before cleaing all keys, we clear them here
+        RedisManager.getInstance().removePendingTxsOnStartupIfServerNameMatches(SERVER_NAME);
 
         if(DEV_MODE) {
             // async runnable every 4 minutes
