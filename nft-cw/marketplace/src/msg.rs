@@ -50,7 +50,7 @@ pub struct SellNft {
 
 // ======= RESPONSES =======
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
-pub struct ContractInfoResponse {
+pub struct ContractInformationResponse {
     pub name: String,
     pub denom: String,
     pub fee_receive_address: String,

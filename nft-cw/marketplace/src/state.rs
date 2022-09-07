@@ -1,4 +1,4 @@
-use crate::msg::ContractInfoResponse;
+use crate::msg::{ContractInformationResponse};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -34,7 +34,7 @@ pub const RECENTLY_SOLD: Item<Vec<Offering>> = Item::new("recently_sold");
 
 pub const OFFERINGS_COUNT: Item<u64> = Item::new("num_offerings");
 
-pub const CONTRACT_INFO: Item<ContractInfoResponse> = Item::new("marketplace_info");
+pub const CONTRACT_INFORMATION: Item<ContractInformationResponse> = Item::new("marketplace_information");
 
 // Offerings helpers
 pub fn num_offerings(storage: &dyn Storage) -> StdResult<u64> {

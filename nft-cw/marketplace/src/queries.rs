@@ -1,9 +1,9 @@
-use crate::msg::{OfferingsResponse, QueryOfferingsResult, CollectionDataResponse, RecentlySoldResponse}; // TODO: move these to msg
+use crate::msg::{OfferingsResponse, QueryOfferingsResult, CollectionDataResponse, RecentlySoldResponse, ContractInformationResponse}; // TODO: move these to msg
                                                            // use crate::msg::{PlatformFeeResponse, DenomResponse, DaoAddressResponse};
-use crate::msg::{CollectionVolumeResponse, ContractInfoResponse};
+use crate::msg::{CollectionVolumeResponse};
 use cosmwasm_std::{Deps, Order, StdResult, Uint128};
 
-use crate::state::{Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS, Volume, RECENTLY_SOLD};
+use crate::state::{Offering, COLLECTION_VOLUME, CONTRACT_INFORMATION, OFFERINGS, Volume, RECENTLY_SOLD};
 
 // gets all offerings
 // ============================== Query Handlers ==============================
@@ -44,17 +44,9 @@ fn parse_offering(item: StdResult<(String, Offering)>) -> StdResult<QueryOfferin
     })
 }
 
-pub fn query_contract_info(deps: Deps) -> StdResult<ContractInfoResponse> {
-    let config = CONTRACT_INFO.load(deps.storage)?;
-    Ok(ContractInfoResponse {
-        name: config.name,
-        denom: config.denom,
-        fee_receive_address: config.fee_receive_address,
-        platform_fee: config.platform_fee,
-        version: config.version,
-        is_selling_allowed: config.is_selling_allowed,
-        contact: "reece@crafteconomy.io".to_string(),        
-    })
+pub fn query_contract_info(deps: Deps) -> StdResult<ContractInformationResponse> {
+    let config = CONTRACT_INFORMATION.load(deps.storage)?;
+    Ok(config)
 }
 
 pub fn query_collection_volume(
@@ -62,7 +54,7 @@ pub fn query_collection_volume(
     contract_address: &str,
 ) -> StdResult<CollectionVolumeResponse> {
     let volume = COLLECTION_VOLUME.may_load(deps.storage, contract_address)?;
-    let denom = CONTRACT_INFO.load(deps.storage)?.denom; 
+    let denom = CONTRACT_INFORMATION.load(deps.storage)?.denom; 
 
     let v_default = Volume {
         collection_volume: Uint128::zero(),

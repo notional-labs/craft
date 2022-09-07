@@ -1,5 +1,5 @@
-import { Coin, coin, SigningStargateClient } from "@cosmjs/stargate";
-import { Secp256k1HdWallet } from "cosmwasm";
+import { Coin, coin, GasPrice, SigningStargateClient } from "@cosmjs/stargate";
+import { Secp256k1HdWallet, SigningCosmWasmClient } from "cosmwasm";
 import { rpcEndpoint } from "./0_test";
 
 export const getBalance = async (wallet_addr: any) => {
@@ -22,6 +22,13 @@ export const getAccountFromMnemonic = async (mnemonic: any, prefix: string = "co
         wallet: wallet,
         account: account,
     }
+}
+
+export const setupCWClient = async (mnemonic: string) => {
+    const gas = GasPrice.fromString("0.025ujunox");
+    const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'juno' });
+    const client = await SigningCosmWasmClient.connectWithSigner(rpcEndpoint, wallet, { gasPrice: gas });
+    return client;
 }
 
 export const getRandomAccount = async (prefix: string = "cosmos") => {

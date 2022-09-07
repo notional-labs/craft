@@ -168,4 +168,7 @@ craftd query wasm contract-state smart $ADDRM '{"get_contract_info": {}}' # 'dao
 craftd tx wasm execute $ADDRM '{"update_platform_fee":{"new_fee":"0"}}' --gas-prices="0.025ucraft" -y --from $KEY
 craftd tx wasm execute $ADDRM '{"force_withdraw_all":{}}' --gas-prices="0.025ucraft" -y --from $KEY
 
-craftd tx wasm migrate $ADDRM 16 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from dao
+# craftd tx wasm execute $ADDRM '{"toggle_ability_to_sell":{"status": false}}' --gas-prices="0.025ucraft" -y --from dao # doesnt work for now? why is it not updating state
+# craftd tx wasm execute $ADDRM '{"update_fee_receiver_address":{"new_address": "craft1n3a53mz55yfsa2t4wvdx3jycjkarpgkf07zwk7"}}' --gas-prices="0.025ucraft" -y --from dao # doesnt work for now
+
+craftd tx wasm migrate $ADDRM 29 '{"migrate_msg":{}}' --gas-prices="0.025ucraft" -y --from dao

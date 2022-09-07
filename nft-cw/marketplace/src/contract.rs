@@ -1,7 +1,7 @@
-use crate::msg::{ContractInfoResponse, MigrateMsg};
-use crate::state::{CONTRACT_INFO, RECENTLY_SOLD, Offering};
+use crate::msg::{MigrateMsg, ContractInformationResponse};
+use crate::state::{RECENTLY_SOLD, Offering, CONTRACT_INFORMATION};
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
 };
 
 use cw2::set_contract_version;
@@ -28,14 +28,12 @@ pub fn instantiate(
     // just ensures this is a valid DAO address
     deps.api.addr_validate(&msg.fee_receive_address)?;
 
-    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;    
 
-    // TODO: Add contract admin?
-
-    let info = ContractInfoResponse {
+    let info = ContractInformationResponse {
         name: msg.name,
         denom: msg.denom,
-        fee_receive_address: msg.fee_receive_address,
+        fee_receive_address: msg.fee_receive_address, // contract admin as well
         platform_fee: msg.platform_fee,
         version: CONTRACT_VERSION.to_string(),
         is_selling_allowed: true,
@@ -45,7 +43,7 @@ pub fn instantiate(
     let sold: Vec<Offering> = vec![];
     RECENTLY_SOLD.save(deps.storage, &sold)?;    
 
-    CONTRACT_INFO.save(deps.storage, &info)?;
+    CONTRACT_INFORMATION.save(deps.storage, &info)?;
     Ok(Response::new().add_attribute("action", "instantiate"))
 }
 
@@ -107,25 +105,29 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 #[entry_point]
 pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, ContractError> {
     // https://docs.cosmwasm.com/docs/1.0/smart-contracts/migration/
-    let ver = cw2::get_contract_version(deps.storage)?;
-    // ensure we are migrating from an allowed contract
-    if ver.contract != CONTRACT_NAME {
-        return Err(StdError::generic_err("Can only upgrade from same type").into());
-    }
-    // note: better to do proper semver compare, but string compare *usually* works
-    if ver.version >= (*CONTRACT_VERSION).to_string() {
-        return Err(StdError::generic_err("Cannot upgrade from a newer version").into());
-    }
+    // let ver = cw2::get_contract_version(deps.storage)?;
+    // // ensure we are migrating from an allowed contract
+    // if ver.contract != CONTRACT_NAME {
+    //     return Err(StdError::generic_err("Can only upgrade from same type").into());
+    // }
+    // // note: better to do proper semver compare, but string compare *usually* works
+    // if ver.version >= (*CONTRACT_VERSION).to_string() {
+    //     return Err(StdError::generic_err("Cannot upgrade from a newer version").into());
+    // }
 
     // set the new version
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     // do any desired state migrations here...
-    // update the version field in the ContractInfo
-    let mut config: ContractInfoResponse = CONTRACT_INFO.load(deps.storage)?;    
-    config.version = CONTRACT_VERSION.to_string();
-    config.is_selling_allowed = true;
-    CONTRACT_INFO.save(deps.storage, &config)?;
+    CONTRACT_INFORMATION.update(deps.storage, 
+        |mut config: ContractInformationResponse| -> StdResult<_> {
+            config.version = CONTRACT_VERSION.to_string();
+            // config.is_selling_allowed = true;
+            Ok(config)
+        }
+    )?;    
+
+    // TODO: update version of the contract config
 
     Ok(Response::default()
         .add_attribute("action", "migration")

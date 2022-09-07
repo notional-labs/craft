@@ -8,7 +8,7 @@ use cosmwasm_std::to_binary;
 
 use crate::error::ContractError;
 use crate::msg::{
-    CollectionVolumeResponse, ContractInfoResponse, ExecuteMsg, InitMsg, QueryMsg, SellNft,
+    CollectionVolumeResponse, ContractInformationResponse, ExecuteMsg, InitMsg, QueryMsg, SellNft,
 };
 use cw721::Cw721ReceiveMsg;
 
@@ -29,7 +29,7 @@ fn proper_initialization() {
     let mut deps = mock_dependencies();
     let (_, dao_address, platform_fee) = initialize_contract(deps.as_mut());
 
-    let res: ContractInfoResponse = from_binary(
+    let res: ContractInformationResponse = from_binary(
         &contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap(),
     )
     .unwrap();
@@ -68,7 +68,7 @@ fn test_update_fee_receiver_address() {
     let info = mock_info(&fee_receiver, &useless_coins);
     contract::execute(deps.as_mut(), mock_env(), info, msg).unwrap();
 
-    let res: ContractInfoResponse = from_binary(
+    let res: ContractInformationResponse = from_binary(
         &contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap(),
     )
     .unwrap();
@@ -109,7 +109,7 @@ fn test_update_platform_fee() {
     let info = mock_info(&fee_receiver, &useless_coins);
     contract::execute(deps.as_mut(), mock_env(), info, msg).unwrap();
 
-    let res: ContractInfoResponse = from_binary(
+    let res: ContractInformationResponse = from_binary(
         &contract::query(deps.as_ref(), mock_env(), QueryMsg::GetContractInfo {}).unwrap(),
     )
     .unwrap();

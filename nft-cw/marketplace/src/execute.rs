@@ -4,7 +4,7 @@ use cosmwasm_std::{BankMsg, Deps, StdResult, Uint128, WasmQuery};
 use cw721::{Cw721ExecuteMsg, Cw721ReceiveMsg, Cw721QueryMsg, NftInfoResponse};
 
 // use crate::package::{ContractInfoResponse};
-use crate::state::{increment_offerings, Offering, COLLECTION_VOLUME, CONTRACT_INFO, OFFERINGS, Volume, RECENTLY_SOLD};
+use crate::state::{increment_offerings, Offering, COLLECTION_VOLUME, CONTRACT_INFORMATION, OFFERINGS, Volume, RECENTLY_SOLD};
 use cosmwasm_std::{
     from_binary, to_binary, Coin, CosmosMsg, DepsMut, MessageInfo, Response, SubMsg, WasmMsg,
 };
@@ -29,7 +29,7 @@ pub fn buy_nft(
         return Err(ContractError::UnableToPurchaseMarketplaceItemYouSold {});
     }
 
-    let denom = CONTRACT_INFO.load(deps.storage)?.denom;
+    let denom = CONTRACT_INFORMATION.load(deps.storage)?.denom;
 
     // check for enough coins (>= the listing price with the same denom)
     assert_sent_exact_coin(
@@ -38,8 +38,8 @@ pub fn buy_nft(
     )?;
 
     // DAO TAX AND PAYMENTS
-    let tax_rate = CONTRACT_INFO.load(deps.storage)?.platform_fee; // 5 = 5%
-    let dao_addr = CONTRACT_INFO.load(deps.storage)?.fee_receive_address;
+    let tax_rate = CONTRACT_INFORMATION.load(deps.storage)?.platform_fee; // 5 = 5%
+    let dao_addr = CONTRACT_INFORMATION.load(deps.storage)?.fee_receive_address;
 
     // 1_000_000ucraft * 0.05 = 50000ucraft -> DAO [5 = 5/100 = 5%]
     let mut dao_tax_payment = (off.list_price.clone().u128() / 100) * &tax_rate;
@@ -166,7 +166,7 @@ pub fn receive_nft(
     let id = increment_offerings(deps.storage)?.to_string();
 
     // save Offering
-    let denom = CONTRACT_INFO.load(deps.storage)?.denom;
+    let denom = CONTRACT_INFORMATION.load(deps.storage)?.denom;
 
     // done here & in the update_listing_price method. Fixes issue with tax rates if price is too low
     if &msg.list_price < &Uint128::from(1_000_000u128) {
@@ -287,11 +287,11 @@ pub fn update_fee_receiver_address(
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
     // update the contract fee in memory
-    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
+    let mut contract_info = CONTRACT_INFORMATION.load(deps.storage)?;
     contract_info.fee_receive_address = new_address.clone();
 
     // save to state
-    CONTRACT_INFO.save(deps.storage, &contract_info)?;
+    CONTRACT_INFORMATION.save(deps.storage, &contract_info)?;
 
     Ok(Response::new()
         .add_attribute("action", "update_fee_receiver_address")
@@ -307,16 +307,18 @@ pub fn toggle_selling_status(
 ) -> Result<Response, ContractError> {
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
-    // update the contract status for selling
-    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
+    let current_sell_status: bool = CONTRACT_INFORMATION.load(deps.storage)?.is_selling_allowed;
 
-    // check the selling_allowed status, if it == the status we are trying to set, return an error
-    if contract_info.is_selling_allowed == status {
+    if current_sell_status == status {
         return Err(ContractError::SellingStatusAlreadySet { status: status });
     }
-
-    contract_info.is_selling_allowed = status;
-    CONTRACT_INFO.save(deps.storage, &contract_info)?;
+    
+    CONTRACT_INFORMATION.update(deps.storage, 
+        |mut contract_info| -> StdResult<_> {
+            contract_info.is_selling_allowed = status;
+            Ok(contract_info)
+        }
+    )?;    
 
     Ok(Response::new()
         .add_attribute("action", "toggle_selling_status")
@@ -331,7 +333,7 @@ pub fn update_platform_fee(
 ) -> Result<Response, ContractError> {
     check_executer_is_authorized_fee_receiver(deps.as_ref(), info.sender.to_string())?;
 
-    let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
+    let mut contract_info = CONTRACT_INFORMATION.load(deps.storage)?;
     let current_platform_fee = contract_info.platform_fee;
 
     if new_fee > 100 {
@@ -339,7 +341,7 @@ pub fn update_platform_fee(
     }
 
     contract_info.platform_fee = new_fee;
-    CONTRACT_INFO.save(deps.storage, &contract_info)?;
+    CONTRACT_INFORMATION.save(deps.storage, &contract_info)?;
 
     Ok(Response::new()
         .add_attribute("action", "update_fee_receiver_address")
@@ -384,7 +386,7 @@ fn check_executer_is_authorized_fee_receiver(
     deps: Deps,
     executer_address: String,
 ) -> Result<(), ContractError> {
-    let contract_info = CONTRACT_INFO.load(deps.storage)?;
+    let contract_info = CONTRACT_INFORMATION.load(deps.storage)?;
     if executer_address != contract_info.fee_receive_address {
         return Err(ContractError::Unauthorized {
             msg: "You are not the current fee_receiver".to_string(),
