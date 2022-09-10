@@ -101,8 +101,8 @@ public class Tx implements Serializable {
         this.toWallet = api.getServerEscrowRestApiWallet();
     }
 
-    public Double getTotalTaxAmount() {
-        return api.getTaxRate() * this.uCraftAmount;
+    public long getTotalTaxAmount() {
+        return (long) Math.round(api.getTaxRate() * this.uCraftAmount);
     }
 
     // IDEA:

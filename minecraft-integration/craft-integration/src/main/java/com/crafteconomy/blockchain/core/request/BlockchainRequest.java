@@ -311,24 +311,11 @@ public class BlockchainRequest {
             String name = Bukkit.getPlayer(transaction.getFromUUID()).getName().toUpperCase();
             Util.coloredBroadcast("&cDEV MODE IS ENABLED FOR THIS TRANSACTION "+name+" (config.yml, no blockchain request)");
         }
-
-
-        String from = transaction.getFromWallet();
-        String to = transaction.getToWallet();
-        long ucraftAmount = transaction.getUCraftAmount();
-        UUID TxID = transaction.getTxID();
-        String desc = transaction.getDescription();
-        TransactionType txType = transaction.getTxType(); // used for webapp
-
-        int redisMinuteTTL = transaction.getRedisMinuteTTL(); // minutes till this transaction should be: rm from redis, rm from pending, run the following:
-        // Consumer<UUID> runOnExpire = transaction.getConsumerOnExpire(); // check these are not null,
-        // BiConsumer<UUID, UUID> runOnBiExpire = transaction.getBiConsumerOnExpire();
-
         
         org.json.JSONObject jsonObject;
         try {
             // we submit the uCraft amount -> the redis for the webapp to sign it directly
-            String transactionJson = generateTxJSON(from, to, ucraftAmount, desc, txType);
+            String transactionJson = generateTxJSON(transaction);
             jsonObject = new org.json.JSONObject(transactionJson);            
        }catch (JSONException err) {
             CraftBlockchainPlugin.log("EBlockchainRequest.java Error " + err.toString());
@@ -337,7 +324,7 @@ public class BlockchainRequest {
        }
        
         pTxs.addPending(transaction.getTxID(), transaction);     
-        redisDB.submitTxForSigning(from, TxID, jsonObject.toString(), redisMinuteTTL);
+        redisDB.submitTxForSigning(transaction.getFromWallet(), transaction.getTxID(), jsonObject.toString(), transaction.getRedisMinuteTTL());
         
         return ErrorTypes.SUCCESS;
     }
@@ -352,13 +339,22 @@ public class BlockchainRequest {
      * @param DESCRIPTION
      * @return String JSON Amino (Readable by webapp)
      */
-    private static String generateTxJSON(String FROM, String TO, long UCRAFT_AMOUNT, String DESCRIPTION, TransactionType txType) {    
-        double taxAmount = UCRAFT_AMOUNT * blockchainPlugin.getTaxRate();        
+    // private static String generateTxJSON(String FROM, String TO, long UCRAFT_AMOUNT, String DESCRIPTION, TransactionType txType) {    
+    private static String generateTxJSON(Tx tx) {                    
         long now = Instant.now().getEpochSecond();
+
+        String FROM = tx.getFromWallet();
+        String TO = tx.getToWallet();
+        String DESCRIPTION = tx.getDescription();
+        TransactionType txType = tx.getTxType();
+
+        long UCRAFT_AMOUNT = tx.getUCraftAmount();
+        long ucraft_tax_amount = tx.getTotalTaxAmount();
+
         // EX: {"amount":"2","description":"Purchase Business License for 2","to_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p","tax":{"amount":0.1,"address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"},"denom":"uosmo","from_address":"osmo10r39fueph9fq7a6lgswu4zdsg8t3gxlqyhl56p"}
               
         // Tax is another message done via webapp to pay a fee to the DAO. So the total transaction cost = amount + tax.amount
-        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"server_name\": "+CraftBlockchainPlugin.SERVER_NAME+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+taxAmount+", \"address\": "+DAO_TAX_WALLET+"}}";
+        String json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"server_name\": "+CraftBlockchainPlugin.SERVER_NAME+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\",\"tax\": { \"amount\": "+ucraft_tax_amount+", \"address\": "+DAO_TAX_WALLET+"}}";
 
         // Escrow, Authentication types = No tax.
         switch (txType) {

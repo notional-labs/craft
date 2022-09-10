@@ -21,6 +21,7 @@ import com.crafteconomy.blockchain.commands.wallet.subcommands.WalletWebapp;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.CraftTokenPrice;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.WalletFakeSign;
 import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.WalletGenerateFakeTx;
+import com.crafteconomy.blockchain.commands.wallet.subcommands.debugging.WalletMultipleTxTesting;
 import com.crafteconomy.blockchain.listeners.JoinLeave;
 import com.crafteconomy.blockchain.storage.MongoDB;
 import com.crafteconomy.blockchain.storage.RedisManager;
@@ -150,6 +151,8 @@ public class CraftBlockchainPlugin extends JavaPlugin {
 
         // debug commands
         cmd.registerCommand(new String[] {"faketx"}, new WalletGenerateFakeTx());
+        cmd.registerCommand(new String[] {"genfaketxstest"}, new WalletMultipleTxTesting());
+        
         cmd.registerCommand(new String[] {"fakesign"}, new WalletFakeSign());
         cmd.registerCommand(new String[] {"allpending", "allkeys"}, new WalletOutputPendingTxs());
         cmd.registerCommand(new String[] {"mypending", "pending", "mykeys", "keys"}, new WalletMyPendingTxs());

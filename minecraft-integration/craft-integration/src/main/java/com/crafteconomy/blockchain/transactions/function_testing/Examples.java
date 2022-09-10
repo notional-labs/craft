@@ -22,6 +22,14 @@ public class Examples implements Serializable {
     }
 
     @SuppressWarnings("deprecation")
+    public static Consumer<UUID> TEST_youPaidXCraft() {
+        Consumer<UUID> testing_craft = (amount) -> {                           
+            Bukkit.broadcastMessage("[COMPLETE] You paid" + amount + " ucraft for this");                
+        };
+        return testing_craft;
+    }
+
+    @SuppressWarnings("deprecation")
     public static Consumer<UUID> purchaseSomeItem(String item) {
         Consumer<UUID> purchase = (uuid) -> {       
             
