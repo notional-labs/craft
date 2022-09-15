@@ -37,6 +37,7 @@ var (
 	ParamStoreKeyFeeAmount        = []byte("feeAmount")
 	ParamStoreKeyPrepareGas       = []byte("prepareGas")
 	ParamStoreKeyExecuteGas       = []byte("executeGas")
+	ParamStoreKeyChannel          = []byte("channel")
 )
 
 // ParamKeyTable for exp module.
@@ -69,6 +70,7 @@ func DefaultParams() Params {
 		FeeAmount:        sdk.NewCoin("uband", sdk.NewInt(100000)),
 		PrepareGas:       300000,
 		ExecuteGas:       300000,
+		Channel:          "channel-0",
 	}
 }
 
@@ -87,6 +89,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(ParamStoreKeyFeeAmount, &p.FeeAmount, validateFeeAmount),
 		paramtypes.NewParamSetPair(ParamStoreKeyPrepareGas, &p.PrepareGas, validatePrepareGas),
 		paramtypes.NewParamSetPair(ParamStoreKeyExecuteGas, &p.ExecuteGas, validateExecuteGas),
+		paramtypes.NewParamSetPair(ParamStoreKeyChannel, &p.Channel, validateChannel),
 	}
 }
 
@@ -192,5 +195,14 @@ func (p Params) Validate() error {
 	if err := validateMaxCoinMint(p.MaxCoinMint); err != nil {
 		return err
 	}
+	return nil
+}
+
+func validateChannel(i interface{}) error {
+	_, ok := i.(string)
+	if !ok {
+		return fmt.Errorf("invalid parameter channel type: %T", i)
+	}
+
 	return nil
 }
