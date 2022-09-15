@@ -286,7 +286,6 @@ func (k ExpKeeper) SendIbcOracle(ctx sdk.Context, fromAddress string, coin sdk.C
 	}
 
 	// feeAmount := sdk.NewCoin("uband", sdk.NewInt(100000)) // 0.1band to fee, need change by gov
-	param := types.DefaultParams()
 	packetData := oracletypes.NewOracleRequestPacketData(
 		fmt.Sprint(clientID),
 		oracletypes.OracleScriptID(param.ScriptId), // oracletypes.OracleScriptID(oraclePrams.ScriptID),
