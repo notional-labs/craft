@@ -97,12 +97,12 @@ func NewBurnExpCmd() *cobra.Command {
 
 func NewSpendIbcAssetForExpCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "spend [coins]",
+		Use:   "spend [coins] [channel]",
 		Short: `Spend IBC asset to receive exp and join the DAO.`,
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			srcPort := "ibc-exp"
-			srcChannel := "channel-0"
+			srcChannel := args[1]
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
