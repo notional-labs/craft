@@ -5,9 +5,8 @@ go 1.18
 require (
 	cosmossdk.io/math v1.0.0-beta.3
 	github.com/CosmWasm/wasmd v0.28.0
-	github.com/cosmos/cosmos-proto v1.0.0-alpha7.0.20220208174455-213b76899fac
 	github.com/cosmos/cosmos-sdk v0.46.1
-	github.com/cosmos/ibc-go/v5 v5.0.0-rc1
+	github.com/cosmos/ibc-go/v5 v5.0.0-rc2
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
@@ -50,6 +49,7 @@ require (
 	github.com/coinbase/rosetta-sdk-go v0.7.9 // indirect
 	github.com/confio/ics23/go v0.7.0 // indirect
 	github.com/cosmos/btcutil v1.0.4 // indirect
+	github.com/cosmos/cosmos-proto v1.0.0-alpha7.0.20220208174455-213b76899fac // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v0.19.1 // indirect
