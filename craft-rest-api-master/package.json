@@ -16,7 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@coingecko/cg-api-ts": "^0.0.51",
-    "@cosmjs/stargate": "^0.28.13",
+    "@cosmjs/stargate": "^0.29.0",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "cosmwasm": "^1.1.1",
