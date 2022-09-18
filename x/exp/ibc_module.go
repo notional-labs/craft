@@ -170,6 +170,13 @@ func (am IBCModule) OnRecvPacket(
 		return channeltypes.Acknowledgement{}
 	}
 
+	param := am.keeper.GetParams(ctx)
+	channel := param.Channel
+
+	if packet.DestinationChannel != channel {
+		return channeltypes.Acknowledgement{}
+	}
+
 	acknowledgement := channeltypes.NewResultAcknowledgement([]byte{byte(1)})
 
 	// handler IBC packet
