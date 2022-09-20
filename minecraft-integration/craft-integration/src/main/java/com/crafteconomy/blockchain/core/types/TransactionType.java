@@ -4,12 +4,12 @@ package com.crafteconomy.blockchain.core.types;
 public enum TransactionType {
     DEFAULT, // base transaction type unless otherwise set
     TRADE,
-    LIQUIDITY_POOL,
     COMPANY,
     LAND_CLAIM,
     REAL_ESTATE,
 
     ESCROW_DEPOSIT, // tax free transactions in BlockchainRequests.java
     ESCROW_WITHDRAW,
+    LIQUIDITY_POOL, // swaps
     AUTHENTICATION;
 }

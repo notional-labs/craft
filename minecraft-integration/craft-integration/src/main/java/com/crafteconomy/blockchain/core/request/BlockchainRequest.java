@@ -361,6 +361,7 @@ public class BlockchainRequest {
             case AUTHENTICATION:
             case ESCROW_DEPOSIT:
             case ESCROW_WITHDRAW:
+            case LIQUIDITY_POOL: // swaps
                 json = "{\"from_address\": "+FROM+",\"to_address\": "+TO+",\"description\": "+DESCRIPTION+",\"tx_type\": "+txType.toString()+",\"server_name\": "+CraftBlockchainPlugin.SERVER_NAME+",\"timestamp\": "+now+",\"amount\": \""+UCRAFT_AMOUNT+"\",\"denom\": \"ucraft\"}";
                 break;
             default:
